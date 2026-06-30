@@ -11,6 +11,28 @@ import { getImageUrl } from '@/features/user-detail-management/utils/image-url';
 import { cn } from '@/lib/utils';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
+const pageTitles: Record<string, string> = {
+  '/': 'Dashboard',
+  '/salesdesk/customers': 'Cari Yonetimi',
+  '/salesdesk/potentials': 'Potansiyel Cariler',
+  '/salesdesk/products': 'Stok / Urunler',
+  '/salesdesk/product-customers': 'Urun Bazli Musteriler',
+  '/salesdesk/quotes': 'Teklifler',
+  '/salesdesk/invoices': 'Faturalar',
+  '/salesdesk/invoices/new': 'Yeni Satis Faturasi',
+  '/salesdesk/sales-tracking': 'Satis Takip',
+  '/salesdesk/weekly-visits': 'Haftalik Ziyaretler',
+  '/salesdesk/open-items': 'Acik Maddeler',
+  '/salesdesk/weekly-plan': 'Haftalik Plan',
+  '/salesdesk/visit-forms': 'Ziyaret Formu',
+  '/salesdesk/assets': 'Demirbaslar',
+  '/salesdesk/recurring-payments': 'Standart Odemeler',
+  '/salesdesk/software-research': 'Yazilim Arastirma',
+  '/salesdesk/erp-news': 'ERP Haber Takibi',
+  '/salesdesk/gmail': 'Gmail',
+  '/salesdesk/settings': 'Ayarlar',
+};
+
 export function Navbar(): ReactElement {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -39,6 +61,7 @@ export function Navbar(): ReactElement {
 
   const displayName = user?.name || user?.email || 'Kullanıcı';
   const displayInitials = user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'MK';
+  const pageTitle = pageTitles[location.pathname] ?? 'Sales Desk';
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,23 +85,27 @@ export function Navbar(): ReactElement {
   return (
     <>
       <header className={cn(
-        "min-h-20 h-auto pt-[env(safe-area-inset-top)] px-4 sm:px-8 flex items-center justify-between border-b transition-all sticky top-0 z-40 backdrop-blur-xl",
-        "border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_82%,transparent)]"
+        "min-h-[76px] h-auto pt-[env(safe-area-inset-top)] px-4 sm:px-6 flex items-center justify-between border-b transition-all sticky top-0 z-40 backdrop-blur-xl",
+        "border-white/10 bg-[#080915]/82 shadow-[0_10px_26px_rgba(0,0,0,.18)]"
       )}>
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0 h-20">
+        <div className="flex h-[76px] min-w-0 flex-1 items-center gap-4">
           <button
             type="button"
             onClick={toggleSidebar}
             aria-pressed={isSidebarOpen}
-            className="p-2 shrink-0 rounded-xl text-slate-500 dark:text-slate-400 hover:text-[var(--crm-brand-primary)] hover:bg-[var(--crm-brand-soft)] hover:shadow-[0_0_15px_var(--crm-brand-shadow)] transition-all duration-300 focus:outline-none"
+            className="shrink-0 rounded-xl border border-white/8 bg-white/[.03] p-2 text-slate-400 transition-all duration-300 hover:bg-violet-500/10 hover:text-violet-300 focus:outline-none"
           >
-            <SidebarLeft01Icon size={24} />
+            <SidebarLeft01Icon size={21} />
           </button>
 
-          <div className="relative hidden md:block w-full max-md group">
-            <div className="absolute inset-0 rounded-2xl bg-[image:var(--crm-brand-gradient-soft)] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+          <div className="hidden min-w-[140px] border-l border-white/10 pl-5 md:block">
+            <p className="text-[11px] text-slate-500">Sales Desk</p>
+            <p className="mt-1 truncate text-base font-semibold text-slate-100">{pageTitle}</p>
+          </div>
+
+          <div className="group relative mx-auto hidden w-full max-w-[760px] md:block">
             <div className="relative flex items-center">
-              <SearchList01Icon className="absolute left-4 text-slate-400 w-5 h-5 group-focus-within:text-[var(--crm-brand-primary)] transition-colors duration-300" />
+              <SearchList01Icon className="absolute left-4 h-5 w-5 text-slate-500 transition-colors duration-300 group-focus-within:text-violet-300" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -86,10 +113,9 @@ export function Navbar(): ReactElement {
                 onChange={handleSearch}
                 placeholder={t('navbar.search_placeholder')}
                 className={cn(
-                  "w-full py-3 pl-12 pr-24 text-base md:text-sm font-medium transition-all duration-300 outline-none rounded-2xl border",
-                  "bg-slate-100/50 border-slate-200 text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[var(--crm-brand-ring)]",
-                  "dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-[var(--crm-app-panel-strong)]",
-                  "focus:ring-4 focus:ring-[var(--crm-brand-ring)] focus:shadow-[0_0_20px_var(--crm-brand-shadow)]"
+                  "h-12 w-full rounded-2xl border py-0 pl-12 pr-24 text-sm font-medium outline-none transition-all duration-300",
+                  "border-white/10 bg-[#0b0d19]/90 text-white placeholder:text-slate-500",
+                  "focus:border-violet-400/60 focus:bg-[#0f1222] focus:ring-4 focus:ring-violet-500/10"
                 )}
               />
               <div className="absolute right-3 flex items-center gap-2">
@@ -97,10 +123,10 @@ export function Navbar(): ReactElement {
                   <button
                     onClick={(e) => { e.preventDefault(); startListening(); }}
                     className={cn(
-                      "p-2 rounded-xl transition-all duration-300",
+                      "rounded-xl p-2 transition-all duration-300",
                       isListening
-                        ? "text-[var(--crm-brand-primary)] bg-[var(--crm-brand-soft)] animate-pulse shadow-[0_0_15px_var(--crm-brand-shadow)]"
-                        : "text-slate-400 hover:text-[var(--crm-brand-primary)] hover:bg-slate-100 dark:hover:bg-white/10"
+                        ? "animate-pulse bg-violet-500/10 text-violet-300"
+                        : "text-slate-400 hover:bg-white/10 hover:text-violet-300"
                     )}
                     title={t('common.voiceSearchTitle')}
                   >
@@ -138,28 +164,28 @@ export function Navbar(): ReactElement {
           )}
         </div>
 
-        <div className="flex items-center justify-end shrink-0 gap-3 sm:gap-8 h-20">
-          <div className="flex items-center gap-3 sm:gap-8 shrink-0">
-            <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full hover:bg-[var(--crm-brand-soft)] transition-colors cursor-pointer text-slate-500 hover:text-[var(--crm-brand-primary)] dark:text-slate-400 flex items-center justify-center group shrink-0">
+        <div className="flex h-[76px] shrink-0 items-center justify-end gap-3 sm:gap-5">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-5">
+            <div className="group relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-violet-500/10 hover:text-violet-300">
               <NotificationIcon />
             </div>
           </div>
 
-          {user && <div className="hidden xs:block h-6 w-px bg-slate-200 dark:bg-white/10 shrink-0" />}
+          {user && <div className="hidden h-8 w-px shrink-0 bg-white/10 xs:block" />}
 
           {user && (
-            <div onClick={() => setUserProfileModalOpen(true)} className="flex items-center gap-2 sm:gap-3 cursor-pointer group shrink-0">
+            <div onClick={() => setUserProfileModalOpen(true)} className="group flex shrink-0 cursor-pointer items-center gap-2 sm:gap-3">
               <div className="text-right hidden lg:block">
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 group-hover:text-[var(--crm-brand-primary)] transition-colors truncate max-w-[150px]">
+                <p className="max-w-[160px] truncate text-sm font-semibold text-slate-100 transition-colors group-hover:text-violet-300">
                   {displayName}
                 </p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
                   {t('roles.admin')}
                 </p>
               </div>
               <div className="relative shrink-0">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full p-[2px] bg-[image:var(--crm-brand-gradient)] group-hover:shadow-[0_0_20px_var(--crm-brand-shadow)] transition-all duration-300">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-[var(--crm-app-background)] flex items-center justify-center overflow-hidden border-2 border-white dark:border-[var(--crm-app-background)]">
+                <div className="h-11 w-11 rounded-full bg-[image:var(--crm-brand-gradient)] p-[2px] transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(115,103,255,.45)]">
+                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-[#080915] bg-[#090b16]">
                     {userDetail?.profilePictureUrl ? (
                       <img src={getImageUrl(userDetail.profilePictureUrl) || ''} alt={displayName} className="w-full h-full object-cover" />
                     ) : (

@@ -1,4 +1,4 @@
-import { type ReactElement, type ReactNode } from 'react';
+import { type ReactElement, type ReactNode, useState } from 'react';
 import {
   Bell,
   BriefcaseBusiness,
@@ -22,6 +22,8 @@ import {
   UsersRound,
 } from 'lucide-react';
 
+type IconComponent = typeof Home;
+
 type Variant = 'blue' | 'green' | 'pink' | 'yellow' | 'cyan' | 'red' | 'purple';
 
 interface Metric {
@@ -44,6 +46,9 @@ const variantText: Record<Variant, string> = {
   red: 'text-rose-300',
   purple: 'text-violet-300',
 };
+
+const surfaceClass = 'border border-white/10 bg-[#0d1222]/72 shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] backdrop-blur-xl';
+const fieldClass = 'h-11 rounded-lg border border-white/10 bg-[#070a13]/85 px-4 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10';
 
 const customers = [
   ['CR1001', 'ABC Teknoloji A.S.', 'Ahmet Yilmaz', '0212 555 0101', 'ahmet@abctek.com', 'Musteri', '₺45.000,00', 'Istanbul'],
@@ -138,13 +143,13 @@ function PageShell({
     <div className="space-y-5 text-slate-100">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/15 text-violet-300">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/15 text-violet-300 shadow-[0_0_28px_rgba(124,58,237,.18)]">
             <BriefcaseBusiness size={22} />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="h-7 w-1 rounded-full bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,.7)]" />
-              <h1 className="text-2xl font-semibold tracking-normal">{title}</h1>
+              <h1 className="text-2xl font-semibold tracking-normal text-slate-50">{title}</h1>
             </div>
             {subtitle && <p className="mt-1 text-sm text-slate-400">{subtitle}</p>}
           </div>
@@ -165,7 +170,7 @@ function MetricGrid({ metrics }: { metrics: Metric[] }): ReactElement {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric) => (
-        <div key={metric.label} className="rounded-xl border border-white/8 bg-slate-950/35 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,.04)]">
+        <div key={metric.label} className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
           <p className="text-xs font-semibold uppercase text-slate-500">{metric.label}</p>
           <p className={`mt-3 text-3xl font-semibold ${variantText[metric.variant ?? 'blue']}`}>{metric.value}</p>
           {metric.hint && <p className="mt-2 text-sm text-slate-400">{metric.hint}</p>}
@@ -177,10 +182,10 @@ function MetricGrid({ metrics }: { metrics: Metric[] }): ReactElement {
 
 function Toolbar({ search = 'Ara', extra }: { search?: string; extra?: React.ReactNode }): ReactElement {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-white/8 bg-slate-950/30 p-4 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0f1e]/70 p-4 md:flex-row md:items-center md:justify-between">
       <div className="relative w-full md:max-w-xs">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-        <input className="h-10 w-full rounded-lg border border-white/10 bg-black/30 pl-10 pr-3 text-sm text-slate-200 outline-none focus:border-violet-400" placeholder={search} />
+        <input className="h-10 w-full rounded-lg border border-white/10 bg-[#050711]/80 pl-10 pr-3 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10" placeholder={search} />
       </div>
       <div className="flex flex-wrap gap-2">
         {extra}
@@ -195,7 +200,7 @@ function Toolbar({ search = 'Ara', extra }: { search?: string; extra?: React.Rea
 
 function GhostButton({ icon, label }: { icon: ReactNode; label: string }): ReactElement {
   return (
-    <button className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-white/20 px-4 text-sm font-medium text-slate-200 hover:border-violet-400/60 hover:text-white">
+    <button className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-white/20 bg-white/[.02] px-4 text-sm font-medium text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white">
       {icon}
       {label}
     </button>
@@ -204,10 +209,10 @@ function GhostButton({ icon, label }: { icon: ReactNode; label: string }): React
 
 function DataTable({ columns, rows, dangerIndex }: { columns: string[]; rows: Row[]; dangerIndex?: number }): ReactElement {
   return (
-    <div className="overflow-hidden rounded-xl border border-white/8 bg-slate-950/35">
+    <div className="overflow-hidden rounded-xl border border-white/10 bg-[#070a13]/72">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[820px] text-left text-sm">
-          <thead className="border-b border-white/8 text-xs uppercase text-slate-300">
+          <thead className="border-b border-white/10 bg-white/[.025] text-xs uppercase text-slate-300">
             <tr>
               {columns.map((column) => (
                 <th key={column} className="px-4 py-4 font-semibold">{column}</th>
@@ -217,7 +222,7 @@ function DataTable({ columns, rows, dangerIndex }: { columns: string[]; rows: Ro
           </thead>
           <tbody>
             {rows.map((row, rowIndex) => (
-              <tr key={rowIndex} className={`border-b border-white/8 last:border-b-0 ${dangerIndex === rowIndex ? 'bg-rose-500/15 text-rose-100' : 'text-slate-300'}`}>
+              <tr key={rowIndex} className={`border-b border-white/10 last:border-b-0 ${dangerIndex === rowIndex ? 'bg-rose-500/16 text-rose-100' : 'text-slate-300 hover:bg-white/[.025]'}`}>
                 {columns.map((column, columnIndex) => (
                   <td key={column} className={`px-4 py-3 ${columnIndex === 1 ? 'font-semibold text-slate-100' : ''}`}>
                     {renderCell(row[column])}
@@ -261,6 +266,60 @@ function rows(source: string[][], columns: string[]): Row[] {
   return source.map((item) => Object.fromEntries(columns.map((column, index) => [column, item[index]])));
 }
 
+function QuickActionsPanel(): ReactElement {
+  const groups: Array<{ title: string; items: Array<{ label: string; icon: IconComponent; tone: string }> }> = [
+    {
+      title: 'Musteriler',
+      items: [
+        { label: 'Musteri Yonetimi', icon: UsersRound, tone: 'text-cyan-300' },
+        { label: 'Potansiyel Cariler', icon: Sparkles, tone: 'text-pink-300' },
+      ],
+    },
+    {
+      title: 'Satis Hunisi',
+      items: [
+        { label: 'Yeni Teklif Olustur', icon: Plus, tone: 'text-violet-300' },
+        { label: 'Teklif Listesi', icon: FileText, tone: 'text-violet-300' },
+        { label: 'Yeni Fatura Olustur', icon: CreditCard, tone: 'text-pink-300' },
+        { label: 'Satis Takip', icon: Columns3, tone: 'text-emerald-300' },
+      ],
+    },
+    {
+      title: 'Planlama',
+      items: [
+        { label: 'Haftalik Ziyaretler', icon: CalendarDays, tone: 'text-cyan-300' },
+        { label: 'Acik Maddeler', icon: FileText, tone: 'text-violet-300' },
+      ],
+    },
+  ];
+
+  return (
+    <div className="absolute right-0 top-14 z-30 w-[310px] rounded-2xl border border-white/10 bg-[#090c18]/95 p-4 shadow-[0_24px_70px_rgba(0,0,0,.45)] backdrop-blur-xl">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-base font-semibold text-white">Hizli Islemler</h2>
+        <span className="text-lg leading-none text-slate-500">x</span>
+      </div>
+      <div className="space-y-4">
+        {groups.map((group, groupIndex) => (
+          <div key={group.title} className={groupIndex > 0 ? 'border-t border-white/10 pt-4' : ''}>
+            <p className="mb-2 text-xs font-bold uppercase text-slate-600">{group.title}</p>
+            <div className="space-y-2">
+              {group.items.map(({ label, icon: Icon, tone }) => (
+                <button key={label} className="flex w-full items-center gap-3 rounded-lg p-2 text-left text-sm text-slate-200 transition hover:bg-white/[.04]">
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/14 ${tone}`}>
+                    <Icon size={17} />
+                  </span>
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ListPage({
   title,
   subtitle,
@@ -293,6 +352,8 @@ function ListPage({
 }
 
 export function SalesDeskDashboardPage(): ReactElement {
+  const [quickOpen, setQuickOpen] = useState(false);
+
   return (
     <div className="space-y-6 text-slate-100">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -301,12 +362,13 @@ export function SalesDeskDashboardPage(): ReactElement {
           <p className="mt-4 flex items-center gap-2 text-slate-400"><CalendarDays size={16} /> 30.06.2026</p>
           <p className="mt-6 text-slate-500">Dashboard verileri yuklenemedi.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="relative flex gap-3">
           <GhostButton icon={<Edit3 size={15} />} label="Duzenle" />
-          <button className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white"><Sparkles size={16} /> Hizli Islemler</button>
+          <button onClick={() => setQuickOpen((value) => !value)} className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white shadow-lg shadow-violet-950/50 hover:bg-violet-400"><Sparkles size={16} /> Hizli Islemler</button>
+          {quickOpen && <QuickActionsPanel />}
         </div>
       </div>
-      <div className="max-w-xl rounded-xl border border-white/8 bg-slate-950/35 p-5">
+      <div className={`max-w-xl rounded-xl p-5 ${surfaceClass}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CalendarDays className="text-violet-300" size={22} />
@@ -339,12 +401,12 @@ export function SalesDeskProductCustomersPage(): ReactElement {
     <PageShell title="Urun Bazli Musteriler" subtitle="Urun secin; o urunle iliskili carileri ve potansiyel musterileri listeleyin">
       <MetricGrid metrics={[{ label: 'Urun', value: '9', hint: 'Stok karti' }, { label: 'Cari', value: '1', hint: 'Secili urunde', variant: 'green' }, { label: 'Potansiyel', value: '0', hint: 'Aday musteri', variant: 'pink' }]} />
       <div className="grid gap-4 xl:grid-cols-[380px_1fr]">
-        <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4">
+        <section className={`rounded-xl p-4 ${surfaceClass}`}>
           <h2 className="text-lg font-semibold">Stok Listesi</h2>
           <div className="mt-3"><Toolbar search="Stok ara..." extra={<GhostButton icon={<RefreshCw size={15} />} label="Yenile" />} /></div>
           <DataTable columns={['KOD', 'URUN', 'KATEGORI']} rows={rows(products.slice(0, 6), ['KOD', 'URUN', 'KATEGORI'])} />
         </section>
-        <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4">
+        <section className={`rounded-xl p-4 ${surfaceClass}`}>
           <h2 className="text-lg font-semibold">Bagli Cariler</h2>
           <p className="mt-1 text-sm text-slate-400">Bulut Yedekleme 1TB: 1 cari, 0 potansiyel musteri.</p>
           <div className="mt-4"><DataTable columns={['KOD', 'CARI ADI', 'YETKILI', 'TELEFON', 'IL', 'ILCE']} rows={rows([['CR1005', 'Global Dijital A.S.', 'Zeynep Arslan', '0242 555 05...', 'Antalya', 'Muratpasa']], ['KOD', 'CARI ADI', 'YETKILI', 'TELEFON', 'IL', 'ILCE'])} /></div>
@@ -453,7 +515,7 @@ export function SalesDeskSoftwareResearchPage(): ReactElement {
       <MetricGrid metrics={[{ label: 'Toplam', value: '6' }, { label: 'Bekleyen', value: '0' }, { label: 'Bulunan', value: '0', variant: 'green' }, { label: 'Supheli', value: '0', variant: 'pink' }, { label: 'Guclu', value: '0', hint: 'Skor 80+', variant: 'yellow' }]} />
       <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4">
         <h2 className="text-lg font-semibold">Netsis Arastirmasi</h2>
-        <div className="mt-3 grid gap-3 md:grid-cols-[1fr_220px_220px]"><input className="h-11 rounded-lg border border-white/10 bg-black/30 px-3" placeholder="Anahtar Kelimeler" /><select className="h-11 rounded-lg border border-white/10 bg-black/30 px-3"><option>Skor 45+</option></select><select className="h-11 rounded-lg border border-white/10 bg-black/30 px-3"><option>Hepsi</option></select></div>
+        <div className="mt-3 grid gap-3 md:grid-cols-[1fr_220px_220px]"><input className={fieldClass} placeholder="Anahtar Kelimeler" /><select className={fieldClass}><option>Skor 45+</option></select><select className={fieldClass}><option>Hepsi</option></select></div>
       </section>
       <div className="grid gap-4 xl:grid-cols-2">
         <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4"><h2 className="text-lg font-semibold">Aday Kayitlari</h2><DataTable columns={['KOD', 'FIRMA', 'DURUM', 'SKOR', 'SON']} rows={rows([['POT001', 'Anadolu Lojistik Ltd.', 'Bulunamadi', '0', '30.06.2026'], ['PTC00...', 'deneme', 'Bulunamadi', '0', '30.06.2026']], ['KOD', 'FIRMA', 'DURUM', 'SKOR', 'SON'])} /></section>
@@ -486,7 +548,7 @@ export function SalesDeskSettingsPage(): ReactElement {
     <PageShell title="Sistem Ayarlari" subtitle="Gmail baglantisi ve kullanici yonetimi">
       <MetricGrid metrics={[{ label: 'Toplam Kullanici', value: '2' }, { label: 'Aktif', value: '2', variant: 'green' }, { label: 'Listelenen', value: '2' }, { label: 'Gmail', value: 'Bagli', hint: 'efe.alagoz@v3rii.com', variant: 'yellow' }]} />
       <div className="grid gap-4 xl:grid-cols-2">
-        <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5"><h2 className="text-lg font-semibold">Gmail Baglantisi</h2><label className="mt-4 flex gap-2 text-sm"><input type="checkbox" defaultChecked /> Gmail baglantisini etkinlestir</label><input className="mt-4 h-12 w-full rounded-lg border border-white/10 bg-black/30 px-4" defaultValue="efe.alagoz@v3rii.com" /><input className="mt-4 h-12 w-full rounded-lg border border-white/10 bg-black/30 px-4" defaultValue="bmbx icef wtub ppio" /><button className="mt-4 rounded-lg bg-violet-500 px-6 py-3 font-semibold">Kaydet</button></section>
+        <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5"><h2 className="text-lg font-semibold">Gmail Baglantisi</h2><label className="mt-4 flex gap-2 text-sm"><input type="checkbox" defaultChecked /> Gmail baglantisini etkinlestir</label><input className={`mt-4 w-full ${fieldClass}`} defaultValue="efe.alagoz@v3rii.com" /><input className={`mt-4 w-full ${fieldClass}`} defaultValue="bmbx icef wtub ppio" /><button className="mt-4 rounded-lg bg-violet-500 px-6 py-3 font-semibold">Kaydet</button></section>
         <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5"><h2 className="text-lg font-semibold">Uygulama Bilgileri</h2><div className="mt-4 rounded-lg bg-black/30 p-4 text-sm text-slate-300"><p>Sirket: <b>V3RII TEKNOLOJI</b></p><p>Surum: 1.0.0</p><p>Veritabani: V3RII_SALES_DESK @ localhost</p></div><p className="mt-5 text-sm text-slate-400">Kullanici eklemek icin listedeki Yeni Kullanici butonunu kullanin.</p></section>
       </div>
     </PageShell>
@@ -500,10 +562,10 @@ export function SalesDeskInvoiceCreatePage(): ReactElement {
       <div className="grid gap-5 xl:grid-cols-[1fr_340px]">
         <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5">
           <h2 className="font-semibold">1 Baslik Bilgileri</h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-2"><input className="h-12 rounded-lg border border-white/10 bg-black/30 px-4" placeholder="Musteri" /><input className="h-12 rounded-lg border border-white/10 bg-black/30 px-4" defaultValue="Sistem Yoneticisi" /></div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2"><input className={fieldClass} placeholder="Musteri" /><input className={fieldClass} defaultValue="Sistem Yoneticisi" /></div>
           <div className="mt-5 grid gap-4 md:grid-cols-3"><Panel title="Tip & Tarihler" lines={['Fatura No: FTR2026000009', 'Fatura Tarihi: 30.06.2026', 'Vade Tarihi: 30.07.2026', 'Durum: Kesilecek']} /><Panel title="Tekliften Aktar" lines={['Onayli Teklif: -', 'Teklif Kalemlerini Yukle']} /><Panel title="Belge Aciklamasi" lines={['Notlar']} /></div>
         </section>
-        <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5"><h2 className="font-semibold">3 Ozet</h2><input className="mt-4 h-12 w-full rounded-lg border border-white/10 bg-black/30 px-4" defaultValue="0" /><input className="mt-4 h-12 w-full rounded-lg border border-white/10 bg-black/30 px-4" defaultValue="0" /><div className="mt-8 border-t border-white/10 pt-5 text-sm text-slate-400"><p>Ara Toplam <b className="float-right text-white">₺0,00</b></p><p className="mt-4">Toplam KDV <b className="float-right text-white">₺0,00</b></p><p className="mt-8 text-3xl font-semibold text-blue-300">₺0,00</p></div></section>
+        <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5"><h2 className="font-semibold">3 Ozet</h2><input className={`mt-4 w-full ${fieldClass}`} defaultValue="0" /><input className={`mt-4 w-full ${fieldClass}`} defaultValue="0" /><div className="mt-8 border-t border-white/10 pt-5 text-sm text-slate-400"><p>Ara Toplam <b className="float-right text-white">₺0,00</b></p><p className="mt-4">Toplam KDV <b className="float-right text-white">₺0,00</b></p><p className="mt-8 text-3xl font-semibold text-blue-300">₺0,00</p></div></section>
       </div>
     </PageShell>
   );

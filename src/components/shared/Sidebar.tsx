@@ -79,8 +79,8 @@ function SubMenuComponent({ item, pathname, searchQuery }: { item: NavItem; path
         className={cn(
           "flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors text-sm group select-none relative",
           isOpen || hasActiveChild
-            ? "text-slate-900 dark:text-white font-medium" 
-            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5"
+            ? "text-white font-medium"
+            : "text-slate-400 hover:bg-white/[.04] hover:text-white"
         )}
       >
         <span className="whitespace-normal leading-tight crm-text-start wrap-break-word crm-pe-2">{item.title}</span>
@@ -90,7 +90,7 @@ function SubMenuComponent({ item, pathname, searchQuery }: { item: NavItem; path
       </button>
 
       {isOpen && (
-        <div className="crm-ms-2 mt-1 space-y-1 crm-border-start border-slate-200 dark:border-white/10 crm-ps-2">
+        <div className="crm-ms-2 mt-1 space-y-1 crm-border-start border-white/10 crm-ps-2">
           {item.children?.map((child) => {
              const isSubLinkActive = pathname === child.href;
              return (
@@ -100,8 +100,8 @@ function SubMenuComponent({ item, pathname, searchQuery }: { item: NavItem; path
                  className={cn(
                    "flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-xs w-full relative",
                    isSubLinkActive
-                     ? 'bg-slate-100 text-slate-900 font-medium dark:bg-white/10 dark:text-white'
-                     : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5'
+                     ? 'bg-violet-500/12 text-violet-200 font-medium'
+                     : 'text-slate-400 hover:bg-white/[.04] hover:text-white'
                  )}
                  onClick={() => {
                    
@@ -209,7 +209,7 @@ function NavItemComponent({
             type="button"
             className={cn(
                 "relative flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-colors cursor-pointer select-none crm-text-start group",
-                visualActive ? 'bg-[var(--crm-brand-soft)]' : 'hover:bg-slate-100 dark:hover:bg-white/5',
+                visualActive ? 'bg-violet-500/12' : 'hover:bg-white/[.04]',
                 !isSidebarOpen && "justify-center px-0 gap-0",
                 SIDEBAR_TRANSITION
             )}
@@ -224,7 +224,7 @@ function NavItemComponent({
           {item.icon && (
             <div className={cn(
                 "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200",
-                visualActive ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)]' : 'bg-white border border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-none dark:text-slate-400'
+                visualActive ? 'bg-violet-500/18 text-violet-200' : 'bg-slate-800/80 border border-white/8 text-slate-400'
             )}>
               {item.icon}
             </div>
@@ -234,7 +234,7 @@ function NavItemComponent({
             className={cn(
               SIDEBAR_LABEL_TRANSITION,
               "flex-1 min-w-0 text-sm font-medium leading-tight crm-text-start crm-pe-2 whitespace-nowrap text-ellipsis",
-              visualActive ? 'text-[var(--crm-brand-primary)] font-semibold' : 'text-slate-600 dark:text-slate-300',
+              visualActive ? 'text-violet-200 font-semibold' : 'text-slate-300',
               isSidebarOpen ? 'opacity-100 max-w-[12rem]' : 'opacity-0 max-w-0 w-0 pointer-events-none'
             )}
           >
@@ -244,7 +244,7 @@ function NavItemComponent({
             aria-hidden={!isSidebarOpen}
             className={cn(
               SIDEBAR_LABEL_TRANSITION,
-              "text-slate-400 dark:text-slate-500 shrink-0",
+              "text-slate-500 shrink-0",
               isSidebarOpen ? 'opacity-100 w-4' : 'opacity-0 w-0 pointer-events-none'
             )}
           >
@@ -253,7 +253,7 @@ function NavItemComponent({
         </button>
 
         {isExpanded && isSidebarOpen && (
-          <div className="crm-ms-12 mt-2 space-y-1 crm-border-start border-slate-200 dark:border-white/10 crm-ps-2">
+          <div className="crm-ms-12 mt-2 space-y-1 crm-border-start border-white/10 crm-ps-2">
             {item.children?.map((child) => (
               child.children && child.children.length > 0 
                 ? <SubMenuComponent key={child.title} item={child} pathname={location.pathname} searchQuery={searchQuery} />
@@ -262,7 +262,7 @@ function NavItemComponent({
                     to={child.href || '#'}
                     className={cn(
                       "flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-sm w-full relative",
-                      location.pathname === child.href ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5'
+                      location.pathname === child.href ? 'bg-violet-500/12 text-violet-200 font-semibold' : 'text-slate-400 hover:bg-white/[.04] hover:text-white'
                     )}
                     onClick={() => { 
                  
@@ -273,7 +273,7 @@ function NavItemComponent({
                     }}
                   >
                     <span className="whitespace-normal leading-tight crm-text-start wrap-break-word">{child.title}</span>
-                    {location.pathname === child.href && <span className="w-2 h-2 rounded-full bg-[var(--crm-brand-primary)] shrink-0 crm-ms-2" />}
+                    {location.pathname === child.href && <span className="w-2 h-2 rounded-full bg-violet-400 shrink-0 crm-ms-2" />}
                   </Link>
             ))}
           </div>
@@ -288,7 +288,7 @@ function NavItemComponent({
           to={item.href || '#'} 
           className={cn(
             "relative flex items-center gap-3 rounded-xl px-3 py-2 transition-all group",
-            isActive ? 'bg-[var(--crm-brand-soft)]' : 'hover:bg-slate-100 dark:hover:bg-white/5',
+            isActive ? 'bg-violet-500/12' : 'hover:bg-white/[.04]',
             !isSidebarOpen && "justify-center px-0 gap-0",
             SIDEBAR_TRANSITION
           )}
@@ -302,7 +302,7 @@ function NavItemComponent({
           }}
         >
             {item.icon && (
-                <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200", isActive ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)]' : 'bg-white border border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-none dark:text-slate-400')}>
+                <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200", isActive ? 'bg-violet-500/18 text-violet-200' : 'bg-slate-800/80 border border-white/8 text-slate-400')}>
                     {item.icon}
                 </div>
             )}
@@ -311,7 +311,7 @@ function NavItemComponent({
               className={cn(
                 SIDEBAR_LABEL_TRANSITION,
                 "flex-1 min-w-0 text-sm font-medium leading-tight crm-text-start crm-pe-2 whitespace-nowrap text-ellipsis",
-                isActive ? 'text-[var(--crm-brand-primary)] font-semibold' : 'text-slate-600 dark:text-slate-300',
+                isActive ? 'text-violet-200 font-semibold' : 'text-slate-300',
                 isSidebarOpen ? 'opacity-100 max-w-[12rem]' : 'opacity-0 max-w-0 w-0 pointer-events-none'
               )}
             >
@@ -327,7 +327,7 @@ function NavItemComponent({
             />
             <div
               className={cn(
-                "app-sidebar-active-marker absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-[image:var(--crm-brand-gradient)] transition-opacity duration-200",
+                "app-sidebar-active-marker absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full bg-violet-400 transition-opacity duration-200",
                 isActive && isSidebarOpen ? 'opacity-100' : 'opacity-0'
               )}
             />
@@ -426,9 +426,9 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
       
       <aside className={cn(
         'app-sidebar-panel fixed lg:sticky top-0 min-h-dvh h-[100dvh] z-50 flex flex-col shrink-0 overflow-hidden will-change-[width,transform]',
-        'bg-[color-mix(in_srgb,var(--crm-app-panel)_82%,transparent)] backdrop-blur-xl',
-        'border-r border-[var(--crm-app-border)]',
-        'shadow-[2px_0_12px_-4px_rgba(15,23,42,0.08)] dark:shadow-[2px_0_16px_-4px_rgba(0,0,0,0.45)]',
+        'bg-[#080915]/95 backdrop-blur-xl',
+        'border-r border-white/10',
+        'shadow-[8px_0_34px_rgba(0,0,0,.28)]',
         'pb-[env(safe-area-inset-bottom)]',
         'transition-[width,transform] duration-[260ms] motion-reduce:transition-none',
         SIDEBAR_EASE,
@@ -438,7 +438,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
       >
         
         <div className={cn(
-          "h-24 flex items-center justify-center border-b border-slate-200 dark:border-white/5 shrink-0 relative overflow-hidden",
+          "h-[104px] flex items-center justify-center border-b border-white/10 shrink-0 relative overflow-hidden",
           "pt-[env(safe-area-inset-top)] transition-[padding] duration-[260ms]",
           SIDEBAR_EASE,
           isSidebarOpen ? "px-4" : "px-0"
@@ -456,9 +456,9 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
               onDoubleClick={handleLogoDoubleClick}
               className="flex justify-center flex-1 cursor-pointer select-none rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--crm-brand-ring)]"
             >
-              <img src={VERII_LOGO_URL} alt="Logo" className="h-32 object-contain pointer-events-none" />
+              <img src={VERII_LOGO_URL} alt="V3RII Sales Desk" className="h-24 object-contain pointer-events-none" />
             </button>
-            <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:text-red-500 rounded-lg">
+            <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:text-red-400 rounded-lg">
               <X size={24} />
             </button>
             <div className="w-8 hidden lg:block" />
@@ -472,12 +472,12 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
               isSidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
             )}
           >
-            <img src={LOGO_URL} alt="V3" className="w-full h-full object-contain scale-150 pointer-events-none" />
+            <img src={LOGO_URL} alt="V3" className="w-full h-full object-contain scale-125 pointer-events-none" />
           </button>
         </div>
 
         <nav className={cn(
-          "flex-1 min-h-0 pt-6 pb-6 px-3 space-y-2 overscroll-contain touch-pan-y",
+          "flex-1 min-h-0 pt-5 pb-12 px-3 space-y-1 overscroll-contain touch-pan-y",
           isSidebarOpen ? "overflow-y-auto custom-scrollbar" : "overflow-hidden"
         )}>
           {items.map((item, idx) => (
