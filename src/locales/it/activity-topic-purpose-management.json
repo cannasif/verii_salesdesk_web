@@ -1,0 +1,82 @@
+{
+  "menu": "Gestione degli Argomenti di Interesse",
+  "description": "Gestire e modificare gli argomenti di interesse",
+  "addButton": "Aggiungi Nuovo Argomento",
+  "loading": "Caricamento...",
+  "noData": "Nessun dato",
+  "actions": "Azioni",
+  "edit": "Modifica",
+  "deleteButton": "Elimina",
+  "cancel": "Annulla",
+  "save": "Salva",
+  "saving": "Salvataggio...",
+  "previous": "Precedente",
+  "next": "Successivo",
+  "advancedFilter": {
+    "columnName": "Nome Argomento",
+    "columnDescription": "Descrizione",
+    "columnCreatedBy": "Creato Da"
+  },
+  "activityType": {
+    "form": {
+      "addTitle": "Aggiungi Nuovo Argomento",
+      "editTitle": "Modifica Argomento",
+      "addDescription": "Inserisci le nuove informazioni sull'argomento",
+      "editDescription": "Modifica le informazioni sull'argomento",
+      "name": "Nome Argomento",
+      "namePlaceholder": "Inserisci il nome dell'argomento",
+      "nameRequired": "Il nome dell'argomento è obbligatororio",
+      "nameMaxLength": "Il nome dell'argomento può contenere al massimo 100 caratteri",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Inserisci descrizione (facoltativo)",
+      "descriptionMaxLength": "La descrizione può contenere al massimo 500 caratteri"
+    },
+    "table": {
+      "title": "Elenco degli Argomenti di Interesse",
+      "id": "ID",
+      "name": "Nome Argomento",
+      "description": "Descrizione",
+      "createdDate": "Data di Creazione",
+      "createdBy": "Creato Da",
+      "showing": "Visualizzazione di {{from}}-{{to}} / {{total}}",
+      "page": "Pagina {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Totale Argomenti",
+      "activeActivityTypes": "Argomenti Attivi",
+      "newThisMonth": "Nuovo Questo Mese"
+    },
+    "messages": {
+      "createSuccess": "Argomento creato con successo",
+      "createError": "Errore durante la creazione dell'argomento",
+      "updateSuccess": "Argomento aggiornato con successo",
+      "updateError": "Errore durante l'aggiornamento dell'argomento",
+      "deleteSuccess": "Argomento eliminato con successo",
+      "deleteError": "Errore durante l'eliminazione dell'argomento"
+    },
+    "error": "Si è verificato un errore",
+    "create": "Aggiungi Nuovo Argomento",
+    "loading": "Caricamento...",
+    "noData": "Nessun dato",
+    "actions": "Azioni",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "saving": "Salvataggio..."
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Elimina Argomento",
+    "confirmMessage": "Sei sicuro di voler eliminare {{name}}?"
+  },
+  "messages": {
+    "deleteSuccess": "Argomento eliminato con successo",
+    "deleteError": "Errore durante l'eliminazione dell'argomento"
+  },
+  "table": {
+    "title": "Elenco degli Argomenti di Interesse",
+    "id": "ID",
+    "name": "Nome Argomento",
+    "description": "Descrizione",
+    "createdDate": "Data di Creazione",
+    "createdBy": "Creato Da"
+  }
+}

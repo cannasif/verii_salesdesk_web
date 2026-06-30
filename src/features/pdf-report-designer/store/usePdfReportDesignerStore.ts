@@ -1,0 +1,443 @@
+import { create } from 'zustand';
+import type { PdfCanvasElement, PdfReportElement, PdfTableColumn, PdfTableElement } from '../types/pdf-report-template.types';
+
+const MAX_HISTORY = 50;
+
+function withoutInvalidTableIfFixed(
+  invalidElementIds: string[],
+  tableId: string,
+  columnCount: number
+): string[] {
+  if (columnCount <= 0) return invalidElementIds;
+  return invalidElementIds.filter((id) => id !== tableId);
+}
+
+interface PdfReportDesignerState {
+  elementsById: Record<string, PdfCanvasElement>;
+  elementOrder: string[];
+  selectedIds: string[];
+  history: { elementsById: Record<string, PdfCanvasElement>; elementOrder: string[] }[];
+  historyIndex: number;
+  setElements: (elements: PdfCanvasElement[]) => void;
+  addElement: (element: PdfReportElement | PdfTableElement) => void;
+  removeElement: (id: string) => void;
+  updateElement: (id: string, patch: Partial<PdfCanvasElement>) => void;
+  updateElementPosition: (id: string, x: number, y: number) => void;
+  updateElementSize: (id: string, width: number, height: number, x: number, y: number) => void;
+  updateElementsPosition: (ids: string[], dx: number, dy: number) => void;
+  updateElementsSize: (ids: string[], dWidth: number, dHeight: number) => void;
+  getSelectedEditableIds: () => string[];
+  updateElementText: (id: string, text: string) => void;
+  updateReportElement: (
+    id: string,
+    updates: Partial<Pick<PdfReportElement, 'text' | 'value' | 'path' | 'fontSize' | 'fontFamily' | 'color' | 'style' | 'pageNumbers' | 'parentId' | 'summaryItems' | 'quotationTotalsOptions' | 'visibilityRule' | 'visibilityRules' | 'visibilityLogic' | 'conditionalStyleRules'>>
+  ) => void;
+  addColumnToTable: (tableId: string, column: PdfTableColumn) => void;
+  replaceTableColumns: (tableId: string, columns: PdfTableColumn[]) => void;
+  updateTableColumn: (tableId: string, index: number, patch: Partial<PdfTableColumn>) => void;
+  removeColumnFromTable: (tableId: string, index: number) => void;
+  moveTableColumn: (tableId: string, index: number, direction: 'left' | 'right') => void;
+  updateTableOptions: (tableId: string, patch: Partial<PdfTableElement>) => void;
+  setSelectedIds: (ids: string[]) => void;
+  toggleSelection: (id: string) => void;
+  reorderElements: (fromIndex: number, toIndex: number) => void;
+  setElementLocked: (id: string, locked: boolean) => void;
+  setElementHidden: (id: string, hidden: boolean) => void;
+  bringForward: (id: string) => void;
+  sendBackward: (id: string) => void;
+  undo: () => void;
+  redo: () => void;
+  pushHistory: () => void;
+  getOrderedElements: () => PdfCanvasElement[];
+  snapEnabled: boolean;
+  setSnapEnabled: (enabled: boolean) => void;
+  flashingId: string | null;
+  setFlashingId: (id: string | null) => void;
+  invalidElementIds: string[];
+  setInvalidElementIds: (ids: string[]) => void;
+  clearInvalidElementIds: () => void;
+}
+
+function snapshot(
+  elementsById: Record<string, PdfCanvasElement>,
+  elementOrder: string[]
+): { elementsById: Record<string, PdfCanvasElement>; elementOrder: string[] } {
+  return {
+    elementsById: JSON.parse(JSON.stringify(elementsById)),
+    elementOrder: [...elementOrder],
+  };
+}
+
+function areStringArraysEqual(a: string[], b: string[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  return a.every((value, index) => value === b[index]);
+}
+
+function areElementsEquivalent(
+  currentById: Record<string, PdfCanvasElement>,
+  currentOrder: string[],
+  nextElements: PdfCanvasElement[]
+): boolean {
+  if (currentOrder.length !== nextElements.length) return false;
+
+  return nextElements.every((nextElement, index) => {
+    if (currentOrder[index] !== nextElement.id) return false;
+    const currentElement = currentById[nextElement.id];
+    return currentElement === nextElement || JSON.stringify(currentElement) === JSON.stringify(nextElement);
+  });
+}
+
+export const usePdfReportDesignerStore = create<PdfReportDesignerState>((set, get) => ({
+  elementsById: {},
+  elementOrder: [],
+  selectedIds: [],
+  history: [],
+  historyIndex: -1,
+  snapEnabled: true,
+  setSnapEnabled: (enabled) => set({ snapEnabled: enabled }),
+  flashingId: null,
+  setFlashingId: (id) => set({ flashingId: id }),
+  invalidElementIds: [],
+  setInvalidElementIds: (ids) => {
+    const nextIds = [...new Set(ids)];
+    set((s) => (areStringArraysEqual(s.invalidElementIds, nextIds) ? s : { invalidElementIds: nextIds }));
+  },
+  clearInvalidElementIds: () => set((s) => (s.invalidElementIds.length === 0 ? s : { invalidElementIds: [] })),
+
+  setElements: (elements) => {
+    set((s) => {
+      if (
+        s.selectedIds.length === 0 &&
+        s.historyIndex === 0 &&
+        s.history.length === 1 &&
+        areElementsEquivalent(s.elementsById, s.elementOrder, elements)
+      ) {
+        return s;
+      }
+
+      const byId: Record<string, PdfCanvasElement> = {};
+      const order: string[] = [];
+      elements.forEach((el) => {
+        byId[el.id] = el;
+        order.push(el.id);
+      });
+      return {
+        elementsById: byId,
+        elementOrder: order,
+        selectedIds: [],
+        history: [snapshot(byId, order)],
+        historyIndex: 0,
+      };
+    });
+  },
+
+  addElement: (element) => {
+    set((s) => {
+      const byId = { ...s.elementsById, [element.id]: element };
+      const order = [...s.elementOrder, element.id];
+      return {
+        elementsById: byId,
+        elementOrder: order,
+        selectedIds: [element.id],
+      };
+    });
+    get().pushHistory();
+  },
+
+  removeElement: (id) => {
+    set((s) => ({
+      elementsById: (() => {
+        const next = { ...s.elementsById };
+        delete next[id];
+        return next;
+      })(),
+      elementOrder: s.elementOrder.filter((i) => i !== id),
+      selectedIds: s.selectedIds.filter((i) => i !== id),
+    }));
+    get().pushHistory();
+  },
+
+  updateElement: (id, patch) => {
+    set((s) => {
+      const el = s.elementsById[id];
+      if (!el) return s;
+      const next = { ...el, ...patch };
+      return { elementsById: { ...s.elementsById, [id]: next as PdfCanvasElement } };
+    });
+  },
+
+  updateElementPosition: (id, x, y) => {
+    set((s) => {
+      const el = s.elementsById[id];
+      if (!el) return s;
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [id]: { ...el, x, y } as PdfCanvasElement,
+        },
+      };
+    });
+  },
+
+  updateElementSize: (id, width, height, x, y) => {
+    set((s) => {
+      const el = s.elementsById[id];
+      if (!el) return s;
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [id]: { ...el, width, height, x, y } as PdfCanvasElement,
+        },
+      };
+    });
+  },
+
+  updateElementsPosition: (ids, dx, dy) => {
+    if (ids.length === 0) return;
+    set((s) => {
+      const next = { ...s.elementsById };
+      for (const id of ids) {
+        const el = next[id];
+        if (!el || el.locked || el.hidden) continue;
+        next[id] = { ...el, x: el.x + dx, y: el.y + dy } as PdfCanvasElement;
+      }
+      return { elementsById: next };
+    });
+  },
+
+  updateElementsSize: (ids, dWidth, dHeight) => {
+    if (ids.length === 0) return;
+    set((s) => {
+      const next = { ...s.elementsById };
+      for (const id of ids) {
+        const el = next[id];
+        if (!el || el.locked || el.hidden) continue;
+        next[id] = {
+          ...el,
+          width: Math.max(8, el.width + dWidth),
+          height: Math.max(8, el.height + dHeight),
+        } as PdfCanvasElement;
+      }
+      return { elementsById: next };
+    });
+  },
+
+  getSelectedEditableIds: () => {
+    const { selectedIds, elementsById } = get();
+    return selectedIds.filter((id) => {
+      const el = elementsById[id];
+      return el && !el.locked && !el.hidden;
+    });
+  },
+
+  updateElementText: (id, text) => {
+    set((s) => {
+      const el = s.elementsById[id];
+      if (!el || el.type === 'table') return s;
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [id]: { ...el, text } as PdfCanvasElement,
+        },
+      };
+    });
+  },
+
+  updateReportElement: (id, updates) => {
+    set((s) => {
+      const el = s.elementsById[id];
+      if (!el || el.type === 'table') return s;
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [id]: { ...el, ...updates } as PdfCanvasElement,
+        },
+      };
+    });
+  },
+
+  addColumnToTable: (tableId, column) => {
+    set((s) => {
+      const el = s.elementsById[tableId];
+      if (!el || el.type !== 'table') return s;
+      if (el.columns.some((c) => c.path === column.path)) return s;
+      const columns = [...el.columns, column];
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [tableId]: { ...el, columns } as PdfCanvasElement,
+        },
+        invalidElementIds: withoutInvalidTableIfFixed(s.invalidElementIds, tableId, columns.length),
+      };
+    });
+    get().pushHistory();
+  },
+
+  replaceTableColumns: (tableId, columns) => {
+    set((s) => {
+      const el = s.elementsById[tableId];
+      if (!el || el.type !== 'table') return s;
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [tableId]: { ...el, columns } as PdfCanvasElement,
+        },
+        invalidElementIds: withoutInvalidTableIfFixed(s.invalidElementIds, tableId, columns.length),
+      };
+    });
+    get().pushHistory();
+  },
+
+  updateTableColumn: (tableId, index, patch) => {
+    set((s) => {
+      const el = s.elementsById[tableId];
+      if (!el || el.type !== 'table' || index < 0 || index >= el.columns.length) return s;
+      const columns = el.columns.map((column, columnIndex) =>
+        columnIndex === index ? { ...column, ...patch } : column
+      );
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [tableId]: { ...el, columns } as PdfCanvasElement,
+        },
+      };
+    });
+  },
+
+  removeColumnFromTable: (tableId, index) => {
+    set((s) => {
+      const el = s.elementsById[tableId];
+      if (!el || el.type !== 'table') return s;
+      const columns = el.columns.filter((_, columnIndex) => columnIndex !== index);
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [tableId]: { ...el, columns } as PdfCanvasElement,
+        },
+        invalidElementIds:
+          columns.length > 0
+            ? withoutInvalidTableIfFixed(s.invalidElementIds, tableId, columns.length)
+            : [...new Set([...s.invalidElementIds, tableId])],
+      };
+    });
+    get().pushHistory();
+  },
+
+  moveTableColumn: (tableId, index, direction) => {
+    set((s) => {
+      const el = s.elementsById[tableId];
+      if (!el || el.type !== 'table') return s;
+      const targetIndex = direction === 'left' ? index - 1 : index + 1;
+      if (index < 0 || index >= el.columns.length || targetIndex < 0 || targetIndex >= el.columns.length)
+        return s;
+      const columns = [...el.columns];
+      const [moved] = columns.splice(index, 1);
+      columns.splice(targetIndex, 0, moved);
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [tableId]: { ...el, columns } as PdfCanvasElement,
+        },
+      };
+    });
+    get().pushHistory();
+  },
+
+  updateTableOptions: (tableId, patch) => {
+    set((s) => {
+      const el = s.elementsById[tableId];
+      if (!el || el.type !== 'table') return s;
+      return {
+        elementsById: {
+          ...s.elementsById,
+          [tableId]: { ...el, ...patch } as PdfCanvasElement,
+        },
+      };
+    });
+  },
+
+  setSelectedIds: (ids) => set((s) => (areStringArraysEqual(s.selectedIds, ids) ? s : { selectedIds: ids })),
+
+  toggleSelection: (id) => {
+    set((s) => {
+      const has = s.selectedIds.includes(id);
+      const next = has ? s.selectedIds.filter((i) => i !== id) : [...s.selectedIds, id];
+      return { selectedIds: next };
+    });
+  },
+
+  reorderElements: (fromIndex, toIndex) => {
+    set((s) => {
+      const order = [...s.elementOrder];
+      const [removed] = order.splice(fromIndex, 1);
+      order.splice(toIndex, 0, removed);
+      return { elementOrder: order };
+    });
+    get().pushHistory();
+  },
+
+  setElementLocked: (id, locked) => {
+    get().updateElement(id, { locked });
+  },
+
+  setElementHidden: (id, hidden) => {
+    get().updateElement(id, { hidden });
+  },
+
+  bringForward: (id) => {
+    const { elementOrder } = get();
+    const i = elementOrder.indexOf(id);
+    if (i < 0 || i >= elementOrder.length - 1) return;
+    get().reorderElements(i, i + 1);
+  },
+
+  sendBackward: (id) => {
+    const { elementOrder } = get();
+    const i = elementOrder.indexOf(id);
+    if (i <= 0) return;
+    get().reorderElements(i, i - 1);
+  },
+
+  undo: () => {
+    const { history, historyIndex } = get();
+    if (historyIndex <= 0) return;
+    const next = historyIndex - 1;
+    const snap = history[next];
+    set({
+      elementsById: snap.elementsById,
+      elementOrder: snap.elementOrder,
+      historyIndex: next,
+    });
+  },
+
+  redo: () => {
+    const { history, historyIndex } = get();
+    if (historyIndex >= history.length - 1) return;
+    const next = historyIndex + 1;
+    const snap = history[next];
+    set({
+      elementsById: snap.elementsById,
+      elementOrder: snap.elementOrder,
+      historyIndex: next,
+    });
+  },
+
+  pushHistory: () => {
+    const { elementsById, elementOrder, history, historyIndex } = get();
+    const newSnap = snapshot(elementsById, elementOrder);
+    const trimmed = history.slice(0, historyIndex + 1);
+    const next = [...trimmed, newSnap].slice(-MAX_HISTORY);
+    set({
+      history: next,
+      historyIndex: next.length - 1,
+    });
+  },
+
+  getOrderedElements: () => {
+    const { elementsById, elementOrder } = get();
+    return elementOrder
+      .map((id) => elementsById[id])
+      .filter((el): el is PdfCanvasElement => el != null);
+  },
+}));

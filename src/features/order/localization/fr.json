@@ -1,0 +1,63 @@
+{
+  "lines": {
+    "doubleClickToEdit": "Double-cliquez pour modifier",
+    "unit": "Unité",
+    "descriptionTooltipText": "Note de production au niveau de la ligne. Lors du transfert vers l'ERP, la correspondance Netsis est : Description 1 -> Champ Supplémentaire 1, Description 2 -> Champ Supplémentaire 2, Description 3 -> Description Supplémentaire de Ligne 7.",
+    "profileErpTooltip": "Cette sélection de Profil est envoyée à l'ERP comme champ supplémentaire Netsis ligne 2 / description supplémentaire ligne 2.",
+    "rebarErpTooltip": "Cette sélection de fer est envoyée à l'ERP comme description supplémentaire ligne 3 Netsis.",
+    "screwErpTooltip": "Cette sélection de vis est envoyée à l'ERP comme description supplémentaire ligne 4 Netsis.",
+    "printErpTooltip": "Cette sélection d'impression est envoyée à l'ERP comme description supplémentaire ligne 8 Netsis. La note d'impression va aussi dans la description ligne 9 et la description supplémentaire ligne 9 Netsis.",
+    "lineItemDescriptionPlaceholder": "Description de l'article par ligne"
+  },
+  "notes": {
+    "notesTooltipText": "Notes d'expédition/facturation pour toute la commande. Elles sont enregistrées dans Netsis en descriptions supplémentaires d'en-tête 1-5; la note 2 va dans la description supplémentaire Netsis 2."
+  },
+  "erpOrder": {
+    "title": "Liste des commandes ERP",
+    "description": "Consultez les en-têtes et lignes de commandes Netsis visibles pour l'utilisateur connecté.",
+    "currentUserScope": "Périmètre de l'utilisateur connecté",
+    "searchPlaceholder": "Rechercher par commande, client, commercial ou date...",
+    "loading": "Chargement des commandes ERP...",
+    "loadError": "Impossible de charger les commandes ERP.",
+    "noData": "Aucune commande ERP trouvée.",
+    "detailAction": "Détails",
+    "detailTitle": "Détails de la commande {{orderNo}}",
+    "unknownCustomer": "Nom client absent",
+    "lineCount": "{{count}} lignes",
+    "linesLoading": "Chargement des lignes de commande...",
+    "lineLoadError": "Impossible de charger les lignes de commande.",
+    "noLines": "Aucune ligne trouvée pour cette commande.",
+    "table": {
+      "title": "Informations d'en-tête de commande",
+      "branchCode": "Agence",
+      "orderNo": "N° commande",
+      "customerCode": "Code client",
+      "customerName": "Nom client",
+      "date": "Date",
+      "deliveryDate": "Date de livraison",
+      "grossTotal": "Total brut",
+      "vat": "TVA",
+      "grandTotal": "Total général",
+      "salesRepCode": "Commercial"
+    },
+    "lines": {
+      "rowNo": "Ligne",
+      "stockCode": "Code stock",
+      "stockName": "Nom du stock",
+      "quantity": "Quantité",
+      "unit": "Unité",
+      "netPrice": "Prix net",
+      "vatRate": "Taux TVA",
+      "warehouseCode": "Dépôt"
+    }
+  },
+  "header": {
+    "notes": "Notes",
+    "descriptionErpTooltip": "Note de production générale pour toute la commande. Lors de l'envoi à l'ERP, elle est enregistrée dans le champ Description d'en-tête de commande Netsis (FatUst.Aciklama).",
+    "ozelKod1": "Code spécial 1",
+    "ozelKod1Placeholder": "Sélectionner le code spécial 1",
+    "ozelKod2": "Code spécial 2",
+    "ozelKod2Placeholder": "Sélectionner le code spécial 2",
+    "specialCodeSearchPlaceholder": "Rechercher un code spécial..."
+  }
+}

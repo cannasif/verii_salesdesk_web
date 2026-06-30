@@ -1,0 +1,83 @@
+{
+  "menu": "Gestion des villes",
+  "description": "Gérer et organiser les villes",
+  "addButton": "Ajouter une Nouvelle Ville",
+  "searchPlaceholder": "Rechercher...",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée trouvée",
+  "stats": {
+    "totalCities": "Total des villes",
+    "activeCities": "Villes actives",
+    "newThisMonth": "Nouveau ce mois-ci"
+  },
+  "table": {
+    "title": "Liste des villes",
+    "id": "ID",
+    "name": "Nom de la ville",
+    "erpCode": "Code ERP",
+    "countryName": "Nom du pays",
+    "createdDate": "Date de création",
+    "createdBy": "Créé par",
+    "showing": "Affichage {{from}}-{{to}} / {{total}}",
+    "page": "Page {{current}} / {{total}}"
+  },
+  "cityManagement": {
+    "table": {
+      "title": "Liste des villes",
+      "id": "ID",
+      "name": "Nom de la ville",
+      "erpCode": "Code ERP",
+      "countryName": "Nom du pays",
+      "createdDate": "Date de création",
+      "createdBy": "Créé par"
+    },
+    "error": "Une erreur s'est produite",
+    "form": {
+      "tabs": {
+        "header": "Informations générales"
+      }
+    },
+    "menu": "Gestion des villes",
+    "description": "Gérer et organiser les villes",
+    "addButton": "Ajouter une Nouvelle Ville",
+    "searchPlaceholder": "Recherche rapide...",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée trouvée",
+    "actions": "Actions",
+    "delete": {
+      "success": "Ville supprimée avec succès",
+      "error": "Une erreur s'est produite lors de la suppression de la ville",
+      "confirmTitle": "Supprimer la ville",
+      "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+    }
+  },
+  "form": {
+    "editCity": "Modifier la ville",
+    "addCity": "Ajouter une Nouvelle Ville",
+    "editDescription": "Modifier les détails de la ville",
+    "addDescription": "Entrer les détails de la nouvelle ville",
+    "name": "Nom de la ville",
+    "namePlaceholder": "Entrer le nom de la ville",
+    "country": "Pays",
+    "selectCountry": "Sélectionner un pays",
+    "erpCode": "Code ERP",
+    "erpCodePlaceholder": "Entrer le code ERP (facultatif)",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "nameRequired": "Le nom de la ville est obligatoire",
+    "nameMaxLength": "Le nom de la ville peut avoir au maximum 100 caractères",
+    "erpCodeMaxLength": "Le code ERP peut avoir au maximum 10 caractères",
+    "countryRequired": "La sélection du pays est obligatoire"
+  },
+  "actions": "Actions",
+  "delete": {
+    "button": "Supprimer",
+    "success": "Ville supprimée avec succès",
+    "error": "Une erreur s'est produite lors de la suppression de la ville",
+    "confirmTitle": "Supprimer la ville",
+    "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+  },
+  "previous": "Précédent",
+  "next": "Suivant"
+}

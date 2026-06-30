@@ -1,0 +1,139 @@
+{
+  "menu": "İlçe Yönetimi",
+  "description": "İlçeleri yönetin ve düzenleyin",
+  "addButton": "Yeni İlçe Ekle",
+  "showStats": "İstatistikleri Göster",
+  "hideStats": "İstatistikleri Gizle",
+  "listTitle": "İlçe Listesi",
+  "listDescription": "Sistemdeki kayıtlı tüm ilçeleri buradan yönetebilirsiniz.",
+  "loading": "Yükleniyor...",
+  "noData": "Veri bulunamadı",
+  "actions": "İşlemler",
+  "previous": "Önceki",
+  "next": "Sonraki",
+  "cancel": "İptal",
+  "delete": "Sil",
+  "save": "Kaydet",
+  "saving": "Kaydediliyor...",
+  "countryManagement": {
+    "error": "Hata oluştu"
+  },
+  "table": {
+    "id": "ID",
+    "name": "İlçe Adı",
+    "erpCode": "ERP Kodu",
+    "postalCode": "Posta Kodu",
+    "city": "Şehir",
+    "cityName": "Şehir Adı",
+    "status": "Durum",
+    "title": "İlçe Listesi",
+    "createdDate": "Oluşturulma Tarihi",
+    "createdBy": "Oluşturan",
+    "showing": "{{from}}-{{to}} / {{total}} gösteriliyor",
+    "page": "Sayfa {{current}} / {{total}}"
+  },
+  "delete": {
+    "confirmTitle": "İlçeyi Sil",
+    "confirmMessage": "{{name}} ilçesini silmek istediğinizden emin misiniz?",
+    "success": "İlçe başarıyla silindi",
+    "error": "İlçe silinemedi",
+    "deleting": "Siliniyor...",
+    "action": "Sil"
+  },
+  "form": {
+    "editDistrict": "İlçe Düzenle",
+    "addDistrict": "Yeni İlçe Ekle",
+    "editDescription": "İlçe bilgilerini düzenleyin",
+    "addDescription": "Yeni ilçe bilgilerini girin",
+    "name": "İlçe Adı",
+    "namePlaceholder": "İlçe adını girin",
+    "city": "Şehir",
+    "selectCity": "Şehir seçin",
+    "searchCity": "Şehir ara...",
+    "erpCode": "ERP Kodu",
+    "erpCodePlaceholder": "ERP kodunu girin (opsiyonel)",
+    "postalCode": "Posta Kodu",
+    "postalCodePlaceholder": "Posta kodunu girin (opsiyonel)",
+    "nameRequired": "İlçe adı zorunludur",
+    "nameMaxLength": "İlçe adı en fazla 100 karakter olabilir",
+    "erpCodeMaxLength": "ERP kodu en fazla 10 karakter olabilir",
+    "postalCodeMaxLength": "Posta kodu en fazla 20 karakter olabilir",
+    "cityRequired": "Şehir seçimi zorunludur"
+  },
+  "stats": {
+    "totalDistricts": "Toplam İlçe",
+    "activeDistricts": "Aktif İlçe",
+    "newThisMonth": "Bu Ay Yeni"
+  },
+  "status": {
+    "inactive": "Pasif",
+    "active": "Aktif"
+  },
+  "messages": {
+    "createSuccess": "İlçe başarıyla oluşturuldu",
+    "createError": "İlçe oluşturulamadı",
+    "updateSuccess": "İlçe başarıyla güncellendi",
+    "updateError": "İlçe güncellenemedi",
+    "deleteSuccess": "İlçe başarıyla silindi",
+    "deleteError": "İlçe silinemedi"
+  },
+  "districtManagement": {
+    "menu": "İlçe Yönetimi",
+    "description": "İlçeleri yönetin ve düzenleyin",
+    "addButton": "Yeni İlçe Ekle",
+    "loading": "Yükleniyor...",
+    "noData": "Veri bulunamadı",
+    "table": {
+      "id": "ID",
+      "name": "İlçe Adı",
+      "erpCode": "ERP Kodu",
+      "postalCode": "Posta Kodu",
+      "city": "Şehir",
+      "cityName": "Şehir Adı",
+      "status": "Durum",
+      "title": "İlçe Listesi"
+    },
+    "delete": {
+      "confirmTitle": "İlçeyi Sil",
+      "confirmMessage": "{{name}} ilçesini silmek istediğinizden emin misiniz?",
+      "success": "İlçe başarıyla silindi",
+      "error": "İlçe silinirken bir hata oluştu"
+    },
+    "messages": {
+      "createSuccess": "İlçe başarıyla oluşturuldu",
+      "createError": "İlçe oluşturulamadı",
+      "updateSuccess": "İlçe başarıyla güncellendi",
+      "updateError": "İlçe güncellenemedi"
+    },
+    "stats": {
+      "totalDistricts": "Toplam İlçe",
+      "activeDistricts": "Aktif İlçe",
+      "newThisMonth": "Bu Ay Yeni"
+    },
+    "status": {
+      "inactive": "Pasif",
+      "active": "Aktif"
+    },
+    "error": "Hata oluştu",
+    "form": {
+      "editDistrict": "İlçe Düzenle",
+      "addDistrict": "Yeni İlçe Ekle",
+      "editDescription": "İlçe bilgilerini düzenleyin",
+      "addDescription": "Yeni ilçe bilgilerini girin",
+      "name": "İlçe Adı",
+      "namePlaceholder": "İlçe adını girin",
+      "city": "Şehir",
+      "selectCity": "Şehir seçin",
+      "searchCity": "Şehir ara...",
+      "erpCode": "ERP Kodu",
+      "erpCodePlaceholder": "ERP kodunu girin (opsiyonel)",
+      "postalCode": "Posta Kodu",
+      "postalCodePlaceholder": "Posta kodunu girin (opsiyonel)",
+      "nameRequired": "İlçe adı zorunludur",
+      "nameMaxLength": "İlçe adı en fazla 100 karakter olabilir",
+      "erpCodeMaxLength": "ERP kodu en fazla 10 karakter olabilir",
+      "postalCodeMaxLength": "Posta kodu en fazla 20 karakter olabilir",
+      "cityRequired": "Şehir seçimi zorunludur"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "addButton": "إضافة لقب جديد",
+  "loading": "جارٍ التحميل...",
+  "noData": "لا توجد بيانات",
+  "error": "حدث خطأ",
+  "search": "بحث...",
+  "refresh": "تحديث",
+  "previous": "السابق",
+  "next": "التالي",
+  "menu": "إدارة الألقاب",
+  "description": "إدارة وتعديل الألقاب",
+  "advancedFilter": {
+    "columnTitleName": "اللقب",
+    "columnCode": "الرمز"
+  },
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "saving": "جارٍ الحفظ...",
+  "delete": {
+    "confirmTitle": "حذف اللقب",
+    "confirmMessage": "هل أنت متأكد من حذف اللقب {{titleName}}؟",
+    "button": "حذف"
+  },
+  "deleting": "جارٍ الحذف...",
+  "actions": "الإجراءات",
+  "edit": "تعديل",
+  "header": {
+    "title": "إدارة الألقاب",
+    "description": "يمكنك إدارة تعريفات الألقاب من هنا."
+  },
+  "table": {
+    "id": "المعرف",
+    "name": "اللقب",
+    "code": "الرمز",
+    "createdDate": "تاريخ الإنشاء",
+    "createdBy": "تم الإنشاء بواسطة",
+    "showing": "عرض {{from}}-{{to}} من {{total}}",
+    "page": "صفحة {{current}} من {{total}}",
+    "title": "قائمة الألقاب"
+  },
+  "form": {
+    "addTitle": "إضافة لقب جديد",
+    "editTitle": "تعديل اللقب",
+    "addDescription": "أدخل معلومات اللقب الجديدة",
+    "editDescription": "عدل معلومات اللقب",
+    "titleName": "اللقب",
+    "titleNamePlaceholder": "أدخل اسم اللقب",
+    "titleCode": "رمز اللقب",
+    "codePlaceholder": "أدخل الرمز (اختياري)",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ..."
+  },
+  "stats": {
+    "totalTitles": "إجمالي الألقاب",
+    "activeTitles": "الألقاب النشطة",
+    "newThisMonth": "جديد هذا الشهر"
+  },
+  "messages": {
+    "deleteSuccess": "تم حذف اللقب بنجاح",
+    "deleteError": "تعذر حذف اللقب"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "lines": {
+    "doubleClickToEdit": "Doppio clic per modificare",
+    "unit": "Unità",
+    "descriptionTooltipText": "Nota di produzione a livello riga. Al trasferimento all'ERP, la mappatura Netsis è: Descrizione 1 -> Campo Aggiuntivo 1, Descrizione 2 -> Campo Aggiuntivo 2, Descrizione 3 -> Descrizione Extra Riga 7.",
+    "profileErpTooltip": "Questa selezione Profilo viene inviata all'ERP come Campo extra riga 2 / Descrizione extra riga 2 Netsis.",
+    "rebarErpTooltip": "Questa selezione Ferro viene inviata all'ERP come Descrizione extra riga 3 Netsis.",
+    "screwErpTooltip": "Questa selezione Vite viene inviata all'ERP come Descrizione extra riga 4 Netsis.",
+    "printErpTooltip": "Questa selezione Stampa viene inviata all'ERP come Descrizione extra riga 8 Netsis. La nota di stampa va anche in Descrizione riga 9 e Descrizione extra riga 9 Netsis.",
+    "lineItemDescriptionPlaceholder": "Descrizione dell'articolo per riga"
+  },
+  "notes": {
+    "notesTooltipText": "Note di spedizione/fatturazione per l'intero ordine. Sono salvate in sequenza nelle descrizioni extra testata Netsis 1-5; la nota 2 va nella descrizione extra Netsis 2."
+  },
+  "erpOrder": {
+    "title": "Elenco ordini ERP",
+    "description": "Visualizza testate e righe degli ordini Netsis visibili per l'utente connesso.",
+    "currentUserScope": "Ambito utente connesso",
+    "searchPlaceholder": "Cerca numero ordine, cliente, venditore o data...",
+    "loading": "Caricamento ordini ERP...",
+    "loadError": "Impossibile caricare gli ordini ERP.",
+    "noData": "Nessun ordine ERP trovato.",
+    "detailAction": "Dettaglio",
+    "detailTitle": "Dettaglio ordine {{orderNo}}",
+    "unknownCustomer": "Nome cliente assente",
+    "lineCount": "{{count}} righe",
+    "linesLoading": "Caricamento righe ordine...",
+    "lineLoadError": "Impossibile caricare le righe ordine.",
+    "noLines": "Nessuna riga trovata per questo ordine.",
+    "table": {
+      "title": "Informazioni testata ordine",
+      "branchCode": "Filiale",
+      "orderNo": "N. ordine",
+      "customerCode": "Codice cliente",
+      "customerName": "Nome cliente",
+      "date": "Data",
+      "deliveryDate": "Data consegna",
+      "grossTotal": "Totale lordo",
+      "vat": "IVA",
+      "grandTotal": "Totale generale",
+      "salesRepCode": "Venditore"
+    },
+    "lines": {
+      "rowNo": "Riga",
+      "stockCode": "Codice stock",
+      "stockName": "Nome stock",
+      "quantity": "Quantità",
+      "unit": "Unità",
+      "netPrice": "Prezzo netto",
+      "vatRate": "Aliquota IVA",
+      "warehouseCode": "Magazzino"
+    }
+  },
+  "header": {
+    "notes": "Note",
+    "descriptionErpTooltip": "Nota di produzione generale per l'intero ordine. All'invio all'ERP viene salvata nel campo Descrizione testata ordine Netsis (FatUst.Aciklama).",
+    "ozelKod1": "Codice speciale 1",
+    "ozelKod1Placeholder": "Seleziona codice speciale 1",
+    "ozelKod2": "Codice speciale 2",
+    "ozelKod2Placeholder": "Seleziona codice speciale 2",
+    "specialCodeSearchPlaceholder": "Cerca codice speciale..."
+  }
+}

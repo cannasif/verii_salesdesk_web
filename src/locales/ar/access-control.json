@@ -1,0 +1,146 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Unique key used by route and page guards. Prefer stable snake_case or dot naming.",
+      "name": "Display name shown to admins when managing permissions.",
+      "description": "Optional internal explanation for this permission.",
+      "isActive": "Inactive permissions are not considered when calculating user access.",
+      "save": "Changes affect role and group authorization flows."
+    },
+    "permissionGroup": {
+      "name": "Group name for identification when assigning to المستخدمون.",
+      "isSystemAdmin": "Members of this group can access all pages and actions without individual permission checks.",
+      "isActive": "Inactive groups should not be assigned for جديد access decisions.",
+      "permissions": "Selected permissions define what members of this group can access.",
+      "save": "Updates effective access for all المستخدمون assigned to this group."
+    },
+    "userAssignment": {
+      "user": "Choose the user whose access scope you want to manage.",
+      "groups": "User receives combined permissions from all selected groups.",
+      "save": "Assignments apply immediately for the next authorization checks. المستخدمون may need to refresh their session.",
+      "systemAdminNote": "If the user has a system-admin group, detailed permissions are bypassed."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "تعريفات الأذونات",
+    "description": "إدارة رموز الأذونات المستخدمة في النظام",
+    "add": "إضافة تعريف",
+    "form": {
+      "editTitle": "تعديل تعريف الإذن",
+      "addTitle": "إضافة تعريف الإذن",
+      "editDescription": "تحديث تفاصيل تعريف الإذن",
+      "addDescription": "إنشاء تعريف إذن جديد",
+      "code": "الرمز",
+      "name": "الاسم",
+      "namePlaceholder": "اسم العرض",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "isActive": "مفعل",
+      "codePlaceholder": "اختر الرمز",
+      "affectedRoutes": "الصفحات المتضررة",
+      "affectedRoutesNone": "لم يتم العثور على مسار مطابق لهذا الرمز",
+      "codeSearchPlaceholder": "بحث...",
+      "codeEmpty": "لم يتم العثور على نتائج"
+    },
+    "table": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "isActive": "مفعل",
+      "updatedDate": "تم التحديث",
+      "showing": "{{from}}-{{to}} من {{total}}",
+      "title": "تعريفات الأذونات"
+    },
+    "delete": {
+      "confirmTitle": "حذف تعريف الإذن",
+      "confirmMessage": "هل أنت متأكد أنك تريد حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "syncFromRoutes": "المزامنة من المسارات",
+    "syncSummaryTitle": "ملخص مزامنة المسارات"
+  },
+  "permissionGroups": {
+    "title": "مجموعات الأذونات",
+    "description": "إدارة مجموعات الأذونات وتعيينات المستخدمين",
+    "add": "إضافة مجموعة",
+    "selectAll": "تحديد الكل",
+    "noDefinitions": "لا توجد تعريفات أذونات متاحة",
+    "form": {
+      "editTitle": "تعديل مجموعة الإذن",
+      "addTitle": "إضافة مجموعة إذن",
+      "editDescription": "تحديث تفاصيل مجموعة الإذن",
+      "addDescription": "إنشاء مجموعة إذن جديدة",
+      "name": "الاسم",
+      "namePlaceholder": "اسم المجموعة",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "isSystemAdmin": "مدير النظام",
+      "isActive": "مفعل",
+      "permissions": "الأذونات"
+    },
+    "table": {
+      "name": "الاسم",
+      "isSystemAdmin": "مدير النظام",
+      "isActive": "مفعل",
+      "permissionCount": "الأذونات",
+      "showing": "{{from}}-{{to}} من {{total}}",
+      "title": "مجموعات الأذونات"
+    },
+    "managePermissions": "إدارة الأذونات",
+    "permissionsPanel": {
+      "title": "تعديل أذونات المجموعة",
+      "description": "اختر الأذونات لهذه المجموعة",
+      "currentCodes": "أكواد الأذونات الحالية",
+      "groupedRows": "الشاشات",
+      "screen": "الشاشة",
+      "actionsMapped": "الإجراءات",
+      "actions": {
+        "create": "إنشاء",
+        "read": "عرض",
+        "update": "تحديث",
+        "delete": "حذف",
+        "other": "صلاحيات العمليات"
+      }
+    },
+    "delete": {
+      "confirmTitle": "حذف مجموعة الإذن",
+      "confirmMessage": "هل أنت متأكد أنك تريد حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "search": "بحث...",
+    "systemAdminLocked": "لا يمكن تعديل مجموعة مسؤول النظام"
+  },
+  "userGroupAssignments": {
+    "title": "تعيين مجموعات المستخدمين",
+    "description": "تعيين مجموعات الأذونات للمستخدمين",
+    "selectUser": "اختر المستخدم",
+    "selectUserPlaceholder": "ابحث واختر المستخدم...",
+    "selectUserHint": "اختر مستخدماً لإدارة تعيينات مجموعة الأذونات الخاصة به",
+    "assignedGroups": "مجموعات الأذونات المعينة",
+    "noUsers": "لا يوجد مستخدمون",
+    "noGroups": "لا توجد مجموعات أذونات متاحة",
+    "selectAll": "تحديد الكل",
+    "status": "الحالة",
+    "unsavedChanges": "غير محفوظ",
+    "upToDate": "محدث"
+  },
+  "common": {
+    "cancel": "إلغاء",
+    "saving": "جارٍ الحفظ...",
+    "save": "حفظ وتطبيق",
+    "loading": "تحميل...",
+    "search": "بحث...",
+    "noData": "لا توجد بيانات",
+    "actions": "المعاملات",
+    "yes": "نعم",
+    "no": "لا",
+    "edit": "يحرر",
+    "delete": "يمسح",
+    "previous": "سابق",
+    "next": "التالي",
+    "processing": "يعالج..."
+  },
+  "sidebar": {
+    "accessControl": "التحكم في الوصول",
+    "permissionDefinitions": "تعريفات الأذونات",
+    "permissionGroups": "مجموعات الأذونات",
+    "userGroupAssignments": "تعيينات مجموعات المستخدمين"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "lines": {
+    "doubleClickToEdit": "Düzenlemek için çift tıklayın",
+    "unit": "Birim",
+    "descriptionTooltipText": "Satır bazlı üretim açıklamasıdır. ERP'ye aktarıldığında Netsis eşleşmesi: Açıklama 1 -> Ek Alan 1, Açıklama 2 -> Ek Alan 2, Açıklama 3 -> Satır Ek Açıklama 7.",
+    "profileErpTooltip": "Bu Profil seçimi ERP'ye gönderimde Netsis Satır Ek Açıklama 2 alanına kaydedilir.",
+    "rebarErpTooltip": "Bu Demir seçimi ERP'ye gönderimde Netsis Satır Ek Açıklama 3 değerine kaydedilir.",
+    "screwErpTooltip": "Bu Vida seçimi ERP'ye gönderimde Netsis Satır Ek Açıklama 4 değerine kaydedilir.",
+    "printErpTooltip": "Bu Baskı seçimi ERP'ye gönderimde Netsis Satır Ek Açıklama 8 değerine kaydedilir. Baskı açıklaması ayrıca Netsis satır Açıklama 9 ve Satır Ek Açıklama 9 alanlarına gider.",
+    "lineItemDescriptionPlaceholder": "Satır bazlı kalem açıklaması"
+  },
+  "notes": {
+    "title": "Sipariş Notları",
+    "description": "Sipariş için iç notlar ekleyin ve güncelleyin.",
+    "placeholder": "Sipariş notunu girin",
+    "noteLabel": "Sipariş Notu",
+    "notesTooltipText": "Siparişin tümünü ilgilendiren sevkiyat/fatura notlarıdır. Netsis sipariş üst Ek Açıklama 1-5 alanlarına sırayla kaydedilir; 2. not Netsis Ek Açıklama 2'ye gider.",
+    "addLineTooltip": "Açıklama satırı ekle",
+    "linesHint": "Her satır PDF ve belge notlarında ayrı görünür.",
+    "removeLine": "Satırı kaldır",
+    "pageLabel": "Sayfa {{current}} / {{total}}",
+    "saving": "Notlar kaydediliyor...",
+    "maxLengthError": "Not alanı en fazla 100 karakter olabilir."
+  },
+  "erpOrder": {
+    "title": "ERP Sipariş Listesi",
+    "description": "Netsis üzerinde giriş yapan kullanıcı kapsamında görünen sipariş üst kayıtlarını ve kalemlerini izleyin.",
+    "currentUserScope": "Giriş yapan kullanıcı esaslıdır",
+    "searchPlaceholder": "Sipariş no, cari, plasiyer veya tarih ara...",
+    "loading": "ERP siparişleri yükleniyor...",
+    "loadError": "ERP siparişleri yüklenemedi.",
+    "noData": "ERP siparişi bulunamadı.",
+    "detailAction": "Detay",
+    "detailTitle": "{{orderNo}} sipariş detayı",
+    "unknownCustomer": "Cari adı yok",
+    "lineCount": "{{count}} kalem",
+    "linesLoading": "Sipariş kalemleri yükleniyor...",
+    "lineLoadError": "Sipariş kalemleri yüklenemedi.",
+    "noLines": "Bu sipariş için kalem bulunamadı.",
+    "table": {
+      "title": "Sipariş Üst Bilgileri",
+      "branchCode": "Şube",
+      "orderNo": "Sipariş No",
+      "customerCode": "Cari Kodu",
+      "customerName": "Cari Adı",
+      "date": "Tarih",
+      "deliveryDate": "Teslim Tarihi",
+      "grossTotal": "Brüt Tutar",
+      "vat": "KDV",
+      "grandTotal": "Genel Toplam",
+      "salesRepCode": "Plasiyer"
+    },
+    "lines": {
+      "rowNo": "Sıra",
+      "stockCode": "Stok Kodu",
+      "stockName": "Stok Adı",
+      "quantity": "Miktar",
+      "unit": "Birim",
+      "netPrice": "Net Fiyat",
+      "vatRate": "KDV Oranı",
+      "warehouseCode": "Depo"
+    }
+  },
+  "header": {
+    "notes": "Notlar",
+    "descriptionErpTooltip": "Siparişin tamamı için üretimin görmesini istediğiniz genel açıklamadır. ERP'ye gönderimde Netsis sipariş üst Açıklama (FatUst.Aciklama) alanına kaydedilir.",
+    "ozelKod1": "Özel Kod 1",
+    "ozelKod1Placeholder": "Özel Kod 1 seçin",
+    "ozelKod2": "Özel Kod 2",
+    "ozelKod2Placeholder": "Özel Kod 2 seçin",
+    "specialCodeSearchPlaceholder": "Özel kod ara..."
+  }
+}

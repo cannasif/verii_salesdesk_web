@@ -1,0 +1,67 @@
+{
+  "title": "Gestión de tipo de pago",
+  "headerDescription": "Gestione y edite los tipos de pago",
+  "create": "Nuevo tipo de pago",
+  "edit": "Editar tipo de pago",
+  "editDescription": "Editar la información del tipo de pago",
+  "createDescription": "Ingrese la información del nuevo tipo de pago",
+  "delete": {
+    "confirmTitle": "Eliminar tipo de pago",
+    "confirmMessage": "¿Está seguro que desea eliminar {{name}}? Esta acción no se puede deshacer.",
+    "success": "Tipo de pago eliminado correctamente",
+    "error": "Error al eliminar el tipo de pago"
+  },
+  "deleteTitle": "Eliminar tipo de pago",
+  "name": "Nombre",
+  "namePlaceholder": "Ingrese el nombre del tipo de pago",
+  "description": "Descripción",
+  "descriptionPlaceholder": "Ingrese una descripción (opcional)",
+  "createdDate": "Fecha de creación",
+  "updatedDate": "Fecha de actualización",
+  "actions": "Acciones",
+  "search": "Buscar",
+  "refresh": "Actualizar",
+  "loading": "Cargando...",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "advancedFilter": {
+    "columnName": "Nombre",
+    "columnDescription": "Descripción"
+  },
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "saving": "Guardando...",
+  "noData": "No se encontraron datos",
+  "error": "Ocurrió un error",
+  "confirmDelete": "¿Seguro que desea eliminar este tipo de pago?",
+  "createSuccess": "Tipo de pago creado correctamente",
+  "updateSuccess": "Tipo de pago actualizado correctamente",
+  "deleteSuccess": "Tipo de pago eliminado correctamente",
+  "createError": "Error al crear el tipo de pago",
+  "updateError": "Error al actualizar el tipo de pago",
+  "deleteError": "Error al eliminar el tipo de pago",
+  "table": {
+    "title": "Tipos de pago",
+    "status": "Estado",
+    "id": "ID",
+    "name": "Nombre",
+    "description": "Descripción",
+    "createdDate": "Fecha de creación",
+    "updatedDate": "Fecha de actualización",
+    "showing": "Mostrando {{from}}-{{to}} / {{total}}",
+    "page": "Página {{current}} / {{total}}"
+  },
+  "form": {
+    "name": {
+      "required": "El nombre es obligatorio",
+      "maxLength": "El nombre puede tener como máximo 100 caracteres"
+    },
+    "description": {
+      "maxLength": "La descripción puede tener como máximo 500 caracteres"
+    }
+  },
+  "status": {
+    "inactive": "Inactivo",
+    "active": "Activo"
+  }
+}

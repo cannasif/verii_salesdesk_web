@@ -1,0 +1,82 @@
+{
+  "activityType": {
+    "table": {
+      "title": "Elenco spedizioni",
+      "id": "ID",
+      "name": "Nome spedizione",
+      "description": "Descrizione",
+      "createdDate": "Data creazione",
+      "createdBy": "Creato da",
+      "showing": "Visualizzazione {{from}}-{{to}} / {{total}}",
+      "page": "Pagina {{current}} / {{total}}"
+    },
+    "error": "Si è verificato un errore",
+    "create": "Aggiungi nuova spedizione",
+    "loading": "Caricamento...",
+    "noData": "Nessun dato",
+    "actions": "Azioni",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "saving": "Salvataggio...",
+    "form": {
+      "addTitle": "Aggiungi nuova spedizione",
+      "editTitle": "Modifica spedizione",
+      "addDescription": "Inserisci le informazioni della spedizione",
+      "editDescription": "Modifica le informazioni della spedizione",
+      "name": "Nome spedizione",
+      "namePlaceholder": "Inserisci nome spedizione",
+      "nameRequired": "Il nome della spedizione è obbligatorio",
+      "nameMaxLength": "Il nome della spedizione può contenere fino a 100 caratteri",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Inserisci descrizione (opzionale)",
+      "descriptionMaxLength": "La descrizione può contenere fino a 500 caratteri"
+    },
+    "stats": {
+      "totalActivityTypes": "Totale spedizioni",
+      "activeActivityTypes": "Spedizioni attive",
+      "newThisMonth": "Nuove di questo mese"
+    },
+    "messages": {
+      "createSuccess": "Spedizione creata con successo",
+      "createError": "Impossibile creare la spedizione",
+      "updateSuccess": "Spedizione aggiornata con successo",
+      "updateError": "Impossibile aggiornare la spedizione",
+      "deleteSuccess": "Spedizione eliminata con successo",
+      "deleteError": "Impossibile eliminare la spedizione"
+    }
+  },
+  "menu": "Gestione spedizioni",
+  "description": "Gestisci e modifica le definizioni di spedizione",
+  "addButton": "Aggiungi nuova spedizione",
+  "loading": "Caricamento...",
+  "noData": "Nessun dato",
+  "actions": "Azioni",
+  "edit": "Modifica",
+  "deleteButton": "Elimina",
+  "cancel": "Annulla",
+  "save": "Salva",
+  "saving": "Kaydediliyor...",
+  "previous": "Precedente",
+  "next": "Successivo",
+  "advancedFilter": {
+    "columnName": "Nome spedizione",
+    "columnDescription": "Descrizione",
+    "columnCreatedBy": "Creato da"
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Elimina spedizione",
+    "confirmMessage": "Sei sicuro di voler eliminare {{name}}?"
+  },
+  "messages": {
+    "deleteSuccess": "Spedizione eliminata con successo",
+    "deleteError": "Impossibile eliminare la spedizione"
+  },
+  "table": {
+    "title": "Elenco spedizioni",
+    "id": "ID",
+    "name": "Nome spedizione",
+    "description": "Descrizione",
+    "createdDate": "Data creazione",
+    "createdBy": "Creato da"
+  }
+}

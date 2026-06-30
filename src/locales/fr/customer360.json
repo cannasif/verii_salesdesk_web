@@ -1,0 +1,247 @@
+{
+  "title": "Client 360",
+  "notFound": "Client introuvable",
+  "error": "Une erreur s'est produite",
+  "retry": "Réessayer",
+  "quickActivity": "Activité Rapide",
+  "currencyFilter": {
+    "label": "Devise",
+    "all": "Tous"
+  },
+  "balanceDialog": {
+    "openButton": "Customer balance summary",
+    "title": "Customer Balance Summary",
+    "error": "Could not load ERP balance summary."
+  },
+  "tabs": {
+    "quotations": "Devis",
+    "orders": "Commandes",
+    "activities": "Activités",
+    "overview": "Aperçu",
+    "analytics": "Analytique",
+    "quickQuotations": "Devis Rapides",
+    "mailLogs": "Historique des E-mails",
+    "images": "Images",
+    "imagesDefaultDescription": "Image de carte de visite",
+    "erpMovements": "Mouvements ERP",
+    "erpOrders": "Commandes ERP"
+  },
+  "quickQuotations": {
+    "empty": "Aucun devis rapide trouvé pour ce client",
+    "error": "Impossible de charger les devis rapides",
+    "draft": "Brouillon",
+    "converted": "Converti",
+    "sentToApproval": "Envoyé pour Approbation",
+    "notSentToApproval": "Non Envoyé pour Approbation",
+    "currency": "Devise",
+    "total": "Total",
+    "quotationStatus": "Statut du Devis",
+    "approvalStep": "Étape d'Approbation",
+    "stepValue": "Étape {{step}}",
+    "convertedAt": "Converti : {{date}}",
+    "notConvertedYet": "Pas encore converti",
+    "openQuotation": "Ouvrir le Devis"
+  },
+  "mail": {
+    "providers": {
+      "google": "Google",
+      "outlook": "Outlook"
+    },
+    "columns": {
+      "date": "Date",
+      "sender": "Expéditeur",
+      "to": "Destinataire",
+      "subject": "Objet",
+      "status": "Statut",
+      "template": "Modèle",
+      "errorCode": "Code d'Erreur",
+      "body": "Message"
+    }
+  },
+  "kpi": {
+    "totalDemands": "Total des Devis",
+    "totalQuotations": "Total des Devis",
+    "totalOrders": "Total des Commandes",
+    "openQuotations": "Devis Ouverts",
+    "openOrders": "Commandes en Attente"
+  },
+  "sections": {
+    "contacts": "Contacts",
+    "shippingAddresses": "Adresses de Livraison",
+    "recentDemands": "Demandes Récentes",
+    "recentQuotations": "Devis Récents",
+    "recentOrders": "Commandes Récentes",
+    "recentActivities": "Activités Récentes",
+    "timeline": "Chronologie"
+  },
+  "analytics": {
+    "error": "Impossible de charger les données analytiques",
+    "last12MonthsOrderAmount": "Montant des Commandes 12 Derniers Mois",
+    "openQuotationAmount": "Montant des Devis Ouverts",
+    "openOrderAmount": "Montant des Commandes Ouvertes",
+    "activityCount": "Nombre d'Activités",
+    "lastActivityDate": "Date de la Dernière Activité"
+  },
+  "analyticsCharts": {
+    "demand": "Devis",
+    "quotation": "Devis",
+    "order": "Commande",
+    "last12MonthsOrderAmount": "Commandes 12 Derniers Mois",
+    "openQuotationAmount": "Devis Ouvert",
+    "openOrderAmount": "Commande Ouverte",
+    "distributionTitle": "Distribution",
+    "monthlyTrendTitle": "Tendance Mensuelle",
+    "amountComparisonTitle": "Comparaison des Montants"
+  },
+  "currencyTotals": {
+    "currency": "Devise",
+    "demandAmount": "Montant des Devis",
+    "quotationAmount": "Montant des Devis",
+    "orderAmount": "Montant des Commandes"
+  },
+  "revenueQuality": {
+    "title": "Qualité des Revenus",
+    "churnRisk": "Risque de Perte",
+    "upsell": "Propension à la Vente Additionnelle",
+    "payment": "Comportement de Paiement",
+    "segment": "Regroupement RFM",
+    "ltv": "Valeur de Vie Client"
+  },
+  "cohort": {
+    "title": "Rétention de Cohorte",
+    "empty": "Aucune donnée de cohorte",
+    "cohortKey": "Cohorte"
+  },
+  "actions": {
+    "title": "Actions Recommandées",
+    "empty": "Aucune action recommandée",
+    "execute": "Exécuter"
+  },
+  "explain": {
+    "revenueQualityTitle": "La qualité des revenus résume le potentiel de vente et le profil de risque du client.",
+    "churnRisk": "Le risque de perte indique la probabilité que le client ne passe plus de commandes.",
+    "upsellPropensity": "La propension à la vente additionnelle montre le potentiel du client pour des achats à plus grand volume ou des produits supplémentaires.",
+    "paymentBehavior": "Le comportement de paiement résume le modèle de recouvrement et de paiement du client.",
+    "rfmSegment": "Le regroupement RFM montre le groupe du client selon les données de récence, fréquence et montant.",
+    "modelNote": "Ces champs sont des sorties du modèle analytique et sont affichés à des fins d'aide à la décision.",
+    "cohortRetentionTitle": "La rétention de cohorte montre la continuité des clients acquis dans une période similaire au fil du temps.",
+    "noCohortData": "Données de cohorte insuffisantes pour ce client.",
+    "recommendedActionsTitle": "Les actions recommandées par le système sont listées dans cette section.",
+    "executeAction": "Exécuter l'action"
+  },
+  "button": "Client 360",
+  "status": {
+    "havenotstarted": "Non démarré",
+    "notstarted": "Non démarré",
+    "inprogress": "En approbation",
+    "pending": "En attente",
+    "waiting": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "completed": "Terminé",
+    "cancelled": "Annulé",
+    "canceled": "Annulé",
+    "draft": "Brouillon",
+    "converted": "Converti",
+    "sent": "Envoyé",
+    "active": "Actif",
+    "passive": "Passif",
+    "closed": "Fermé",
+    "open": "Ouvert"
+  },
+  "erpMovements": {
+    "title": "Mouvements ERP",
+    "tableTitle": "Mouvements de Compte",
+    "error": "Impossible de charger les données de mouvement ERP",
+    "columns": {
+      "date": "Date",
+      "dueDate": "Date d'échéance",
+      "documentNo": "N° Document",
+      "description": "Description",
+      "currency": "Devise",
+      "debit": "Débit",
+      "credit": "Crédit",
+      "tlBalanceByDate": "Solde TRY par Date",
+      "tlBalanceByDueDate": "Solde TRY par Échéance",
+      "fxDebit": "Débit Devise",
+      "fxCredit": "Crédit Devise",
+      "fxBalanceByDate": "Solde Devise par Date",
+      "fxBalanceByDueDate": "Solde Devise par Échéance"
+    },
+    "summary": {
+      "totalDebit": "Débit Total",
+      "totalCredit": "Crédit Total",
+      "balance": "Solde",
+      "closed": "Fermé"
+    }
+  },
+  "erpOrders": {
+    "title": "Netsis Orders",
+    "noCariCode": "No ERP customer code is defined for this customer.",
+    "forbidden": "You do not have permission to view ERP orders.",
+    "error": "ERP orders could not be loaded.",
+    "empty": "No Netsis orders were found for this customer.",
+    "scopeHint": "Limited to the logged-in user's Netsis scope.",
+    "columns": {
+      "branch": "Branch",
+      "orderNo": "Order No",
+      "date": "Date",
+      "deliveryDate": "Delivery",
+      "gross": "Gross",
+      "vat": "VAT",
+      "total": "Total",
+      "salesRep": "Sales Rep"
+    }
+  },
+  "hero": {
+    "statusActive": "Actif",
+    "statusCrm": "Fiche CRM",
+    "since": "Depuis {{year}}",
+    "whatsapp": "WhatsApp",
+    "call": "Appeler",
+    "email": "E-mail",
+    "quickQuote": "Devis rapide",
+    "editCustomer": "Modifier le client",
+    "none": "Aucun",
+    "emailLabel": "E-mail",
+    "phoneLabel": "Téléphone",
+    "websiteLabel": "Site web",
+    "addressLabel": "Adresse",
+    "infoTitle": "Détails",
+    "taxNumber": "N° fiscal",
+    "customerType": "Type de client",
+    "salesRep": "Commercial",
+    "creditLimit": "Limite de crédit"
+  },
+  "related": {
+    "newQuotation": "Nouveau devis",
+    "newOrder": "Nouvelle commande",
+    "newActivity": "Nouvelle activité",
+    "error": "Impossible de charger la liste",
+    "emptyQuotations": "Aucun devis pour ce client",
+    "emptyOrders": "Aucune commande pour ce client",
+    "emptyActivities": "Aucune activité pour ce client",
+    "columns": {
+      "offerNo": "N°",
+      "date": "Date",
+      "representative": "Représentant",
+      "total": "Total",
+      "subject": "Sujet",
+      "type": "Type",
+      "assignee": "Responsable",
+      "status": "Statut"
+    },
+    "activityStatus": {
+      "scheduled": "Planifié",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    }
+  },
+  "images": {
+    "upload": "Téléverser une image",
+    "delete": "Supprimer",
+    "emptyHint": "Cliquez ou glissez pour ajouter une image",
+    "deleteConfirmTitle": "Supprimer l'image",
+    "deleteConfirmDescription": "Voulez-vous vraiment supprimer cette image ? Cette action est irréversible."
+  }
+}

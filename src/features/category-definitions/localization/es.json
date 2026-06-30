@@ -1,0 +1,511 @@
+{
+  "categoryDefinitions": {
+    "title": "Definiciones de categorías",
+    "description": "Empiece aquí a gestionar el árbol de categorías y los stocks vinculados a categorías para catálogos B2B y B2C.",
+    "guidedTitle": "Gestione la estructura de categorías en 3 pasos claros",
+    "hierarchyBlueprintTitle": "Esquema jerárquico de categorías corporativas recomendado",
+    "hierarchyBlueprintDescription": "Si mantiene el árbol de categorías en una estructura fija, la experiencia del usuario será más clara y la asignación de productos será más consistente.",
+    "hierarchyExampleLabel": "Flujo de ejemplo",
+    "hierarchyExampleValue": "Teléfonos > Teléfonos con botones > iPhone > Serie 17 > Lista de productos",
+    "easyModeTitle": "No tiene que adivinar qué hacer aquí",
+    "summaryGuideTitle": "Le mostraré el siguiente paso correcto",
+    "createCatalogTitle": "Crear catálogo nuevo",
+    "createCatalogDescription": "Añada una definición de catálogo nueva para flujos B2B, B2C o personalizados.",
+    "editCatalogTitle": "Editar catálogo",
+    "editCatalogDescription": "Actualice el nombre, el tipo y el orden del catálogo seleccionado.",
+    "createCategoryTitle": "Añadir categoría",
+    "createCategoryDescription": "Cree una categoría nueva bajo {{target}}.",
+    "editCategoryTitle": "Editar categoría",
+    "editCategoryDescription": "Actualice los datos de la categoría para {{target}}.",
+    "createCategoryTarget": "Nivel de destino",
+    "deleteCatalogConfirm": "¿Seguro que desea eliminar el catálogo {{name}}?",
+    "deleteCategoryConfirm": "¿Seguro que desea eliminar la categoría {{name}}?",
+    "deleteStockConfirm": "¿Seguro que desea quitar esta asignación de stock?",
+    "createRuleTitle": "Añadir regla",
+    "createRuleDescription": "Cree una regla de coincidencia automática para la categoría {{category}}.",
+    "editRuleTitle": "Editar regla",
+    "editRuleDescription": "Actualice los datos de la regla de la categoría {{category}}.",
+    "deleteRuleConfirm": "¿Seguro que desea eliminar la regla {{name}}?",
+    "noRules": "Aún no se han definido reglas para esta categoría.",
+    "rulePriority": "Prioridad {{priority}}",
+    "catalogsTitle": "Catálogos",
+    "catalogsDescription": "Seleccione primero el catálogo con el que desea trabajar.",
+    "catalogDescriptionFallback": "Aún no se ha introducido una descripción para este catálogo.",
+    "catalogHelperText": "En resumen: elija un catálogo a la izquierda, recorra el árbol en el centro y gestione stocks y reglas a la derecha.",
+    "treeTitle": "Árbol de categorías",
+    "treeDescription": "Navegue de categoría a subcategoría con un flujo al estilo Trendyol o Hepsiburada.",
+    "treeReorderHint": "Puede reordenar las categorías del mismo nivel arrastrándolas y soltándolas.",
+    "chooseCatalogFirst": "Primero elija un catálogo a la izquierda. La gestión de categorías no comienza antes de eso.",
+    "stocksTitle": "Stocks de la categoría",
+    "stocksDescription": "Aquí se listarán los stocks vinculados a la categoría hoja seleccionada.",
+    "stocksDescriptionSelected": "Stocks vinculados a {{category}}",
+    "stocksGuideTitle": "¿Para qué sirve esta zona?",
+    "stocksGuideDescription": "Aquí decide qué productos pertenecen a la categoría seleccionada. Puede asignar stocks uno a uno si lo necesita.",
+    "stocksHelperText": "Flujo sencillo: primero elija una categoría, después pulse «Asignar stock» y elija el producto en la lista.",
+    "rulesGuideTitle": "¿Qué hace la pantalla de reglas?",
+    "rulesGuideDescription": "Si no quiere asignar productos similares uno a uno, defina aquí una regla. Por ejemplo, si Código1 = VIDRIO, colóquelos en esta categoría.",
+    "rulesHelperText": "Primero cree la regla. Después use «Vista previa de reglas» para ver qué ocurrirá. Si es correcto, use «Aplicar reglas» para asignar automáticamente.",
+    "selectionTitle": "Estado de la selección",
+    "selectionDescription": "Use el panel derecho para ver de un vistazo el catálogo, la categoría y los stocks vinculados seleccionados.",
+    "selectionCatalog": "Catálogo",
+    "selectionCategory": "Categoría seleccionada",
+    "selectionCurrentLevel": "Nivel actual",
+    "selectionPath": "Ruta",
+    "selectionTotalStocks": "Stocks vinculados",
+    "selectionValueEmpty": "Aún no seleccionado",
+    "nextStepTitle": "Siguiente paso recomendado",
+    "nextStepChooseCatalog": "Primero, elija un catálogo en el panel izquierdo.",
+    "nextStepBrowseTree": "Use el panel central para pasar de las categorías principales a niveles más profundos.",
+    "nextStepSelectLeaf": "Seleccione una categoría hoja para ver la lista de stocks.",
+    "nextStepReviewStocks": "Revise los stocks vinculados a la categoría seleccionada y confirme que coinciden.",
+    "stepCatalogTitle": "Elegir catálogo",
+    "stepCatalogDescription": "Decida si trabaja en un catálogo B2B, B2C o personalizado.",
+    "stepTreeTitle": "Recorrer el árbol",
+    "stepTreeDescription": "Avance pulsando categorías principales, subcategorías y niveles inferiores.",
+    "stepStocksTitle": "Revisar stocks",
+    "stepStocksDescription": "Cuando una categoría hoja esté seleccionada, vea en el panel derecho los stocks vinculados y el desglose de códigos ERP.",
+    "ready": "Listo",
+    "pending": "Pendiente",
+    "openBranchAction": "Abrir subcategorías",
+    "selectLeafAction": "Seleccionar esta categoría",
+    "root": "Raíz",
+    "leaf": "Hoja",
+    "branch": "Rama",
+    "treeLevelLabel": "Nivel {{level}}",
+    "noCatalogs": "Aún no se han definido catálogos.",
+    "noCategories": "No se han encontrado categorías en este nivel.",
+    "noStocks": "No hay stocks vinculados a esta categoría.",
+    "selectLeafHint": "Seleccione una categoría hoja para ver los stocks vinculados.",
+    "stockSearchPlaceholder": "Buscar por código o nombre de stock...",
+    "primaryBadge": "Categoría principal",
+    "tabs": {
+      "summary": "Ayuda",
+      "stocks": "Asignar stock",
+      "rules": "Añadir regla",
+      "tips": "Guía",
+      "favorites": "Favoritos"
+    },
+    "catalogTypes": {
+      "b2b": "B2B",
+      "b2c": "B2C",
+      "dealer": "Distribuidor",
+      "custom": "Personalizado"
+    },
+    "tips": {
+      "catalogTitle": "1. Elija primero el catálogo correcto",
+      "catalogDescription": "Aunque los nombres de categoría parezcan similares, B2B y B2C pueden requerir estructuras de catálogo distintas.",
+      "branchTitle": "2. Las categorías rama sirven para navegar",
+      "branchDescription": "Las categorías rama no son el punto de selección final. Úselas para llevar al usuario al nivel inferior correcto.",
+      "leafTitle": "3. Valide los stocks en la categoría hoja",
+      "leafDescription": "La lista de stocks vinculados cobra sentido en el nivel hoja, por lo que la revisión final debe hacerse ahí.",
+      "exampleTitle": "4. Mantenga estable la jerarquía corporativa",
+      "exampleDescription": "Estructura recomendada: Categoría principal > Subcategoría > Marca > Serie > Productos. Así todo el equipo utiliza la misma lógica y los resultados de búsqueda se vuelven más predecibles."
+    },
+    "hierarchyStages": {
+      "root": {
+        "title": "Categoría principal",
+        "description": "Representa el nivel de negocio superior. Ejemplo: Teléfonos"
+      },
+      "subcategory": {
+        "title": "Subcategoría",
+        "description": "Separa familias de productos. Ejemplo: Teléfonos con botones"
+      },
+      "brand": {
+        "title": "Marca",
+        "description": "Utilícela para separación por marca o fabricante. Ejemplo: iPhone"
+      },
+      "series": {
+        "title": "Serie",
+        "description": "Mantenga aquí la separación por familias de modelo. Ejemplo: Serie 17"
+      },
+      "products": {
+        "title": "Productos",
+        "description": "Debe ser la categoría hoja final; aquí se realiza la asignación de artículos."
+      }
+    },
+    "actions": {
+      "newCatalog": "Catálogo nuevo",
+      "createCatalog": "Crear catálogo",
+      "addRootCategory": "Añadir categoría raíz",
+      "addSubCategory": "Añadir subcategoría",
+      "createCategory": "Crear categoría",
+      "uploadCategoryImage": "Subir imagen",
+      "uploadingCategoryImage": "Subiendo imagen",
+      "removeCategoryImage": "Quitar imagen",
+      "addStock": "Asignar stock",
+      "removeStock": "Quitar vínculo",
+      "addRule": "Añadir regla",
+      "createRule": "Crear regla",
+      "previewRules": "Vista previa de reglas",
+      "previewingRules": "Generando vista previa",
+      "applyRules": "Aplicar reglas",
+      "applyingRules": "Aplicando reglas",
+      "importFromRiiStock": "Crear desde RII_STOK",
+      "previewingStockHierarchy": "Leyendo jerarquía",
+      "refreshStockHierarchyPreview": "Actualizar vista previa",
+      "applyStockHierarchy": "Crear árbol del catálogo",
+      "applyingStockHierarchy": "Creando árbol del catálogo",
+      "addFavorite": "Agregar a favoritos",
+      "removeFavorite": "Quitar de favoritos",
+      "addCategoryFavorite": "Agregar categoría a favoritos",
+      "removeCategoryFavorite": "Quitar categoría de favoritos"
+    },
+    "messages": {
+      "catalogCreateSuccess": "Catálogo creado correctamente.",
+      "catalogCreateError": "No se ha podido crear el catálogo.",
+      "catalogUpdateSuccess": "Catálogo actualizado correctamente.",
+      "catalogUpdateError": "No se ha podido actualizar el catálogo.",
+      "catalogDeleteSuccess": "Catálogo eliminado correctamente.",
+      "catalogDeleteError": "No se ha podido eliminar el catálogo.",
+      "rootCategoryCreateSuccess": "Categoría raíz creada correctamente.",
+      "subCategoryCreateSuccess": "Subcategoría creada correctamente.",
+      "categoryCreateError": "No se ha podido crear la categoría.",
+      "categoryUpdateSuccess": "Categoría actualizada correctamente.",
+      "categoryUpdateError": "No se ha podido actualizar la categoría.",
+      "categoryReorderSuccess": "Orden de categorías actualizado correctamente.",
+      "categoryReorderError": "No se ha podido actualizar el orden de las categorías.",
+      "categoryDeleteSuccess": "Categoría eliminada correctamente.",
+      "categoryDeleteError": "No se ha podido eliminar la categoría.",
+      "stockAssignSuccess": "Stock asignado a la categoría correctamente.",
+      "stockAssignError": "No se ha podido asignar el stock a la categoría.",
+      "stockUnassignSuccess": "Asignación de stock eliminada correctamente.",
+      "stockUnassignError": "No se ha podido eliminar la asignación de stock.",
+      "ruleCreateSuccess": "Regla creada correctamente.",
+      "ruleCreateError": "No se ha podido crear la regla.",
+      "ruleUpdateSuccess": "Regla actualizada correctamente.",
+      "ruleUpdateError": "No se ha podido actualizar la regla.",
+      "ruleDeleteSuccess": "Regla eliminada correctamente.",
+      "ruleDeleteError": "No se ha podido eliminar la regla.",
+      "rulePreviewError": "No se ha podido cargar la vista previa de reglas.",
+      "ruleApplySuccess": "Reglas aplicadas correctamente.",
+      "ruleApplyError": "No se han podido aplicar las reglas.",
+      "stockHierarchyPreviewError": "No se pudo obtener la vista previa de la jerarquía de stock.",
+      "stockHierarchyApplySuccess": "Se creó el árbol del catálogo desde la jerarquía de RII_STOK.",
+      "stockHierarchyApplyError": "No se pudo crear el árbol del catálogo desde la jerarquía de RII_STOK.",
+      "favoriteAddSuccess": "Stock agregado a favoritos.",
+      "favoriteRemoveSuccess": "Stock eliminado de favoritos.",
+      "favoriteToggleError": "No se ha podido actualizar el estado de favorito.",
+      "categoryFavoriteAddSuccess": "Categoría agregada a favoritos.",
+      "categoryFavoriteRemoveSuccess": "Categoría eliminada de favoritos."
+    },
+    "stockHierarchyImport": {
+      "title": "Crear catálogo desde jerarquía de RII_STOK",
+      "description": "Convierte Grupo de código > Código 1 > Código 2 > Código 3 en un árbol de catálogo. Al igual que en marketplaces, el usuario avanza por niveles y visualiza los stocks en la hoja final.",
+      "options": {
+        "includeCode1": {
+          "title": "Incluir nivel de Código 1",
+          "description": "Abre la primera subdivisión bajo el grupo. Ej.: Gasolina / Diésel."
+        },
+        "includeCode2": {
+          "title": "Incluir nivel de Código 2",
+          "description": "Abre la segunda subdivisión bajo Código 1. Ej.: Manual / Automático."
+        },
+        "includeCode3": {
+          "title": "Incluir nivel de Código 3",
+          "description": "Abre la tercera subdivisión bajo Código 2. Si no hay valor, la última capa disponible se usa como hoja."
+        },
+        "assignStocks": {
+          "title": "Asignar stocks a la hoja",
+          "description": "Al crear el árbol del catálogo, asigna los stocks automáticamente a su nivel final más profundo."
+        }
+      },
+      "preview": {
+        "sourceStock": "Stocks leídos",
+        "category": "Total de categorías",
+        "newCategory": "Categorías nuevas",
+        "newStockAssignment": "Nuevas asignaciones de stock",
+        "group": "Grupo: {{count}}",
+        "code1": "Código 1: {{count}}",
+        "code2": "Código 2: {{count}}",
+        "code3": "Código 3: {{count}}",
+        "samples": "Rutas de ejemplo que se crearán",
+        "noSamples": "No se encontraron jerarquías de ejemplo."
+      }
+    },
+    "rulePreviewSummaryTitle": "Resumen de la vista previa de reglas",
+    "rulePreviewSummary": {
+      "matched": "Stocks que coincidirán: {{count}}",
+      "created": "Asignaciones a crear: {{count}}",
+      "updated": "Asignaciones a actualizar: {{count}}",
+      "skipped": "Asignaciones manuales conservadas: {{count}}"
+    },
+    "rulePreviewListTitle": "Muestras de la vista previa",
+    "rulePreviewListEmpty": "No se han encontrado coincidencias de muestra para la vista previa.",
+    "rulePreviewMatchedRule": "Regla coincidente: {{rule}} · Prioridad {{priority}}",
+    "rulePreviewActions": {
+      "create": "Asignación nueva",
+      "update": "Asignación actualizada",
+      "skip": "Manual conservada"
+    },
+    "ruleApplySummaryTitle": "Resumen de la aplicación de reglas",
+    "ruleApplySummary": {
+      "matched": "Stocks coincidentes: {{count}}",
+      "created": "Asignaciones nuevas: {{count}}",
+      "updated": "Asignaciones actualizadas: {{count}}",
+      "skipped": "Asignaciones manuales conservadas: {{count}}"
+    },
+    "form": {
+      "catalogName": "Nombre del catálogo",
+      "catalogNamePlaceholder": "p. ej. Catálogo principal B2B",
+      "catalogCode": "Código del catálogo",
+      "catalogCodePlaceholder": "p. ej. B2B_MAIN",
+      "catalogType": "Tipo de catálogo",
+      "branchCode": "Código de rama",
+      "branchCodePlaceholder": "Opcional",
+      "sortOrder": "Orden",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Explique brevemente esta definición para que otros responsables la entiendan.",
+      "categoryName": "Nombre de la categoría",
+      "categoryNamePlaceholder": "p. ej. Sistemas de vidrio",
+      "categoryCode": "Código de categoría",
+      "categoryCodePlaceholder": "p. ej. GLASS_SYSTEMS",
+      "nodeType": "Tipo de categoría",
+      "visualPreset": "Tema visual",
+      "visualPresetPlaceholder": "Busque y elija un tema",
+      "visualPresetSearchPlaceholder": "Buscar tema...",
+      "visualPresetEmpty": "No se ha encontrado ningún tema coincidente.",
+      "visualPresetHelp": "Aquí no sube una imagen externa. El sistema crea el aspecto de la categoría según esta elección.",
+      "categoryImage": "Imagen de la categoría",
+      "categoryImageHelp": "Opcionalmente puede subir una imagen propia del sistema. Si lo hace, la tarjeta de categoría usa esta imagen en lugar del icono del tema.",
+      "ruleName": "Nombre de la regla",
+      "ruleCode": "Código de la regla",
+      "stockAttribute": "Atributo de stock",
+      "operator": "Operador",
+      "ruleValue": "Valor de la regla",
+      "ruleValuePlaceholder": "p. ej. GLASS o PROFILE,ACCESSORY",
+      "ruleValueDropdownPlaceholder": "Elegir entre valores de stock existentes",
+      "ruleValueSearchPlaceholder": "Buscar desglose ERP...",
+      "ruleValueLoading": "Cargando valores...",
+      "ruleValueEmpty": "No se han encontrado valores coincidentes para este campo.",
+      "ruleValueDropdownHelp": "El sistema lista valores reales del ERP del campo de stock seleccionado. Elegir aquí es más seguro que escribir a mano.",
+      "ruleValueInListHelp": "Con el operador En lista puede seleccionar varios valores. Elija arriba y pulse una etiqueta para quitarla.",
+      "ruleValueInListEmpty": "Aún no se han añadido valores.",
+      "ruleValueManualHelp": "Este operador funciona con texto libre. Escriba el texto que debe coincidir para contiene, empieza por o termina en.",
+      "ruleValueTopMatchesTitle": "Valores más frecuentes en el sistema",
+      "ruleValueTopMatchesSubtitle": "Pulse para seleccionar rápidamente",
+      "ruleValueTopMatchesEmpty": "No se han encontrado valores destacados para este campo.",
+      "nodeTypeBranchHelp": "Una categoría rama sirve para navegación y desglose más profundo. No asigne productos directamente en este nivel.",
+      "nodeTypeLeafHelp": "La categoría hoja es el nivel final de selección; la asignación de stock y la lista de artículos deben hacerse aquí.",
+      "priority": "Prioridad"
+    },
+    "visualPreviewTitle": "Vista previa de la categoría",
+    "visualPreviewFallback": "Vista previa de la categoría",
+    "visualPresets": {
+      "general": {
+        "label": "General"
+      },
+      "glass": {
+        "label": "Vidrio"
+      },
+      "profile": {
+        "label": "Perfil"
+      },
+      "accessory": {
+        "label": "Accesorio"
+      },
+      "service": {
+        "label": "Servicio"
+      },
+      "logistics": {
+        "label": "Logística"
+      },
+      "machinery": {
+        "label": "Maquinaria"
+      },
+      "electronics": {
+        "label": "Electrónica"
+      },
+      "security": {
+        "label": "Seguridad"
+      },
+      "lighting": {
+        "label": "Iluminación"
+      },
+      "construction": {
+        "label": "Construcción"
+      },
+      "furniture": {
+        "label": "Mobiliario"
+      },
+      "hardware": {
+        "label": "Ferretería"
+      },
+      "automation": {
+        "label": "Automatización"
+      },
+      "energy": {
+        "label": "Energía"
+      },
+      "office": {
+        "label": "Oficina"
+      },
+      "textile": {
+        "label": "Textil"
+      },
+      "chemical": {
+        "label": "Química"
+      },
+      "outdoor": {
+        "label": "Exterior"
+      },
+      "cooling": {
+        "label": "Refrigeración"
+      },
+      "heating": {
+        "label": "Calefacción"
+      },
+      "plumbing": {
+        "label": "Fontanería"
+      },
+      "decoration": {
+        "label": "Decoración"
+      },
+      "packaging": {
+        "label": "Embalaje"
+      },
+      "automotive": {
+        "label": "Automoción"
+      },
+      "agriculture": {
+        "label": "Agricultura"
+      },
+      "medical": {
+        "label": "Medicina"
+      },
+      "pharmacy": {
+        "label": "Farmacia"
+      },
+      "cosmetics": {
+        "label": "Cosmética"
+      },
+      "food": {
+        "label": "Alimentación"
+      },
+      "beverage": {
+        "label": "Bebidas"
+      },
+      "cleaning": {
+        "label": "Limpieza"
+      },
+      "education": {
+        "label": "Educación"
+      },
+      "finance": {
+        "label": "Finanzas"
+      },
+      "insurance": {
+        "label": "Seguros"
+      },
+      "real-estate": {
+        "label": "Inmobiliaria"
+      },
+      "tourism": {
+        "label": "Turismo"
+      },
+      "hospitality": {
+        "label": "Hostelería"
+      },
+      "restaurant": {
+        "label": "Restauración"
+      },
+      "ecommerce": {
+        "label": "Comercio electrónico"
+      },
+      "retail": {
+        "label": "Minorista"
+      },
+      "wholesale": {
+        "label": "Mayorista"
+      },
+      "manufacturing": {
+        "label": "Fabricación"
+      },
+      "mining": {
+        "label": "Minería"
+      },
+      "marine": {
+        "label": "Marítimo"
+      },
+      "aviation": {
+        "label": "Aviación"
+      },
+      "telecom": {
+        "label": "Telecomunicaciones"
+      },
+      "software": {
+        "label": "Software"
+      },
+      "data-center": {
+        "label": "Centro de datos"
+      },
+      "media": {
+        "label": "Medios"
+      },
+      "printing": {
+        "label": "Impresión"
+      },
+      "sports": {
+        "label": "Deportes"
+      },
+      "baby-kids": {
+        "label": "Bebé y niños"
+      },
+      "pet": {
+        "label": "Mascotas"
+      },
+      "jewelry": {
+        "label": "Joyería"
+      },
+      "luxury": {
+        "label": "Lujo"
+      },
+      "stationery": {
+        "label": "Papelería"
+      },
+      "laboratory": {
+        "label": "Laboratorio"
+      },
+      "recycling": {
+        "label": "Reciclaje"
+      },
+      "defense": {
+        "label": "Defensa"
+      }
+    },
+    "ruleAttributes": {
+      "groupCode": "Código de grupo",
+      "groupName": "Nombre de grupo",
+      "code1": "Código 1",
+      "code1Name": "Nombre código 1",
+      "code2": "Código 2",
+      "code2Name": "Nombre código 2",
+      "code3": "Código 3",
+      "code3Name": "Nombre código 3",
+      "code4": "Código 4",
+      "code4Name": "Nombre código 4",
+      "code5": "Código 5",
+      "code5Name": "Nombre código 5",
+      "manufacturerCode": "Código de fabricante",
+      "erpStockCode": "Código de stock ERP",
+      "stockName": "Nombre de stock"
+    },
+    "ruleOperators": {
+      "equals": "Igual a",
+      "contains": "Contiene",
+      "startsWith": "Empieza por",
+      "endsWith": "Termina en",
+      "inList": "En lista"
+    },
+    "meta": {
+      "group": "Grupo",
+      "code1": "Código 1",
+      "code2": "Código 2",
+      "code3": "Código 3"
+    },
+    "favoritesGuideTitle": "¿Para qué sirven los favoritos?",
+    "favoritesGuideDescription": "Muestra los stocks favoritos de la categoría seleccionada en una lista rápida por usuario. Los favoritos de stock y categoría se guardan separados.",
+    "favoritesHelperText": "Esta categoría tiene {{count}} stocks favoritos. Pulse el corazón otra vez para quitar un stock.",
+    "noFavorites": "Todavía no hay stocks favoritos en esta categoría.",
+    "favoriteSearchPlaceholder": "Buscar favoritos por código o nombre..."
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "countryManagement": {
+    "menu": "Country Management",
+    "description": "Manage and edit countries",
+    "addButton": "Add New Country",
+    "searchPlaceholder": "Search...",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "table": {
+      "id": "ID",
+      "name": "Country Name",
+      "code": "Code",
+      "erpCode": "ERP Code",
+      "createdDate": "Created Date",
+      "createdBy": "Created By",
+      "noData": "No data found",
+      "title": "Country List"
+    },
+    "delete": {
+      "confirmTitle": "Delete Country",
+      "confirmMessage": "Are you sure you want to delete {{name}}?"
+    },
+    "messages": {
+      "deleteSuccess": "Country deleted successfully",
+      "deleteError": "Country could not be deleted",
+      "createSuccess": "Country successfully created",
+      "createError": "Country could not be created",
+      "updateSuccess": "Country successfully updated",
+      "updateError": "Country could not be updated"
+    },
+    "form": {
+      "addCountry": "Add New Country",
+      "editCountry": "Edit Country",
+      "addDescription": "Enter new country information",
+      "editDescription": "Edit country information",
+      "name": "Country Name",
+      "namePlaceholder": "Enter country name",
+      "code": "Country Code",
+      "codePlaceholder": "Enter country code (e.g. TR, US)",
+      "erpCode": "ERP Code",
+      "erpCodePlaceholder": "Enter ERP code (optional)",
+      "nameRequired": "Country name is required",
+      "nameMaxLength": "Country name can be at most 100 characters",
+      "codeMinLength": "Country code must be at least 2 characters",
+      "codeMaxLength": "Country code can be at most 5 characters",
+      "erpCodeMaxLength": "ERP code can be at most 10 characters",
+      "cancel": "Cancel",
+      "save": "Save",
+      "tabs": {
+        "header": "General Information"
+      }
+    },
+    "stats": {
+      "totalCountries": "Total Countries",
+      "activeCountries": "Active Countries",
+      "newThisMonth": "New This Month"
+    }
+  },
+  "menu": "Country Management",
+  "description": "Manage and edit countries",
+  "addButton": "Add New Country",
+  "searchPlaceholder": "Search...",
+  "loading": "Loading...",
+  "noData": "No data found",
+  "actions": "Actions",
+  "previous": "Previous",
+  "next": "Next",
+  "deleteConfirmTitle": "Delete Confirmation",
+  "cancel": "Cancel",
+  "deleting": "Deleting...",
+  "delete": {
+    "confirmTitle": "Delete Country",
+    "confirmMessage": "Are you sure you want to delete {{name}}?"
+  },
+  "saving": "Saving...",
+  "save": "Save",
+  "stats": {
+    "totalCountries": "Total Countries",
+    "activeCountries": "Active Countries",
+    "newThisMonth": "New This Month"
+  },
+  "table": {
+    "id": "ID",
+    "name": "Country Name",
+    "code": "Code",
+    "erpCode": "ERP Code",
+    "createdDate": "Created Date",
+    "createdBy": "Created By",
+    "showing": "Showing {{from}}-{{to}} / {{total}}",
+    "page": "Page {{current}} / {{total}}",
+    "noData": "No data found",
+    "title": "Country List"
+  },
+  "advancedFilter": {
+    "columnName": "Country Name",
+    "columnCode": "Country Code",
+    "columnErpCode": "ERP Code"
+  },
+  "form": {
+    "addCountry": "Add New Country",
+    "editCountry": "Edit Country",
+    "addDescription": "Enter new country information",
+    "editDescription": "Edit country information",
+    "name": "Country Name",
+    "namePlaceholder": "Enter country name",
+    "code": "Country Code",
+    "codePlaceholder": "Enter country code (e.g. TR, US)",
+    "erpCode": "ERP Code",
+    "erpCodePlaceholder": "Enter ERP code (optional)",
+    "nameRequired": "Country name is required",
+    "nameMaxLength": "Country name can be at most 100 characters",
+    "codeMinLength": "Country code must be at least 2 characters",
+    "codeMaxLength": "Country code can be at most 5 characters",
+    "erpCodeMaxLength": "ERP code can be at most 10 characters"
+  },
+  "deleteConfirm": {
+    "confirmMessage": "Are you sure you want to delete {{name}}?"
+  },
+  "search": "Search..."
+}

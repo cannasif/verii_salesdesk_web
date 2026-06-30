@@ -1,0 +1,62 @@
+{
+  "advancedFilter": {
+    "columnName": "Gruppenname",
+    "columnCreatedBy": "Erstellt von"
+  },
+  "menu": "Genehmigungsrollengruppen-Verwaltung",
+  "description": "Genehmigungsrollengruppen verwalten und bearbeiten",
+  "addButton": "Neue Genehmigungsrolle hinzufügen",
+  "refresh": "Aktualisieren",
+  "searchPlaceholder": "Suchen...",
+  "loading": "Lädt...",
+  "noData": "Keine Daten gefunden",
+  "noDataDescription": "Es wurden keine Treffer zu Ihren Suchkriterien gefunden oder es wurden noch keine Datensätze hinzugefügt.",
+  "approvalRoleGroup": {
+    "menu": "Genehmigungsrollengruppen-Verwaltung",
+    "description": "Genehmigungsrollengruppen verwalten und bearbeiten",
+    "addButton": "Neue Genehmigungsrolle hinzufügen",
+    "searchPlaceholder": "Suchen...",
+    "noData": "Keine Daten gefunden",
+    "table": {
+      "title": "Gruppenliste",
+      "id": "ID",
+      "name": "Gruppenname",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "actions": "Aktionen",
+      "showing": "Anzeige von {{from}} bis {{to}} von {{total}} Datensätzen"
+    },
+    "delete": {
+      "title": "Löschen bestätigen",
+      "confirmMessage": "Möchten Sie die Gruppe {{name}} wirklich löschen?",
+      "success": "Gruppe wurde erfolgreich gelöscht",
+      "error": "Fehler beim Löschen der Gruppe aufgetreten"
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Gruppenname",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von",
+    "actions": "Aktionen",
+    "showing": "Anzeige von {{from}}-{{to}} von {{total}} Einträgen"
+  },
+  "delete": {
+    "confirmTitle": "Löschen bestätigen",
+    "confirmMessage": "Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?"
+  },
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Wird gespeichert...",
+  "deleteButton": "Löschen",
+  "form": {
+    "editTitle": "Genehmigungsrollengruppe bearbeiten",
+    "addTitle": "Neue Genehmigungsrollengruppe hinzufügen",
+    "editDescription": "Genehmigungsrollengruppen-Informationen bearbeiten",
+    "addDescription": "Neue Genehmigungsrollengruppe hinzufügen",
+    "name": "Gruppenname",
+    "namePlaceholder": "Gruppennamen eingeben",
+    "nameRequired": "Gruppenname ist erforderlich",
+    "nameMaxLength": "Gruppenname darf maximal 100 Zeichen lang sein"
+  }
+}

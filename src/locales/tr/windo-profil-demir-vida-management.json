@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "Windoform Tanımları",
+    "description": "Profil, demir, vida ve baskı kayıtlarını proje genelindeki yönetim sayfalarıyla uyumlu, sayfalı tablo yapısında yönetin.",
+    "documentTitle": "Windoform Tanımları"
+  },
+  "sections": {
+    "profil": {
+      "title": "Profil Tanımla",
+      "description": "Satır bazında seçilecek profil tanımlarını yönetin."
+    },
+    "demir": {
+      "title": "Demir Tanımla",
+      "description": "Satır bazında seçilecek demir tanımlarını yönetin."
+    },
+    "vida": {
+      "title": "Vida Tanımla",
+      "description": "Satır bazında seçilecek vida tanımlarını yönetin."
+    },
+    "baski": {
+      "title": "Baskı Tanımla",
+      "description": "Satır bazında seçilecek baskı tanımlarını yönetin."
+    },
+    "koliBaski": {
+      "title": "Koli Baskı Tanımla",
+      "description": "Teklif üst bilgisinde seçilip Netsis üst açıklama alanına gönderilecek koli baskı tanımlarını yönetin."
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Ad",
+    "profilName": "Profil",
+    "createdDate": "Oluşturulma",
+    "updatedDate": "Güncellenme",
+    "newRecord": "Yeni Kayıt",
+    "searchPlaceholder": "Tanım ara...",
+    "refresh": "Yenile",
+    "loading": "Tanımlar yükleniyor...",
+    "empty": "Kayıt bulunamadı.",
+    "actions": "İşlem",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "pagination": "Toplam {{total}} kayıttan {{from}}-{{to}} arası gösteriliyor",
+    "filterName": "Ad",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "Yeni profil ekle",
+    "addNewRebar": "Yeni demir ekle",
+    "addNewScrew": "Yeni vida ekle",
+    "addNewPrint": "Yeni baskı ekle",
+    "addNewKoliBaski": "Yeni koli baskı ekle",
+    "editTitle": "{{section}} güncelle",
+    "addTitle": "{{section}} ekle",
+    "nameLabel": "Ad",
+    "profilLabel": "Bağlı profil",
+    "profilPlaceholder": "Profil seçin",
+    "profilSearchPlaceholder": "Profil ara",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "demirNameLabel": "Demir adı",
+    "demirNamePlaceholder": "Bağlı demir adı",
+    "vidaNameLabel": "Vida adı",
+    "vidaNamePlaceholder": "Bağlı vida adı"
+  },
+  "validation": {
+    "nameRequired": "Ad alanı zorunludur",
+    "profilRequired": "Profil seçimi zorunludur"
+  },
+  "toasts": {
+    "created": "{{section}} kaydı oluşturuldu",
+    "updated": "{{section}} kaydı güncellendi",
+    "deleted": "{{section}} kaydı silindi"
+  }
+}

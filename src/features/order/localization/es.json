@@ -1,0 +1,63 @@
+{
+  "lines": {
+    "doubleClickToEdit": "Doble clic para editar",
+    "unit": "Unidad",
+    "descriptionTooltipText": "Nota de producción por línea. Al transferirse al ERP, el mapeo de Netsis es: Descripción 1 -> Campo Adicional 1, Descripción 2 -> Campo Adicional 2, Descripción 3 -> Descripción Extra de Línea 7.",
+    "profileErpTooltip": "Esta selección de Perfil se envía al ERP como Campo extra 2 / Descripción extra de línea 2 de Netsis.",
+    "rebarErpTooltip": "Esta selección de hierro se envía al ERP como Descripción extra de línea 3 de Netsis.",
+    "screwErpTooltip": "Esta selección de tornillo se envía al ERP como Descripción extra de línea 4 de Netsis.",
+    "printErpTooltip": "Esta selección de impresión se envía al ERP como Descripción extra de línea 8 de Netsis. La nota de impresión también va a la Descripción de línea 9 y Descripción extra de línea 9 de Netsis.",
+    "lineItemDescriptionPlaceholder": "Descripción del artículo por línea"
+  },
+  "notes": {
+    "notesTooltipText": "Notas de envío/factura para todo el pedido. Se guardan secuencialmente en Netsis, descripción extra de cabecera 1-5; la nota 2 va a la descripción extra 2 de Netsis."
+  },
+  "erpOrder": {
+    "title": "Lista de pedidos ERP",
+    "description": "Revise los encabezados y líneas de pedidos Netsis visibles para el usuario conectado.",
+    "currentUserScope": "Ámbito del usuario conectado",
+    "searchPlaceholder": "Buscar pedido, cliente, vendedor o fecha...",
+    "loading": "Cargando pedidos ERP...",
+    "loadError": "No se pudieron cargar los pedidos ERP.",
+    "noData": "No se encontraron pedidos ERP.",
+    "detailAction": "Detalle",
+    "detailTitle": "Detalle del pedido {{orderNo}}",
+    "unknownCustomer": "Sin nombre de cliente",
+    "lineCount": "{{count}} líneas",
+    "linesLoading": "Cargando líneas del pedido...",
+    "lineLoadError": "No se pudieron cargar las líneas del pedido.",
+    "noLines": "No hay líneas para este pedido.",
+    "table": {
+      "title": "Información de encabezado del pedido",
+      "branchCode": "Sucursal",
+      "orderNo": "N.º pedido",
+      "customerCode": "Código cliente",
+      "customerName": "Nombre cliente",
+      "date": "Fecha",
+      "deliveryDate": "Fecha entrega",
+      "grossTotal": "Total bruto",
+      "vat": "IVA",
+      "grandTotal": "Total general",
+      "salesRepCode": "Vendedor"
+    },
+    "lines": {
+      "rowNo": "Fila",
+      "stockCode": "Código stock",
+      "stockName": "Nombre stock",
+      "quantity": "Cantidad",
+      "unit": "Unidad",
+      "netPrice": "Precio neto",
+      "vatRate": "Tasa IVA",
+      "warehouseCode": "Almacén"
+    }
+  },
+  "header": {
+    "notes": "Notas",
+    "descriptionErpTooltip": "Nota general de producción para todo el pedido. Al enviarse al ERP, se guarda en el campo Descripción de cabecera de pedido de Netsis (FatUst.Aciklama).",
+    "ozelKod1": "Código especial 1",
+    "ozelKod1Placeholder": "Seleccionar código especial 1",
+    "ozelKod2": "Código especial 2",
+    "ozelKod2Placeholder": "Seleccionar código especial 2",
+    "specialCodeSearchPlaceholder": "Buscar código especial..."
+  }
+}

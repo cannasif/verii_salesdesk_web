@@ -1,0 +1,82 @@
+{
+  "activityType": {
+    "table": {
+      "title": "Liste des envois",
+      "id": "ID",
+      "name": "Nom de l'expédition",
+      "description": "Description",
+      "createdDate": "Date de création",
+      "createdBy": "Créé par",
+      "showing": "Affichage de {{from}}-{{to}} / {{total}}",
+      "page": "Page {{current}} / {{total}}"
+    },
+    "error": "Une erreur est survenue",
+    "create": "Ajouter un nouvel envoi",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée",
+    "actions": "Actions",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "form": {
+      "addTitle": "Ajouter un nouvel envoi",
+      "editTitle": "Modifier l'expédition",
+      "addDescription": "Saisissez les informations d'expédition",
+      "editDescription": "Modifier les informations d'expédition",
+      "name": "Nom de l'expédition",
+      "namePlaceholder": "Saisir le nom de l'expédition",
+      "nameRequired": "Le nom de l'expédition est requis",
+      "nameMaxLength": "Le nom de l'expédition peut contenir au maximum 100 caractères",
+      "description": "Description",
+      "descriptionPlaceholder": "Saisir la description (optionnel)",
+      "descriptionMaxLength": "La description peut contenir au maximum 500 caractères"
+    },
+    "stats": {
+      "totalActivityTypes": "Total des envois",
+      "activeActivityTypes": "Envois actifs",
+      "newThisMonth": "Nouveaux ce mois-ci"
+    },
+    "messages": {
+      "createSuccess": "L'expédition a été créée avec succès",
+      "createError": "Impossible de créer l'expédition",
+      "updateSuccess": "L'expédition a été mise à jour avec succès",
+      "updateError": "Impossible de mettre à jour l'expédition",
+      "deleteSuccess": "L'expédition a été supprimée avec succès",
+      "deleteError": "Impossible de supprimer l'expédition"
+    }
+  },
+  "menu": "Gestion des envois",
+  "description": "Gérez et modifiez les définitions d'expédition",
+  "addButton": "Ajouter un nouvel envoi",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée",
+  "actions": "Actions",
+  "edit": "Modifier",
+  "deleteButton": "Supprimer",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "saving": "Kaydediliyor...",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "advancedFilter": {
+    "columnName": "Nom de l'expédition",
+    "columnDescription": "Description",
+    "columnCreatedBy": "Créé par"
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Supprimer l'expédition",
+    "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+  },
+  "messages": {
+    "deleteSuccess": "L'expédition a été supprimée avec succès",
+    "deleteError": "Impossible de supprimer l'expédition"
+  },
+  "table": {
+    "title": "Liste des envois",
+    "id": "ID",
+    "name": "Nom de l'expédition",
+    "description": "Description",
+    "createdDate": "Date de création",
+    "createdBy": "Créé par"
+  }
+}

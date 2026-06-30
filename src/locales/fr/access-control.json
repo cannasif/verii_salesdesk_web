@@ -1,0 +1,146 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Clé unique utilisée par les gardes de route et de page. Préférez une notation snake_case ou point stable.",
+      "name": "Nom affiché aux administrateurs lors de la gestion des permissions.",
+      "description": "Explication interne facultative pour cette permission.",
+      "isActive": "Les permissions inactives ne sont pas prises en compte lors du calcul de l'accès utilisateur.",
+      "save": "Les modifications affectent les flux d'autorisation des rôles et des groupes."
+    },
+    "permissionGroup": {
+      "name": "Nom du groupe pour l'identification lors de l'attribution aux utilisateurs.",
+      "isSystemAdmin": "Les membres de ce groupe peuvent accéder à toutes les pages et actions sans vérification individuelle des permissions.",
+      "isActive": "Les groupes inactifs ne doivent pas être attribués pour les nouvelles décisions d'accès.",
+      "permissions": "Les permissions sélectionnées définissent ce à quoi les membres de ce groupe peuvent accéder.",
+      "save": "Met à jour l'accès effectif pour tous les utilisateurs assignés à ce groupe."
+    },
+    "userAssignment": {
+      "user": "Choisissez l'utilisateur dont vous souhaitez gérer la portée d'accès.",
+      "groups": "L'utilisateur reçoit les permissions combinées de tous les groupes sélectionnés.",
+      "save": "Les affectations s'appliquent immédiatement pour les prochains contrôles d'autorisation. Les utilisateurs devront peut-être rafraîchir leur session.",
+      "systemAdminNote": "Si l'utilisateur a un groupe administrateur système, les permissions détaillées sont contournées."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Définitions d'autorisation",
+    "description": "Gérer les codes de permission utilisés dans le système",
+    "add": "Ajouter une définition",
+    "form": {
+      "editTitle": "Modifier la définition d'autorisation",
+      "addTitle": "Ajouter une définition d'autorisation",
+      "editDescription": "Mettre à jour les détails de la définition d'autorisation",
+      "addDescription": "Créer une nouvelle définition d'autorisation",
+      "code": "Code",
+      "name": "Nom",
+      "namePlaceholder": "Nom d'affichage",
+      "description": "Description",
+      "descriptionPlaceholder": "Description optionnelle",
+      "isActive": "Actif",
+      "codePlaceholder": "Choisissez le code",
+      "affectedRoutes": "Pages concernées",
+      "affectedRoutesNone": "Aucun itinéraire correspondant trouvé pour ce code",
+      "codeSearchPlaceholder": "Rechercher...",
+      "codeEmpty": "Aucun résultat trouvé"
+    },
+    "table": {
+      "code": "Code",
+      "name": "Nom",
+      "isActive": "Actif",
+      "updatedDate": "Mis à jour",
+      "showing": "{{from}}-{{to}} sur {{total}}",
+      "title": "Définitions d'autorisation"
+    },
+    "delete": {
+      "confirmTitle": "Supprimer la définition d'autorisation",
+      "confirmMessage": "Confirmez-vous la suppression de \"{{name}}\" ? Cette action ne peut pas être annulée."
+    },
+    "syncFromRoutes": "Synchroniser depuis les routes",
+    "syncSummaryTitle": "Résumé de synchronisation des routes"
+  },
+  "permissionGroups": {
+    "title": "Groupes d'autorisation",
+    "description": "Gérer les groupes d'autorisation et leurs affectations",
+    "add": "Ajouter un groupe",
+    "selectAll": "Tout sélectionner",
+    "noDefinitions": "Aucune définition d'autorisation disponible",
+    "form": {
+      "editTitle": "Modifier le groupe d'autorisation",
+      "addTitle": "Ajouter un groupe d'autorisation",
+      "editDescription": "Mettre à jour les détails du groupe d'autorisation",
+      "addDescription": "Créer un nouveau groupe d'autorisation",
+      "name": "Nom",
+      "namePlaceholder": "Nom du groupe",
+      "description": "Description",
+      "descriptionPlaceholder": "Description optionnelle",
+      "isSystemAdmin": "Administrateur système",
+      "isActive": "Actif",
+      "permissions": "Autorisations"
+    },
+    "table": {
+      "name": "Nom",
+      "isSystemAdmin": "Administrateur système",
+      "isActive": "Actif",
+      "permissionCount": "Autorisations",
+      "showing": "{{from}}-{{to}} sur {{total}}",
+      "title": "Groupes d'autorisation"
+    },
+    "managePermissions": "Gérer les autorisations",
+    "permissionsPanel": {
+      "title": "Modifier les autorisations du groupe",
+      "description": "Sélectionner les autorisations de ce groupe",
+      "currentCodes": "Codes d'autorisation actuels",
+      "groupedRows": "Écrans",
+      "screen": "Écran",
+      "actionsMapped": "Actions",
+      "actions": {
+        "create": "Créer",
+        "read": "Voir",
+        "update": "Mettre à jour",
+        "delete": "Supprimer",
+        "other": "Autorisations d’opération"
+      }
+    },
+    "delete": {
+      "confirmTitle": "Supprimer le groupe d'autorisation",
+      "confirmMessage": "Confirmez-vous la suppression de \"{{name}}\" ? Cette action ne peut pas être annulée."
+    },
+    "search": "Rechercher...",
+    "systemAdminLocked": "Le groupe administrateur système ne peut pas être modifié"
+  },
+  "userGroupAssignments": {
+    "title": "Affectation de groupes d'utilisateurs",
+    "description": "Affecter des groupes d'autorisation aux utilisateurs",
+    "selectUser": "Sélectionner un utilisateur",
+    "selectUserPlaceholder": "Rechercher et sélectionner un utilisateur...",
+    "selectUserHint": "Sélectionnez un utilisateur pour gérer ses affectations de groupe",
+    "assignedGroups": "Groupes d'autorisation attribués",
+    "noUsers": "Aucun utilisateur trouvé",
+    "noGroups": "Aucun groupe d'autorisation disponible",
+    "selectAll": "Tout sélectionner",
+    "status": "Statut",
+    "unsavedChanges": "Non enregistré",
+    "upToDate": "À jour"
+  },
+  "common": {
+    "cancel": "Annuler",
+    "saving": "Enregistrement...",
+    "save": "Enregistrer et appliquer",
+    "loading": "Chargement...",
+    "search": "Rechercher...",
+    "noData": "Aucune donnée",
+    "actions": "Actions",
+    "yes": "Oui",
+    "no": "Non",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "processing": "Traitement..."
+  },
+  "sidebar": {
+    "accessControl": "Contrôle d'accès",
+    "permissionDefinitions": "Définitions d'autorisation",
+    "permissionGroups": "Groupes d'autorisation",
+    "userGroupAssignments": "Affectation de groupes d'utilisateurs"
+  }
+}

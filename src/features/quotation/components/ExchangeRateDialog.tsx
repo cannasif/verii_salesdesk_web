@@ -1,0 +1,455 @@
+import {
+  type ChangeEvent,
+  type FormEvent,
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { useExchangeRate } from '@/services/hooks/useExchangeRate';
+import { DollarSign, Edit2, Check, X, RefreshCw, Loader2 } from 'lucide-react';
+import type { QuotationExchangeRateFormState, QuotationExchangeRateGetDto } from '../types/quotation-types';
+import { useUpdateExchangeRateInQuotation } from '../hooks/useUpdateExchangeRateInQuotation';
+import { cn } from '@/lib/utils';
+import {
+  applyExchangeRateDraftToNumberInput,
+  exchangeRateDraftDefaultNumber,
+  formatExchangeRateForEdit,
+  normalizeExchangeRateDraftInput,
+  parseExchangeRateInput,
+} from '@/lib/exchange-rate-input';
+
+interface ExchangeRateDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  exchangeRates: QuotationExchangeRateFormState[];
+  onSave: (rates: QuotationExchangeRateFormState[]) => void;
+  lines?: Array<{ productCode?: string | null; productName?: string | null }>;
+  currentCurrency?: string | number | null;
+  onApplyRateChangeToLines?: (oldExchangeRate: number, newExchangeRate: number) => void;
+  quotationId?: number | null;
+  quotationOfferNo?: string | null;
+  readOnly?: boolean;
+}
+
+function parseRateId(id: string): number {
+  if (id.startsWith('rate-')) {
+    const n = parseInt(id.slice(5), 10);
+    return Number.isNaN(n) ? 0 : n;
+  }
+  const n = parseInt(id, 10);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+export function ExchangeRateDialog({
+  open,
+  onOpenChange,
+  exchangeRates,
+  onSave,
+  currentCurrency,
+  onApplyRateChangeToLines,
+  quotationId,
+  quotationOfferNo,
+  readOnly = false,
+}: ExchangeRateDialogProps): ReactElement {
+  const { t } = useTranslation(['quotation', 'common']);
+  const { data: erpRates = [], isLoading } = useExchangeRate();
+  const updateMutation = useUpdateExchangeRateInQuotation(quotationId ?? 0);
+  const [localRates, setLocalRates] = useState<QuotationExchangeRateFormState[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingDraft, setEditingDraft] = useState('');
+  const [editMountKey, setEditMountKey] = useState(0);
+  const hydratedForOpenRef = useRef(false);
+  const isUpdateMode = quotationId != null && quotationId > 0;
+  const isSaving = isUpdateMode && updateMutation.isPending;
+
+  const findRateForCurrency = useCallback(
+    (rates: QuotationExchangeRateFormState[]): QuotationExchangeRateFormState | undefined => {
+      if (currentCurrency === null || currentCurrency === undefined || currentCurrency === '') return undefined;
+      const currency = String(currentCurrency);
+      const numericCurrency = Number(currency);
+      return rates.find((rate) => {
+        if (rate.currency === currency) return true;
+        return !Number.isNaN(numericCurrency) && rate.dovizTipi === numericCurrency;
+      });
+    },
+    [currentCurrency]
+  );
+
+  const applyCreateModeLineRepricing = useCallback(
+    (ratesToUse: QuotationExchangeRateFormState[]): void => {
+      if (isUpdateMode || !onApplyRateChangeToLines) return;
+      const previousRate = findRateForCurrency(exchangeRates);
+      const nextRate = findRateForCurrency(ratesToUse);
+      const previousValue = Number(previousRate?.exchangeRate ?? 0);
+      const nextValue = Number(nextRate?.exchangeRate ?? 0);
+      if (previousValue > 0 && nextValue > 0 && previousValue !== nextValue) {
+        onApplyRateChangeToLines(previousValue, nextValue);
+      }
+    },
+    [exchangeRates, findRateForCurrency, isUpdateMode, onApplyRateChangeToLines]
+  );
+
+  useEffect(() => {
+    if (!open) {
+      hydratedForOpenRef.current = false;
+      return;
+    }
+    if (hydratedForOpenRef.current || erpRates.length === 0) return;
+
+    setEditingId(null);
+    setEditingDraft('');
+    setEditMountKey(0);
+    const mappedRates: QuotationExchangeRateFormState[] = erpRates.map((rate, index) => {
+      const existing = exchangeRates.find((er) => er.dovizTipi === rate.dovizTipi);
+      const erpRateValue = Number(rate.kurDegeri ?? 0);
+      const existingRateValue = Number(existing?.exchangeRate ?? 0);
+      const shouldUseErpRate =
+        !existing ||
+        existingRateValue <= 0 ||
+        (existing.isOfficial !== false && existingRateValue === 1 && rate.dovizTipi !== 0 && erpRateValue > 0);
+
+      return {
+        id: existing?.id || `temp-${rate.dovizTipi}-${index}`,
+        currency: existing?.currency || String(rate.dovizTipi),
+        exchangeRate: shouldUseErpRate ? erpRateValue : existingRateValue,
+        exchangeRateDate: existing?.exchangeRateDate || new Date().toISOString().split('T')[0],
+        isOfficial: shouldUseErpRate ? rate.kurDegeri != null : existing?.isOfficial ?? rate.kurDegeri != null,
+        dovizTipi: rate.dovizTipi,
+      };
+    });
+    setLocalRates(mappedRates);
+    hydratedForOpenRef.current = true;
+  }, [open, erpRates, exchangeRates]);
+
+  const handleRateChange = (id: string, value: number): void => {
+    setLocalRates((prev) =>
+      prev.map((rate) => {
+        if (rate.id === id) {
+          const originalRate = erpRates.find((er) => er.dovizTipi === rate.dovizTipi);
+          const isChanged = originalRate?.kurDegeri !== value;
+          return {
+            ...rate,
+            exchangeRate: value,
+            isOfficial: !isChanged && originalRate?.kurDegeri !== null,
+          };
+        }
+        return rate;
+      })
+    );
+  };
+
+  const mapRatesToUpdateDtos = useCallback(
+    (rates: QuotationExchangeRateFormState[]): QuotationExchangeRateGetDto[] =>
+      rates.map((r) => ({
+        id: parseRateId(r.id),
+        quotationId: quotationId ?? 0,
+        quotationOfferNo: quotationOfferNo ?? undefined,
+        currency: r.currency || (r.dovizTipi != null ? String(r.dovizTipi) : ''),
+        exchangeRate: r.exchangeRate,
+        exchangeRateDate: r.exchangeRateDate || new Date().toISOString().split('T')[0],
+        isOfficial: r.isOfficial ?? true,
+      })),
+    [quotationId, quotationOfferNo]
+  );
+
+  const handleSave = async (): Promise<void> => {
+    if (readOnly) return;
+    let ratesToUse = localRates;
+    if (editingId !== null) {
+      const n = parseExchangeRateInput(editingDraft);
+      ratesToUse = localRates.map((rate) => {
+        if (rate.id !== editingId) return rate;
+        const originalRate = erpRates.find((er) => er.dovizTipi === rate.dovizTipi);
+        const isChanged = originalRate?.kurDegeri !== n;
+        return {
+          ...rate,
+          exchangeRate: n,
+          isOfficial: !isChanged && originalRate?.kurDegeri !== null,
+        };
+      });
+      setLocalRates(ratesToUse);
+      setEditingId(null);
+      setEditingDraft('');
+      setEditMountKey(0);
+    }
+    if (isUpdateMode) {
+      try {
+        await updateMutation.mutateAsync(mapRatesToUpdateDtos(ratesToUse));
+        onSave(ratesToUse);
+        onOpenChange(false);
+      } catch {
+        void 0;
+      }
+      return;
+    }
+    applyCreateModeLineRepricing(ratesToUse);
+    onSave(ratesToUse);
+    onOpenChange(false);
+  };
+
+  const handleCancel = (): void => {
+    if (isSaving) return;
+    setLocalRates([]);
+    setEditingId(null);
+    setEditingDraft('');
+    setEditMountKey(0);
+    onOpenChange(false);
+  };
+
+  const handleExchangeRateDraftInput = useCallback((e: ChangeEvent<HTMLInputElement> | FormEvent<HTMLInputElement>): void => {
+    const el = e.currentTarget;
+    const next = normalizeExchangeRateDraftInput(el.value);
+    applyExchangeRateDraftToNumberInput(el, next);
+    setEditingDraft(next);
+  }, []);
+
+  const handleOpenChange = (next: boolean): void => {
+    if (!next && isSaving) return;
+    onOpenChange(next);
+  };
+
+  const selectedRate = findRateForCurrency(localRates);
+  const selectedErpRate = selectedRate
+    ? erpRates.find((er) => er.dovizTipi === selectedRate.dovizTipi)
+    : undefined;
+  const selectedCurrencyName = selectedErpRate?.dovizIsmi || selectedRate?.currency || '-';
+
+  const styles = {
+    tableHead: "h-10 px-4 text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider bg-zinc-50/80 dark:bg-zinc-900/50 border-b border-zinc-200 dark:border-zinc-800",
+    tableRow: "hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors border-b border-zinc-100 dark:border-zinc-800 last:border-0",
+    input: "h-8 bg-white dark:bg-zinc-950/50 border-zinc-200 dark:border-zinc-800 focus-visible:border-pink-500 focus-visible:ring-4 focus-visible:ring-pink-500/20 font-mono font-medium text-right pr-2 rounded-lg transition-all duration-200",
+    actionButton: "h-7 w-7 p-0 rounded-md hover:scale-105 transition-transform",
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0 overflow-hidden bg-white/95 dark:bg-[#0c0516]/95 backdrop-blur-xl border-zinc-200 dark:border-white/10 shadow-2xl">
+        
+        {/* HEADER */}
+        <DialogHeader className="p-6 pb-5 border-b border-zinc-200/50 dark:border-white/5 bg-zinc-50/30 dark:bg-white/5">
+          <DialogTitle className="flex items-center gap-3 text-xl">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/20 text-white">
+              <DollarSign className="h-5 w-5" />
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-zinc-900 dark:text-zinc-100">{t('exchangeRates.dialog.title')}</span>
+              <span className="text-xs font-normal text-slate-500 dark:text-slate-400">{t('exchangeRates.dialog.subtitle')}</span>
+            </div>
+          </DialogTitle>
+          <DialogDescription className="hidden">
+            {t('exchangeRates.dialog.description')}
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* CONTENT */}
+        <div className="p-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
+              <RefreshCw className="h-8 w-8 animate-spin text-zinc-300" />
+              <span className="text-sm font-medium">{t('loading')}</span>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-emerald-400/30 bg-emerald-50/80 p-4 shadow-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-lg shadow-emerald-600/20">
+                      <DollarSign className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                        Seçili döviz kuru: {selectedCurrencyName}
+                      </div>
+                      <div className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+                        Kur değerini düzenleyip <span className="font-semibold">Kaydet ve Uygula</span> dediğinizde satır fiyatları, KDV ve teklif toplamı yeni kura göre güncellenecektir.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-emerald-400/30 bg-white/80 px-4 py-2 text-right dark:bg-black/20">
+                    <div className="text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-300">Mevcut kur</div>
+                    <div className="font-mono text-lg font-bold text-zinc-900 dark:text-white">
+                      {selectedRate ? selectedRate.exchangeRate.toFixed(4) : '-'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-zinc-200 dark:border-white/10 overflow-hidden shadow-sm bg-white dark:bg-black/20">
+                <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent border-0 bg-zinc-50/50 dark:bg-white/5">
+                    <TableHead className={cn(styles.tableHead, "pl-6 text-zinc-600 dark:text-zinc-400")}>{t('exchangeRates.currency')}</TableHead>
+                    <TableHead className={cn(styles.tableHead, "text-right text-zinc-600 dark:text-zinc-400")}>{t('exchangeRates.rate')}</TableHead>
+                    <TableHead className={cn(styles.tableHead, "text-center text-zinc-600 dark:text-zinc-400")}>{t('exchangeRates.status')}</TableHead>
+                    <TableHead className={cn(styles.tableHead, "text-center w-[120px] text-zinc-600 dark:text-zinc-400")}>{t('actions')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {localRates.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                        {t('exchangeRates.empty')}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    localRates.map((rate) => {
+                      const erpRate = erpRates.find((er) => er.dovizTipi === rate.dovizTipi);
+                      const currencyCode = erpRate?.dovizIsmi || `DOVIZ_${rate.dovizTipi}`;
+
+                      return (
+                        <TableRow key={rate.id} className={styles.tableRow}>
+                          <TableCell className="pl-6 font-semibold text-zinc-700 dark:text-zinc-200">
+                            {currencyCode}
+                          </TableCell>
+                          
+                          <TableCell className="text-right">
+                            {editingId === rate.id ? (
+                              <Input
+                                key={`erp-rate-${rate.id}-${editMountKey}`}
+                                type="number"
+                                lang="en"
+                                inputMode="decimal"
+                                step={0.0001}
+                                min={0}
+                                autoComplete="off"
+                                defaultValue={exchangeRateDraftDefaultNumber(editingDraft)}
+                                onChange={handleExchangeRateDraftInput}
+                                onInput={handleExchangeRateDraftInput}
+                                onWheel={(e) => e.preventDefault()}
+                                className={cn(styles.input, "w-36 ml-auto [appearance:auto]")}
+                                autoFocus
+                              />
+                            ) : (
+                              <div className="font-mono font-medium text-zinc-600 dark:text-zinc-300">
+                                {rate.exchangeRate.toFixed(4)}
+                              </div>
+                            )}
+                          </TableCell>
+                          
+                          <TableCell className="text-center">
+                            {rate.isOfficial ? (
+                              <Badge variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800 text-[10px] px-2 h-5 shadow-sm">
+                                {t('exchangeRates.official')}
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800 text-[10px] px-2 h-5 shadow-sm">
+                                {t('exchangeRates.custom')}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          
+                          <TableCell className="text-center">
+                            {editingId === rate.id ? (
+                              <div className="flex gap-1 justify-center">
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    handleRateChange(rate.id, parseExchangeRateInput(editingDraft));
+                                    setEditingId(null);
+                                    setEditingDraft('');
+                                    setEditMountKey(0);
+                                  }}
+                                  className={cn(styles.actionButton, "hover:bg-emerald-50 text-emerald-600 dark:hover:bg-emerald-900/20 dark:text-emerald-400")}
+                                >
+                                  <Check className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    const originalRate = erpRates.find((er) => er.dovizTipi === rate.dovizTipi);
+                                    handleRateChange(rate.id, originalRate?.kurDegeri || 0);
+                                    setEditingId(null);
+                                    setEditingDraft('');
+                                    setEditMountKey(0);
+                                  }}
+                                  className={cn(styles.actionButton, "hover:bg-rose-50 text-rose-600 dark:hover:bg-rose-900/20 dark:text-rose-400")}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  setEditingDraft(formatExchangeRateForEdit(rate.exchangeRate));
+                                  setEditMountKey((k) => k + 1);
+                                  setEditingId(rate.id);
+                                }}
+                                className="h-8 gap-1.5 px-2 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                                title={t('edit')}
+                              >
+                                <Edit2 className="h-4 w-4" />
+                                <span className="text-xs font-medium">{t('edit')}</span>
+                              </Button>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+          
+          <div className="mt-4 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-xl p-4 text-xs text-blue-600 dark:text-blue-400 flex gap-3 items-start shadow-sm">
+             <div className="mt-0.5 min-w-4 p-1 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+               <DollarSign className="w-3 h-3" />
+             </div>
+             <p className="leading-relaxed opacity-90">{t('exchangeRates.dialog.info')}</p>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <DialogFooter className="p-6 border-t border-zinc-200/50 dark:border-white/5 bg-zinc-50/30 dark:bg-black/20 gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleCancel}
+            disabled={isSaving}
+            className="h-11 px-6 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-700 dark:text-zinc-300 font-medium transition-all"
+          >
+            {t('cancel')}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => void handleSave()}
+            disabled={readOnly || isLoading || isSaving}
+            className="h-11 px-6 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 border-0 font-medium transition-all"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                {t('saving')}
+              </>
+            ) : (
+              t('saveAndApply')
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

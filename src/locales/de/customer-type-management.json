@@ -1,0 +1,65 @@
+{
+  "menu": "Kundentyp-Verwaltung",
+  "description": "Kundentypen verwalten und bearbeiten",
+  "addButton": "Hinzufügen Neu Customer Type",
+  "loading": "Laden...",
+  "noData": "Keine Daten gefunden",
+  "actions": "Aktionen",
+  "previous": "Vorherige",
+  "next": "Nächste",
+  "stats": {
+    "totalCustomerTypes": "Gesamte Kundentypen",
+    "activeCustomerTypes": "Aktive Kundentypen",
+    "newThisMonth": "Neu in diesem Monat"
+  },
+  "table": {
+    "id": "AUSWEIS",
+    "name": "Kundentyp Name",
+    "description": "Beschreibung",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von",
+    "updatedDate": "Aktualisierungsdatum",
+    "updatedBy": "Aktualisiert von",
+    "showing": "Zeige {{from}}-{{to}} / {{total}}",
+    "page": "Seite {{current}} / {{total}}",
+    "title": "Kundentyp-Liste"
+  },
+  "form": {
+    "addCustomerType": "Hinzufügen Neu Customer Type",
+    "editCustomerType": "Kundentyp bearbeiten",
+    "addDescription": "Geben Sie neue Kundentyp-Informationen ein",
+    "editDescription": "Kundentyp-Informationen bearbeiten",
+    "name": "Kundentyp Name",
+    "namePlaceholder": "Kundentyp-Namen eingeben",
+    "nameRequired": "Kundentyp-Name ist erforderlich",
+    "nameMaxLength": "Kundentyp-Name darf maximal 100 Zeichen lang sein",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+    "descriptionMaxLength": "Beschreibung darf maximal 500 Zeichen lang sein",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Speichert..."
+  },
+  "delete": {
+    "confirmTitle": "Kundentyp löschen",
+    "confirmMessage": "Sind Sie sicher, dass Sie den Kundentyp {{name}} löschen möchten?",
+    "confirmButton": "Löschen",
+    "deleting": "Wird gelöscht...",
+    "action": "Löschen",
+    "success": "Kundentyp erfolgreich gelöscht",
+    "error": "Kundentyp konnte nicht gelöscht werden"
+  },
+  "messages": {
+    "createSuccess": "Kundentyp erfolgreich erstellt",
+    "createError": "Kundentyp konnte nicht erstellt werden",
+    "updateSuccess": "Kundentyp erfolgreich aktualisiert",
+    "updateError": "Kundentyp konnte nicht aktualisiert werden",
+    "deleteSuccess": "Kundentyp erfolgreich gelöscht",
+    "deleteError": "Kundentyp konnte nicht gelöscht werden"
+  },
+  "error": "Ein Fehler ist aufgetreten",
+  "advancedFilter": {
+    "columnName": "Kunden-Typ-Name",
+    "columnDescription": "Beschreibung"
+  }
+}

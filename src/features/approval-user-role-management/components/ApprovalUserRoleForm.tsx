@@ -1,0 +1,225 @@
+import { type ReactElement, useEffect, useState } from 'react';
+import { useForm, type FieldErrors } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { VoiceSearchCombobox } from '@/components/shared/VoiceSearchCombobox';
+import { useUserOptionsInfinite, useApprovalRoleOptionsInfinite } from '@/components/shared/dropdown/useDropdownEntityInfinite';
+import { approvalUserRoleFormSchema, type ApprovalUserRoleFormSchema } from '../types/approval-user-role-types';
+import type { ApprovalUserRoleDto } from '../types/approval-user-role-types';
+import { ShieldCheck, X, Loader2 } from 'lucide-react';
+import { isZodFieldRequired } from '@/lib/zod-required';
+
+interface ApprovalUserRoleFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: ApprovalUserRoleFormSchema) => void | Promise<void>;
+  userRole?: ApprovalUserRoleDto | null;
+  isLoading?: boolean;
+}
+
+const INPUT_STYLE = `
+  h-12 rounded-xl
+  bg-slate-50 dark:bg-[#0c0516]
+  border border-slate-200 dark:border-white/10
+  text-slate-900 dark:text-white text-sm
+  placeholder:text-slate-400 dark:placeholder:text-slate-600
+  focus-visible:ring-0 focus-visible:ring-offset-0
+  focus:bg-white focus:border-rose-500 focus:shadow-[0_0_0_3px_rgba(244,63,94,0.15)]
+  dark:focus:bg-[#0c0516] dark:focus:border-rose-500/60 dark:focus:shadow-[0_0_0_3px_rgba(244,63,94,0.1)]
+  transition-all duration-200
+`;
+
+const LABEL_STYLE =
+  'text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold ml-1 mb-1.5 block';
+
+export function ApprovalUserRoleForm({
+  open,
+  onOpenChange,
+  onSubmit,
+  userRole,
+  isLoading = false,
+}: ApprovalUserRoleFormProps): ReactElement {
+  const { t } = useTranslation();
+  const [userSearchTerm, setUserSearchTerm] = useState('');
+  const [approvalRoleSearchTerm, setApprovalRoleSearchTerm] = useState('');
+  const userDropdown = useUserOptionsInfinite(userSearchTerm, open);
+  const approvalRoleDropdown = useApprovalRoleOptionsInfinite(approvalRoleSearchTerm, open);
+
+  const form = useForm<ApprovalUserRoleFormSchema>({
+    resolver: zodResolver(approvalUserRoleFormSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+    defaultValues: {
+      userId: 0,
+      approvalRoleId: 0,
+    },
+  });
+
+  useEffect(() => {
+    if (userRole) {
+      form.reset({
+        userId: userRole.userId,
+        approvalRoleId: userRole.approvalRoleId,
+      });
+    } else {
+      form.reset({
+        userId: 0,
+        approvalRoleId: 0,
+      });
+    }
+  }, [userRole, form]);
+
+  const handleSubmit = async (data: ApprovalUserRoleFormSchema): Promise<void> => {
+    await onSubmit(data);
+    if (!isLoading) {
+      form.reset();
+      onOpenChange(false);
+    }
+  };
+
+  const handleInvalidSubmit = (errors: FieldErrors<ApprovalUserRoleFormSchema>): void => {
+    const fieldNames = Object.keys(errors);
+    const firstField = fieldNames[0] as keyof ApprovalUserRoleFormSchema | undefined;
+    if (firstField) {
+      form.setFocus(firstField);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent showCloseButton={false} className="w-[calc(100vw-1rem)] sm:w-[calc(40vw-2rem)] !max-w-[96vw] xl:max-w-[600px] max-h-[92vh] flex flex-col p-0 overflow-visible bg-white/90 dark:bg-[#130822]/90 border border-slate-200/60 dark:border-white/10 shadow-2xl rounded-[2.5rem]">
+        <div className="flex flex-col w-full h-full overflow-hidden rounded-[2.5rem]">
+        <DialogHeader className="px-6 sm:px-8 py-6 border-b border-slate-100 dark:border-white/5 shrink-0 flex-row items-center justify-between space-y-0 sticky top-0 z-10 backdrop-blur-sm">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-linear-to-br from-rose-500 to-amber-500 p-0.5 shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)]">
+              <div className="h-full w-full bg-white dark:bg-[#130822] rounded-[14px] flex items-center justify-center">
+                <ShieldCheck size={24} className="text-rose-600 dark:text-rose-400" />
+              </div>
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
+                {userRole
+                  ? t('approvalUserRole.form.editTitle')
+                  : t('approvalUserRole.form.addTitle')}
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+                {userRole
+                  ? t('approvalUserRole.form.editDescription')
+                  : t('approvalUserRole.form.addDescription')}
+              </DialogDescription>
+            </div>
+          </div>
+          <button
+            onClick={() => onOpenChange(false)}
+            className="group relative h-10 w-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-rose-500 hover:text-white transition-all duration-300 hover:rotate-90 shadow-sm"
+          >
+            <X size={20} className="relative z-10" />
+            <div className="absolute inset-0 rounded-full bg-rose-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto p-6 sm:p-8 custom-scrollbar">
+          <Form {...form}>
+            <form id="approval-user-role-form" onSubmit={form.handleSubmit(handleSubmit, handleInvalidSubmit)} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <FormField
+                control={form.control}
+                name="userId"
+                render={({ field }) => (
+                  <FormItem className="space-y-0">
+                    <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(approvalUserRoleFormSchema, 'userId')}>
+                      {t('approvalUserRole.form.userId')}
+                    </FormLabel>
+                    <VoiceSearchCombobox
+                      value={field.value && field.value !== 0 ? field.value.toString() : ''}
+                      onSelect={(value) => field.onChange(value ? parseInt(value) : 0)}
+                      options={userDropdown.options}
+                      onDebouncedSearchChange={setUserSearchTerm}
+                      onFetchNextPage={userDropdown.fetchNextPage}
+                      hasNextPage={userDropdown.hasNextPage}
+                      isLoading={userDropdown.isLoading}
+                      isFetchingNextPage={userDropdown.isFetchingNextPage}
+                      placeholder={t('approvalUserRole.form.selectUser')}
+                      searchPlaceholder={t('common.search')}
+                      className={INPUT_STYLE}
+                      modal={true}
+                    />
+                    <FormMessage className="text-red-500 text-[10px] mt-1" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="approvalRoleId"
+                render={({ field }) => (
+                  <FormItem className="space-y-0">
+                    <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(approvalUserRoleFormSchema, 'approvalRoleId')}>
+                      {t('approvalUserRole.form.approvalRoleId')}
+                    </FormLabel>
+                    <VoiceSearchCombobox
+                      value={field.value && field.value !== 0 ? field.value.toString() : ''}
+                      onSelect={(value) => field.onChange(value ? parseInt(value) : 0)}
+                      options={approvalRoleDropdown.options}
+                      onDebouncedSearchChange={setApprovalRoleSearchTerm}
+                      onFetchNextPage={approvalRoleDropdown.fetchNextPage}
+                      hasNextPage={approvalRoleDropdown.hasNextPage}
+                      isLoading={approvalRoleDropdown.isLoading}
+                      isFetchingNextPage={approvalRoleDropdown.isFetchingNextPage}
+                      placeholder={t('approvalUserRole.form.selectApprovalRole')}
+                      searchPlaceholder={t('common.search')}
+                      className={INPUT_STYLE}
+                      modal={true}
+                    />
+                    <FormMessage className="text-red-500 text-[10px] mt-1" />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </div>
+
+        <DialogFooter className="px-6 sm:px-8 py-6 border-t border-slate-100 dark:border-white/5 shrink-0 flex flex-row justify-end gap-4 backdrop-blur-sm">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+            className="h-12 px-8 rounded-2xl border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 font-bold transition-all"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            type="submit"
+            form="approval-user-role-form"
+            disabled={isLoading}
+            className="h-12 px-10 rounded-2xl bg-[image:var(--crm-brand-gradient)] text-white font-black shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] ring-1 ring-rose-400/30 transition-all duration-300 hover:scale-[1.05] hover:from-rose-500 hover:to-amber-500 active:scale-[0.98] opacity-90 grayscale-[0] dark:opacity-100 dark:grayscale-0"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t('common.saving')}
+              </>
+            ) : t('common.save')}
+          </Button>
+        </DialogFooter>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

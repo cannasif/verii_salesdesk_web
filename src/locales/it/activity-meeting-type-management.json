@@ -1,0 +1,82 @@
+{
+  "menu": "Gestione riunioni",
+  "description": "Gestisci e modifica le definizioni delle riunioni",
+  "addButton": "Aggiungi nuova riunione",
+  "loading": "Caricamento...",
+  "noData": "Nessun dato",
+  "actions": "Azioni",
+  "edit": "Modifica",
+  "deleteButton": "Elimina",
+  "cancel": "Annulla",
+  "save": "Salva",
+  "saving": "Salvataggio in corso...",
+  "previous": "Precedente",
+  "next": "Successivo",
+  "advancedFilter": {
+    "columnName": "Nome riunione",
+    "columnDescription": "Descrizione",
+    "columnCreatedBy": "Creato da"
+  },
+  "activityType": {
+    "create": "Aggiungi nuova riunione",
+    "loading": "Caricamento...",
+    "noData": "Nessun dato",
+    "actions": "Azioni",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "saving": "Salvataggio in corso...",
+    "error": "Si è verificato un errore",
+    "form": {
+      "addTitle": "Aggiungi nuova riunione",
+      "editTitle": "Modifica riunione",
+      "addDescription": "Inserisci i nuovi dati della riunione",
+      "editDescription": "Modifica le informazioni della riunione",
+      "name": "Nome riunione",
+      "namePlaceholder": "Inserisci il nome della riunione",
+      "nameRequired": "Il nome della riunione è obbligatorio",
+      "nameMaxLength": "Il nome della riunione può contenere al massimo 100 caratteri",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Inserisci la descrizione (facoltativa)",
+      "descriptionMaxLength": "La descrizione può contenere al massimo 500 caratteri"
+    },
+    "table": {
+      "title": "Elenco riunioni",
+      "id": "ID",
+      "name": "Nome riunione",
+      "description": "Descrizione",
+      "createdDate": "Data di creazione",
+      "createdBy": "Creato da",
+      "showing": "Visualizzazione {{from}}-{{to}} / {{total}}",
+      "page": "Pagina {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Totale riunioni",
+      "activeActivityTypes": "Riunioni attive",
+      "newThisMonth": "Nuove questo mese"
+    },
+    "messages": {
+      "createSuccess": "Riunione creata correttamente",
+      "createError": "Impossibile creare la riunione",
+      "updateSuccess": "Riunione aggiornata correttamente",
+      "updateError": "Impossibile aggiornare la riunione",
+      "deleteSuccess": "Riunione eliminata correttamente",
+      "deleteError": "Impossibile eliminare la riunione"
+    }
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Elimina riunione",
+    "confirmMessage": "Sei sicuro di voler eliminare {{name}}?"
+  },
+  "messages": {
+    "deleteSuccess": "Riunione eliminata correttamente",
+    "deleteError": "Impossibile eliminare la riunione"
+  },
+  "table": {
+    "title": "Elenco riunioni",
+    "id": "ID",
+    "name": "Nome riunione",
+    "description": "Descrizione",
+    "createdDate": "Data di creazione",
+    "createdBy": "Creato da"
+  }
+}

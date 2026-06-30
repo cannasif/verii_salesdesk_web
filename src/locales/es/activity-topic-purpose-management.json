@@ -1,0 +1,82 @@
+{
+  "menu": "Gestión de Temas de Interés",
+  "description": "Administrar y editar temas de interés",
+  "addButton": "Añadir Nuevo Tema",
+  "loading": "Cargando...",
+  "noData": "Sin datos",
+  "actions": "Acciones",
+  "edit": "Editar",
+  "deleteButton": "Eliminar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "saving": "Guardando...",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "advancedFilter": {
+    "columnName": "Nombre del Tema",
+    "columnDescription": "Descripción",
+    "columnCreatedBy": "Creado Por"
+  },
+  "activityType": {
+    "form": {
+      "addTitle": "Añadir Nuevo Tema",
+      "editTitle": "Editar Tema",
+      "addDescription": "Ingrese la nueva información del tema",
+      "editDescription": "Editar información del tema",
+      "name": "Nombre del Tema",
+      "namePlaceholder": "Ingrese el nombre del tema",
+      "nameRequired": "El nombre del tema es obligatorio",
+      "nameMaxLength": "El nombre del tema puede tener un máximo de 100 caracteres",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingrese descripción (opcional)",
+      "descriptionMaxLength": "La descripción puede tener un máximo de 500 caracteres"
+    },
+    "table": {
+      "title": "Lista de Temas de Interés",
+      "id": "ID",
+      "name": "Nombre del Tema",
+      "description": "Descripción",
+      "createdDate": "Fecha de Creación",
+      "createdBy": "Creado Por",
+      "showing": "Mostrando {{from}}-{{to}} / {{total}}",
+      "page": "Página {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Total de Temas",
+      "activeActivityTypes": "Temas Activos",
+      "newThisMonth": "Nuevo este Mes"
+    },
+    "messages": {
+      "createSuccess": "Tema creado con éxito",
+      "createError": "Error al crear el tema",
+      "updateSuccess": "Tema actualizado con éxito",
+      "updateError": "Error al actualizar el tema",
+      "deleteSuccess": "Tema eliminado con éxito",
+      "deleteError": "Error al eliminar el tema"
+    },
+    "error": "Ocurrió un error",
+    "create": "Añadir Nuevo Tema",
+    "loading": "Cargando...",
+    "noData": "Sin datos",
+    "actions": "Acciones",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando..."
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Eliminar Tema",
+    "confirmMessage": "¿Seguro que desea eliminar {{name}}?"
+  },
+  "messages": {
+    "deleteSuccess": "Tema eliminado con éxito",
+    "deleteError": "Error al eliminar el tema"
+  },
+  "table": {
+    "title": "Lista de Temas de Interés",
+    "id": "ID",
+    "name": "Nombre del Tema",
+    "description": "Descripción",
+    "createdDate": "Fecha de Creación",
+    "createdBy": "Creado Por"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "menu": "Şehir Yönetimi",
+  "description": "Şehirleri yönetin ve düzenleyin",
+  "addButton": "Yeni Şehir Ekle",
+  "searchPlaceholder": "Ara...",
+  "loading": "Yükleniyor...",
+  "noData": "Veri bulunamadı",
+  "stats": {
+    "totalCities": "Toplam Şehir",
+    "activeCities": "Aktif Şehir",
+    "newThisMonth": "Bu Ay Yeni"
+  },
+  "table": {
+    "title": "Şehir Listesi",
+    "id": "ID",
+    "name": "Şehir Adı",
+    "erpCode": "ERP Kodu",
+    "countryName": "Ülke Adı",
+    "createdDate": "Oluşturulma Tarihi",
+    "createdBy": "Oluşturan",
+    "showing": "{{from}}-{{to}} / {{total}} gösteriliyor",
+    "page": "Sayfa {{current}} / {{total}}"
+  },
+  "cityManagement": {
+    "table": {
+      "title": "Şehir Listesi",
+      "id": "ID",
+      "name": "Şehir Adı",
+      "erpCode": "ERP Kodu",
+      "countryName": "Ülke Adı",
+      "createdDate": "Oluşturulma Tarihi",
+      "createdBy": "Oluşturan"
+    },
+    "error": "Hata oluştu",
+    "form": {
+      "tabs": {
+        "header": "Genel Bilgiler"
+      }
+    },
+    "menu": "Şehir Yönetimi",
+    "description": "Şehirleri yönetin ve düzenleyin",
+    "addButton": "Yeni Şehir Ekle",
+    "searchPlaceholder": "Hızlı Ara...",
+    "loading": "Yükleniyor...",
+    "noData": "Veri yok",
+    "actions": "İşlemler",
+    "delete": {
+      "success": "Şehir başarıyla silindi",
+      "error": "Şehir silinirken bir hata oluştu",
+      "confirmTitle": "Şehri Sil",
+      "confirmMessage": "{{name}} şehrini silmek istediğinizden emin misiniz?"
+    }
+  },
+  "form": {
+    "editCity": "Şehir Düzenle",
+    "addCity": "Yeni Şehir Ekle",
+    "editDescription": "Şehir bilgilerini düzenleyin",
+    "addDescription": "Yeni şehir bilgilerini girin",
+    "name": "Şehir Adı",
+    "namePlaceholder": "Şehir adını girin",
+    "country": "Ülke",
+    "selectCountry": "Ülke seçin",
+    "erpCode": "ERP Kodu",
+    "erpCodePlaceholder": "ERP kodunu girin (opsiyonel)",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "saving": "Kaydediliyor...",
+    "nameRequired": "Şehir adı zorunludur",
+    "nameMaxLength": "Şehir adı en fazla 100 karakter olabilir",
+    "erpCodeMaxLength": "ERP kodu en fazla 10 karakter olabilir",
+    "countryRequired": "Ülke seçimi zorunludur"
+  },
+  "actions": "İşlemler",
+  "delete": {
+    "button": "Sil",
+    "success": "Şehir başarıyla silindi",
+    "error": "Şehir silinirken bir hata oluştu",
+    "confirmTitle": "Şehri Sil",
+    "confirmMessage": "{{name}} şehrini silmek istediğinizden emin misiniz?"
+  },
+  "previous": "Önceki",
+  "next": "Sonraki"
+}

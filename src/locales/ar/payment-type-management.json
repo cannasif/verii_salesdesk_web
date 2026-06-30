@@ -1,0 +1,67 @@
+{
+  "title": "إدارة أنواع الدفع",
+  "headerDescription": "إدارة وتعديل أنواع الدفع",
+  "create": "نوع دفع جديد",
+  "edit": "تعديل نوع الدفع",
+  "editDescription": "قم بتعديل معلومات نوع الدفع",
+  "createDescription": "أدخل معلومات نوع الدفع الجديد",
+  "delete": {
+    "confirmTitle": "حذف نوع الدفع",
+    "confirmMessage": "هل أنت متأكد أنك تريد حذف {{name}}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "success": "تم حذف نوع الدفع بنجاح",
+    "error": "فشل حذف نوع الدفع"
+  },
+  "deleteTitle": "حذف نوع الدفع",
+  "name": "الاسم",
+  "namePlaceholder": "أدخل اسم نوع الدفع",
+  "description": "الوصف",
+  "descriptionPlaceholder": "أدخل الوصف (اختياري)",
+  "createdDate": "تاريخ الإنشاء",
+  "updatedDate": "تاريخ التحديث",
+  "actions": "إجراءات",
+  "search": "بحث",
+  "refresh": "تحديث",
+  "loading": "جارٍ التحميل...",
+  "previous": "السابق",
+  "next": "التالي",
+  "advancedFilter": {
+    "columnName": "الاسم",
+    "columnDescription": "الوصف"
+  },
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "saving": "جارٍ الحفظ...",
+  "noData": "لا توجد بيانات",
+  "error": "حدث خطأ",
+  "confirmDelete": "هل أنت متأكد من حذف نوع الدفع هذا؟",
+  "createSuccess": "تم إنشاء نوع الدفع بنجاح",
+  "updateSuccess": "تم تحديث نوع الدفع بنجاح",
+  "deleteSuccess": "تم حذف نوع الدفع بنجاح",
+  "createError": "فشل إنشاء نوع الدفع",
+  "updateError": "فشل تحديث نوع الدفع",
+  "deleteError": "فشل حذف نوع الدفع",
+  "table": {
+    "title": "أنواع الدفع",
+    "status": "الحالة",
+    "id": "المعرف",
+    "name": "الاسم",
+    "description": "الوصف",
+    "createdDate": "تاريخ الإنشاء",
+    "updatedDate": "تاريخ التحديث",
+    "showing": "عرض {{from}}-{{to}} / {{total}}",
+    "page": "الصفحة {{current}} / {{total}}"
+  },
+  "form": {
+    "name": {
+      "required": "الاسم مطلوب",
+      "maxLength": "يمكن أن يكون الاسم بحد أقصى 100 حرف"
+    },
+    "description": {
+      "maxLength": "يمكن أن يكون الوصف بحد أقصى 500 حرف"
+    }
+  },
+  "status": {
+    "inactive": "غير نشط",
+    "active": "نشط"
+  }
+}

@@ -1,0 +1,362 @@
+import type { MyReportDashboardItem, MyReportDashboardLayout } from '../types';
+import {
+  clampGridSpan,
+  createEmptyOccupancyGrid,
+  findRectanglePlacementContainingCell,
+  isRectangleFree,
+  occupyRectangle,
+  tryPlaceFirstFit,
+} from './grid-occupancy';
+
+const STORAGE_PREFIX = 'report-builder:my-dashboard-layout';
+export const DASHBOARD_CANVAS_WIDTH = 1200;
+export const DASHBOARD_ITEM_MIN_WIDTH = 280;
+export const DASHBOARD_ITEM_MIN_HEIGHT = 180;
+export const DASHBOARD_ITEM_DEFAULT_WIDTH = 360;
+export const DASHBOARD_ITEM_DEFAULT_HEIGHT = 240;
+export const DASHBOARD_GRID_SIZE = 12;
+
+const DEFAULT_MAX_COLS = 3;
+const DEFAULT_MAX_ROWS = 2;
+const ABS_MAX_COLS = 6;
+const ABS_MAX_ROWS = 6;
+const APPEND_PROBE_REPORT_ID = -9_000_001;
+
+function getStorageKey(userId: number | undefined): string {
+  return `${STORAGE_PREFIX}:user-${userId ?? 'anonymous'}`;
+}
+
+function isDashboardItem(value: unknown): value is MyReportDashboardItem {
+  if (typeof value !== 'object' || value == null) return false;
+  const item = value as Record<string, unknown>;
+  return Number.isFinite(Number(item.reportId))
+    && (item.widgetId == null || typeof item.widgetId === 'string')
+    && (item.widgetTitle == null || typeof item.widgetTitle === 'string')
+    && Number.isFinite(Number(item.x))
+    && Number.isFinite(Number(item.y))
+    && Number.isFinite(Number(item.w))
+    && Number.isFinite(Number(item.h))
+    && Number.isFinite(Number(item.order));
+}
+
+function normalizeItem(item: MyReportDashboardItem): MyReportDashboardItem {
+  const maxX = Math.max(0, DASHBOARD_CANVAS_WIDTH - DASHBOARD_ITEM_MIN_WIDTH);
+  const colSpan = clampGridSpan(Math.round(Number(item.colSpan) || 1), 1, ABS_MAX_COLS);
+  const rowSpan = clampGridSpan(Math.round(Number(item.rowSpan) || 1), 1, ABS_MAX_ROWS);
+  const rawGc = item.gridCol != null ? Math.round(Number(item.gridCol)) : undefined;
+  const rawGr = item.gridRow != null ? Math.round(Number(item.gridRow)) : undefined;
+  return {
+    reportId: item.reportId,
+    widgetId: item.widgetId?.trim() || undefined,
+    widgetTitle: item.widgetTitle?.trim() || undefined,
+    colSpan,
+    rowSpan,
+    gridCol: rawGc != null ? clampGridSpan(rawGc, 1, ABS_MAX_COLS) : undefined,
+    gridRow: rawGr != null ? clampGridSpan(rawGr, 1, ABS_MAX_ROWS) : undefined,
+    x: Math.max(0, Math.min(maxX, Math.round(item.x))),
+    y: Math.max(0, Math.round(item.y)),
+    w: Math.max(DASHBOARD_ITEM_MIN_WIDTH, Math.round(item.w)),
+    h: Math.max(DASHBOARD_ITEM_MIN_HEIGHT, Math.round(item.h)),
+    order: Math.max(0, Math.round(item.order)),
+    hidden: Boolean(item.hidden),
+    hideChrome: Boolean(item.hideChrome),
+  };
+}
+
+export function buildOccupancyForItemsAtStoredPositions(
+  layout: MyReportDashboardLayout,
+  excludeKey: string | undefined,
+  getKey: (item: MyReportDashboardItem) => string,
+): boolean[][] {
+  const grid = createEmptyOccupancyGrid(layout.maxRows, layout.maxCols);
+  const sorted = [...layout.items].sort((a, b) => a.order - b.order);
+  for (const item of sorted) {
+    if (excludeKey != null && getKey(item) === excludeKey) continue;
+    const gr = item.gridRow;
+    const gc = item.gridCol;
+    if (gr == null || gc == null) continue;
+    const cols = clampGridSpan(item.colSpan, 1, layout.maxCols);
+    const rows = clampGridSpan(item.rowSpan, 1, layout.maxRows);
+    occupyRectangle(grid, gr - 1, gc - 1, rows, cols);
+  }
+  return grid;
+}
+
+export function canPlaceWidgetAtCell(
+  layout: MyReportDashboardLayout,
+  excludeKey: string,
+  getKey: (item: MyReportDashboardItem) => string,
+  dropRow0: number,
+  dropCol0: number,
+  rowSpan: number,
+  colSpan: number,
+): boolean {
+  const grid = buildOccupancyForItemsAtStoredPositions(layout, excludeKey, getKey);
+  const cols = clampGridSpan(colSpan, 1, layout.maxCols);
+  const rows = clampGridSpan(rowSpan, 1, layout.maxRows);
+  return isRectangleFree(grid, dropRow0, dropCol0, rows, cols, layout.maxRows, layout.maxCols);
+}
+
+export function resolvePlacementForDashboardDrop(
+  layout: MyReportDashboardLayout,
+  excludeKey: string,
+  getKey: (item: MyReportDashboardItem) => string,
+  dropRow0: number,
+  dropCol0: number,
+  rowSpan: number,
+  colSpan: number,
+): { gridRow: number; gridCol: number } | null {
+  const grid = buildOccupancyForItemsAtStoredPositions(layout, excludeKey, getKey);
+  const cols = clampGridSpan(colSpan, 1, layout.maxCols);
+  const rows = clampGridSpan(rowSpan, 1, layout.maxRows);
+  const placement = findRectanglePlacementContainingCell(
+    grid,
+    dropRow0,
+    dropCol0,
+    rows,
+    cols,
+    layout.maxRows,
+    layout.maxCols,
+  );
+  if (!placement) return null;
+  return { gridRow: placement.row0 + 1, gridCol: placement.col0 + 1 };
+}
+
+export function canAppend1x1Tile(layout: MyReportDashboardLayout): boolean {
+  const nextOrder = layout.items.length;
+  const ghost: MyReportDashboardItem = {
+    reportId: APPEND_PROBE_REPORT_ID,
+    colSpan: 1,
+    rowSpan: 1,
+    x: 0,
+    y: 0,
+    w: DASHBOARD_ITEM_DEFAULT_WIDTH,
+    h: DASHBOARD_ITEM_DEFAULT_HEIGHT,
+    order: nextOrder,
+    hidden: true,
+  };
+  const merged = reconcileDashboardLayoutPositions({
+    ...layout,
+    items: [...layout.items, ghost],
+  });
+  const probe = merged.items.find((it) => it.reportId === APPEND_PROBE_REPORT_ID);
+  return Boolean(probe?.gridCol != null && probe?.gridRow != null);
+}
+
+export function reconcileDashboardLayoutPositions(layout: MyReportDashboardLayout): MyReportDashboardLayout {
+  const { maxCols, maxRows, items } = layout;
+  const mc = clampGridSpan(maxCols, 1, ABS_MAX_COLS);
+  const mr = clampGridSpan(maxRows, 1, ABS_MAX_ROWS);
+  const grid = createEmptyOccupancyGrid(mr, mc);
+  const sorted = [...items].sort((a, b) => a.order - b.order);
+  const nextItems = sorted.map((item) => {
+    const cols = clampGridSpan(item.colSpan, 1, mc);
+    const rows = clampGridSpan(item.rowSpan, 1, mr);
+    const prefR = item.gridRow != null ? item.gridRow - 1 : -1;
+    const prefC = item.gridCol != null ? item.gridCol - 1 : -1;
+    if (
+      prefR >= 0
+      && prefC >= 0
+      && isRectangleFree(grid, prefR, prefC, rows, cols, mr, mc)
+    ) {
+      occupyRectangle(grid, prefR, prefC, rows, cols);
+      return { ...item, colSpan: cols, rowSpan: rows, gridCol: prefC + 1, gridRow: prefR + 1 };
+    }
+    const fit = tryPlaceFirstFit(grid, cols, rows, mc, mr);
+    if (!fit) {
+      return { ...item, colSpan: cols, rowSpan: rows };
+    }
+    return { ...item, colSpan: cols, rowSpan: rows, gridCol: fit.col + 1, gridRow: fit.row + 1 };
+  });
+  return {
+    ...layout,
+    maxCols: mc,
+    maxRows: mr,
+    items: nextItems,
+    updatedAt: layout.updatedAt,
+  };
+}
+
+function migrateLayoutFromV1(
+  items: MyReportDashboardItem[],
+  rawMaxCols: unknown,
+  rawMaxRows: unknown,
+): MyReportDashboardLayout {
+  const maxCols = clampGridSpan(Math.round(Number(rawMaxCols) || DEFAULT_MAX_COLS), 1, ABS_MAX_COLS);
+  const maxRows = clampGridSpan(Math.round(Number(rawMaxRows) || DEFAULT_MAX_ROWS), 1, ABS_MAX_ROWS);
+  const normalizedItems = items
+    .map((item) => normalizeItem({
+      ...item,
+      colSpan: item.colSpan ?? 1,
+      rowSpan: item.rowSpan ?? 1,
+    }))
+    .map((item, index) => ({
+      ...item,
+      colSpan: clampGridSpan(item.colSpan, 1, maxCols),
+      rowSpan: clampGridSpan(item.rowSpan, 1, maxRows),
+      order: index,
+    }));
+  return reconcileDashboardLayoutPositions({
+    version: 2,
+    maxCols,
+    maxRows,
+    updatedAt: new Date().toISOString(),
+    items: normalizedItems,
+  });
+}
+
+export function loadMyDashboardLayout(userId: number | undefined): MyReportDashboardLayout {
+  if (typeof window === 'undefined') {
+    return {
+      version: 2,
+      maxCols: DEFAULT_MAX_COLS,
+      maxRows: DEFAULT_MAX_ROWS,
+      updatedAt: new Date().toISOString(),
+      items: [],
+    };
+  }
+
+  try {
+    const raw = window.localStorage.getItem(getStorageKey(userId));
+    if (!raw) {
+      return {
+        version: 2,
+        maxCols: DEFAULT_MAX_COLS,
+        maxRows: DEFAULT_MAX_ROWS,
+        updatedAt: new Date().toISOString(),
+        items: [],
+      };
+    }
+
+    const parsed = JSON.parse(raw) as {
+      version?: number;
+      maxCols?: number;
+      maxRows?: number;
+      updatedAt?: string;
+      items?: unknown[];
+    };
+    const items = Array.isArray(parsed.items)
+      ? parsed.items.filter(isDashboardItem).map((row) => row as MyReportDashboardItem)
+      : [];
+
+    if (parsed.version !== 2) {
+      return migrateLayoutFromV1(items, parsed.maxCols, parsed.maxRows);
+    }
+
+    const maxCols = clampGridSpan(Math.round(Number(parsed.maxCols) || DEFAULT_MAX_COLS), 1, ABS_MAX_COLS);
+    const maxRows = clampGridSpan(Math.round(Number(parsed.maxRows) || DEFAULT_MAX_ROWS), 1, ABS_MAX_ROWS);
+    const normalizedItems = items
+      .map((item) => normalizeItem({
+        ...item,
+        colSpan: item.colSpan ?? 1,
+        rowSpan: item.rowSpan ?? 1,
+      }))
+      .map((item) => ({
+        ...item,
+        colSpan: clampGridSpan(item.colSpan, 1, maxCols),
+        rowSpan: clampGridSpan(item.rowSpan, 1, maxRows),
+      }))
+      .sort((a, b) => a.order - b.order)
+      .map((item, index) => ({ ...item, order: index }));
+
+    return reconcileDashboardLayoutPositions({
+      version: 2,
+      maxCols,
+      maxRows,
+      updatedAt: typeof parsed.updatedAt === 'string' ? parsed.updatedAt : new Date().toISOString(),
+      items: normalizedItems,
+    });
+  } catch {
+    return {
+      version: 2,
+      maxCols: DEFAULT_MAX_COLS,
+      maxRows: DEFAULT_MAX_ROWS,
+      updatedAt: new Date().toISOString(),
+      items: [],
+    };
+  }
+}
+
+export function saveMyDashboardLayout(userId: number | undefined, layout: MyReportDashboardLayout): void {
+  if (typeof window === 'undefined') return;
+  const maxCols = clampGridSpan(layout.maxCols, 1, ABS_MAX_COLS);
+  const maxRows = clampGridSpan(layout.maxRows, 1, ABS_MAX_ROWS);
+  const reconciled = reconcileDashboardLayoutPositions({
+    ...layout,
+    maxCols,
+    maxRows,
+  });
+  window.localStorage.setItem(
+    getStorageKey(userId),
+    JSON.stringify({
+      version: 2,
+      maxCols,
+      maxRows,
+      updatedAt: new Date().toISOString(),
+      items: reconciled.items.map((item) => normalizeItem({
+        ...item,
+        colSpan: clampGridSpan(item.colSpan, 1, maxCols),
+        rowSpan: clampGridSpan(item.rowSpan, 1, maxRows),
+      })).sort((a, b) => a.order - b.order),
+    }),
+  );
+}
+
+export function sanitizeMyDashboardLayout(
+  layout: MyReportDashboardLayout,
+  allowedReportIds: number[],
+): MyReportDashboardLayout {
+  const allowed = new Set(allowedReportIds);
+  const deduped = new Set<string>();
+  const maxCols = clampGridSpan(layout.maxCols ?? DEFAULT_MAX_COLS, 1, ABS_MAX_COLS);
+  const maxRows = clampGridSpan(layout.maxRows ?? DEFAULT_MAX_ROWS, 1, ABS_MAX_ROWS);
+  const items = layout.items
+    .filter((item) => allowed.has(item.reportId))
+    .filter((item) => {
+      const key = `${item.reportId}:${item.widgetId ?? '__report__'}`;
+      if (deduped.has(key)) return false;
+      deduped.add(key);
+      return true;
+    })
+    .map((item) => normalizeItem({
+      ...item,
+      colSpan: clampGridSpan(item.colSpan ?? 1, 1, maxCols),
+      rowSpan: clampGridSpan(item.rowSpan ?? 1, 1, maxRows),
+    }))
+    .sort((a, b) => a.order - b.order)
+    .map((item, index) => ({ ...item, order: index }));
+
+  return reconcileDashboardLayoutPositions({
+    version: 2,
+    maxCols,
+    maxRows,
+    updatedAt: new Date().toISOString(),
+    items,
+  });
+}
+
+export function createDashboardItem(
+  reportId: number,
+  existingItems: MyReportDashboardItem[],
+  options?: { widgetId?: string; widgetTitle?: string },
+): MyReportDashboardItem {
+  const index = existingItems.length;
+  const column = index % 3;
+  const row = Math.floor(index / 3);
+  const gap = 24;
+
+  return {
+    reportId,
+    widgetId: options?.widgetId?.trim() || undefined,
+    widgetTitle: options?.widgetTitle?.trim() || undefined,
+    colSpan: 1,
+    rowSpan: 1,
+    x: column * (DASHBOARD_ITEM_DEFAULT_WIDTH + gap),
+    y: row * (DASHBOARD_ITEM_DEFAULT_HEIGHT + gap),
+    w: DASHBOARD_ITEM_DEFAULT_WIDTH,
+    h: DASHBOARD_ITEM_DEFAULT_HEIGHT,
+    order: existingItems.length,
+    hidden: false,
+    hideChrome: false,
+  };
+}

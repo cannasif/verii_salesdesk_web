@@ -1,0 +1,469 @@
+import { type ReactElement, useState, useRef, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { GripVertical, Plus, Trash2, Edit2, Layers, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { VoiceSearchCombobox } from '@/components/shared/VoiceSearchCombobox';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useApprovalFlowStepList } from '../hooks/useApprovalFlowStepList';
+import { useCreateApprovalFlowStep } from '../hooks/useCreateApprovalFlowStep';
+import { useUpdateApprovalFlowStep } from '../hooks/useUpdateApprovalFlowStep';
+import { useDeleteApprovalFlowStep } from '../hooks/useDeleteApprovalFlowStep';
+import { useReorderApprovalFlowSteps } from '../hooks/useReorderApprovalFlowSteps';
+import { useApprovalRoleGroupOptionsInfinite } from '@/components/shared/dropdown/useDropdownEntityInfinite';
+import type { ApprovalFlowStepGetDto } from '../types/approval-flow-step-types';
+import { isZodFieldRequired } from '@/lib/zod-required';
+import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
+
+interface ApprovalFlowStepListProps {
+  approvalFlowId: number;
+  onStepEditorOpenChange?: (open: boolean) => void;
+}
+
+const stepFormSchema = z.object({
+  approvalRoleGroupId: z.number().min(1, 'approvalFlowStep.form.approvalRoleGroupId.required'),
+});
+
+type StepFormSchema = z.infer<typeof stepFormSchema>;
+
+// --- MODERN TASARIM SABİTLERİ ---
+const INPUT_STYLE = `
+  h-11 rounded-lg
+  bg-slate-50 dark:bg-[#0c0516] 
+  border border-slate-200 dark:border-white/10 
+  text-slate-900 dark:text-white text-sm
+  placeholder:text-slate-400 dark:placeholder:text-slate-600 
+  
+  focus-visible:ring-0 focus-visible:ring-offset-0 
+  
+  /* LIGHT MODE FOCUS */
+  focus:bg-white 
+  focus:border-rose-500 
+  focus:shadow-[0_0_0_3px_rgba(244,63,94,0.15)] 
+
+  /* DARK MODE FOCUS */
+  dark:focus:bg-[#0c0516] 
+  dark:focus:border-rose-500/60 
+  dark:focus:shadow-[0_0_0_3px_rgba(244,63,94,0.1)]
+
+  transition-all duration-200
+`;
+
+const LABEL_STYLE = "text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-bold ml-1 mb-1.5 block";
+
+export function ApprovalFlowStepList({
+  approvalFlowId,
+  onStepEditorOpenChange,
+}: ApprovalFlowStepListProps): ReactElement {
+  const { t } = useTranslation(['approval-flow-management', 'common']);
+  const { canCreate, canUpdate, canDelete } = useCrudPermissions('approval.flow-management.view');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [pendingDeleteStep, setPendingDeleteStep] = useState<ApprovalFlowStepGetDto | null>(null);
+  const [editingStep, setEditingStep] = useState<ApprovalFlowStepGetDto | null>(null);
+  const dragItemRef = useRef<number | null>(null);
+
+  const { data: steps = [], isLoading } = useApprovalFlowStepList(approvalFlowId);
+  const [roleGroupSearchTerm, setRoleGroupSearchTerm] = useState('');
+  const roleGroupDropdown = useApprovalRoleGroupOptionsInfinite(roleGroupSearchTerm, formOpen);
+  const createStep = useCreateApprovalFlowStep();
+  const updateStep = useUpdateApprovalFlowStep();
+  const deleteStep = useDeleteApprovalFlowStep();
+  const reorderSteps = useReorderApprovalFlowSteps();
+
+  const sortedSteps = [...steps].sort((a, b) => a.stepOrder - b.stepOrder);
+
+  const availableRoleGroupOptions = useMemo(() => {
+    const usedRoleGroupIds = new Set(
+      sortedSteps
+        .filter((step) => step.approvalRoleGroupId !== 0)
+        .map((step) => step.approvalRoleGroupId)
+    );
+    return roleGroupDropdown.options.filter(
+      (opt) =>
+        !usedRoleGroupIds.has(parseInt(opt.value)) ||
+        (editingStep && editingStep.approvalRoleGroupId === parseInt(opt.value))
+    );
+  }, [sortedSteps, roleGroupDropdown.options, editingStep]);
+
+  const form = useForm<StepFormSchema>({
+    resolver: zodResolver(stepFormSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+    defaultValues: {
+      approvalRoleGroupId: 0,
+    },
+  });
+  const isFormValid = form.formState.isValid;
+
+  useEffect(() => {
+    onStepEditorOpenChange?.(formOpen || pendingDeleteStep !== null);
+  }, [formOpen, pendingDeleteStep, onStepEditorOpenChange]);
+
+  const handleDragStart = (index: number): void => {
+    dragItemRef.current = index;
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number): void => {
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDragEnd = (): void => {
+    if (draggedIndex === null || dragItemRef.current === null) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      dragItemRef.current = null;
+      return;
+    }
+
+    const sourceIndex = dragItemRef.current;
+    const targetIndex = dragOverIndex;
+
+    if (targetIndex !== null && sourceIndex !== null && sourceIndex !== targetIndex && targetIndex >= 0 && targetIndex < sortedSteps.length) {
+      const movedStep = sortedSteps[sourceIndex];
+      const newSteps: ApprovalFlowStepGetDto[] = [];
+
+      for (let i = 0; i < sortedSteps.length; i++) {
+        if (i === sourceIndex) {
+          continue;
+        }
+        if (i === targetIndex) {
+          if (sourceIndex < targetIndex) {
+            newSteps.push(sortedSteps[i]);
+            newSteps.push(movedStep);
+          } else {
+            newSteps.push(movedStep);
+            newSteps.push(sortedSteps[i]);
+          }
+        } else {
+          newSteps.push(sortedSteps[i]);
+        }
+      }
+
+      reorderSteps.mutate({
+        approvalFlowId,
+        steps: newSteps.map((step, index) => ({
+          id: step.id,
+          stepOrder: index + 1,
+        })),
+      });
+    }
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    dragItemRef.current = null;
+  };
+
+  const handleAddClick = (): void => {
+    if (!canCreate) return;
+    setEditingStep(null);
+    form.reset({ approvalRoleGroupId: 0 });
+    setFormOpen(true);
+  };
+
+  const handleEditClick = (step: ApprovalFlowStepGetDto): void => {
+    if (!canUpdate) return;
+    setEditingStep(step);
+    form.reset({ approvalRoleGroupId: step.approvalRoleGroupId });
+    setFormOpen(true);
+  };
+
+  const handleDeleteClick = (step: ApprovalFlowStepGetDto): void => {
+    if (!canDelete) return;
+    setPendingDeleteStep(step);
+  };
+
+  const handleConfirmDelete = (): void => {
+    if (!pendingDeleteStep || deleteStep.isPending) return;
+    const target = pendingDeleteStep;
+    deleteStep.mutate(
+      { id: target.id, approvalFlowId: target.approvalFlowId },
+      { onSettled: () => setPendingDeleteStep(null) },
+    );
+  };
+
+  const handleFormSubmit = async (data: StepFormSchema): Promise<void> => {
+    if (!canCreate && !canUpdate) return;
+    if (editingStep) {
+      await updateStep.mutateAsync({
+        id: editingStep.id,
+        data: {
+          approvalFlowId: editingStep.approvalFlowId,
+          stepOrder: editingStep.stepOrder,
+          approvalRoleGroupId: data.approvalRoleGroupId,
+        },
+      });
+    } else {
+      const maxOrder = sortedSteps.length > 0 ? Math.max(...sortedSteps.map((s) => s.stepOrder)) : 0;
+      await createStep.mutateAsync({
+        approvalFlowId,
+        stepOrder: maxOrder + 1,
+        approvalRoleGroupId: data.approvalRoleGroupId,
+      });
+    }
+    setFormOpen(false);
+    setEditingStep(null);
+    form.reset();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-slate-50/50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl p-6 transition-all duration-300">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-500">
+              <Layers size={18} />
+            </div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              {t('approvalFlowStep.title')}
+            </h3>
+          </div>
+          {canCreate ? (
+            <Button
+              type="button"
+              onClick={handleAddClick}
+              size="sm"
+              className="px-4 py-2 bg-[image:var(--crm-brand-gradient)] rounded-lg text-white text-xs font-bold shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] hover:scale-105 transition-transform border-0 hover:text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t('approvalFlowStep.addButton')}
+            </Button>
+          ) : null}
+        </div>
+
+        <div>
+          {isLoading ? (
+            <div className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">
+              {t('approvalFlow.loading')}
+            </div>
+          ) : sortedSteps.length === 0 ? (
+            <div className="text-sm text-slate-500 dark:text-slate-400 text-center py-8 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-xl bg-slate-50/50 dark:bg-white/5">
+              {t('approvalFlowStep.empty')}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {sortedSteps.map((step, index) => (
+                <div
+                  key={step.id}
+                  draggable={canUpdate}
+                  onDragStart={() => {
+                    if (!canUpdate) return;
+                    handleDragStart(index);
+                  }}
+                  onDragOver={(e) => {
+                    if (!canUpdate) return;
+                    handleDragOver(e, index);
+                  }}
+                  onDragEnd={() => {
+                    if (!canUpdate) return;
+                    handleDragEnd();
+                  }}
+                  className={`
+                    flex items-center gap-4 p-4 rounded-xl border cursor-move transition-all duration-200 group
+                    ${draggedIndex === index 
+                      ? 'opacity-50 border-rose-500/50 bg-rose-50 dark:bg-rose-900/20' 
+                      : dragOverIndex === index && draggedIndex !== index 
+                        ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/20 scale-[1.02]' 
+                        : 'border-slate-200 dark:border-white/5 bg-white dark:bg-[#0c0516] hover:border-rose-500/30 hover:shadow-md hover:shadow-rose-500/5'}
+                  `}
+                >
+                  <GripVertical className="h-5 w-5 text-slate-400 group-hover:text-rose-500 transition-colors flex-shrink-0" />
+                  
+                  <div className="flex-1 flex items-center gap-4">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-sm border border-rose-500/20">
+                      {step.stepOrder}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-slate-900 dark:text-white text-sm">
+                        {step.approvalRoleGroupName || t('approvalFlowStep.unknownRoleGroup')}
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        {t('approvalFlowStep.stepDescription', { order: step.stepOrder })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {canUpdate ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEditClick(step)}
+                        className="h-8 w-8 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-lg"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                    ) : null}
+                    {canDelete ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteClick(step)}
+                        className="h-8 w-8 text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <Dialog open={(canCreate || canUpdate) && formOpen} onOpenChange={setFormOpen}>
+        <DialogContent className="bg-white dark:bg-[#130822] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white max-w-lg shadow-2xl shadow-slate-200/50 dark:shadow-black/50 sm:rounded-2xl p-0 overflow-hidden">
+          <DialogHeader className="border-b border-slate-100 dark:border-white/5 px-6 py-5 bg-white/80 dark:bg-[#130822]/90 backdrop-blur-md shrink-0 flex-row items-center justify-between space-y-0">
+            <div className="flex items-center gap-3">
+               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-amber-500/20 border border-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                 <Layers size={20} />
+               </div>
+               <div>
+                  <DialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+                    {editingStep
+                      ? t('approvalFlowStep.form.editTitle')
+                      : t('approvalFlowStep.form.addTitle')}
+                  </DialogTitle>
+                  <DialogDescription className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+                    {editingStep
+                      ? t('approvalFlowStep.form.editDescription')
+                      : t('approvalFlowStep.form.addDescription')}
+                  </DialogDescription>
+               </div>
+            </div>
+          </DialogHeader>
+
+          <div className="p-6">
+            <Form {...form}>
+              <form
+                onSubmit={(ev) => {
+                  ev.stopPropagation();
+                  form.handleSubmit(handleFormSubmit)(ev);
+                }}
+                className="space-y-5"
+              >
+                <FormField
+                  control={form.control}
+                  name="approvalRoleGroupId"
+                  render={({ field }) => (
+                    <FormItem className="space-y-0">
+                      <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(stepFormSchema, 'approvalRoleGroupId')}>
+                        {t('approvalFlowStep.form.approvalRoleGroup')}
+                      </FormLabel>
+                      <VoiceSearchCombobox
+                        value={field.value && field.value !== 0 ? field.value.toString() : ''}
+                        onSelect={(value) => field.onChange(value ? Number(value) : 0)}
+                        options={availableRoleGroupOptions}
+                        onDebouncedSearchChange={setRoleGroupSearchTerm}
+                        onFetchNextPage={roleGroupDropdown.fetchNextPage}
+                        hasNextPage={roleGroupDropdown.hasNextPage}
+                        isLoading={roleGroupDropdown.isLoading}
+                        isFetchingNextPage={roleGroupDropdown.isFetchingNextPage}
+                        placeholder={t('approvalFlowStep.form.selectRoleGroup')}
+                        searchPlaceholder={t('common.search')}
+                        className={INPUT_STYLE}
+                      />
+                      <FormMessage className="text-red-500 text-[10px] mt-1" />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-white/5">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setFormOpen(false)}
+                    disabled={createStep.isPending || updateStep.isPending}
+                    className="h-10 px-4 rounded-lg border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300"
+                  >
+                    {t('approvalFlowStep.form.cancel')}
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createStep.isPending || updateStep.isPending || !isFormValid}
+                    className="h-10 px-6 rounded-lg bg-[image:var(--crm-brand-gradient)] hover:from-rose-700 hover:to-amber-700 text-white font-medium shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] border-0"
+                  >
+                    {createStep.isPending || updateStep.isPending
+                      ? t('approvalFlowStep.form.saving')
+                      : t('approvalFlowStep.form.save')}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={pendingDeleteStep !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingDeleteStep(null);
+          }
+        }}
+      >
+        <AlertDialogContent className="max-w-lg z-[60] border border-slate-200 dark:border-white/10 rounded-2xl bg-white dark:bg-[#130822] p-0 gap-0 overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-black/50">
+          <AlertDialogHeader className="px-6 pt-6 pb-2 space-y-1 text-left sm:text-left border-b border-slate-100 dark:border-white/5">
+            <AlertDialogTitle className="text-lg font-bold text-slate-900 dark:text-white">
+              {t('approvalFlowStep.deleteDialog.title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-slate-500 dark:text-slate-400 pt-2 pb-1">
+              {t('approvalFlowStep.deleteDialog.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row justify-end gap-3 px-6 py-4 bg-slate-50/80 dark:bg-white/5 border-t border-slate-100 dark:border-white/5 sm:space-x-0">
+            <AlertDialogCancel
+              disabled={deleteStep.isPending}
+              className="m-0 mt-0 sm:mt-0 h-10 px-5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0c0516] text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 focus-visible:ring-offset-0"
+              type="button"
+            >
+              {t('approvalFlowStep.deleteDialog.cancel')}
+            </AlertDialogCancel>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deleteStep.isPending}
+              className="m-0 h-10 px-6 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 font-semibold text-white border-0"
+              onClick={handleConfirmDelete}
+            >
+              {deleteStep.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
+              ) : null}
+              {t('approvalFlowStep.deleteDialog.confirm')}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}

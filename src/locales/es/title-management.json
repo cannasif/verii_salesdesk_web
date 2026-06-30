@@ -1,0 +1,63 @@
+{
+  "addButton": "Añadir Nuevo Título",
+  "loading": "Cargando...",
+  "noData": "No se encontraron datos",
+  "error": "Se produjo un error",
+  "search": "Buscar...",
+  "refresh": "Actualizar",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "menu": "Gestión de Títulos",
+  "description": "Gestionar y editar títulos",
+  "advancedFilter": {
+    "columnTitleName": "Nombre del título",
+    "columnCode": "Código"
+  },
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "saving": "Guardando...",
+  "delete": {
+    "confirmTitle": "Eliminar título",
+    "confirmMessage": "¿Seguro que desea eliminar el título {{titleName}}?",
+    "button": "Eliminar"
+  },
+  "deleting": "Eliminando...",
+  "actions": "Acciones",
+  "edit": "Editar",
+  "header": {
+    "title": "Gestión de títulos",
+    "description": "Puede gestionar las definiciones de títulos aquí."
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nombre del título",
+    "code": "Código",
+    "createdDate": "Fecha de creación",
+    "createdBy": "Creado por",
+    "showing": "Mostrando {{from}}-{{to}} / {{total}}",
+    "page": "Página {{current}} / {{total}}",
+    "title": "Lista de títulos"
+  },
+  "form": {
+    "addTitle": "Agregar nuevo título",
+    "editTitle": "Editar título",
+    "addDescription": "Ingrese la información del nuevo título",
+    "editDescription": "Edite la información del título",
+    "titleName": "Nombre del título",
+    "titleNamePlaceholder": "Ingrese el nombre del título",
+    "titleCode": "Código del título",
+    "codePlaceholder": "Ingrese código (opcional)",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando..."
+  },
+  "stats": {
+    "totalTitles": "Total de títulos",
+    "activeTitles": "Títulos activos",
+    "newThisMonth": "Nuevo este mes"
+  },
+  "messages": {
+    "deleteSuccess": "Título eliminado con éxito",
+    "deleteError": "No se pudo eliminar el título"
+  }
+}

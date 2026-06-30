@@ -1,0 +1,644 @@
+import axios from 'axios';
+import i18n from './i18n';
+import { useAuthStore } from '@/stores/auth-store';
+import { getUserFromToken } from '@/utils/jwt';
+import {
+  loadConfig,
+  getApiUrl,
+  getApiBaseUrl,
+  isCurrentAppPath,
+  resolveAppPath,
+} from './api-config';
+import { publishAiAssistantErrorContext } from '@/features/ai-assistant/lib/ai-assistant-error-context';
+
+export { loadConfig, getApiUrl, getApiBaseUrl, resolveAppPath };
+
+const MAX_MANAGEMENT_PAGE_SIZE = 200;
+
+export async function ensureApiReady(): Promise<void> {
+  const base = await loadConfig();
+  api.defaults.baseURL = base;
+}
+
+export const api = axios.create({
+  baseURL: getApiBaseUrl(),
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+let refreshPromise: Promise<string | null> | null = null;
+let activeApiRequestCount = 0;
+
+function publishApiActivity(): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(
+    new CustomEvent('salesdesk-api-activity', {
+      detail: { activeCount: activeApiRequestCount },
+    })
+  );
+}
+
+function trackApiRequestStart(): void {
+  activeApiRequestCount += 1;
+  publishApiActivity();
+}
+
+function trackApiRequestEnd(): void {
+  activeApiRequestCount = Math.max(0, activeApiRequestCount - 1);
+  publishApiActivity();
+}
+
+function appendPathSegment(url: string | undefined, segment: string): string | undefined {
+  if (!url) return url;
+
+  const [path, query] = url.split('?');
+  const nextPath = path.endsWith(`/${segment}`) ? path : `${path.replace(/\/$/, '')}/${segment}`;
+  return query ? `${nextPath}?${query}` : nextPath;
+}
+
+// This API is hosted behind IIS, which rejects native PUT/DELETE verbs and the
+// X-HTTP-Method-Override tunnel with 403. Every mutation must therefore be sent
+// as a plain POST. Standard CRUD uses the legacy `POST .../{id}/update` and
+// `POST .../{id}/delete` aliases (the segment is appended below). The endpoints
+// matched here already carry their action verb in the route, so they must be
+// POSTed to the same URL without appending an extra `/update` segment.
+function isPutActionAlreadyInPath(url: string | undefined): boolean {
+  if (!url) return false;
+
+  const path = url.split('?')[0].toLowerCase();
+
+  if (/\/bulk-(quotation|order|demand)\/\d+/.test(path)) return true;
+  if (/\/(quotationline|orderline|demandline)\/update-multiple$/.test(path)) return true;
+  if (path.includes('exchangerate/update-exchange-rate-in-')) return true;
+  if (path.endsWith('/notes-list')) return true;
+
+  return false;
+}
+
+function resolveBranchCodeFromPersistedState(): string | null {
+  try {
+    const raw = localStorage.getItem('auth-storage');
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as {
+      state?: { branch?: { code?: string | number; id?: string | number } };
+    };
+
+    const code = parsed?.state?.branch?.code ?? parsed?.state?.branch?.id;
+    if (code == null) return null;
+
+    const normalized = String(code).trim();
+    return normalized.length > 0 ? normalized : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeApiEnvelope(payload: unknown): unknown {
+  if (
+    (typeof Blob !== 'undefined' && payload instanceof Blob) ||
+    payload instanceof ArrayBuffer
+  ) {
+    return payload;
+  }
+
+  if (payload == null || typeof payload !== 'object' || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const source = payload as Record<string, unknown>;
+  const normalized: Record<string, unknown> = { ...source };
+
+  if (normalized.success === undefined && typeof source.Success === 'boolean') {
+    normalized.success = source.Success;
+  }
+  if (normalized.message === undefined && typeof source.Message === 'string') {
+    normalized.message = source.Message;
+  }
+  if (normalized.exceptionMessage === undefined && typeof source.ExceptionMessage === 'string') {
+    normalized.exceptionMessage = source.ExceptionMessage;
+  }
+  if (normalized.data === undefined && source.Data !== undefined) {
+    normalized.data = source.Data;
+  }
+  if (normalized.details === undefined && source.Details !== undefined) {
+    normalized.details = source.Details;
+  }
+  if (normalized.errors === undefined && Array.isArray(source.Errors)) {
+    normalized.errors = source.Errors;
+  }
+  if (normalized.timestamp === undefined && typeof source.Timestamp === 'string') {
+    normalized.timestamp = source.Timestamp;
+  }
+  if (normalized.statusCode === undefined && typeof source.StatusCode === 'number') {
+    normalized.statusCode = source.StatusCode;
+  }
+  if (normalized.className === undefined && typeof source.ClassName === 'string') {
+    normalized.className = source.ClassName;
+  }
+
+  return normalized;
+}
+
+function isIsoDateTimeWithoutOffset(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(value);
+}
+
+function convertLocalDateTimeStringToUtc(value: string): string {
+  if (!isIsoDateTimeWithoutOffset(value)) {
+    return value;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toISOString();
+}
+
+function normalizeUtcDateStrings(payload: unknown): unknown {
+  if (
+    payload == null ||
+    typeof payload !== 'object' ||
+    payload instanceof Date ||
+    (typeof Blob !== 'undefined' && payload instanceof Blob) ||
+    payload instanceof ArrayBuffer
+  ) {
+    if (typeof payload === 'string' && isIsoDateTimeWithoutOffset(payload)) {
+      return `${payload}Z`;
+    }
+    return payload;
+  }
+
+  if (Array.isArray(payload)) {
+    return payload.map((item) => normalizeUtcDateStrings(item));
+  }
+
+  const source = payload as Record<string, unknown>;
+  const normalized: Record<string, unknown> = {};
+  Object.entries(source).forEach(([key, value]) => {
+    normalized[key] = normalizeUtcDateStrings(value);
+  });
+  return normalized;
+}
+
+function normalizeOutgoingUtcDateStrings(payload: unknown): unknown {
+  if (
+    payload == null ||
+    typeof payload !== 'object' ||
+    payload instanceof Date ||
+    (typeof Blob !== 'undefined' && payload instanceof Blob) ||
+    payload instanceof ArrayBuffer
+  ) {
+    if (typeof payload === 'string') {
+      return convertLocalDateTimeStringToUtc(payload);
+    }
+    return payload;
+  }
+
+  if (Array.isArray(payload)) {
+    return payload.map((item) => normalizeOutgoingUtcDateStrings(item));
+  }
+
+  const source = payload as Record<string, unknown>;
+  const normalized: Record<string, unknown> = {};
+  Object.entries(source).forEach(([key, value]) => {
+    normalized[key] = normalizeOutgoingUtcDateStrings(value);
+  });
+  return normalized;
+}
+
+function extractApiErrorMessage(payload: unknown): string | null {
+  if (payload == null || typeof payload !== 'object') return null;
+
+  const errorPayload = payload as Record<string, unknown>;
+
+  const message = errorPayload.message;
+  const exceptionMessage = errorPayload.exceptionMessage;
+  const normalizedMessage =
+    typeof message === 'string'
+      ? message.trim().toLocaleLowerCase('tr-TR')
+      : '';
+  const searchableMessage = normalizedMessage
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .replace(/ı/g, 'i')
+    .replace(/ş/g, 's');
+  const isGenericServerMessage =
+    (searchableMessage.includes('sunucu') &&
+      searchableMessage.includes('hata') &&
+      searchableMessage.includes('olustu')) ||
+    normalizedMessage === 'sunucu hatası oluştu.' ||
+    normalizedMessage === 'sunucu hatası oluştu' ||
+    normalizedMessage === 'internal server error occurred.' ||
+    normalizedMessage === 'internal server error occurred';
+
+  if (
+    isGenericServerMessage &&
+    typeof exceptionMessage === 'string' &&
+    exceptionMessage.trim().length > 0
+  ) {
+    return exceptionMessage;
+  }
+
+  if (typeof message === 'string' && message.trim().length > 0) {
+    return message;
+  }
+
+  if (typeof exceptionMessage === 'string' && exceptionMessage.trim().length > 0) {
+    return exceptionMessage;
+  }
+
+  const errors = errorPayload.errors;
+  if (Array.isArray(errors)) {
+    const firstError = errors.find((item) => typeof item === 'string' && item.trim().length > 0);
+    if (typeof firstError === 'string') {
+      return firstError;
+    }
+  }
+
+  return null;
+}
+
+function extractApiErrorCode(payload: unknown): string | null {
+  if (payload == null || typeof payload !== 'object') return null;
+
+  const errorPayload = payload as Record<string, unknown>;
+  const errorCode = errorPayload.errorCode ?? errorPayload.ErrorCode;
+  return typeof errorCode === 'string' && errorCode.trim().length > 0 ? errorCode : null;
+}
+
+function getStoredAccessToken(): string | null {
+  return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+}
+
+function clampPageSizeValue(value: unknown): string | null {
+  const numeric = typeof value === 'string' ? Number(value) : typeof value === 'number' ? value : Number.NaN;
+  if (!Number.isFinite(numeric) || numeric <= 0) return null;
+  return String(Math.min(Math.trunc(numeric), MAX_MANAGEMENT_PAGE_SIZE));
+}
+
+function normalizePositiveIntegerValue(value: unknown): number | null {
+  const numeric = typeof value === 'string' ? Number(value) : typeof value === 'number' ? value : Number.NaN;
+  if (!Number.isFinite(numeric) || numeric <= 0) return null;
+  return Math.max(1, Math.trunc(numeric));
+}
+
+type RequestFilterParam = {
+  column?: unknown;
+  operator?: unknown;
+  value?: unknown;
+};
+
+function appendIndexedFilters(searchParams: URLSearchParams, filters: RequestFilterParam[]): boolean {
+  const validFilters = filters.filter((filter) => filter?.column && filter?.operator);
+  if (validFilters.length === 0) return false;
+
+  searchParams.delete('filters');
+  searchParams.delete('Filters');
+
+  validFilters.forEach((filter, index) => {
+    searchParams.append(`filters[${index}].column`, String(filter.column));
+    searchParams.append(`filters[${index}].operator`, String(filter.operator));
+    searchParams.append(`filters[${index}].value`, filter.value == null ? '' : String(filter.value));
+  });
+
+  return true;
+}
+
+function rewriteJsonFilterParam(searchParams: URLSearchParams): boolean {
+  const rawFilters = searchParams.get('filters') ?? searchParams.get('Filters');
+  if (!rawFilters?.trim().startsWith('[')) return false;
+
+  try {
+    const parsed = JSON.parse(rawFilters) as unknown;
+    if (!Array.isArray(parsed)) return false;
+    return appendIndexedFilters(searchParams, parsed as RequestFilterParam[]);
+  } catch {
+    return false;
+  }
+}
+
+function clampPagedRequestUrl(url?: string): string | undefined {
+  if (!url || !url.includes('?')) return url;
+
+  const [path, query = ''] = url.split('?');
+  if (!query) return url;
+
+  const searchParams = new URLSearchParams(query);
+  let changed = false;
+
+  ['pageSize', 'PageSize'].forEach((key) => {
+    const current = searchParams.get(key);
+    const next = clampPageSizeValue(current);
+    if (current != null && next != null && current !== next) {
+      searchParams.set(key, next);
+      changed = true;
+    }
+  });
+
+  changed = rewriteJsonFilterParam(searchParams) || changed;
+
+  if (!changed) return url;
+  const nextQuery = searchParams.toString();
+  return nextQuery ? `${path}?${nextQuery}` : path;
+}
+
+function clampPagedRequestParams(params: unknown): unknown {
+  if (!params) return params;
+
+  if (params instanceof URLSearchParams) {
+    ['pageSize', 'PageSize'].forEach((key) => {
+      const current = params.get(key);
+      const next = clampPageSizeValue(current);
+      if (current != null && next != null && current !== next) {
+        params.set(key, next);
+      }
+    });
+    rewriteJsonFilterParam(params);
+    return params;
+  }
+
+  if (typeof params !== 'object' || Array.isArray(params)) {
+    return params;
+  }
+
+  const nextParams = { ...(params as Record<string, unknown>) };
+  ['pageSize', 'PageSize'].forEach((key) => {
+    if (!(key in nextParams)) return;
+    const next = clampPageSizeValue(nextParams[key]);
+    if (next != null) {
+      nextParams[key] = next;
+    }
+  });
+
+  const rawFilters = nextParams.filters ?? nextParams.Filters;
+  if (Array.isArray(rawFilters)) {
+    delete nextParams.filters;
+    delete nextParams.Filters;
+
+    rawFilters
+      .filter((filter): filter is RequestFilterParam => Boolean(filter && typeof filter === 'object'))
+      .forEach((filter, index) => {
+        if (!filter.column || !filter.operator) return;
+        nextParams[`filters[${index}].column`] = String(filter.column);
+        nextParams[`filters[${index}].operator`] = String(filter.operator);
+        nextParams[`filters[${index}].value`] = filter.value == null ? '' : String(filter.value);
+      });
+  }
+
+  return nextParams;
+}
+
+function clampPagedRequestData(data: unknown): unknown {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return data;
+  }
+
+  const nextData = { ...(data as Record<string, unknown>) };
+  let changed = false;
+
+  ['pageNumber', 'PageNumber'].forEach((key) => {
+    if (!(key in nextData)) return;
+    const next = normalizePositiveIntegerValue(nextData[key]);
+    if (next != null && nextData[key] !== next) {
+      nextData[key] = next;
+      changed = true;
+    }
+  });
+
+  ['pageSize', 'PageSize'].forEach((key) => {
+    if (!(key in nextData)) return;
+    const next = clampPageSizeValue(nextData[key]);
+    if (next != null) {
+      const numericNext = Number(next);
+      if (nextData[key] !== numericNext) {
+        nextData[key] = numericNext;
+        changed = true;
+      }
+    }
+  });
+
+  return changed ? nextData : data;
+}
+
+function getStoredRefreshToken(): string | null {
+  return localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token');
+}
+
+function isPersistentSession(): boolean {
+  return !!(localStorage.getItem('access_token') || localStorage.getItem('refresh_token'));
+}
+
+function storeTokens(accessToken: string, refreshToken: string | null): void {
+  const persistent = isPersistentSession();
+
+  localStorage.removeItem('access_token');
+  sessionStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  sessionStorage.removeItem('refresh_token');
+
+  if (persistent) {
+    localStorage.setItem('access_token', accessToken);
+    if (refreshToken) localStorage.setItem('refresh_token', refreshToken);
+    return;
+  }
+
+  sessionStorage.setItem('access_token', accessToken);
+  if (refreshToken) sessionStorage.setItem('refresh_token', refreshToken);
+}
+
+function clearStoredTokens(): void {
+  localStorage.removeItem('access_token');
+  sessionStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  sessionStorage.removeItem('refresh_token');
+}
+
+function shouldSkipRefresh(url?: string): boolean {
+  if (!url) return false;
+
+  return [
+    '/api/auth/login',
+    '/api/auth/refresh-token',
+    '/api/auth/request-password-reset',
+    '/api/auth/reset-password',
+  ].some((path) => url.includes(path));
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const storedRefreshToken = getStoredRefreshToken();
+  if (!storedRefreshToken) {
+    return null;
+  }
+
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      const response = (await axios.post(
+        `${getApiBaseUrl()}/api/auth/refresh-token`,
+        { refreshToken: storedRefreshToken },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Language': i18n.language || 'tr',
+          },
+        }
+      )) as { data: unknown };
+
+      const normalized = normalizeApiEnvelope(response.data) as {
+        success?: boolean;
+        data?: { token?: string; refreshToken?: string };
+        message?: string;
+        exceptionMessage?: string;
+      };
+
+      if (!normalized.success || !normalized.data?.token) {
+        throw new Error(normalized.message || normalized.exceptionMessage || 'Session refresh failed');
+      }
+
+      storeTokens(normalized.data.token, normalized.data.refreshToken ?? storedRefreshToken);
+
+      const decodedUser = getUserFromToken(normalized.data.token);
+      const branch = useAuthStore.getState().branch;
+      if (decodedUser) {
+        useAuthStore.getState().setAuth(
+          decodedUser,
+          normalized.data.token,
+          branch,
+          isPersistentSession(),
+          normalized.data.refreshToken ?? storedRefreshToken
+        );
+      } else {
+        useAuthStore.setState({ token: normalized.data.token });
+      }
+
+      return normalized.data.token;
+    })().finally(() => {
+      refreshPromise = null;
+    });
+  }
+
+  return refreshPromise;
+}
+
+api.interceptors.request.use((config) => {
+  trackApiRequestStart();
+  config.baseURL = config.baseURL || getApiBaseUrl() || api.defaults.baseURL;
+  const originalMethod = (config.method ?? 'get').toLowerCase();
+  const useNativeHttpMethod = config.useNativeHttpMethod === true;
+
+  if (!useNativeHttpMethod) {
+    if (originalMethod === 'put') {
+      config.method = 'post';
+      if (!isPutActionAlreadyInPath(config.url)) {
+        config.url = appendPathSegment(config.url, 'update');
+      }
+    } else if (originalMethod === 'delete') {
+      config.method = 'post';
+      config.url = appendPathSegment(config.url, 'delete');
+    }
+  }
+
+  if (originalMethod === 'get') {
+    config.url = clampPagedRequestUrl(config.url);
+    config.params = clampPagedRequestParams(config.params);
+  }
+
+  const isFormDataPayload = typeof FormData !== 'undefined' && config.data instanceof FormData;
+
+  if (isFormDataPayload) {
+    delete config.headers['Content-Type'];
+    delete config.headers['content-type'];
+  } else if (config.data !== undefined) {
+    config.data = clampPagedRequestData(normalizeOutgoingUtcDateStrings(config.data));
+  }
+
+  const token = getStoredAccessToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  config.headers['X-Language'] = i18n.language || 'tr';
+
+  const branch = useAuthStore.getState().branch;
+  const branchCode = branch?.code || resolveBranchCodeFromPersistedState();
+  if (branchCode) {
+    config.headers['X-Branch-Code'] = branchCode;
+  }
+
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => {
+    trackApiRequestEnd();
+    response.data = normalizeUtcDateStrings(normalizeApiEnvelope(response.data));
+    return response.data;
+  },
+  async (error) => {
+    trackApiRequestEnd();
+    const originalRequest = error.config as import('axios').AxiosRequestConfig & { _retry?: boolean };
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !shouldSkipRefresh(originalRequest.url)) {
+      originalRequest._retry = true;
+
+      try {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
+          originalRequest.headers = originalRequest.headers ?? {};
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        }
+      } catch {
+        // Refresh fallback continues with logout below.
+      }
+
+      clearStoredTokens();
+      useAuthStore.getState().logout();
+
+      if (!isCurrentAppPath('/auth/login?sessionExpired=true') && !isCurrentAppPath('/auth/login')) {
+        window.location.href = resolveAppPath('/auth/login?sessionExpired=true');
+      }
+    }
+
+    const apiError = normalizeApiEnvelope(error.response?.data);
+    if (error.response) {
+      error.response.data = apiError;
+    }
+
+    const apiMessage = extractApiErrorMessage(apiError);
+    if (apiMessage) {
+      error.message = apiMessage;
+    }
+
+    const requestUrl = originalRequest?.url ?? error.config?.url ?? null;
+    if (requestUrl && !requestUrl.toLowerCase().includes('/api/aiassistant')) {
+      publishAiAssistantErrorContext({
+        message: error.message || apiMessage || 'Request failed',
+        errorCode: extractApiErrorCode(apiError),
+        httpStatusCode: error.response?.status ?? null,
+        currentPath: window.location.pathname,
+        requestMethod: (originalRequest?.method ?? error.config?.method ?? null)?.toUpperCase() ?? null,
+        requestUrl,
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    useNativeHttpMethod?: boolean;
+  }
+
+  export interface AxiosInstance {
+    get<T = unknown>(url: string, config?: import('axios').AxiosRequestConfig): Promise<T>;
+    post<T = unknown>(url: string, data?: unknown, config?: import('axios').AxiosRequestConfig): Promise<T>;
+    put<T = unknown>(url: string, data?: unknown, config?: import('axios').AxiosRequestConfig): Promise<T>;
+    delete<T = unknown>(url: string, config?: import('axios').AxiosRequestConfig): Promise<T>;
+    patch<T = unknown>(url: string, data?: unknown, config?: import('axios').AxiosRequestConfig): Promise<T>;
+  }
+}

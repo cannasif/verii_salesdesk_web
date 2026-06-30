@@ -1,0 +1,120 @@
+{
+  "countryManagement": {
+    "menu": "Länderverwaltung",
+    "description": "Länder verwalten und bearbeiten",
+    "addButton": "Land hinzufügen",
+    "searchPlaceholder": "Suchen...",
+    "loading": "Lädt...",
+    "error": "Ein Fehler ist aufgetreten",
+    "table": {
+      "id": "ID",
+      "name": "Ländername",
+      "code": "Code",
+      "erpCode": "ERP-Code",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "noData": "Keine Daten gefunden",
+      "title": "Länderliste"
+    },
+    "delete": {
+      "confirmTitle": "Land löschen",
+      "confirmMessage": "Sind Sie sicher, dass Sie {{name}} löschen möchten?"
+    },
+    "messages": {
+      "deleteSuccess": "Land erfolgreich gelöscht",
+      "deleteError": "Land konnte nicht gelöscht werden",
+      "createSuccess": "Land erfolgreich erstellt",
+      "createError": "Land konnte nicht erstellt werden",
+      "updateSuccess": "Land erfolgreich aktualisiert",
+      "updateError": "Land konnte nicht aktualisiert werden"
+    },
+    "form": {
+      "addCountry": "Land hinzufügen",
+      "editCountry": "Land bearbeiten",
+      "addDescription": "Neue Länderinformationen eingeben",
+      "editDescription": "Länderinformationen bearbeiten",
+      "name": "Ländername",
+      "namePlaceholder": "Ländernamen eingeben",
+      "code": "Ländercode",
+      "codePlaceholder": "Ländercode eingeben (z. B. TR, US)",
+      "erpCode": "ERP-Code",
+      "erpCodePlaceholder": "ERP-Code eingeben (optional)",
+      "nameRequired": "Der Ländername ist erforderlich",
+      "nameMaxLength": "Der Ländername darf maximal 100 Zeichen haben",
+      "codeMinLength": "Der Ländercode muss mindestens 2 Zeichen haben",
+      "codeMaxLength": "Der Ländercode darf maximal 5 Zeichen haben",
+      "erpCodeMaxLength": "Der ERP-Code darf maximal 10 Zeichen haben",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "tabs": {
+        "header": "Allgemeine Informationen"
+      }
+    },
+    "stats": {
+      "totalCountries": "Gesamtländer",
+      "activeCountries": "Aktive Länder",
+      "newThisMonth": "Neu in diesem Monat"
+    }
+  },
+  "menu": "Länderverwaltung",
+  "description": "Länder verwalten und bearbeiten",
+  "addButton": "Land hinzufügen",
+  "searchPlaceholder": "Suchen...",
+  "loading": "Lädt...",
+  "noData": "Keine Daten gefunden",
+  "actions": "Aktionen",
+  "previous": "Zurück",
+  "next": "Weiter",
+  "deleteConfirmTitle": "Löschbestätigung",
+  "cancel": "Abbrechen",
+  "deleting": "Wird gelöscht...",
+  "delete": {
+    "confirmTitle": "Land löschen",
+    "confirmMessage": "Sind Sie sicher, dass Sie {{name}} löschen möchten?"
+  },
+  "saving": "Wird gespeichert...",
+  "save": "Speichern",
+  "stats": {
+    "totalCountries": "Gesamtländer",
+    "activeCountries": "Aktive Länder",
+    "newThisMonth": "Neu in diesem Monat"
+  },
+  "table": {
+    "id": "ID",
+    "name": "Ländername",
+    "code": "Code",
+    "erpCode": "ERP-Code",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von",
+    "showing": "Zeige {{from}}-{{to}} / {{total}}",
+    "page": "Seite {{current}} / {{total}}",
+    "noData": "Keine Daten gefunden",
+    "title": "Länderliste"
+  },
+  "advancedFilter": {
+    "columnName": "Ländername",
+    "columnCode": "Ländercode",
+    "columnErpCode": "ERP-Code"
+  },
+  "form": {
+    "addCountry": "Land hinzufügen",
+    "editCountry": "Land bearbeiten",
+    "addDescription": "Neue Länderinformationen eingeben",
+    "editDescription": "Länderinformationen bearbeiten",
+    "name": "Ländername",
+    "namePlaceholder": "Ländernamen eingeben",
+    "code": "Ländercode",
+    "codePlaceholder": "Ländercode eingeben (z. B. TR, US)",
+    "erpCode": "ERP-Code",
+    "erpCodePlaceholder": "ERP-Code eingeben (optional)",
+    "nameRequired": "Der Ländername ist erforderlich",
+    "nameMaxLength": "Der Ländername darf maximal 100 Zeichen haben",
+    "codeMinLength": "Der Ländercode muss mindestens 2 Zeichen haben",
+    "codeMaxLength": "Der Ländercode darf maximal 5 Zeichen haben",
+    "erpCodeMaxLength": "Der ERP-Code darf maximal 10 Zeichen haben"
+  },
+  "deleteConfirm": {
+    "confirmMessage": "Sind Sie sicher, dass Sie {{name}} löschen möchten?"
+  },
+  "search": "Suchen..."
+}

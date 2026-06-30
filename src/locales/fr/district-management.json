@@ -1,0 +1,129 @@
+{
+  "menu": "Gestion des districts",
+  "description": "Gérer et modifier les districts",
+  "addButton": "Ajouter un nouveau district",
+  "listTitle": "Liste des districts",
+  "listDescription": "Vous pouvez gérer tous les districts enregistrés dans le système ici.",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée trouvée",
+  "actions": "Actions",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+  "save": "Enregistrer",
+  "saving": "Enregistrement en cours...",
+  "countryManagement": {
+    "error": "Une erreur est survenue"
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nom du district",
+    "erpCode": "Code ERP",
+    "city": "Ville",
+    "cityName": "Nom de la ville",
+    "status": "Statut",
+    "title": "Liste des districts",
+    "createdDate": "Date de création",
+    "createdBy": "Créé par",
+    "showing": "Affichage de {{from}} à {{to}} / {{total}}",
+    "page": "Page {{current}} / {{total}}"
+  },
+  "delete": {
+    "confirmTitle": "Supprimer le district",
+    "confirmMessage": "Voulez-vous vraiment supprimer le district {{name}} ?",
+    "success": "District supprimé avec succès",
+    "error": "Le district n'a pas pu être supprimé",
+    "deleting": "Suppression en cours...",
+    "action": "Supprimer"
+  },
+  "form": {
+    "editDistrict": "Modifier le district",
+    "addDistrict": "Ajouter un nouveau district",
+    "editDescription": "Modifier les informations du district",
+    "addDescription": "Saisissez les informations du nouveau district",
+    "name": "Nom du district",
+    "namePlaceholder": "Entrez le nom du district",
+    "city": "Ville",
+    "selectCity": "Sélectionner une ville",
+    "searchCity": "Rechercher une ville...",
+    "erpCode": "Code ERP",
+    "erpCodePlaceholder": "Entrez le code ERP (optionnel)",
+    "nameRequired": "Le nom du district est obligatoire",
+    "nameMaxLength": "Le nom du district ne doit pas dépasser 100 caractères",
+    "erpCodeMaxLength": "Le code ERP ne doit pas dépasser 10 caractères",
+    "cityRequired": "La ville est obligatoire"
+  },
+  "stats": {
+    "totalDistricts": "Total des districts",
+    "activeDistricts": "Districts actifs",
+    "newThisMonth": "Nouveaux ce mois"
+  },
+  "status": {
+    "inactive": "Inactif",
+    "active": "Actif"
+  },
+  "messages": {
+    "createSuccess": "District créé avec succès",
+    "createError": "Impossible de créer le district",
+    "updateSuccess": "District mis à jour avec succès",
+    "updateError": "Impossible de mettre à jour le district",
+    "deleteSuccess": "District supprimé avec succès",
+    "deleteError": "Impossible de supprimer le district"
+  },
+  "districtManagement": {
+    "menu": "Gestion des districts",
+    "description": "Gérer et modifier les districts",
+    "addButton": "Ajouter un nouveau district",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée trouvée",
+    "table": {
+      "id": "ID",
+      "name": "Nom du district",
+      "erpCode": "Code ERP",
+      "city": "Ville",
+      "cityName": "Nom de la ville",
+      "status": "Statut",
+      "title": "Liste des districts"
+    },
+    "delete": {
+      "confirmTitle": "Supprimer le district",
+      "confirmMessage": "Voulez-vous vraiment supprimer le district {{name}} ?",
+      "success": "District supprimé avec succès",
+      "error": "Le district n'a pas pu être supprimé"
+    },
+    "messages": {
+      "createSuccess": "District créé avec succès",
+      "createError": "Impossible de créer le district",
+      "updateSuccess": "District mis à jour avec succès",
+      "updateError": "Impossible de mettre à jour le district"
+    },
+    "stats": {
+      "totalDistricts": "Total des districts",
+      "activeDistricts": "Districts actifs",
+      "newThisMonth": "Nouveaux ce mois"
+    },
+    "status": {
+      "inactive": "Inactif",
+      "active": "Actif"
+    },
+    "error": "Une erreur est survenue",
+    "form": {
+      "editDistrict": "Modifier le district",
+      "addDistrict": "Ajouter un nouveau district",
+      "editDescription": "Modifier les informations du district",
+      "addDescription": "Saisissez les informations du nouveau district",
+      "name": "Nom du district",
+      "namePlaceholder": "Entrez le nom du district",
+      "city": "Ville",
+      "selectCity": "Sélectionner une ville",
+      "searchCity": "Rechercher une ville...",
+      "erpCode": "Code ERP",
+      "erpCodePlaceholder": "Entrez le code ERP (optionnel)",
+      "nameRequired": "Le nom du district est obligatoire",
+      "nameMaxLength": "Le nom du district ne doit pas dépasser 100 caractères",
+      "erpCodeMaxLength": "Le code ERP ne doit pas dépasser 10 caractères",
+      "cityRequired": "La ville est obligatoire"
+    }
+  }
+}

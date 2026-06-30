@@ -1,0 +1,129 @@
+{
+  "menu": "Gestione distretti",
+  "description": "Gestire e modificare i distretti",
+  "addButton": "Aggiungere nuovo distretto",
+  "listTitle": "Elenco distretti",
+  "listDescription": "Qui puoi gestire tutti i distretti registrati nel sistema.",
+  "loading": "Caricamento in corso...",
+  "noData": "Nessun dato trovato",
+  "actions": "Azioni",
+  "previous": "Precedente",
+  "next": "Successivo",
+  "cancel": "Annulla",
+  "delete": "Elimina",
+  "save": "Salva",
+  "saving": "Salvataggio...",
+  "countryManagement": {
+    "error": "Si è verificato un errore"
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nome del distretto",
+    "erpCode": "Codice ERP",
+    "city": "Città",
+    "cityName": "Nome della città",
+    "status": "Stato",
+    "title": "Elenco distretti",
+    "createdDate": "Data di creazione",
+    "createdBy": "Creato da",
+    "showing": "Visualizzazione {{from}}-{{to}} / {{total}}",
+    "page": "Pagina {{current}} / {{total}}"
+  },
+  "delete": {
+    "confirmTitle": "Eliminare il distretto",
+    "confirmMessage": "Sei sicuro di voler eliminare il distretto {{name}}?",
+    "success": "Distretto eliminato con successo",
+    "error": "Impossibile eliminare il distretto",
+    "deleting": "Eliminazione in corso...",
+    "action": "Elimina"
+  },
+  "form": {
+    "editDistrict": "Modifica distretto",
+    "addDistrict": "Aggiungere nuovo distretto",
+    "editDescription": "Modifica le informazioni del distretto",
+    "addDescription": "Inserisci le informazioni del nuovo distretto",
+    "name": "Nome del distretto",
+    "namePlaceholder": "Inserisci il nome del distretto",
+    "city": "Città",
+    "selectCity": "Seleziona città",
+    "searchCity": "Cerca città...",
+    "erpCode": "Codice ERP",
+    "erpCodePlaceholder": "Inserisci codice ERP (opzionale)",
+    "nameRequired": "Il nome del distretto è obbligatorio",
+    "nameMaxLength": "Il nome del distretto non può superare 100 caratteri",
+    "erpCodeMaxLength": "Il codice ERP non può superare 10 caratteri",
+    "cityRequired": "La città è obbligatoria"
+  },
+  "stats": {
+    "totalDistricts": "Totale distretti",
+    "activeDistricts": "Distretti attivi",
+    "newThisMonth": "Nuovi questo mese"
+  },
+  "status": {
+    "inactive": "Inattivo",
+    "active": "Attivo"
+  },
+  "messages": {
+    "createSuccess": "Distretto creato con successo",
+    "createError": "Impossibile creare il distretto",
+    "updateSuccess": "Distretto aggiornato con successo",
+    "updateError": "Impossibile aggiornare il distretto",
+    "deleteSuccess": "Distretto eliminato con successo",
+    "deleteError": "Impossibile eliminare il distretto"
+  },
+  "districtManagement": {
+    "menu": "Gestione distretti",
+    "description": "Gestire e modificare i distretti",
+    "addButton": "Aggiungere nuovo distretto",
+    "loading": "Caricamento in corso...",
+    "noData": "Nessun dato trovato",
+    "table": {
+      "id": "ID",
+      "name": "Nome del distretto",
+      "erpCode": "Codice ERP",
+      "city": "Città",
+      "cityName": "Nome della città",
+      "status": "Stato",
+      "title": "Elenco distretti"
+    },
+    "delete": {
+      "confirmTitle": "Eliminare il distretto",
+      "confirmMessage": "Sei sicuro di voler eliminare il distretto {{name}}?",
+      "success": "Distretto eliminato con successo",
+      "error": "Impossibile eliminare il distretto"
+    },
+    "messages": {
+      "createSuccess": "Distretto creato con successo",
+      "createError": "Impossibile creare il distretto",
+      "updateSuccess": "Distretto aggiornato con successo",
+      "updateError": "Impossibile aggiornare il distretto"
+    },
+    "stats": {
+      "totalDistricts": "Totale distretti",
+      "activeDistricts": "Distretti attivi",
+      "newThisMonth": "Nuovi questo mese"
+    },
+    "status": {
+      "inactive": "Inattivo",
+      "active": "Attivo"
+    },
+    "error": "Si è verificato un errore",
+    "form": {
+      "editDistrict": "Modifica distretto",
+      "addDistrict": "Aggiungere nuovo distretto",
+      "editDescription": "Modifica le informazioni del distretto",
+      "addDescription": "Inserisci le informazioni del nuovo distretto",
+      "name": "Nome del distretto",
+      "namePlaceholder": "Inserisci il nome del distretto",
+      "city": "Città",
+      "selectCity": "Seleziona città",
+      "searchCity": "Cerca città...",
+      "erpCode": "Codice ERP",
+      "erpCodePlaceholder": "Inserisci codice ERP (opzionale)",
+      "nameRequired": "Il nome del distretto è obbligatorio",
+      "nameMaxLength": "Il nome del distretto non può superare 100 caratteri",
+      "erpCodeMaxLength": "Il codice ERP non può superare 10 caratteri",
+      "cityRequired": "La città è obbligatoria"
+    }
+  }
+}

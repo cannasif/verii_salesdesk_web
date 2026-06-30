@@ -1,0 +1,522 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Eindeutiger Schlüssel für Routen- und Seitenwächter. Verwenden Sie stabile snake_case- oder Punktnotation.",
+      "name": "Anzeigename für Administratoren bei der Berechtigungsverwaltung.",
+      "description": "Optionale interne Beschreibung dieser Berechtigung.",
+      "isActive": "Inaktive Berechtigungen werden bei der Zugriffsberechnung ignoriert.",
+      "save": "Änderungen wirken sich auf Rollen- und Gruppenberechtigungsabläufe aus."
+    },
+    "permissionGroup": {
+      "name": "Gruppenname zur Zuordnung und Identifikation bei Benutzern.",
+      "isSystemAdmin": "Mitglieder dieser Gruppe greifen ohne einzelne Berechtigungsprüfungen auf alle Seiten und Aktionen zu.",
+      "isActive": "Inaktive Gruppen sollten nicht mehr für neue Zugriffsentscheidungen vergeben werden.",
+      "permissions": "Ausgewählte Berechtigungen bestimmen, worauf Mitglieder dieser Gruppe zugreifen dürfen.",
+      "save": "Aktualisiert die wirksamen Zugriffe aller dieser Gruppe zugewiesenen Benutzer."
+    },
+    "userAssignment": {
+      "user": "Wählen Sie den Benutzer, dessen Zugriffsrahmen Sie verwalten möchten.",
+      "groups": "Der Benutzer erhält die zusammengeführten Berechtigungen aller ausgewählten Gruppen.",
+      "save": "Zuweisungen gelten unmittelbar für die nächsten Autorisierungsprüfungen. Eine Sitzungsaktualisierung kann nötig sein.",
+      "systemAdminNote": "Hat der Benutzer eine Systemadministrator-Gruppe, werden detaillierte Berechtigungen übersprungen."
+    },
+    "userVisibilityAssignment": {
+      "user": "Wählen Sie den Benutzer aus, dessen Einheiten-Sichtbarkeit Sie verwalten möchten.",
+      "policy": "Wählen Sie für jede Entität eine aktive Sichtbarkeitsrichtlinie aus oder lassen Sie es leer."
+    },
+    "visibilityPolicy": {
+      "code": "Verwenden Sie einen eindeutigen Code, damit die Richtlinie in Zuweisungs- und Prüfabläufen eindeutig erkennbar ist.",
+      "name": "Anzeigename, der Administratoren beim Verwalten der Richtlinie sehen.",
+      "includeSelf": "Wenn aktiviert, bleiben die eigenen Datensätze des Benutzers im Gültigkeitsbereich sichtbar.",
+      "isActive": "Inaktive Richtlinien bleiben von neuen Zuweisungen und Zugriffsentscheidungen ausgeschlossen."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Berechtigungsdefinitionen",
+    "description": "Im System verwendete Berechtigungscodes verwalten",
+    "add": "Definition hinzufügen",
+    "form": {
+      "editTitle": "Berechtigungsdefinition bearbeiten",
+      "addTitle": "Berechtigungsdefinition hinzufügen",
+      "editDescription": "Details der Berechtigungsdefinition aktualisieren",
+      "addDescription": "Neue Berechtigungsdefinition anlegen",
+      "code": "Code",
+      "codePlaceholder": "Code wählen",
+      "affectedRoutes": "Betroffene Seiten",
+      "affectedRoutesNone": "Keine passende Route für diesen Code gefunden",
+      "name": "Name",
+      "namePlaceholder": "Anzeigename",
+      "availableOnWeb": "Im Web verfügbar",
+      "availableOnWebHint": "Diese Berechtigung kann in der Web-Anwendung für Menüs, Seiten und Aktionen genutzt werden.",
+      "availableOnMobile": "Im Mobile verfügbar",
+      "availableOnMobileHint": "Diese Berechtigung kann in der Mobile-Anwendung für Menüs, Bildschirme und Aktionen genutzt werden.",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "isActive": "Aktiv",
+      "codeSearchPlaceholder": "Suchen...",
+      "codeEmpty": "Keine Ergebnisse"
+    },
+    "table": {
+      "title": "Berechtigungsdefinitionen",
+      "code": "Code",
+      "name": "Name",
+      "platform": "Plattform",
+      "isActive": "Aktiv",
+      "updatedDate": "Aktualisiert",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "platform": {
+      "web": "Web",
+      "mobile": "Mobil",
+      "both": "Web + Mobil"
+    },
+    "delete": {
+      "confirmTitle": "Berechtigungsdefinition löschen",
+      "confirmMessage": "Möchten Sie „{{name}}“ wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden."
+    },
+    "syncFromRoutes": "Aus Routen synchronisieren"
+  },
+  "permissionGroups": {
+    "title": "Berechtigungsgruppen",
+    "description": "Berechtigungsgruppen und Zuweisungen verwalten",
+    "systemAdminLocked": "Die Systemadministrator-Gruppe kann nicht geändert werden",
+    "add": "Gruppe hinzufügen",
+    "selectAll": "Alle auswählen",
+    "noDefinitions": "Keine Berechtigungsdefinitionen verfügbar",
+    "form": {
+      "editTitle": "Berechtigungsgruppe bearbeiten",
+      "addTitle": "Berechtigungsgruppe hinzufügen",
+      "editDescription": "Details der Berechtigungsgruppe aktualisieren",
+      "addDescription": "Neue Berechtigungsgruppe anlegen",
+      "name": "Name",
+      "namePlaceholder": "Gruppenname",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "isSystemAdmin": "Systemadministrator",
+      "isActive": "Aktiv",
+      "permissions": "Berechtigungen"
+    },
+    "table": {
+      "title": "Berechtigungsgruppen",
+      "name": "Name",
+      "isSystemAdmin": "Systemadministrator",
+      "isActive": "Aktiv",
+      "permissionCount": "Berechtigungen",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "managePermissions": "Berechtigungen verwalten",
+    "permissionsPanel": {
+      "title": "Gruppenberechtigungen bearbeiten",
+      "description": "Berechtigungen für diese Gruppe auswählen",
+      "currentCodes": "Aktuelle Berechtigungscodes",
+      "screen": "Bildschirm / Berechtigungsbereich",
+      "groupedRows": "Berechtigungsbereiche",
+      "actionsMapped": "Berechtigungen",
+      "actions": {
+        "create": "Erstellen",
+        "read": "Lesen",
+        "update": "Aktualisieren",
+        "delete": "Löschen",
+        "other": "Sonstiges"
+      }
+    },
+    "delete": {
+      "confirmTitle": "Berechtigungsgruppe löschen",
+      "confirmMessage": "Möchten Sie „{{name}}“ wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden."
+    },
+    "search": "Suchen..."
+  },
+  "userGroupAssignments": {
+    "title": "Benutzer-Gruppenzuweisungen",
+    "description": "Benutzern Berechtigungsgruppen zuweisen",
+    "selectUser": "Benutzer auswählen",
+    "selectUserPlaceholder": "Benutzer suchen und auswählen...",
+    "selectUserHint": "Wählen Sie einen Benutzer, um dessen Gruppenzuweisungen zu verwalten",
+    "assignedGroups": "Zugewiesene Berechtigungsgruppen",
+    "noUsers": "Keine Benutzer gefunden",
+    "noGroups": "Keine Berechtigungsgruppen verfügbar",
+    "selectAll": "Alle auswählen"
+  },
+  "userVisibilityAssignments": {
+    "title": "Benutzersichtbarkeitszuweisungen",
+    "description": "Verwalten Sie Sichtbarkeitsrichtlinien pro Benutzer und Entität",
+    "selectUser": "Benutzer auswählen",
+    "selectedUser": "Ausgewählter Benutzer",
+    "selectUserPlaceholder": "Benutzer suchen und auswählen...",
+    "selectUserHint": "Wählen Sie einen Benutzer aus, um Sichtbarkeitszuweisungen zu verwalten",
+    "assignedPolicies": "Zugewiesene Richtlinien",
+    "status": "Status",
+    "ready": "Aktuell",
+    "unassigned": "Nicht zugewiesen",
+    "cardDescription": "{{entity}}-Datensätze dieses Benutzers werden mit der folgenden Sichtbarkeitsrichtlinie verwaltet.",
+    "selectPolicyPlaceholder": "Richtlinie auswählen",
+    "noPolicy": "Keine Richtlinie"
+  },
+  "visibilityPolicies": {
+    "title": "Sichtbarkeitsrichtlinien",
+    "description": "Verwalten von Richtliniensätzen, die definieren, wer welche Datensätze sehen kann",
+    "add": "Richtlinie hinzufügen",
+    "search": "Richtlinien suchen...",
+    "table": {
+      "title": "Liste der Sichtbarkeitsrichtlinien",
+      "code": "Code",
+      "name": "Name",
+      "entityType": "Entität",
+      "scopeType": "Gültigkeitsbereich",
+      "includeSelf": "Eigene einschließen",
+      "isActive": "Aktiv",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "stats": {
+      "total": "Gesamt Richtlinien",
+      "active": "Aktive Richtlinien",
+      "entities": "Entitätstypen"
+    },
+    "form": {
+      "addTitle": "Sichtbarkeitsrichtlinie hinzufügen",
+      "editTitle": "Sichtbarkeitsrichtlinie bearbeiten",
+      "addDescription": "Neue Sichtbarkeitsrichtlinie erstellen",
+      "editDescription": "Ausgewählte Sichtbarkeitsrichtlinie bearbeiten",
+      "code": "Code",
+      "codePlaceholder": "example.quotation.team",
+      "name": "Name",
+      "namePlaceholder": "Team-Quotierungssichtbarkeit",
+      "entityType": "Entität",
+      "entityTypePlaceholder": "Entität auswählen",
+      "scopeType": "Gültigkeitsbereich",
+      "scopeTypePlaceholder": "Gültigkeitsbereich auswählen",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Kurzbeschreibung",
+      "includeSelf": "Eigene Datensätze einschließen",
+      "isActive": "Aktiv",
+      "summaryTitle": "Richtlinienzusammenfassung",
+      "summary": "Der {{scope}}-Gültigkeitsbereich gilt für {{entity}} Datensätze."
+    },
+    "scope": {
+      "self": "Nur eigene",
+      "managerHierarchy": "Management-Hierarchie",
+      "permissionGroup": "Berechtigungsgruppe",
+      "company": "Unternehmensweit"
+    },
+    "entity": {
+      "activity": "Aktivität",
+      "quotation": "Angebot",
+      "demand": "Anfrage",
+      "order": "Auftrag",
+      "salesman360": "Vertriebs-KPI"
+    }
+  },
+  "visibilitySimulator": {
+    "title": "Sichtbarkeitssimulator",
+    "description": "Teste, welche Datensätze eines Benutzers und aktive Genehmigungs-Overrides für die ausgewählte Entität sichtbar sind.",
+    "selectUser": "Benutzer",
+    "helpUser": "Wählen Sie den Benutzer aus, dessen Sichtbarkeit simuliert werden soll.",
+    "selectUserPlaceholder": "Benutzer auswählen...",
+    "selectEntity": "Entität",
+    "helpEntity": "Wählen Sie das Modul aus, dessen Sichtbarkeit simuliert werden soll.",
+    "selectEntityPlaceholder": "Entität auswählen",
+    "recordId": "Datensatz-ID",
+    "recordIdPlaceholder": "z. B. 125",
+    "helpRecordId": "Geben Sie eine Datensatz-ID ein, um die Sichtbarkeit für view, update, delete und approve zu prüfen.",
+    "selectedUser": "Ausgewählter Benutzer",
+    "entity": "Entität",
+    "visibleUsers": "Sichtbare Benutzer",
+    "approvalOverrides": "Genehmigungsüberschreibungsdatensätze",
+    "visibleUsersTitle": "Benutzer im Gültigkeitsbereich",
+    "policyDefined": "Richtlinie definiert",
+    "noPolicy": "Keine Richtlinie",
+    "companyWide": "Unternehmensweiter Zugriff",
+    "policyActive": "Eine aktive Sichtbarkeitsrichtlinie ist aktiv",
+    "includeSelf": "Eigene einbeziehen",
+    "awaitingSelection": "Wählen Sie zuerst einen Benutzer und eine Entität.",
+    "overrideTitle": "Aktive Genehmigungsüberschreibungsdatensätze",
+    "noOverrides": "Keine aktiven Genehmigungsüberschreibungsdatensätze gefunden.",
+    "overrideRecord": "Datensatz #{{id}}",
+    "auditTitle": "Genehmigungsüberschreibungsprotokoll",
+    "noAudit": "Keine aktiven Genehmigungsüberschreibungsprotokolle gefunden.",
+    "auditActionId": "Genehmigungsaktion",
+    "auditRequestId": "Genehmigungsanfrage",
+    "auditFlow": "Ablauf",
+    "auditApprover": "Genehmiger",
+    "auditStepValue": "Schritt {{step}} / aktiv {{currentStep}}",
+    "actionPanelTitle": "Simulation von Datensatzaktionen",
+    "noRecordSimulation": "Nach Eingabe einer Datensatz-ID werden view / update / delete / approve Ergebnisse angezeigt.",
+    "actionAllowed": "Erlaubt",
+    "actionDenied": "Verweigert",
+    "action": {
+      "view": "Anzeigen",
+      "update": "Aktualisieren",
+      "delete": "Löschen",
+      "approve": "Genehmigen"
+    }
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "saving": "Wird gespeichert...",
+    "save": "Speichern und anwenden",
+    "loading": "Wird geladen...",
+    "search": "Suchen...",
+    "noData": "Keine Daten",
+    "actions": "Aktionen",
+    "yes": "Ja",
+    "no": "Nein",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "processing": "Wird verarbeitet..."
+  },
+  "sidebar": {
+    "accessControl": "Zugriffskontrolle",
+    "permissionDefinitions": "Berechtigungsdefinitionen",
+    "permissionGroups": "Berechtigungsgruppen",
+    "userGroupAssignments": "Benutzer-Gruppenzuweisungen",
+    "visibilityPolicies": "Sichtbarkeitsrichtlinien",
+    "userVisibilityAssignments": "Benutzersichtbarkeitszuweisungen",
+    "auditLogs": "Audit-Protokolle",
+    "visibilitySimulator": "Sichtbarkeitssimulator",
+    "accessControlGuide": "Leitfaden zur Zugriffskontrolle"
+  },
+  "auditLogs": {
+    "title": "Audit-Protokolle",
+    "description": "Nachvollziehen, wer kritische Aktionen ausgeführt hat, unter welchem Trace und mit welchem Ergebnis.",
+    "search": "Audit-Protokolle suchen...",
+    "results": {
+      "success": "Erfolgreich",
+      "succeeded": "Erfolgreich",
+      "warning": "Warnung",
+      "partial": "Teilweise",
+      "error": "Fehler",
+      "failed": "Fehlgeschlagen"
+    },
+    "filters": {
+      "result": "Ergebnis",
+      "actionType": "Aktion",
+      "entityType": "Entität",
+      "entityId": "Datensatz-ID",
+      "performedByUserEmail": "Ausgeführt von",
+      "source": "Quelle",
+      "branchCode": "Filiale",
+      "requestPath": "Anfrage-Pfad",
+      "requestMethod": "Methode",
+      "createdDate": "Datum"
+    },
+    "clearTraceFilter": "Trace-Filter löschen",
+    "viewDetail": "Details",
+    "filterTrace": "Trace filtern",
+    "loadError": "Audit-Protokolle konnten nicht geladen werden",
+    "stats": {
+      "total": "Gesamtprotokolle",
+      "errors": "Fehlerhafte Ergebnisse",
+      "traces": "Aktive Traces"
+    },
+    "table": {
+      "title": "Liste der Audit-Protokolle",
+      "createdDate": "Datum",
+      "traceId": "Trace-ID",
+      "actionType": "Aktion",
+      "entityType": "Entität",
+      "entityId": "Datensatz-ID",
+      "result": "Ergebnis",
+      "source": "Quelle",
+      "performedBy": "Ausgeführt von",
+      "branchCode": "Filiale",
+      "requestPath": "Anfrage-Pfad",
+      "requestMethod": "Methode",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "detail": {
+      "title": "Audit-Protokolldetail",
+      "description": "Kontext der Anfrage und Änderungszusammenfassung des gewählten Datensatzes anzeigen.",
+      "contextTitle": "Aktionskontext",
+      "requestTitle": "Anfragenzusammenfassung",
+      "reason": "Grund",
+      "failureReason": "Fehlerinformation",
+      "changedFieldsTitle": "Geänderte Felder",
+      "noChangedFields": "Keine Feldänderungen für diesen Datensatz verfügbar.",
+      "oldValuesTitle": "Alte Werte",
+      "newValuesTitle": "Neue Werte"
+    },
+    "traceDrillDown": {
+      "traceId": "Ausgewählte Trace",
+      "startedAt": "Gestartet am",
+      "completedAt": "Abgeschlossen am",
+      "entities": "Betroffene Entitäten",
+      "timelineTitle": "Trace-Ablaufübersicht",
+      "openTrace": "Diese Trace öffnen"
+    }
+  },
+  "guide": {
+    "title": "Leitfaden zur Zugriffskontrolle",
+    "description": "Dieser Leitfaden erklärt, was jeder Zugriffskontrollbildschirm tut und welche Änderungen jede Einstellung bewirkt. Das Ziel ist es, das System selbst für jemanden verständlich zu machen, der das Modell zum ersten Mal sieht.",
+    "hero": {
+      "coreLogicLabel": "Kernlogik",
+      "coreLogicValue": "Berechtigungen erlauben, Sichtbarkeit schränkt ein.",
+      "finalCheckLabel": "Letzte Prüfung",
+      "finalCheckValue": "Im Simulator validieren."
+    },
+    "quickRulesTitle": "Fünf Grundregeln",
+    "quickRules": [
+      "Seitenberechtigung und Datensatzsichtbarkeit sind verschiedene Konzepte. Ein Benutzer kann eine Seite öffnen, aber dennoch nur eine Teilmenge der Datensätze sehen.",
+      "Berechtigungsgruppen bestimmen, auf welche Seiten und Aktionen der Benutzer zugreifen kann.",
+      "Sichtbarkeitsrichtlinien bestimmen, welche Datensätze innerhalb dieser Seiten der Benutzer sehen kann.",
+      "Benutzer-Gruppenzuweisungen ordnen Gruppen zu. Benutzersichtbarkeitszuweisungen ordnen Sichtbarkeitsausnahmen für einen bestimmten Benutzer zu.",
+      "Veröffentlichen Sie keine Sichtbarkeitsrichtlinie, ohne das Ergebnis im Sichtbarkeitssimulator zu überprüfen."
+    ],
+    "screensTitle": "Was macht jeder Bildschirm?",
+    "pageCards": [
+      {
+        "id": "permissionGroups",
+        "title": "Berechtigungsgruppen",
+        "summary": "Dieser Bildschirm steuert, welche Module ein Benutzer öffnen und welche Aktionen er ausführen kann.",
+        "bullets": [
+          "Wenn ein Benutzer Angebote öffnen soll, benötigt er eine Leseberechtigung wie `sales.quotations.view`.",
+          "Wenn er Angebote erstellen soll, benötigt dieselbe Gruppe auch `sales.quotations.create`.",
+          "Wenn er aktualisieren oder löschen soll, sind auch die entsprechenden Aktualisierungs- oder Löschberechtigungen erforderlich.",
+          "Diese Berechtigungen öffnen die Zugänge zu Seiten und Aktionen; sie definieren nicht die Sichtbarkeit auf Datensatzebene."
+        ]
+      },
+      {
+        "id": "userGroupAssignments",
+        "title": "Benutzer-Gruppenzuweisungen",
+        "summary": "Dieser Bildschirm weist einem Benutzer eine oder mehrere Berechtigungsgruppen zu.",
+        "bullets": [
+          "Sie wählen zuerst einen Benutzer aus und ordnen ihm dann die Gruppen zu, die er erben soll.",
+          "Wenn ein Benutzer mehrere Gruppen hat, werden die Berechtigungen zusammengeführt.",
+          "Eine falsche Gruppenzuweisung kann Seiten zugänglich machen, auf die der Benutzer keinen Zugriff haben sollte.",
+          "Dieser Bildschirm ist in der Regel der Hauptbereich für die Rollenverteilung: Vertriebsmitarbeiter, Manager, Operations, Systemadministrator."
+        ]
+      },
+      {
+        "id": "visibilityPolicies",
+        "title": "Sichtbarkeitsrichtlinien",
+        "summary": "Dieser Bildschirm definiert, wer Datensätze wie Angebote, Aktivitäten, Anfragen und Aufträge sehen kann.",
+        "bullets": [
+          "Selbst wenn der Benutzer die Seite aufrufen kann, entscheidet diese Richtlinienebene darüber, welche Datensätze sichtbar sind.",
+          "Der ausgewählte Gültigkeitsbereich ändert das Verhalten: nur eigene Datensätze, Team-Gültigkeitsbereich, unternehmensweiter Gültigkeitsbereich und ähnliche Muster.",
+          "Verschiedene Entitäten wie Angebote und Aktivitäten können unterschiedliche Sichtbarkeitsmodelle verwenden.",
+          "Wenn eine Richtlinie aktiv ist, aber der falschen Entität zugeordnet wurde, tritt das erwartete Ergebnis nie ein."
+        ]
+      },
+      {
+        "id": "userVisibilityAssignments",
+        "title": "Benutzersichtbarkeitszuweisungen",
+        "summary": "Dieser Bildschirm dient für benutzerspezifische Sichtbarkeitsausnahmen.",
+        "bullets": [
+          "Verwenden Sie ihn, wenn die Standardrichtlinie nicht ausreicht und ein einzelner Benutzer ein anderes Sichtbarkeitsmodell benötigt.",
+          "Er ist ideal für Ausnahmen, ohne die unternehmensweite Regel zu ändern.",
+          "Dieser Bildschirm gewährt keinen Seitenzugriff; er ändert nur die Sichtbarkeit von Datensätzen."
+        ]
+      },
+      {
+        "id": "visibilitySimulator",
+        "title": "Sichtbarkeitssimulator",
+        "summary": "Dieser Bildschirm zeigt, was das System tatsächlich für einen ausgewählten Benutzer und eine Entität freigibt.",
+        "bullets": [
+          "Wenn Sie sich bei einer Regel unsicher sind, wählen Sie den Benutzer und die Entität aus und überprüfen Sie die sichtbaren Benutzer sowie das Prüfergebnis.",
+          "Wenn Sie eine konkrete Datensatz-ID eingeben, wird die Simulation datensatzspezifisch.",
+          "Genehmigungsüberschreibungen und Prüfeinträge werden hier ebenfalls angezeigt.",
+          "Dies ist der sicherste Ort, um das endgültige Verhalten zu validieren, bevor Sie sich auf eine Richtlinie in der Produktion verlassen."
+        ]
+      },
+      {
+        "id": "permissionDefinitions",
+        "title": "Berechtigungsdefinitionen",
+        "summary": "Dieser Bildschirm ist keine operative Abhängigkeit mehr für die tägliche Administration.",
+        "bullets": [
+          "Berechtigungscodes werden nun durch einen automatischen Synchronisationsfluss gehandhabt.",
+          "Die wichtigsten operativen Oberflächen sind Berechtigungsgruppen und die Zuweisungsbildschirme.",
+          "Der Katalog bleibt als Referenz zum Verständnis des zugrunde liegenden Berechtigungsmodells nützlich."
+        ]
+      }
+    ],
+    "scenariosTitle": "Szenariobasierte Beispiele",
+    "expectedResultLabel": "Erwartetes Ergebnis",
+    "scenarios": [
+      {
+        "id": "s1",
+        "title": "Szenario 1: Vertriebsmitarbeiter soll nur eigene Angebote sehen",
+        "target": "Der Benutzer soll Angebote öffnen und eventuell erstellen können, aber keine Datensätze anderer Personen sehen.",
+        "steps": [
+          "Fügen Sie `sales.quotations.view` und bei Bedarf `sales.quotations.create` zur entsprechenden Berechtigungsgruppe hinzu.",
+          "Weisen Sie diese Gruppe dem Vertriebsmitarbeiter unter Benutzer-Gruppenzuweisungen zu.",
+          "Erstellen Sie eine Angebotssichtbarkeitsrichtlinie, die den Zugriff auf die eigenen Datensätze des Benutzers beschränkt.",
+          "Weisen Sie dem Benutzer diese Richtlinie zu, falls eine Zuweisung auf Benutzerebene erforderlich ist."
+        ],
+        "result": "Der Benutzer öffnet die Angebotsseite und kann dort arbeiten, die Liste bleibt jedoch auf seine zulässigen Datensätze beschränkt."
+      },
+      {
+        "id": "s2",
+        "title": "Szenario 2: Vertriebsleiter soll Teamaktivitäten sehen",
+        "target": "Der Manager soll die Teamaktivitäten überwachen, ohne nicht zusammenhängende unternehmensweite Datensätze zu sehen.",
+        "steps": [
+          "Fügen Sie `activity.activity-management.view` zur Managergruppe hinzu.",
+          "Fügen Sie auch die Aktualisierungsberechtigung hinzu, wenn der Manager Aktivitäten bearbeiten soll.",
+          "Erstellen Sie eine Aktivitätssichtbarkeitsrichtlinie mit einem teamorientierten Gültigkeitsbereich.",
+          "Weisen Sie diese Richtlinie dem Manager oder den relevanten Benutzern zu."
+        ],
+        "result": "Der Manager kann Aktivitäten öffnen und den Team-Gültigkeitsbereich sehen, aber keine nicht zusammenhängenden Datensätze."
+      },
+      {
+        "id": "s3",
+        "title": "Szenario 3: Benutzer darf Aufträge ansehen, aber keine erstellen",
+        "target": "Die Seite soll sich öffnen, aber der Erstellungsfluss soll geschlossen bleiben.",
+        "steps": [
+          "Gewähren Sie `sales.orders.view`.",
+          "Gewähren Sie nicht `sales.orders.create`.",
+          "Weisen Sie dem Benutzer die Gruppe zu."
+        ],
+        "result": "Der Benutzer kann Bestelldaten durchsuchen, aber keine neuen Aufträge erstellen."
+      },
+      {
+        "id": "s4",
+        "title": "Szenario 4: Erklären, warum ein Angebot während der Genehmigung sichtbar wird",
+        "target": "Verstehen Sie ein spezielles Sichtbarkeitsergebnis durch Audit-Nachweise statt durch Raten.",
+        "steps": [
+          "Öffnen Sie den Sichtbarkeitssimulator und wählen Sie den Benutzer aus.",
+          "Wählen Sie Angebot und geben Sie die Datensatz-ID ein.",
+          "Überprüfen Sie die Vorschaudaten und Audit-Einträge."
+        ],
+        "result": "Wenn Genehmigungsüberschreibungslogik involviert ist, zeigt der Simulator diesen Nachweis direkt an."
+      }
+    ],
+    "mistakesTitle": "Häufige Fehler",
+    "mistakes": [
+      "Sichtbarkeit definieren, ohne Seitenberechtigung zu erteilen. Ergebnis: Der Benutzer kann die Seite nicht einmal öffnen.",
+      "Seitenberechtigung erteilen, ohne die Sichtbarkeit zu berücksichtigen. Ergebnis: Der Benutzer sieht möglicherweise zu viele Datensätze.",
+      "Ignorieren von zusammengeführten Berechtigungen, wenn ein Benutzer mehreren Gruppen angehört.",
+      "Veröffentlichen einer Richtlinie, ohne sie im Simulator zu testen.",
+      "Verwechseln von Entitätstypen wie Angebot, Aktivität, Anfrage und Auftrag."
+    ],
+    "checklistTitle": "Empfohlene Einrichtungsreihenfolge",
+    "checklist": [
+      "Definieren Sie zunächst, auf welche Seite der Benutzer zugreifen muss.",
+      "Definieren Sie dann, welche Aktionen er auf dieser Seite ausführen muss.",
+      "Beschränken Sie dann, welche Datensätze er sehen darf.",
+      "Verwenden Sie Benutzersichtbarkeitszuweisungen nur, wenn Sie eine spezifische Ausnahme benötigen.",
+      "Validieren Sie das endgültige Ergebnis im Sichtbarkeitssimulator."
+    ],
+    "faqTitle": "Häufig gestellte Fragen",
+    "faqs": [
+      {
+        "id": "faq1",
+        "question": "Ein Benutzer kann Angebote öffnen, sieht aber keine Datensätze. Warum?",
+        "answer": "Die Seitenberechtigung ist wahrscheinlich korrekt, aber die Sichtbarkeitsebene schränkt Datensätze zu stark ein oder wurde nicht richtig zugewiesen."
+      },
+      {
+        "id": "faq2",
+        "question": "Ein Benutzer kann keine Angebote erstellen. Warum?",
+        "answer": "Die übliche Ursache ist eine fehlende Berechtigung `sales.quotations.create`. Die Ansicht öffnet die Seite; Erstellen öffnet die Erstellungsaktion."
+      },
+      {
+        "id": "faq3",
+        "question": "Ein Benutzer sieht zu viele Datensätze. Wo soll ich anfangen?",
+        "answer": "Überprüfen Sie zuerst die zugewiesenen Berechtigungsgruppen, dann die entitätsspezifischen Sichtbarkeitsrichtlinien und Benutzersichtbarkeitszuweisungen und validieren Sie das Verhalten schließlich im Simulator."
+      }
+    ],
+    "footer": {
+      "title": "Kurze Entscheidungsregel",
+      "body": "Wenn ein Benutzer eine Aktion nicht ausführen kann, beginnen Sie mit Berechtigungsgruppen. Wenn ein Benutzer zu viele oder zu wenige Datensätze sieht, beginnen Sie mit Sichtbarkeit. Überprüfen Sie die endgültige Entscheidung immer im Sichtbarkeitssimulator."
+    }
+  }
+}

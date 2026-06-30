@@ -1,0 +1,35 @@
+{
+  "menu": "إدارة أنواع المبيعات",
+  "description": "إدارة وتعديل أنواع المبيعات",
+  "addButton": "إضافة نوع مبيعات جديد",
+  "searchPlaceholder": "ابحث عن نوع المبيعات...",
+  "advancedFilter": {
+    "columnName": "الاسم",
+    "columnCode": "الكود",
+    "columnSalesType": "نوع العرض"
+  },
+  "table": {
+    "title": "قائمة أنواع المبيعات",
+    "salesType": "نوع العرض",
+    "name": "الاسم",
+    "code": "الكود",
+    "createdDate": "تاريخ الإنشاء"
+  },
+  "form": {
+    "addTitle": "إضافة نوع مبيعات جديد",
+    "editTitle": "تعديل نوع المبيعات",
+    "addDescription": "إنشاء تعريف نوع مبيعات جديد.",
+    "editDescription": "تحديث تعريف نوع المبيعات الحالي.",
+    "salesType": "نوع العرض",
+    "name": "الاسم",
+    "namePlaceholder": "أدخل اسم نوع المبيعات",
+    "code": "الكود",
+    "codePlaceholder": "مثال: 1 أو FOB",
+    "codeHelp": "اختياري. إذا تم إدخاله يُرسل إلى Netsis ككود نوع التصدير/التسليم عند تكامل الطلب؛ وإذا تُرك فارغًا يستخدم البيع الخارجي القيمة الافتراضية FOB.",
+    "validation": {
+      "required": "الاسم مطلوب",
+      "whitespace": "لا يمكن أن يكون الاسم فارغًا",
+      "codeMaxLength": "يجب ألا يتجاوز الكود 50 حرفًا"
+    }
+  }
+}

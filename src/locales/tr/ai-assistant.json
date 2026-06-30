@@ -1,0 +1,53 @@
+{
+  "pageTitle": "AI Asistan",
+  "eyebrow": "SalesDesk AI Asistan",
+  "greeting": "Merhaba {{name}}, size nasıl yardımcı olabilirim?",
+  "loadingGreeting": "Karşılama hazırlanıyor...",
+  "fallbackName": "değerli kullanıcı",
+  "subtitle": "Talep, teklif, sipariş ve aktivite verileriniz hakkında hızlı sorular sorabileceğiniz akıllı SalesDesk yardımcısı.",
+  "chatTitle": "Bugün neyi birlikte inceleyelim?",
+  "chatDescription": "SalesDesk verilerinizle ilgili ilk güvenli soru-cevap akışı aktif. Talep, teklif, sipariş, aktivite ve ERP özetlerini sorabilirsiniz.",
+  "inputPlaceholder": "Örn. Bu ay kaç teklif oluşturdum?",
+  "comingSoon": "Sohbet motoru hazırlanıyor. Bu alan yakında SalesDesk verilerinizle konuşabilir hale gelecek.",
+  "send": "Gönder",
+  "suggestions": {
+    "1": "Bu ay kaç teklif oluşturdum?",
+    "2": "Onaylanan siparişlerimin oranı nedir?",
+    "3": "Kaç aktivite tamamladım?",
+    "4": "Bu hata ne anlama geliyor?"
+  },
+  "chatHint": "Performans, adet, oran, ERP aktarımı ve hata açıklama sorularını cevaplayabiliyorum.",
+  "attachImage": "Görsel ekle",
+  "removeImage": "Görseli kaldır",
+  "imageTooLarge": "Görsel en fazla {{size}} MB olabilir.",
+  "imageUnsupported": "Sadece PNG, JPG/JPEG veya WEBP görsel ekleyebilirsiniz.",
+  "imageDefaultQuestion": "Bu ekran görüntüsünü yorumlar mısın?",
+  "imageContextHint": "Ekran görüntüsü eklendi. Hata metnini de yazarsanız daha net yorumlarım.",
+  "sending": "Yanıt hazırlanıyor...",
+  "thinking": {
+    "title": "AI düşünüyor",
+    "steps": {
+      "1": "Soruyu anlamlandırıyorum...",
+      "2": "SalesDesk verilerini güvenli şekilde okuyorum...",
+      "3": "Yanıtı ve önerilen kontrolleri hazırlıyorum..."
+    }
+  },
+  "answerTitle": "AI yanıtı",
+  "sourceTitle": "Yanıt kaynağı",
+  "actionItemsTitle": "Önerilen kontroller",
+  "openAction": "Aç",
+  "copyAnswer": "Yanıtı kopyala",
+  "copied": "Kopyalandı",
+  "newChat": "Yeni sohbet",
+  "emptyQuestion": "Lütfen bir soru yazın.",
+  "openChat": "AI sohbeti aç",
+  "closeChat": "AI sohbeti kapat",
+  "lastQuestion": "Sorunuz",
+  "lastErrorTitle": "Son yakalanan hata",
+  "askLastError": "Bu hatayı AI'a sor",
+  "askLastErrorQuestion": "Bu hata ne anlama geliyor?",
+  "apiErrors": {
+    "greeting": "AI asistan karşılama bilgisi alınamadı.",
+    "answer": "AI asistan yanıtı alınamadı."
+  }
+}

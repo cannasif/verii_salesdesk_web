@@ -1,0 +1,53 @@
+{
+  "pageTitle": "Asistente IA",
+  "eyebrow": "Asistente IA CRM",
+  "greeting": "Hola {{name}}, ¿cómo puedo ayudarte?",
+  "loadingGreeting": "Preparando el saludo...",
+  "fallbackName": "usuario",
+  "subtitle": "Un asistente SalesDesk inteligente para hacer preguntas rápidas sobre solicitudes, ofertas, pedidos y actividades.",
+  "chatTitle": "¿Qué revisamos juntos hoy?",
+  "chatDescription": "El primer flujo seguro de preguntas y respuestas para tus datos SalesDesk está activo. Puedes preguntar sobre solicitudes, ofertas, pedidos, actividades y resúmenes ERP.",
+  "inputPlaceholder": "Por ejemplo: ¿Cuántas ofertas creé este mes?",
+  "comingSoon": "El motor de chat se está preparando. Esta área pronto podrá conversar con tus datos CRM.",
+  "send": "Enviar",
+  "suggestions": {
+    "1": "¿Cuántas ofertas creé este mes?",
+    "2": "¿Cuál es mi tasa de pedidos aprobados?",
+    "3": "¿Cuántas actividades he completado?",
+    "4": "¿Qué significa este error?"
+  },
+  "chatHint": "Puedo responder preguntas de rendimiento, cantidades, tasas, integración ERP y explicación de errores.",
+  "attachImage": "Adjuntar imagen",
+  "removeImage": "Eliminar imagen",
+  "imageTooLarge": "La imagen puede tener como máximo {{size}} MB.",
+  "imageUnsupported": "Solo se pueden adjuntar imágenes PNG, JPG/JPEG o WEBP.",
+  "imageDefaultQuestion": "¿Puedes interpretar esta captura de pantalla?",
+  "imageContextHint": "Captura adjunta. Si también escribes el texto del error, podré explicarlo con más claridad.",
+  "sending": "Preparando respuesta...",
+  "thinking": {
+    "title": "La IA está pensando",
+    "steps": {
+      "1": "Interpretando tu pregunta...",
+      "2": "Leyendo los datos SalesDesk de forma segura...",
+      "3": "Preparando la respuesta y las comprobaciones recomendadas..."
+    }
+  },
+  "answerTitle": "Respuesta IA",
+  "sourceTitle": "Fuente de la respuesta",
+  "actionItemsTitle": "Comprobaciones recomendadas",
+  "openAction": "Abrir",
+  "copyAnswer": "Copiar respuesta",
+  "copied": "Copiado",
+  "newChat": "Nuevo chat",
+  "emptyQuestion": "Introduce una pregunta.",
+  "openChat": "Abrir chat de IA",
+  "closeChat": "Cerrar chat de IA",
+  "lastQuestion": "Tu pregunta",
+  "lastErrorTitle": "Último error detectado",
+  "askLastError": "Preguntar a la IA sobre este error",
+  "askLastErrorQuestion": "¿Qué significa este error?",
+  "apiErrors": {
+    "greeting": "No se pudo cargar el saludo del asistente de IA.",
+    "answer": "No se pudo cargar la respuesta del asistente de IA."
+  }
+}

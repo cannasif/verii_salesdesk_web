@@ -1,0 +1,62 @@
+{
+  "menu": "Aktivitätsartverwaltung",
+  "description": "Aktivitätstypen verwalten und bearbeiten",
+  "addButton": "Neuen Aktivitätstyp hinzufügen",
+  "loading": "Laden...",
+  "noData": "Keine Daten gefunden",
+  "actions": "Aktionen",
+  "edit": "Bearbeiten",
+  "deleteButton": "Löschen",
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Speichern...",
+  "previous": "Zurück",
+  "next": "Weiter",
+  "form": {
+    "addTitle": "Neuen Aktivitätstyp hinzufügen",
+    "editTitle": "Aktivitätsart bearbeiten",
+    "addDescription": "Geben Sie die neuen Aktivitätsartinformationen ein",
+    "editDescription": "Bearbeiten Sie die Aktivitätsartinformationen",
+    "name": "Name der Aktivitätsart",
+    "namePlaceholder": "Geben Sie den Namen der Aktivitätsart ein",
+    "nameRequired": "Name der Aktivitätsart ist erforderlich",
+    "nameMaxLength": "Name der Aktivitätsart darf maximal 100 Zeichen lang sein",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+    "descriptionMaxLength": "Beschreibung darf maximal 500 Zeichen lang sein"
+  },
+  "table": {
+    "id": "ID",
+    "name": "Name der Aktivitätsart",
+    "description": "Beschreibung",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von",
+    "showing": "Zeige {{from}}-{{to}} von {{total}}",
+    "page": "Seite {{current}} / {{total}}",
+    "title": "Aktivitätsart-Liste"
+  },
+  "stats": {
+    "totalActivityTypes": "Gesamtanzahl Aktivitätsarten",
+    "activeActivityTypes": "Aktive Aktivitätsarten",
+    "newThisMonth": "Diesen Monat neu"
+  },
+  "messages": {
+    "createSuccess": "Aktivitätsart erfolgreich erstellt",
+    "createError": "Fehler beim Erstellen der Aktivitätsart",
+    "updateSuccess": "Aktivitätsart erfolgreich aktualisiert",
+    "updateError": "Fehler beim Aktualisieren der Aktivitätsart",
+    "deleteSuccess": "Aktivitätsart erfolgreich gelöscht",
+    "deleteError": "Fehler beim Löschen der Aktivitätsart"
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Aktivitätsart löschen",
+    "confirmMessage": "Sind Sie sicher, dass Sie die Aktivitätsart {{name}} löschen möchten?"
+  },
+  "advancedFilter": {
+    "columnName": "Name der Aktivitätsart",
+    "columnDescription": "Beschreibung",
+    "columnCreatedBy": "Erstellt von"
+  },
+  "create": "Neuer Aktivitätstyp",
+  "error": "Ein Fehler ist aufgetreten"
+}

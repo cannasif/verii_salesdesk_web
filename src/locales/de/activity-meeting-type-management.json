@@ -1,0 +1,82 @@
+{
+  "menu": "Besprechungsverwaltung",
+  "description": "Besprechungsdefinitionen verwalten und bearbeiten",
+  "addButton": "Neue Besprechung hinzufügen",
+  "loading": "Laden...",
+  "noData": "Keine Daten",
+  "actions": "Aktionen",
+  "edit": "Bearbeiten",
+  "deleteButton": "Löschen",
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Wird gespeichert...",
+  "previous": "Zurück",
+  "next": "Weiter",
+  "advancedFilter": {
+    "columnName": "Besprechungsname",
+    "columnDescription": "Beschreibung",
+    "columnCreatedBy": "Erstellt von"
+  },
+  "activityType": {
+    "create": "Neue Besprechung hinzufügen",
+    "loading": "Laden...",
+    "noData": "Keine Daten",
+    "actions": "Aktionen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert...",
+    "error": "Ein Fehler ist aufgetreten",
+    "form": {
+      "addTitle": "Neue Besprechung hinzufügen",
+      "editTitle": "Besprechung bearbeiten",
+      "addDescription": "Geben Sie die neue Besprechungsinformation ein",
+      "editDescription": "Bearbeiten Sie die Besprechungsinformationen",
+      "name": "Besprechungsname",
+      "namePlaceholder": "Geben Sie den Besprechungsnamen ein",
+      "nameRequired": "Der Besprechungsname ist erforderlich",
+      "nameMaxLength": "Der Besprechungsname darf höchstens 100 Zeichen haben",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+      "descriptionMaxLength": "Die Beschreibung darf höchstens 500 Zeichen haben"
+    },
+    "table": {
+      "title": "Besprechungsliste",
+      "id": "ID",
+      "name": "Besprechungsname",
+      "description": "Beschreibung",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "showing": "Anzeige {{from}}-{{to}} / {{total}}",
+      "page": "Seite {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Gesamtzahl der Besprechungen",
+      "activeActivityTypes": "Aktive Besprechungen",
+      "newThisMonth": "Neu in diesem Monat"
+    },
+    "messages": {
+      "createSuccess": "Besprechung erfolgreich erstellt",
+      "createError": "Besprechung konnte nicht erstellt werden",
+      "updateSuccess": "Besprechung erfolgreich aktualisiert",
+      "updateError": "Besprechung konnte nicht aktualisiert werden",
+      "deleteSuccess": "Besprechung erfolgreich gelöscht",
+      "deleteError": "Besprechung konnte nicht gelöscht werden"
+    }
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Besprechung löschen",
+    "confirmMessage": "Möchten Sie {{name}} wirklich löschen?"
+  },
+  "messages": {
+    "deleteSuccess": "Besprechung erfolgreich gelöscht",
+    "deleteError": "Besprechung konnte nicht gelöscht werden"
+  },
+  "table": {
+    "title": "Besprechungsliste",
+    "id": "ID",
+    "name": "Besprechungsname",
+    "description": "Beschreibung",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von"
+  }
+}

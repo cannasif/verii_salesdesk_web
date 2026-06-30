@@ -1,0 +1,82 @@
+{
+  "activityType": {
+    "table": {
+      "title": "قائمة الشحن",
+      "id": "ID",
+      "name": "اسم الشحنة",
+      "description": "الوصف",
+      "createdDate": "تاريخ الإنشاء",
+      "createdBy": "أنشئ بواسطة",
+      "showing": "عرض {{from}}-{{to}} من {{total}}",
+      "page": "صفحة {{current}} من {{total}}"
+    },
+    "error": "حدث خطأ",
+    "create": "إضافة شحنة جديدة",
+    "loading": "جارٍ التحميل...",
+    "noData": "لا توجد بيانات",
+    "actions": "إجراءات",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ...",
+    "form": {
+      "addTitle": "إضافة شحنة جديدة",
+      "editTitle": "تعديل الشحنة",
+      "addDescription": "أدخل معلومات الشحنة الجديدة",
+      "editDescription": "تعديل معلومات الشحنة",
+      "name": "اسم الشحنة",
+      "namePlaceholder": "أدخل اسم الشحنة",
+      "nameRequired": "اسم الشحنة مطلوب",
+      "nameMaxLength": "يجب ألا يتجاوز اسم الشحنة 100 حرف",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أدخل الوصف (اختياري)",
+      "descriptionMaxLength": "يمكن أن يصل وصف الشحنة إلى 500 حرف"
+    },
+    "stats": {
+      "totalActivityTypes": "إجمالي الشحنات",
+      "activeActivityTypes": "الشحنات النشطة",
+      "newThisMonth": "جديد هذا الشهر"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الشحنة بنجاح",
+      "createError": "فشل إنشاء الشحنة",
+      "updateSuccess": "تم تحديث الشحنة بنجاح",
+      "updateError": "فشل تحديث الشحنة",
+      "deleteSuccess": "تم حذف الشحنة بنجاح",
+      "deleteError": "فشل حذف الشحنة"
+    }
+  },
+  "menu": "إدارة الشحن",
+  "description": "أدر وحرر تعريفات الشحن",
+  "addButton": "إضافة شحنة جديدة",
+  "loading": "جارٍ التحميل...",
+  "noData": "لا توجد بيانات",
+  "actions": "إجراءات",
+  "edit": "تعديل",
+  "deleteButton": "حذف",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "saving": "Kaydediliyor...",
+  "previous": "السابق",
+  "next": "التالي",
+  "advancedFilter": {
+    "columnName": "اسم الشحنة",
+    "columnDescription": "الوصف",
+    "columnCreatedBy": "أنشئ بواسطة"
+  },
+  "deleteConfirm": {
+    "confirmTitle": "حذف الشحنة",
+    "confirmMessage": "هل أنت متأكد أنك تريد حذف {{name}}؟"
+  },
+  "messages": {
+    "deleteSuccess": "تم حذف الشحنة بنجاح",
+    "deleteError": "فشل حذف الشحنة"
+  },
+  "table": {
+    "title": "قائمة الشحن",
+    "id": "ID",
+    "name": "اسم الشحنة",
+    "description": "الوصف",
+    "createdDate": "تاريخ الإنشاء",
+    "createdBy": "أنشئ بواسطة"
+  }
+}

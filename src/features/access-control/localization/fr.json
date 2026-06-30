@@ -1,0 +1,522 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Clé unique utilisée par les garde-routes et garde-pages. Privilégiez une notation snake_case ou par points stable.",
+      "name": "Libellé affiché aux administrateurs lors de la gestion des autorisations.",
+      "description": "Description interne facultative de cette autorisation.",
+      "isActive": "Les autorisations inactives sont ignorées lors du calcul des accès.",
+      "save": "Les modifications influencent les flux d’autorisation des rôles et des groupes."
+    },
+    "permissionGroup": {
+      "name": "Nom du groupe pour l’identifier lors de l’attribution aux utilisateurs.",
+      "isSystemAdmin": "Les membres de ce groupe accèdent à toutes les pages et actions sans vérification individuelle.",
+      "isActive": "Les groupes inactifs ne doivent plus être attribués pour de nouvelles décisions d’accès.",
+      "permissions": "Les autorisations sélectionnées définissent ce à quoi les membres du groupe peuvent accéder.",
+      "save": "Met à jour l’accès effectif de tous les utilisateurs affectés à ce groupe."
+    },
+    "userAssignment": {
+      "user": "Sélectionnez l’utilisateur dont vous voulez gérer le périmètre d’accès.",
+      "groups": "L’utilisateur reçoit l’ensemble des autorisations fusionnées de tous les groupes sélectionnés.",
+      "save": "Les attributions s’appliquent immédiatement aux prochains contrôles d’autorisation. Une actualisation de session peut être nécessaire.",
+      "systemAdminNote": "Si l’utilisateur appartient à un groupe administrateur système, les autorisations détaillées sont ignorées."
+    },
+    "userVisibilityAssignment": {
+      "user": "Sélectionnez l’utilisateur dont vous souhaitez gérer la visibilité de l’entité.",
+      "policy": "Choisissez une politique de visibilité active par entité ou laissez vide."
+    },
+    "visibilityPolicy": {
+      "code": "Utilisez un code unique pour reconnaître la politique dans les flux d’assignation et d’audit.",
+      "name": "Nom visible présenté aux administrateurs lors de la gestion de la politique.",
+      "includeSelf": "Lorsqu’il est activé, les propres enregistrements de l’utilisateur restent visibles dans ce périmètre.",
+      "isActive": "Les politiques inactives restent exclues des nouvelles attributions et décisions d’accès."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Définitions d’autorisations",
+    "description": "Gérer les codes d’autorisation utilisés dans le système",
+    "add": "Ajouter une définition",
+    "form": {
+      "editTitle": "Modifier la définition d’autorisation",
+      "addTitle": "Ajouter une définition d’autorisation",
+      "editDescription": "Mettre à jour les informations de la définition",
+      "addDescription": "Créer une nouvelle définition d’autorisation",
+      "code": "Code",
+      "codePlaceholder": "Choisir un code",
+      "affectedRoutes": "Pages concernées",
+      "affectedRoutesNone": "Aucune route correspondante pour ce code",
+      "name": "Nom",
+      "namePlaceholder": "Libellé",
+      "availableOnWeb": "Disponible sur web",
+      "availableOnWebHint": "Cette autorisation peut être utilisée pour les menus, pages et actions dans l’application web.",
+      "availableOnMobile": "Disponible sur mobile",
+      "availableOnMobileHint": "Cette autorisation peut être utilisée pour les menus, écrans et actions dans l’application mobile.",
+      "description": "Description",
+      "descriptionPlaceholder": "Description facultative",
+      "isActive": "Actif",
+      "codeSearchPlaceholder": "Rechercher...",
+      "codeEmpty": "Aucun résultat"
+    },
+    "table": {
+      "title": "Définitions d’autorisations",
+      "code": "Code",
+      "name": "Nom",
+      "platform": "Plateforme",
+      "isActive": "Actif",
+      "updatedDate": "Mis à jour",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "platform": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "both": "Web + Mobile"
+    },
+    "delete": {
+      "confirmTitle": "Supprimer la définition d’autorisation",
+      "confirmMessage": "Voulez-vous vraiment supprimer « {{name}} » ? Cette action est irréversible."
+    },
+    "syncFromRoutes": "Synchroniser depuis les routes"
+  },
+  "permissionGroups": {
+    "title": "Groupes d’autorisations",
+    "description": "Gérer les groupes d’autorisations et leurs attributions",
+    "systemAdminLocked": "Le groupe administrateur système ne peut pas être modifié",
+    "add": "Ajouter un groupe",
+    "selectAll": "Tout sélectionner",
+    "noDefinitions": "Aucune définition d’autorisation disponible",
+    "form": {
+      "editTitle": "Modifier le groupe d’autorisations",
+      "addTitle": "Ajouter un groupe d’autorisations",
+      "editDescription": "Mettre à jour les informations du groupe",
+      "addDescription": "Créer un nouveau groupe d’autorisations",
+      "name": "Nom",
+      "namePlaceholder": "Nom du groupe",
+      "description": "Description",
+      "descriptionPlaceholder": "Description facultative",
+      "isSystemAdmin": "Administrateur système",
+      "isActive": "Actif",
+      "permissions": "Autorisations"
+    },
+    "table": {
+      "title": "Groupes d’autorisations",
+      "name": "Nom",
+      "isSystemAdmin": "Administrateur système",
+      "isActive": "Actif",
+      "permissionCount": "Autorisations",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "managePermissions": "Gérer les autorisations",
+    "permissionsPanel": {
+      "title": "Modifier les autorisations du groupe",
+      "description": "Sélectionnez les autorisations pour ce groupe",
+      "currentCodes": "Codes d’autorisation actuels",
+      "screen": "Écran / Zone de permissions",
+      "groupedRows": "Zones de permissions",
+      "actionsMapped": "Permissions",
+      "actions": {
+        "create": "Créer",
+        "read": "Lire",
+        "update": "Mettre à jour",
+        "delete": "Supprimer",
+        "other": "Autre"
+      }
+    },
+    "delete": {
+      "confirmTitle": "Supprimer le groupe d’autorisations",
+      "confirmMessage": "Voulez-vous vraiment supprimer « {{name}} » ? Cette action est irréversible."
+    },
+    "search": "Rechercher..."
+  },
+  "userGroupAssignments": {
+    "title": "Attributions utilisateur ↔ groupes",
+    "description": "Attribuer des groupes d’autorisations aux utilisateurs",
+    "selectUser": "Sélectionner un utilisateur",
+    "selectUserPlaceholder": "Rechercher et sélectionner un utilisateur...",
+    "selectUserHint": "Sélectionnez un utilisateur pour gérer ses attributions de groupes",
+    "assignedGroups": "Groupes d’autorisations attribués",
+    "noUsers": "Aucun utilisateur trouvé",
+    "noGroups": "Aucun groupe d’autorisations disponible",
+    "selectAll": "Tout sélectionner"
+  },
+  "userVisibilityAssignments": {
+    "title": "Attributions de visibilité utilisateur",
+    "description": "Gérez les affectations de politique de visibilité par utilisateur et par entité",
+    "selectUser": "Sélectionner un utilisateur",
+    "selectedUser": "Utilisateur sélectionné",
+    "selectUserPlaceholder": "Rechercher et sélectionner un utilisateur...",
+    "selectUserHint": "Sélectionnez un utilisateur pour gérer les attributions de visibilité",
+    "assignedPolicies": "Politiques attribuées",
+    "status": "Statut",
+    "ready": "À jour",
+    "unassigned": "Non attribué",
+    "cardDescription": "Choisissez la politique de visibilité appliquée aux enregistrements {{entity}} de cet utilisateur.",
+    "selectPolicyPlaceholder": "Sélectionner une politique",
+    "noPolicy": "Aucune politique"
+  },
+  "visibilityPolicies": {
+    "title": "Politiques de visibilité",
+    "description": "Gérez les politiques qui définissent qui peut voir quels enregistrements",
+    "add": "Ajouter une politique",
+    "search": "Rechercher des politiques...",
+    "table": {
+      "title": "Liste des politiques de visibilité",
+      "code": "Code",
+      "name": "Nom",
+      "entityType": "Entité",
+      "scopeType": "Portée",
+      "includeSelf": "Inclure soi-même",
+      "isActive": "Actif",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "stats": {
+      "total": "Total des politiques",
+      "active": "Politiques actives",
+      "entities": "Types d’entité"
+    },
+    "form": {
+      "addTitle": "Ajouter une politique de visibilité",
+      "editTitle": "Modifier la politique de visibilité",
+      "addDescription": "Créer une nouvelle définition de politique de visibilité",
+      "editDescription": "Mettre à jour la politique de visibilité sélectionnée",
+      "code": "Code",
+      "codePlaceholder": "example.quotation.team",
+      "name": "Nom",
+      "namePlaceholder": "Visibilité de devis d’équipe",
+      "entityType": "Entité",
+      "entityTypePlaceholder": "Sélectionner une entité",
+      "scopeType": "Portée",
+      "scopeTypePlaceholder": "Sélectionner une portée",
+      "description": "Description",
+      "descriptionPlaceholder": "Description courte facultative",
+      "includeSelf": "Inclure les propres enregistrements",
+      "isActive": "Actif",
+      "summaryTitle": "Résumé de la politique",
+      "summary": "La portée {{scope}} sera appliquée aux enregistrements {{entity}}."
+    },
+    "scope": {
+      "self": "Seulement soi-même",
+      "managerHierarchy": "Hiérarchie manageriale",
+      "permissionGroup": "Groupe de permissions",
+      "company": "Toute l’entreprise"
+    },
+    "entity": {
+      "activity": "Activité",
+      "quotation": "Devis",
+      "demand": "Demande",
+      "order": "Commande",
+      "salesman360": "KPI commercial"
+    }
+  },
+  "visibilitySimulator": {
+    "title": "Simulateur de visibilité",
+    "description": "Testez quels enregistrements et quelles règles de remplacement d’approbation sont visibles pour l’utilisateur et l’entité sélectionnés.",
+    "selectUser": "Utilisateur",
+    "helpUser": "Sélectionnez l’utilisateur dont vous voulez simuler la visibilité.",
+    "selectUserPlaceholder": "Sélectionner un utilisateur...",
+    "selectEntity": "Entité",
+    "helpEntity": "Sélectionnez le module pour lequel vous souhaitez simuler la visibilité des enregistrements.",
+    "selectEntityPlaceholder": "Sélectionner une entité",
+    "recordId": "ID d’enregistrement",
+    "recordIdPlaceholder": "ex. 125",
+    "helpRecordId": "Entrez un ID d’enregistrement pour simuler si view, update, delete et approve sont autorisés.",
+    "selectedUser": "Utilisateur sélectionné",
+    "entity": "Entité",
+    "visibleUsers": "Utilisateurs visibles",
+    "approvalOverrides": "Enregistrements de remplacement d’approbation",
+    "visibleUsersTitle": "Utilisateurs dans le périmètre",
+    "policyDefined": "Politique définie",
+    "noPolicy": "Aucune politique",
+    "companyWide": "Accès entreprise",
+    "policyActive": "Une politique de visibilité active est appliquée",
+    "includeSelf": "inclut soi-même",
+    "awaitingSelection": "Sélectionnez d’abord un utilisateur et une entité",
+    "overrideTitle": "Enregistrements de remplacement d’approbation actifs",
+    "noOverrides": "Aucun enregistrement de remplacement d’approbation actif trouvé",
+    "overrideRecord": "Enregistrement #{{id}}",
+    "auditTitle": "Audit des remplacements d’approbation",
+    "noAudit": "Aucune entrée d’audit de remplacement trouvée",
+    "auditActionId": "Action d’approbation",
+    "auditRequestId": "Demande d’approbation",
+    "auditFlow": "Flux",
+    "auditApprover": "Approbateur",
+    "auditStepValue": "Étape {{step}} / actuelle {{currentStep}}",
+    "actionPanelTitle": "Simulation d’actions au niveau enregistrement",
+    "noRecordSimulation": "Après saisie d’un ID d’enregistrement, le résultat de view/update/delete/approve apparaît ici.",
+    "actionAllowed": "Autorisé",
+    "actionDenied": "Refusé",
+    "action": {
+      "view": "Voir",
+      "update": "Mettre à jour",
+      "delete": "Supprimer",
+      "approve": "Approuver"
+    }
+  },
+  "auditLogs": {
+    "title": "Journaux d’audit",
+    "description": "Suivez qui a exécuté des actions critiques, avec quelle trace et quel résultat.",
+    "search": "Rechercher dans les journaux d’audit...",
+    "results": {
+      "success": "Succès",
+      "succeeded": "Réussi",
+      "warning": "Avertissement",
+      "partial": "Partiel",
+      "error": "Erreur",
+      "failed": "Échec"
+    },
+    "filters": {
+      "result": "Résultat",
+      "actionType": "Action",
+      "entityType": "Entité",
+      "entityId": "ID d’enregistrement",
+      "performedByUserEmail": "Exécuté par",
+      "source": "Source",
+      "branchCode": "Branchement",
+      "requestPath": "Chemin de demande",
+      "requestMethod": "Méthode",
+      "createdDate": "Date"
+    },
+    "clearTraceFilter": "Effacer le filtre de trace",
+    "viewDetail": "Détail",
+    "filterTrace": "Filtrer la trace",
+    "loadError": "Impossible de charger les journaux d’audit",
+    "stats": {
+      "total": "Total des enregistrements",
+      "errors": "Résultats échoués",
+      "traces": "Traces actives"
+    },
+    "table": {
+      "title": "Liste des journaux d’audit",
+      "createdDate": "Date",
+      "traceId": "Trace ID",
+      "actionType": "Action",
+      "entityType": "Entité",
+      "entityId": "ID d’enregistrement",
+      "result": "Résultat",
+      "source": "Source",
+      "performedBy": "Exécuté par",
+      "branchCode": "Branchement",
+      "requestPath": "Chemin de demande",
+      "requestMethod": "Méthode",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "detail": {
+      "title": "Détail du journal d’audit",
+      "description": "Consultez le contexte de demande et le résumé des changements de l’enregistrement sélectionné.",
+      "contextTitle": "Contexte d’action",
+      "requestTitle": "Résumé de la demande",
+      "reason": "Raison",
+      "failureReason": "Détail de l’échec",
+      "changedFieldsTitle": "Champs modifiés",
+      "noChangedFields": "Aucune différence de champ disponible pour cet enregistrement.",
+      "oldValuesTitle": "Anciennes valeurs",
+      "newValuesTitle": "Nouvelles valeurs"
+    },
+    "traceDrillDown": {
+      "traceId": "Trace sélectionnée",
+      "startedAt": "Démarré le",
+      "completedAt": "Terminé le",
+      "entities": "Entités touchées",
+      "timelineTitle": "Résumé du flux de trace",
+      "openTrace": "Ouvrir cette trace"
+    }
+  },
+  "common": {
+    "cancel": "Annuler",
+    "saving": "Enregistrement...",
+    "save": "Enregistrer et appliquer",
+    "loading": "Chargement...",
+    "search": "Rechercher...",
+    "noData": "Aucune donnée",
+    "actions": "Actions",
+    "yes": "Oui",
+    "no": "Non",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "processing": "Traitement..."
+  },
+  "sidebar": {
+    "accessControl": "Contrôle d’accès",
+    "permissionDefinitions": "Définitions d’autorisations",
+    "permissionGroups": "Groupes d’autorisations",
+    "userGroupAssignments": "Attributions utilisateurs et groupes",
+    "visibilityPolicies": "Politiques de visibilité",
+    "userVisibilityAssignments": "Attributions de visibilité utilisateur",
+    "auditLogs": "Journaux d’audit",
+    "visibilitySimulator": "Simulateur de visibilité",
+    "accessControlGuide": "Guide du contrôle d’accès"
+  },
+  "guide": {
+    "title": "Guide de contrôle d'accès",
+    "description": "Ce guide explique ce que fait chaque écran de contrôle d'accès et ce que chaque paramètre modifie. L'objectif est de rendre le système compréhensible même pour quelqu'un qui découvre le modèle pour la première fois.",
+    "hero": {
+      "coreLogicLabel": "Logique principale",
+      "coreLogicValue": "Les autorisations permettent, la visibilité limite.",
+      "finalCheckLabel": "Vérification finale",
+      "finalCheckValue": "Valider dans le simulateur."
+    },
+    "quickRulesTitle": "Cinq règles fondamentales",
+    "quickRules": [
+      "L'autorisation de la page et la visibilité des enregistrements sont des concepts différents. Un utilisateur peut ouvrir une page mais ne voir qu'un sous-ensemble d'enregistrements.",
+      "Les groupes d'autorisations décident à quelles pages et actions l'utilisateur peut accéder.",
+      "Les politiques de visibilité décident quels enregistrements à l'intérieur de ces pages l'utilisateur peut voir.",
+      "Les attributions d'utilisateurs aux groupes associent les groupes. Les attributions de visibilité utilisateur associent des exceptions de visibilité pour un utilisateur spécifique.",
+      "Ne publiez pas de règle de visibilité sans avoir vérifié le résultat dans le Simulateur de visibilité."
+    ],
+    "screensTitle": "À quoi sert chaque écran ?",
+    "pageCards": [
+      {
+        "id": "permissionGroups",
+        "title": "Groupes de permissions",
+        "summary": "Cet écran contrôle quels modules un utilisateur peut ouvrir et quelles actions il peut effectuer.",
+        "bullets": [
+          "Si un utilisateur doit ouvrir des Devis, il a besoin d'une permission de lecture comme `sales.quotations.view`.",
+          "S'il doit créer des devis, le même groupe a également besoin de `sales.quotations.create`.",
+          "S'il doit mettre à jour ou supprimer, les autorisations de mise à jour ou de suppression associées sont également requises.",
+          "Ces permissions ouvrent l'accès aux pages et aux actions ; elles ne définissent pas la visibilité au niveau de l'enregistrement par elles-mêmes."
+        ]
+      },
+      {
+        "id": "userGroupAssignments",
+        "title": "Attributions d'utilisateurs aux groupes",
+        "summary": "Cet écran attribue un ou plusieurs groupes de permissions à un utilisateur.",
+        "bullets": [
+          "Vous sélectionnez d'abord un utilisateur, puis vous attachez les groupes que cet utilisateur doit hériter.",
+          "Lorsqu'un utilisateur appartient à plusieurs groupes, les permissions sont fusionnées.",
+          "Une mauvaise attribution de groupe peut exposer des pages auxquelles l'utilisateur n'était pas censé accéder.",
+          "Cet écran est généralement la principale zone de distribution des rôles : commercial, manager, opérations, administrateur système."
+        ]
+      },
+      {
+        "id": "visibilityPolicies",
+        "title": "Politiques de visibilité",
+        "summary": "Cet écran définit qui peut voir les enregistrements tels que les devis, les activités, les demandes et les commandes.",
+        "bullets": [
+          "Même si l'utilisateur peut entrer sur la page, cette couche de politique décide toujours quels enregistrements sont visibles.",
+          "La portée sélectionnée modifie le comportement : propres enregistrements uniquement, portée de l'équipe, portée à l'échelle de l'entreprise et modèles similaires.",
+          "Différentes entités telles que les devis et les activités peuvent utiliser des modèles de visibilité différents.",
+          "Si une politique est active mais attachée à la mauvaise entité, le résultat attendu n'apparaîtra jamais."
+        ]
+      },
+      {
+        "id": "userVisibilityAssignments",
+        "title": "Attributions de visibilité utilisateur",
+        "summary": "Cet écran est destiné aux exceptions de visibilité spécifiques à un utilisateur.",
+        "bullets": [
+          "Utilisez-le lorsque la politique standard ne suffit pas et qu'un utilisateur a besoin d'un modèle de visibilité différent.",
+          "Il est idéal pour les exceptions sans changer la règle à l'échelle de l'entreprise.",
+          "Cet écran n'accorde pas l'accès à la page ; il ne modifie que la visibilité des enregistrements."
+        ]
+      },
+      {
+        "id": "visibilitySimulator",
+        "title": "Simulateur de visibilité",
+        "summary": "Cet écran montre ce que le système exposera réellement pour un utilisateur et une entité sélectionnés.",
+        "bullets": [
+          "Si vous n'êtes pas sûr d'une règle, sélectionnez l'utilisateur et l'entité et inspectez les utilisateurs visibles ainsi que le résultat de l'audit.",
+          "Si vous entrez un identifiant d'enregistrement concret, la simulation devient spécifique à l'enregistrement.",
+          "Les dérogations d'approbation et les entrées d'audit y sont également affichées.",
+          "C'est l'endroit le plus sûr pour valider le comportement final avant de s'appuyer sur une politique en production."
+        ]
+      },
+      {
+        "id": "permissionDefinitions",
+        "title": "Définitions des permissions",
+        "summary": "Cet écran n'est plus une dépendance opérationnelle pour l'administration au quotidien.",
+        "bullets": [
+          "Les codes de permission sont désormais gérés par un flux de synchronisation automatique.",
+          "Les principales surfaces opérationnelles sont les Groupes de permissions et les écrans d'attribution.",
+          "Le catalogue reste utile comme référence pour comprendre le modèle de permissions sous-jacent."
+        ]
+      }
+    ],
+    "scenariosTitle": "Exemples basés sur des scénarios",
+    "expectedResultLabel": "Résultat attendu",
+    "scenarios": [
+      {
+        "id": "s1",
+        "title": "Scénario 1 : Le commercial ne doit voir que ses propres devis",
+        "target": "L'utilisateur doit pouvoir ouvrir les devis, peut-être les créer, mais ne pas voir les enregistrements des autres.",
+        "steps": [
+          "Ajoutez `sales.quotations.view` et, si nécessaire, `sales.quotations.create` au groupe de permissions pertinent.",
+          "Attribuez ce groupe au commercial depuis les Attributions d'utilisateurs aux groupes.",
+          "Créez une politique de visibilité des devis qui limite l'accès aux seuls enregistrements de l'utilisateur.",
+          "Attachez cette politique à l'utilisateur si une attribution au niveau de l'utilisateur est nécessaire."
+        ],
+        "result": "L'utilisateur ouvre la page des devis et peut y travailler, mais la liste est toujours limitée à ses enregistrements autorisés."
+      },
+      {
+        "id": "s2",
+        "title": "Scénario 2 : Le responsable commercial doit voir les activités de l'équipe",
+        "target": "Le manager doit surveiller l'activité de l'équipe sans voir les enregistrements non liés à l'échelle de l'entreprise.",
+        "steps": [
+          "Ajoutez `activity.activity-management.view` au groupe du manager.",
+          "Ajoutez également l'autorisation de mise à jour si le manager doit modifier les activités.",
+          "Créez une politique de visibilité des activités avec une portée orientée vers l'équipe.",
+          "Attribuez cette politique au manager ou aux utilisateurs concernés."
+        ],
+        "result": "Le manager peut ouvrir les activités et voir la portée de l'équipe, mais pas les enregistrements non liés."
+      },
+      {
+        "id": "s3",
+        "title": "Scénario 3 : L'utilisateur peut consulter les commandes mais ne doit pas en créer",
+        "target": "La page doit s'ouvrir, mais le flux de création doit rester fermé.",
+        "steps": [
+          "Accordez `sales.orders.view`.",
+          "N'accordez pas `sales.orders.create`.",
+          "Attribuez le groupe à l'utilisateur."
+        ],
+        "result": "L'utilisateur peut parcourir les données de commande mais ne peut pas créer de nouvelle commande."
+      },
+      {
+        "id": "s4",
+        "title": "Scénario 4 : Expliquer pourquoi un devis devient visible pendant l'approbation",
+        "target": "Comprendre un résultat de visibilité spécial grâce aux preuves d'audit au lieu de deviner.",
+        "steps": [
+          "Ouvrez le Simulateur de visibilité et sélectionnez l'utilisateur.",
+          "Choisissez Devis et entrez l'ID de l'enregistrement.",
+          "Passez en revue les données d'aperçu et les entrées d'audit."
+        ],
+        "result": "Si une logique de dérogation d'approbation est impliquée, le simulateur affiche directement cette preuve."
+      }
+    ],
+    "mistakesTitle": "Erreurs courantes",
+    "mistakes": [
+      "Définir la visibilité sans accorder la permission de page. Résultat : l'utilisateur ne peut même pas ouvrir la page.",
+      "Accorder la permission de page sans tenir compte de la visibilité. Résultat : l'utilisateur peut voir trop d'enregistrements.",
+      "Ignorer les permissions fusionnées lorsqu'un utilisateur appartient à plusieurs groupes.",
+      "Publier une politique sans la tester dans le simulateur.",
+      "Confondre les types d'entités tels que devis, activité, demande et commande."
+    ],
+    "checklistTitle": "Ordre de configuration recommandé",
+    "checklist": [
+      "Définissez d'abord à quelle page l'utilisateur doit accéder.",
+      "Ensuite, définissez quelles actions il doit effectuer sur cette page.",
+      "Puis, restreignez les enregistrements qu'il est autorisé à voir.",
+      "Utilisez les attributions de visibilité au niveau de l'utilisateur uniquement lorsque vous avez besoin d'une exception spécifique.",
+      "Validez le résultat final dans le Simulateur de visibilité."
+    ],
+    "faqTitle": "Foire aux questions",
+    "faqs": [
+      {
+        "id": "faq1",
+        "question": "Un utilisateur peut ouvrir les devis mais ne voit aucun enregistrement. Pourquoi ?",
+        "answer": "La permission de la page est probablement correcte, mais la couche de visibilité restreint trop les enregistrements ou n'a pas été attribuée correctement."
+      },
+      {
+        "id": "faq2",
+        "question": "Un utilisateur ne peut pas créer de devis. Pourquoi ?",
+        "answer": "La cause habituelle est une permission `sales.quotations.create` manquante. La vue ouvre la page ; la création ouvre l'action de création."
+      },
+      {
+        "id": "faq3",
+        "question": "Un utilisateur voit trop d'enregistrements. Par où dois-je commencer ?",
+        "answer": "Vérifiez d'abord les groupes de permissions attribués, puis les politiques de visibilité spécifiques à l'entité et les attributions de visibilité de l'utilisateur, et vérifiez enfin le comportement dans le simulateur."
+      }
+    ],
+    "footer": {
+      "title": "Règle de décision courte",
+      "body": "Si un utilisateur ne peut pas effectuer une action, commencez par les Groupes de permissions. Si un utilisateur voit trop ou trop peu d'enregistrements, commencez par la Visibilité. Vérifiez toujours la décision finale dans le Simulateur de visibilité."
+    }
+  }
+}

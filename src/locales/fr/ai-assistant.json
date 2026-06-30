@@ -1,0 +1,53 @@
+{
+  "pageTitle": "Assistant IA",
+  "eyebrow": "Assistant IA CRM",
+  "greeting": "Bonjour {{name}}, comment puis-je vous aider ?",
+  "loadingGreeting": "Préparation de l'accueil...",
+  "fallbackName": "cher utilisateur",
+  "subtitle": "Un assistant SalesDesk intelligent pour poser rapidement des questions sur vos demandes, devis, commandes et activités.",
+  "chatTitle": "Qu'allons-nous examiner ensemble aujourd'hui ?",
+  "chatDescription": "Le premier flux sécurisé de questions-réponses sur vos données SalesDesk est actif. Vous pouvez poser des questions sur les demandes, devis, commandes, activités et résumés ERP.",
+  "inputPlaceholder": "Ex. : Combien de devis ai-je créés ce mois-ci ?",
+  "comingSoon": "Le moteur de conversation est en préparation. Cet espace pourra bientôt échanger avec vos données CRM.",
+  "send": "Envoyer",
+  "suggestions": {
+    "1": "Combien de devis ai-je créés ce mois-ci ?",
+    "2": "Quel est mon taux de commandes approuvées ?",
+    "3": "Combien d'activités ai-je terminées ?",
+    "4": "Que signifie cette erreur ?"
+  },
+  "chatHint": "Je peux répondre aux questions de performance, volumes, taux, intégration ERP et explication d’erreurs.",
+  "attachImage": "Joindre une image",
+  "removeImage": "Retirer l'image",
+  "imageTooLarge": "L'image peut faire au maximum {{size}} Mo.",
+  "imageUnsupported": "Seules les images PNG, JPG/JPEG ou WEBP peuvent être jointes.",
+  "imageDefaultQuestion": "Pouvez-vous interpréter cette capture d’écran ?",
+  "imageContextHint": "Capture d’écran jointe. Si vous ajoutez aussi le texte de l’erreur, je pourrai l’expliquer plus clairement.",
+  "sending": "Préparation de la réponse...",
+  "thinking": {
+    "title": "L’IA réfléchit",
+    "steps": {
+      "1": "Analyse de votre question...",
+      "2": "Lecture sécurisée des données CRM...",
+      "3": "Préparation de la réponse et des contrôles recommandés..."
+    }
+  },
+  "answerTitle": "Réponse IA",
+  "sourceTitle": "Source de la réponse",
+  "actionItemsTitle": "Contrôles recommandés",
+  "openAction": "Ouvrir",
+  "copyAnswer": "Copier la réponse",
+  "copied": "Copié",
+  "newChat": "Nouvelle conversation",
+  "emptyQuestion": "Veuillez saisir une question.",
+  "openChat": "Ouvrir le chat IA",
+  "closeChat": "Fermer le chat IA",
+  "lastQuestion": "Votre question",
+  "lastErrorTitle": "Dernière erreur détectée",
+  "askLastError": "Demander à l’IA pour cette erreur",
+  "askLastErrorQuestion": "Que signifie cette erreur ?",
+  "apiErrors": {
+    "greeting": "Impossible de charger le message d’accueil de l’assistant IA.",
+    "answer": "Impossible de charger la réponse de l’assistant IA."
+  }
+}

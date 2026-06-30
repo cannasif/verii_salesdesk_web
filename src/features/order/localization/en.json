@@ -1,0 +1,73 @@
+{
+  "lines": {
+    "doubleClickToEdit": "Double-click to edit",
+    "unit": "Unit",
+    "descriptionTooltipText": "Line-level production notes. When transferred to ERP, Netsis mapping is: Description 1 -> Extra Field 1, Description 2 -> Extra Field 2, Description 3 -> Line Extra Description 7.",
+    "profileErpTooltip": "This Profile selection is saved to the Netsis Line Extra Description 2 field when sent to ERP.",
+    "rebarErpTooltip": "This Rebar selection is sent to ERP as the Netsis Line Extra Description 3 value.",
+    "screwErpTooltip": "This Screw selection is sent to ERP as the Netsis Line Extra Description 4 value.",
+    "printErpTooltip": "This Print selection is sent to ERP as the Netsis Line Extra Description 8 value. The print note is also sent to Netsis line Description 9 and Line Extra Description 9.",
+    "lineItemDescriptionPlaceholder": "Line-based item description"
+  },
+  "notes": {
+    "title": "Order Notes",
+    "description": "Add and update internal notes for this order.",
+    "placeholder": "Enter order note",
+    "noteLabel": "Order Note",
+    "notesTooltipText": "Shipment/invoice notes for the whole order. They are saved sequentially to Netsis order header Extra Description 1-5; note 2 is sent to Netsis Extra Description 2.",
+    "addLineTooltip": "Add description line",
+    "linesHint": "Each line appears separately in PDF and document notes.",
+    "removeLine": "Remove line",
+    "pageLabel": "Page {{current}} / {{total}}",
+    "saving": "Saving notes...",
+    "maxLengthError": "Note field can be at most 100 characters."
+  },
+  "erpOrder": {
+    "title": "ERP Order List",
+    "description": "Review Netsis order headers and lines visible for the logged-in user.",
+    "currentUserScope": "Logged-in user scope",
+    "searchPlaceholder": "Search order no, customer, sales rep or date...",
+    "loading": "Loading ERP orders...",
+    "loadError": "ERP orders could not be loaded.",
+    "noData": "No ERP orders found.",
+    "detailAction": "Details",
+    "detailTitle": "Order {{orderNo}} details",
+    "unknownCustomer": "No customer name",
+    "lineCount": "{{count}} lines",
+    "linesLoading": "Loading order lines...",
+    "lineLoadError": "Order lines could not be loaded.",
+    "noLines": "No lines found for this order.",
+    "table": {
+      "title": "Order Header Information",
+      "branchCode": "Branch",
+      "orderNo": "Order No",
+      "customerCode": "Customer Code",
+      "customerName": "Customer Name",
+      "date": "Date",
+      "deliveryDate": "Delivery Date",
+      "grossTotal": "Gross Total",
+      "vat": "VAT",
+      "grandTotal": "Grand Total",
+      "salesRepCode": "Sales Rep"
+    },
+    "lines": {
+      "rowNo": "Row",
+      "stockCode": "Stock Code",
+      "stockName": "Stock Name",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "netPrice": "Net Price",
+      "vatRate": "VAT Rate",
+      "warehouseCode": "Warehouse"
+    }
+  },
+  "header": {
+    "notes": "Notes",
+    "descriptionErpTooltip": "General production note for the whole order. When sent to ERP, it is saved to the Netsis order header Description field (FatUst.Aciklama).",
+    "ozelKod1": "Special Code 1",
+    "ozelKod1Placeholder": "Select special code 1",
+    "ozelKod2": "Special Code 2",
+    "ozelKod2Placeholder": "Select special code 2",
+    "specialCodeSearchPlaceholder": "Search special code..."
+  }
+}

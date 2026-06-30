@@ -1,0 +1,83 @@
+{
+  "menu": "Stadtverwaltung",
+  "description": "Städte verwalten und organisieren",
+  "addButton": "Neue Stadt hinzufügen",
+  "searchPlaceholder": "Suchen...",
+  "loading": "Laden...",
+  "noData": "Keine Daten gefunden",
+  "stats": {
+    "totalCities": "Gesamtstädte",
+    "activeCities": "Aktive Städte",
+    "newThisMonth": "Neu diesen Monat"
+  },
+  "table": {
+    "title": "Stadtliste",
+    "id": "ID",
+    "name": "Stadtname",
+    "erpCode": "ERP-Code",
+    "countryName": "Ländername",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von",
+    "showing": "Zeige {{from}}-{{to}} / {{total}}",
+    "page": "Seite {{current}} / {{total}}"
+  },
+  "cityManagement": {
+    "table": {
+      "title": "Stadtliste",
+      "id": "ID",
+      "name": "Stadtname",
+      "erpCode": "ERP-Code",
+      "countryName": "Ländername",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von"
+    },
+    "error": "Ein Fehler ist aufgetreten",
+    "form": {
+      "tabs": {
+        "header": "Allgemeine Informationen"
+      }
+    },
+    "menu": "Stadtverwaltung",
+    "description": "Städte verwalten und organisieren",
+    "addButton": "Neue Stadt hinzufügen",
+    "searchPlaceholder": "Schnell suchen...",
+    "loading": "Laden...",
+    "noData": "Keine Daten gefunden",
+    "actions": "Aktionen",
+    "delete": {
+      "success": "Die Stadt wurde erfolgreich gelöscht",
+      "error": "Beim Löschen der Stadt ist ein Fehler aufgetreten",
+      "confirmTitle": "Stadt löschen",
+      "confirmMessage": "Möchten Sie {{name}} wirklich löschen?"
+    }
+  },
+  "form": {
+    "editCity": "Stadt bearbeiten",
+    "addCity": "Neue Stadt hinzufügen",
+    "editDescription": "Stadtdetails bearbeiten",
+    "addDescription": "Neue Stadtdetails eingeben",
+    "name": "Stadtname",
+    "namePlaceholder": "Stadtname eingeben",
+    "country": "Land",
+    "selectCountry": "Land auswählen",
+    "erpCode": "ERP-Code",
+    "erpCodePlaceholder": "ERP-Code eingeben (optional)",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert...",
+    "nameRequired": "Der Stadtname ist erforderlich",
+    "nameMaxLength": "Der Stadtname darf maximal 100 Zeichen haben",
+    "erpCodeMaxLength": "ERP-Code darf maximal 10 Zeichen haben",
+    "countryRequired": "Landauswahl ist erforderlich"
+  },
+  "actions": "Aktionen",
+  "delete": {
+    "button": "Löschen",
+    "success": "Die Stadt wurde erfolgreich gelöscht",
+    "error": "Beim Löschen der Stadt ist ein Fehler aufgetreten",
+    "confirmTitle": "Stadt löschen",
+    "confirmMessage": "Möchten Sie {{name}} wirklich löschen?"
+  },
+  "previous": "Vorherige",
+  "next": "Nächste"
+}

@@ -1,0 +1,1145 @@
+import { create } from 'zustand';
+import i18next from 'i18next';
+import { reportingApi } from '../api/reporting-api';
+import { reportsApi } from '../api/reports-api';
+import type {
+  ReportConfig,
+  ReportConfigSorting,
+  ReportConfigFilter,
+  ReportDto,
+  Field,
+  ConnectionDto,
+  DataSourceCatalogItem,
+  DataSourceParameter,
+  DataSourceParameterBindingType,
+  ChartType,
+  Aggregation,
+  DateGrouping,
+  ReportWidget,
+  CalculatedField,
+  ReportHistoryEntry,
+  ReportLifecycleStatus,
+} from '../types';
+
+function createDefaultWidget(id = 'widget-1', title = tr('common.reportBuilder.widgetTitleFallback', { index: 1 })): ReportWidget {
+  return {
+    id,
+    title,
+    size: 'half',
+    height: 'md',
+    appearance: {
+      tone: 'neutral',
+      accentColor: '#1d4ed8',
+      showStats: true,
+      tableDensity: 'comfortable',
+      themePreset: 'executive',
+      titleAlign: 'left',
+      kpiFormat: 'number',
+      backgroundStyle: 'card',
+      kpiLayout: 'split',
+      valueFormat: 'default',
+      decimalPlaces: 0,
+      seriesVisibilityMode: 'auto',
+      maxVisibleSeries: 8,
+      seriesOverflowMode: 'others',
+    },
+    chartType: 'table',
+    values: [],
+    filters: [],
+  };
+}
+
+function createDefaultAppearance() {
+  return {
+    tone: 'neutral' as const,
+    accentColor: '#1d4ed8',
+    showStats: true,
+    tableDensity: 'comfortable' as const,
+    themePreset: 'executive' as const,
+    titleAlign: 'left' as const,
+    kpiFormat: 'number' as const,
+    backgroundStyle: 'card' as const,
+    kpiLayout: 'split' as const,
+    valueFormat: 'default' as const,
+    decimalPlaces: 0,
+    seriesVisibilityMode: 'auto' as const,
+    maxVisibleSeries: 8,
+    seriesOverflowMode: 'others' as const,
+  };
+}
+
+function hydrateWidget(
+  widgetId: string,
+  widget: Partial<ReportWidget> & Pick<ReportWidget, 'title' | 'chartType' | 'values'>,
+): ReportWidget {
+  const defaults = createDefaultWidget(widgetId, widget.title);
+  return {
+    ...defaults,
+    ...widget,
+    id: widgetId,
+    title: widget.title,
+    chartType: widget.chartType,
+    values: widget.values,
+    filters: widget.filters ?? defaults.filters,
+    appearance: {
+      ...createDefaultAppearance(),
+      ...(defaults.appearance ?? {}),
+      ...(widget.appearance ?? {}),
+    },
+  };
+}
+
+function tr(key: string, options?: Record<string, unknown>): string {
+  return i18next.t(key, { ns: 'common', ...options });
+}
+
+function createConfigFromWidget(widget: ReportWidget, widgets?: ReportWidget[], activeWidgetId?: string): ReportConfig {
+  return {
+    chartType: widget.chartType,
+    axis: widget.axis,
+    values: widget.values,
+    legend: widget.legend,
+    sorting: widget.sorting,
+    filters: widget.filters,
+    datasetParameters: [],
+    widgets,
+    activeWidgetId,
+    lifecycle: { status: 'draft', version: 1 },
+    history: [],
+    governance: {
+      audience: 'private',
+      refreshCadence: 'manual',
+      favorite: false,
+      tags: [],
+      sharedWith: [],
+      subscriptionEnabled: false,
+      subscriptionChannel: 'email',
+      subscriptionFrequency: 'weekly',
+      certified: false,
+    },
+  };
+}
+
+function ensureWidgets(config?: Partial<ReportConfig> | null): ReportConfig {
+  const incoming = config ?? {};
+  const widgets: ReportWidget[] = Array.isArray(incoming.widgets) && incoming.widgets.length > 0
+    ? incoming.widgets
+    : [
+        {
+          id: incoming.activeWidgetId ?? 'widget-1',
+          title: tr('common.reportBuilder.widgetTitleFallback', { index: 1 }),
+          size: 'half' as const,
+          height: 'md' as const,
+          appearance: {
+            tone: 'neutral' as const,
+            accentColor: '#1d4ed8',
+            showStats: true,
+            tableDensity: 'comfortable' as const,
+            themePreset: 'executive' as const,
+            titleAlign: 'left' as const,
+            kpiFormat: 'number' as const,
+            backgroundStyle: 'card' as const,
+            kpiLayout: 'split' as const,
+            valueFormat: 'default' as const,
+            decimalPlaces: 0,
+            seriesVisibilityMode: 'auto' as const,
+            maxVisibleSeries: 8,
+            seriesOverflowMode: 'others' as const,
+          },
+          chartType: incoming.chartType ?? 'table',
+          axis: incoming.axis,
+          values: incoming.values ?? [],
+          legend: incoming.legend,
+          sorting: incoming.sorting,
+          filters: incoming.filters ?? [],
+        },
+      ];
+  const activeWidgetId = incoming.activeWidgetId && widgets.some((widget) => widget.id === incoming.activeWidgetId)
+    ? incoming.activeWidgetId
+    : widgets[0].id;
+  const activeWidget = widgets.find((widget) => widget.id === activeWidgetId) ?? widgets[0];
+  return {
+    ...createConfigFromWidget(activeWidget, widgets, activeWidgetId),
+    datasetParameters: incoming.datasetParameters ?? [],
+    calculatedFields: incoming.calculatedFields ?? [],
+    lifecycle: incoming.lifecycle ?? { status: 'draft', version: 1 },
+    history: incoming.history ?? [],
+    governance: incoming.governance ?? {
+      audience: 'private',
+      refreshCadence: 'manual',
+      favorite: false,
+      tags: [],
+      sharedWith: [],
+      subscriptionEnabled: false,
+      subscriptionChannel: 'email',
+      subscriptionFrequency: 'weekly',
+      certified: false,
+    },
+  };
+}
+
+function formatDateLiteral(date: Date): string {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getDefaultBindingForParameter(parameter: DataSourceParameter) {
+  const normalizedName = parameter.name.trim().toLowerCase();
+  if (normalizedName.includes('current_user_id') || normalizedName.includes('currentuserid')) {
+    return { source: 'currentUserId' as const, value: undefined };
+  }
+  if (normalizedName.includes('current_user_email') || normalizedName.includes('currentuseremail')) {
+    return { source: 'currentUserEmail' as const, value: undefined };
+  }
+  if (parameter.semanticType === 'date') {
+    const today = new Date();
+    if (normalizedName.includes('start')) {
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      return { source: 'literal' as const, value: formatDateLiteral(startOfMonth) };
+    }
+    if (normalizedName.includes('end')) {
+      return { source: 'literal' as const, value: formatDateLiteral(today) };
+    }
+    return { source: 'today' as const, value: undefined };
+  }
+  return { source: 'literal' as const, value: '' };
+}
+
+const DEFAULT_CONFIG: ReportConfig = ensureWidgets();
+
+interface BuilderMeta {
+  id?: number;
+  name: string;
+  description?: string;
+  connectionKey: string;
+  dataSourceType: string;
+  dataSourceName: string;
+  canManage?: boolean;
+  accessLevel?: 'owner' | 'shared' | 'organization' | 'none';
+  assignedUserIds?: number[];
+}
+
+interface BuilderUI {
+  connectionsLoading: boolean;
+  dataSourcesLoading: boolean;
+  checkLoading: boolean;
+  previewLoading: boolean;
+  saveLoading: boolean;
+  error: string | null;
+  slotError: string | null;
+  toast: { message: string; variant: 'success' | 'error' } | null;
+}
+
+interface ReportBuilderState {
+  connections: ConnectionDto[];
+  dataSources: DataSourceCatalogItem[];
+  dataSourceParameters: DataSourceParameter[];
+  meta: BuilderMeta;
+  schema: Field[];
+  dataSourceChecked: boolean;
+  fieldsSearch: string;
+  config: ReportConfig;
+  preview: { columns: string[]; rows: unknown[][] };
+  ui: BuilderUI;
+  setMeta: (patch: Partial<BuilderMeta>) => void;
+  setFieldsSearch: (v: string) => void;
+  setConfig: (patch: Partial<ReportConfig>) => void;
+  loadConnections: () => Promise<void>;
+  loadDataSources: (search?: string) => Promise<void>;
+  loadSchemaForCurrentDataSource: () => Promise<void>;
+  setConnectionKey: (v: string) => void;
+  setType: (v: string) => void;
+  setDataSourceName: (v: string) => void;
+  setDatasetParameterBinding: (
+    name: string,
+    source: DataSourceParameterBindingType,
+    value?: string,
+    options?: { allowViewerOverride?: boolean; viewerLabel?: string }
+  ) => void;
+  checkDataSource: () => Promise<void>;
+  setChartType: (t: ChartType) => void;
+  addWidget: () => void;
+  addWidgetWithConfig: (widget: Partial<ReportWidget> & Pick<ReportWidget, 'title' | 'chartType' | 'values'>) => void;
+  setActiveWidget: (widgetId: string) => void;
+  replaceActiveWidget: (widget: Partial<ReportWidget> & Pick<ReportWidget, 'title' | 'chartType' | 'values'>) => void;
+  renameWidget: (widgetId: string, title: string) => void;
+  setWidgetSize: (widgetId: string, size: 'third' | 'half' | 'full') => void;
+  setWidgetHeight: (widgetId: string, height: 'sm' | 'md' | 'lg') => void;
+  setWidgetAppearance: (widgetId: string, patch: Partial<NonNullable<ReportWidget['appearance']>>) => void;
+  reorderWidgets: (fromIndex: number, toIndex: number) => void;
+  removeWidget: (widgetId: string) => void;
+  addToSlot: (slot: 'axis' | 'values' | 'legend' | 'filters', field: string, options?: { aggregation?: Aggregation }) => void;
+  removeFromSlot: (slot: 'axis' | 'values' | 'legend' | 'filters', indexOrField: number | string) => void;
+  reorderSlot: (slot: 'values' | 'filters', fromIndex: number, toIndex: number) => void;
+  setAggregation: (valuesIndex: number, aggregation: Aggregation) => void;
+  setAxisLabel: (label: string) => void;
+  setLegendLabel: (label: string) => void;
+  setValueLabel: (valuesIndex: number, label: string) => void;
+  setDateGrouping: (grouping: DateGrouping) => void;
+  setSorting: (s: ReportConfigSorting | null) => void;
+  addFilter: (f: ReportConfigFilter) => void;
+  addCalculatedField: (field: CalculatedField) => void;
+  updateCalculatedField: (name: string, patch: Partial<CalculatedField>) => void;
+  removeCalculatedField: (name: string) => void;
+  setLifecycleStatus: (status: ReportLifecycleStatus) => void;
+  setLifecycleReleaseNote: (releaseNote: string) => void;
+  rollbackToHistory: (version: number) => void;
+  setGovernanceMetadata: (patch: Partial<NonNullable<ReportConfig['governance']>>) => void;
+  updateFilter: (index: number, patch: Partial<ReportConfigFilter>) => void;
+  removeFilter: (index: number) => void;
+  reorderFilter: (fromIndex: number, toIndex: number) => void;
+  hydrateFromReportDetail: (report: ReportDto) => void;
+  serializeConfigJson: () => string;
+  previewDebounced: () => { execute: () => void; cancel: () => void };
+  saveNewReport: () => Promise<ReportDto | null>;
+  updateReport: () => Promise<ReportDto | null>;
+  loadReportById: (id: number) => Promise<void>;
+  setUi: (patch: Partial<BuilderUI>) => void;
+  setPreview: (data: { columns: string[]; rows: unknown[][] }) => void;
+  reset: () => void;
+}
+
+const defaultMeta: BuilderMeta = {
+  name: '',
+  connectionKey: '',
+  dataSourceType: '',
+  dataSourceName: '',
+  assignedUserIds: [],
+};
+
+const defaultUi: BuilderUI = {
+  connectionsLoading: false,
+  dataSourcesLoading: false,
+  checkLoading: false,
+  previewLoading: false,
+  saveLoading: false,
+  error: null,
+  slotError: null,
+  toast: null,
+};
+
+const initialState = {
+  connections: [] as ConnectionDto[],
+  dataSources: [] as DataSourceCatalogItem[],
+  dataSourceParameters: [] as DataSourceParameter[],
+  meta: { ...defaultMeta },
+  schema: [] as Field[],
+  dataSourceChecked: false,
+  fieldsSearch: '',
+  config: { ...DEFAULT_CONFIG },
+  preview: { columns: [] as string[], rows: [] as unknown[][] },
+  ui: { ...defaultUi },
+};
+
+function inferAggregationForField(config: ReportConfig, schema: Field[], fieldName: string): Aggregation {
+  const schemaField =
+    schema.find((field) => field.name === fieldName)
+    ?? ((config.calculatedFields ?? []).some((field) => field.name === fieldName)
+      ? ({ defaultAggregation: 'sum' } as Field)
+      : undefined);
+  const defaultAggregation = schemaField?.defaultAggregation;
+  if (defaultAggregation === 'count' || defaultAggregation === 'avg' || defaultAggregation === 'min' || defaultAggregation === 'max' || defaultAggregation === 'sum') {
+    return defaultAggregation;
+  }
+  return 'sum';
+}
+
+export const useReportBuilderStore = create<ReportBuilderState>((set, get) => ({
+  ...initialState,
+
+  setMeta: (patch) =>
+    set((s) => ({ meta: { ...s.meta, ...patch } })),
+
+  setFieldsSearch: (v) => set({ fieldsSearch: v }),
+
+  setConfig: (patch) =>
+    set((s) => ({ config: ensureWidgets({ ...s.config, ...patch }) })),
+
+  setChartType: (t) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, chartType: t } : widget
+      );
+      return { config: ensureWidgets({ ...current, chartType: t, widgets }) };
+    }),
+
+  addWidget: () =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const nextIndex = (current.widgets?.length ?? 0) + 1;
+      const widget = createDefaultWidget(`widget-${Date.now()}`, tr('common.reportBuilder.widgetTitleFallback', { index: nextIndex }));
+      const widgets = [...(current.widgets ?? []), widget];
+      return { config: ensureWidgets({ ...current, widgets, activeWidgetId: widget.id }) };
+    }),
+
+  addWidgetWithConfig: (widget) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgetId = `widget-${Date.now()}`;
+      const nextWidget = hydrateWidget(widgetId, widget);
+      const widgets = [...(current.widgets ?? []), nextWidget];
+      return {
+        config: ensureWidgets({
+          ...current,
+          chartType: nextWidget.chartType,
+          axis: nextWidget.axis,
+          values: nextWidget.values,
+          legend: nextWidget.legend,
+          sorting: nextWidget.sorting,
+          filters: nextWidget.filters,
+          widgets,
+          activeWidgetId: widgetId,
+        }),
+      };
+    }),
+
+  setActiveWidget: (widgetId) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      return { config: ensureWidgets({ ...current, activeWidgetId: widgetId }) };
+    }),
+
+  replaceActiveWidget: (widget) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const activeWidgetId = current.activeWidgetId ?? current.widgets?.[0]?.id ?? 'widget-1';
+      const widgets = (current.widgets ?? []).map((item) =>
+        item.id === activeWidgetId
+          ? hydrateWidget(activeWidgetId, {
+              ...item,
+              ...widget,
+              title: widget.title,
+              chartType: widget.chartType,
+              values: widget.values,
+              appearance: {
+                ...(item.appearance ?? {}),
+                ...(widget.appearance ?? {}),
+              },
+            })
+          : item,
+      );
+      const activeWidget = widgets.find((item) => item.id === activeWidgetId) ?? hydrateWidget(activeWidgetId, widget);
+      return {
+        config: ensureWidgets({
+          ...current,
+          chartType: activeWidget.chartType,
+          axis: activeWidget.axis,
+          values: activeWidget.values,
+          legend: activeWidget.legend,
+          sorting: activeWidget.sorting,
+          filters: activeWidget.filters,
+          widgets,
+          activeWidgetId,
+        }),
+      };
+    }),
+
+  renameWidget: (widgetId, title) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === widgetId ? { ...widget, title } : widget
+      );
+      return { config: ensureWidgets({ ...current, widgets }) };
+    }),
+
+  setWidgetSize: (widgetId, size) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === widgetId ? { ...widget, size } : widget
+      );
+      return { config: ensureWidgets({ ...current, widgets }) };
+    }),
+
+  setWidgetHeight: (widgetId, height) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === widgetId ? { ...widget, height } : widget
+      );
+      return { config: ensureWidgets({ ...current, widgets }) };
+    }),
+
+  setWidgetAppearance: (widgetId, patch) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === widgetId
+          ? {
+              ...widget,
+              appearance: {
+                ...createDefaultAppearance(),
+                ...(widget.appearance ?? {}),
+                ...patch,
+              },
+            }
+          : widget
+      );
+      return { config: ensureWidgets({ ...current, widgets }) };
+    }),
+
+  reorderWidgets: (fromIndex, toIndex) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = [...(current.widgets ?? [])];
+      if (fromIndex < 0 || fromIndex >= widgets.length || toIndex < 0 || toIndex >= widgets.length) {
+        return { config: current };
+      }
+      const [moved] = widgets.splice(fromIndex, 1);
+      widgets.splice(toIndex, 0, moved);
+      return { config: ensureWidgets({ ...current, widgets }) };
+    }),
+
+  removeWidget: (widgetId) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).filter((widget) => widget.id !== widgetId);
+      const nextWidgets = widgets.length > 0 ? widgets : [createDefaultWidget()];
+      const nextActiveWidgetId = current.activeWidgetId === widgetId ? nextWidgets[0].id : current.activeWidgetId;
+      return { config: ensureWidgets({ ...current, widgets: nextWidgets, activeWidgetId: nextActiveWidgetId }) };
+    }),
+
+  loadConnections: async () => {
+    try {
+      set((s) => ({ ui: { ...s.ui, connectionsLoading: true, error: null } }));
+      const items = await reportingApi.getConnections();
+      set({ connections: items, ui: { ...get().ui, connectionsLoading: false } });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.loadConnectionsFailed');
+      set((s) => ({ ui: { ...s.ui, connectionsLoading: false, error: msg } }));
+    }
+  },
+
+  loadDataSources: async (search) => {
+    const { meta } = get();
+    if (!meta.connectionKey || !meta.dataSourceType) {
+      set({ dataSources: [] });
+      return;
+    }
+
+    try {
+      set((s) => ({ ui: { ...s.ui, dataSourcesLoading: true, error: null } }));
+      const items = await reportingApi.listDataSources({
+        connectionKey: meta.connectionKey,
+        type: meta.dataSourceType,
+        search,
+      });
+      set((s) => ({
+        dataSources: items,
+        ui: { ...s.ui, dataSourcesLoading: false },
+      }));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.loadDatasetsFailed');
+      set((s) => ({
+        dataSources: [],
+        ui: { ...s.ui, dataSourcesLoading: false, error: msg },
+      }));
+    }
+  },
+
+  loadSchemaForCurrentDataSource: async () => {
+    const { meta } = get();
+    if (!meta.connectionKey?.trim() || !meta.dataSourceType || !meta.dataSourceName?.trim()) {
+      return;
+    }
+
+    try {
+      set((s) => ({
+        ui: { ...s.ui, checkLoading: true, error: null },
+      }));
+      const result = await reportingApi.checkDataSource({
+        connectionKey: meta.connectionKey,
+        type: meta.dataSourceType,
+        name: meta.dataSourceName.trim(),
+      });
+      const fields = result.schema ?? [];
+      set((s) => ({
+        schema: fields,
+        dataSourceParameters: result.parameters ?? [],
+        dataSourceChecked: result.exists && fields.length > 0,
+        ui: { ...s.ui, checkLoading: false },
+      }));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.checkFailed');
+      set((s) => ({
+        schema: [],
+        dataSourceChecked: false,
+        ui: { ...s.ui, checkLoading: false, error: msg },
+      }));
+    }
+  },
+
+  setConnectionKey: (v) =>
+    set((s) => ({
+      meta: { ...s.meta, connectionKey: v, dataSourceName: '' },
+      dataSources: [],
+      dataSourceParameters: [],
+      schema: [],
+      dataSourceChecked: false,
+      preview: { columns: [], rows: [] },
+      config: { ...DEFAULT_CONFIG },
+    })),
+
+  setType: (v) =>
+    set((s) => ({
+      meta: { ...s.meta, dataSourceType: v, dataSourceName: '' },
+      dataSources: [],
+      dataSourceParameters: [],
+      schema: [],
+      dataSourceChecked: false,
+      preview: { columns: [], rows: [] },
+      config: { ...DEFAULT_CONFIG },
+    })),
+
+  setDataSourceName: (v) =>
+    set((s) => ({
+      meta: { ...s.meta, dataSourceName: v },
+      dataSourceParameters: [],
+      schema: [],
+      dataSourceChecked: false,
+      preview: { columns: [], rows: [] },
+      config: { ...DEFAULT_CONFIG },
+    })),
+
+  checkDataSource: async () => {
+    const { meta } = get();
+    if (!meta.connectionKey?.trim() || !meta.dataSourceType || !meta.dataSourceName?.trim()) {
+      get().setUi({ toast: { message: tr('common.reportBuilder.messages.connectionTypeDatasetRequired'), variant: 'error' } });
+      return;
+    }
+    try {
+      set((s) => ({
+        ui: { ...s.ui, checkLoading: true, error: null },
+        dataSourceChecked: false,
+      }));
+      const result = await reportingApi.checkDataSource({
+        connectionKey: meta.connectionKey,
+        type: meta.dataSourceType,
+        name: meta.dataSourceName.trim(),
+      });
+      const fields = result.schema ?? [];
+      const parameters = result.parameters ?? [];
+      const existingBindings = ensureWidgets(get().config).datasetParameters ?? [];
+      const defaultDatasetParameters = parameters.map((parameter: DataSourceParameter) => {
+        const existing = existingBindings.find((item) => item.name === parameter.name);
+        if (existing) return existing;
+        const defaults = getDefaultBindingForParameter(parameter);
+        return {
+          name: parameter.name,
+          source: defaults.source,
+          value: defaults.value,
+        };
+      }) as ReportConfig['datasetParameters'];
+      set((s) => ({
+        schema: fields,
+        dataSourceParameters: parameters,
+        config: ensureWidgets({ ...s.config, datasetParameters: defaultDatasetParameters }),
+        preview: { columns: [], rows: [] },
+        dataSourceChecked: result.exists && fields.length > 0,
+        ui: { ...s.ui, checkLoading: false },
+      }));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.checkFailed');
+      set((s) => ({
+        schema: [],
+        dataSourceChecked: false,
+        ui: { ...s.ui, checkLoading: false, error: msg },
+      }));
+    }
+  },
+
+  addToSlot: (slot, field, options) => {
+    set((s) => {
+      const c = ensureWidgets(s.config);
+      if (slot === 'axis') c.axis = { field };
+      if (slot === 'legend') c.legend = { field };
+      if (slot === 'values') {
+        const agg = options?.aggregation ?? inferAggregationForField(c, s.schema, field);
+        c.values = [...c.values, { field, aggregation: agg }];
+      }
+      if (slot === 'filters') c.filters = [...c.filters, { field, operator: 'eq' }];
+      const widgets = (c.widgets ?? []).map((widget) =>
+        widget.id === c.activeWidgetId
+          ? {
+              ...widget,
+              axis: c.axis,
+              legend: c.legend,
+              values: c.values,
+              filters: c.filters,
+            }
+          : widget
+      );
+      return { config: ensureWidgets({ ...c, widgets }), ui: { ...s.ui, slotError: null } };
+    });
+  },
+
+  setDatasetParameterBinding: (name, source, value, options) =>
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const bindings = [...(current.datasetParameters ?? [])];
+      const existingIndex = bindings.findIndex((item) => item.name === name);
+      const previous = existingIndex >= 0 ? bindings[existingIndex] : undefined;
+      const nextBinding = {
+        name,
+        source,
+        value,
+        allowViewerOverride: options?.allowViewerOverride ?? previous?.allowViewerOverride ?? false,
+        viewerLabel: options?.viewerLabel ?? previous?.viewerLabel,
+      };
+      if (existingIndex >= 0) bindings[existingIndex] = nextBinding;
+      else bindings.push(nextBinding);
+      return { config: ensureWidgets({ ...current, datasetParameters: bindings }) };
+    }),
+
+  removeFromSlot: (slot, indexOrField) => {
+    set((s) => {
+      const c = ensureWidgets(s.config);
+      if (slot === 'axis') c.axis = undefined;
+      if (slot === 'legend') c.legend = undefined;
+      if (slot === 'values') {
+        const idx = typeof indexOrField === 'number' ? indexOrField : c.values.findIndex((v) => v.field === indexOrField);
+        if (idx >= 0) c.values = c.values.filter((_, i) => i !== idx);
+      }
+      if (slot === 'filters') {
+        const idx = typeof indexOrField === 'number' ? indexOrField : c.filters.findIndex((f) => f.field === indexOrField);
+        if (idx >= 0) c.filters = c.filters.filter((_, i) => i !== idx);
+      }
+      const widgets = (c.widgets ?? []).map((widget) =>
+        widget.id === c.activeWidgetId
+          ? {
+              ...widget,
+              axis: c.axis,
+              legend: c.legend,
+              values: c.values,
+              filters: c.filters,
+            }
+          : widget
+      );
+      return { config: ensureWidgets({ ...c, widgets }) };
+    });
+  },
+
+  reorderSlot: (slot, fromIndex, toIndex) => {
+    set((s) => {
+      const c = ensureWidgets(s.config);
+      if (slot === 'values') {
+        const arr = [...c.values];
+        const [removed] = arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, removed);
+        c.values = arr;
+      }
+      if (slot === 'filters') {
+        const arr = [...c.filters];
+        const [removed] = arr.splice(fromIndex, 1);
+        arr.splice(toIndex, 0, removed);
+        c.filters = arr;
+      }
+      const widgets = (c.widgets ?? []).map((widget) =>
+        widget.id === c.activeWidgetId
+          ? { ...widget, values: c.values, filters: c.filters }
+          : widget
+      );
+      return { config: ensureWidgets({ ...c, widgets }) };
+    });
+  },
+
+  setAggregation: (valuesIndex, aggregation) => {
+    set((s) => {
+      const values = [...s.config.values];
+      if (values[valuesIndex]) values[valuesIndex] = { ...values[valuesIndex], aggregation };
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, values } : widget
+      );
+      return { config: ensureWidgets({ ...current, values, widgets }) };
+    });
+  },
+
+  setAxisLabel: (label) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      if (!current.axis) return { config: current };
+      const axis = { ...current.axis, label };
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, axis } : widget
+      );
+      return { config: ensureWidgets({ ...current, axis, widgets }) };
+    });
+  },
+
+  setLegendLabel: (label) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      if (!current.legend) return { config: current };
+      const legend = { ...current.legend, label };
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, legend } : widget
+      );
+      return { config: ensureWidgets({ ...current, legend, widgets }) };
+    });
+  },
+
+  setValueLabel: (valuesIndex, label) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const values = [...current.values];
+      if (!values[valuesIndex]) return { config: current };
+      values[valuesIndex] = { ...values[valuesIndex], label };
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, values } : widget
+      );
+      return { config: ensureWidgets({ ...current, values, widgets }) };
+    });
+  },
+
+  setDateGrouping: (grouping) => {
+    set((s) => ({
+      config: ensureWidgets({
+        ...ensureWidgets(s.config),
+        axis: s.config.axis ? { ...s.config.axis, dateGrouping: grouping } : undefined,
+        widgets: (ensureWidgets(s.config).widgets ?? []).map((widget) =>
+          widget.id === ensureWidgets(s.config).activeWidgetId
+            ? { ...widget, axis: s.config.axis ? { ...s.config.axis, dateGrouping: grouping } : undefined }
+            : widget
+        ),
+      }),
+    }));
+  },
+
+  setSorting: (sorting) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, sorting: sorting ?? undefined } : widget
+      );
+      return { config: ensureWidgets({ ...current, sorting: sorting ?? undefined, widgets }) };
+    });
+  },
+
+  addFilter: (f) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const filters = [...current.filters, f];
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, filters } : widget
+      );
+      return { config: ensureWidgets({ ...current, filters, widgets }) };
+    });
+  },
+
+  addCalculatedField: (field) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const calculatedFields = [...(current.calculatedFields ?? []).filter((item) => item.name !== field.name), field];
+      return { config: ensureWidgets({ ...current, calculatedFields }) };
+    });
+  },
+
+  updateCalculatedField: (name, patch) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const calculatedFields = (current.calculatedFields ?? []).map((item) =>
+        item.name === name ? { ...item, ...patch } : item
+      );
+      return { config: ensureWidgets({ ...current, calculatedFields }) };
+    });
+  },
+
+  removeCalculatedField: (name) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const calculatedFields = (current.calculatedFields ?? []).filter((item) => item.name !== name);
+      const values = current.values.filter((item) => item.field !== name);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, values } : widget
+      );
+      return { config: ensureWidgets({ ...current, calculatedFields, values, widgets }) };
+    });
+  },
+
+  setLifecycleStatus: (status) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const previous = current.lifecycle ?? { status: 'draft' as const, version: 1 };
+      const shouldCreateRelease = status === 'published' && previous.status !== 'published';
+      const nextVersion = shouldCreateRelease ? previous.version + 1 : previous.version;
+      const nextLifecycle = {
+        status,
+        version: nextVersion,
+        publishedAt: status === 'published' ? new Date().toISOString() : previous.publishedAt,
+        releaseNote: previous.releaseNote,
+      };
+      const historyEntry: ReportHistoryEntry | null = shouldCreateRelease
+        ? {
+            version: nextVersion,
+            status,
+            publishedAt: nextLifecycle.publishedAt,
+            releaseNote: nextLifecycle.releaseNote,
+            snapshotAt: new Date().toISOString(),
+            configSnapshot: JSON.stringify({
+              ...current,
+              lifecycle: nextLifecycle,
+              history: undefined,
+            }),
+          }
+        : null;
+
+      return {
+        config: ensureWidgets({
+          ...current,
+          lifecycle: nextLifecycle,
+          history: historyEntry ? [...(current.history ?? []), historyEntry] : current.history,
+        }),
+      };
+    });
+  },
+
+  setLifecycleReleaseNote: (releaseNote) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      return {
+        config: ensureWidgets({
+          ...current,
+          lifecycle: {
+            ...(current.lifecycle ?? { status: 'draft', version: 1 }),
+            releaseNote,
+          },
+        }),
+      };
+    });
+  },
+
+  rollbackToHistory: (version) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const entry = (current.history ?? []).find((item) => item.version === version);
+      if (!entry) return { config: current };
+      try {
+        const parsed = JSON.parse(entry.configSnapshot) as ReportConfig;
+        return {
+          config: ensureWidgets({
+            ...parsed,
+            history: current.history,
+            lifecycle: {
+              ...(parsed.lifecycle ?? { status: 'draft', version }),
+              status: 'draft',
+            },
+          }),
+        };
+      } catch {
+        return { config: current };
+      }
+    });
+  },
+
+  setGovernanceMetadata: (patch) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      return {
+        config: ensureWidgets({
+          ...current,
+          governance: {
+            audience: 'private',
+            refreshCadence: 'manual',
+            favorite: false,
+            tags: [],
+            sharedWith: [],
+            subscriptionEnabled: false,
+            subscriptionChannel: 'email',
+            subscriptionFrequency: 'weekly',
+            certified: false,
+            ...(current.governance ?? {}),
+            ...patch,
+          },
+        }),
+      };
+    });
+  },
+
+  updateFilter: (index, patch) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const filters = [...current.filters];
+      if (filters[index]) filters[index] = { ...filters[index], ...patch };
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, filters } : widget
+      );
+      return { config: ensureWidgets({ ...current, filters, widgets }) };
+    });
+  },
+
+  removeFilter: (index) => {
+    set((s) => {
+      const current = ensureWidgets(s.config);
+      const filters = current.filters.filter((_, i) => i !== index);
+      const widgets = (current.widgets ?? []).map((widget) =>
+        widget.id === current.activeWidgetId ? { ...widget, filters } : widget
+      );
+      return { config: ensureWidgets({ ...current, filters, widgets }) };
+    });
+  },
+
+  reorderFilter: (fromIndex, toIndex) => {
+    get().reorderSlot('filters', fromIndex, toIndex);
+  },
+
+  hydrateFromReportDetail: (report) => {
+    set({
+      meta: {
+        id: report.id,
+        name: report.name,
+        description: report.description,
+        connectionKey: report.connectionKey,
+        dataSourceType: report.dataSourceType,
+        dataSourceName: report.dataSourceName,
+        canManage: report.canManage,
+        accessLevel: report.accessLevel,
+        assignedUserIds: report.assignedUserIds ?? [],
+      },
+    });
+    try {
+      const config = JSON.parse(report.configJson) as ReportConfig;
+      set((_s) => ({ config: ensureWidgets({ ...DEFAULT_CONFIG, ...config }) }));
+    } catch {
+      set((s) => ({ config: ensureWidgets(s.config) }));
+    }
+  },
+
+  serializeConfigJson: () => JSON.stringify(ensureWidgets(get().config)),
+
+  previewDebounced: () => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const cancel = (): void => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = null;
+    };
+
+    const execute = (): void => {
+      cancel();
+      const state = get();
+      const { meta, config, dataSourceChecked } = state;
+      if (!dataSourceChecked || !meta.connectionKey || !meta.dataSourceType || !meta.dataSourceName) return;
+
+      timeoutId = setTimeout(async () => {
+        timeoutId = null;
+        set((s) => ({ ui: { ...s.ui, previewLoading: true, error: null } }));
+
+        try {
+          const configJson = JSON.stringify(ensureWidgets(config));
+          const res = await reportsApi.preview({
+            connectionKey: meta.connectionKey,
+            dataSourceType: meta.dataSourceType,
+            dataSourceName: meta.dataSourceName,
+            configJson,
+          });
+          const rawColumns = res.columns ?? [];
+          const columns = rawColumns.map((c) =>
+            typeof c === 'string' ? c : (c != null && typeof c === 'object' && 'name' in c ? String((c as { name: string }).name) : String(c))
+          );
+          const rawRows = res.rows ?? [];
+          const rows = Array.isArray(rawRows) ? rawRows : [];
+          set({
+            preview: { columns, rows },
+            ui: { ...get().ui, previewLoading: false },
+          });
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.previewFailed');
+          set((s) => ({ ui: { ...s.ui, previewLoading: false, error: msg } }));
+        }
+      }, 600);
+    };
+
+    return { execute, cancel };
+  },
+
+  saveNewReport: async () => {
+    const state = get();
+    const { meta, config } = state;
+    if (!meta.name?.trim()) {
+      get().setUi({ toast: { message: tr('common.reportBuilder.messages.reportNameRequired'), variant: 'error' } });
+      return null;
+    }
+    if (!meta.connectionKey || !meta.dataSourceType || !meta.dataSourceName) {
+      get().setUi({ toast: { message: tr('common.reportBuilder.messages.connectionDatasetRequired'), variant: 'error' } });
+      return null;
+    }
+    get().setUi({ saveLoading: true });
+    try {
+      const body = {
+        name: meta.name.trim(),
+        description: meta.description,
+        connectionKey: meta.connectionKey,
+        dataSourceType: meta.dataSourceType,
+        dataSourceName: meta.dataSourceName,
+        configJson: JSON.stringify(ensureWidgets(config)),
+        assignedUserIds: meta.assignedUserIds ?? [],
+      };
+      const report = await reportsApi.create(body);
+      get().setUi({ saveLoading: false, toast: { message: tr('common.saved'), variant: 'success' } });
+      return report;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.saveFailed');
+      get().setUi({ saveLoading: false, toast: { message: msg, variant: 'error' } });
+      return null;
+    }
+  },
+
+  updateReport: async () => {
+    const state = get();
+    const { meta, config } = state;
+    if (meta.id == null) return null;
+    if (!meta.name?.trim()) {
+      get().setUi({ toast: { message: tr('common.reportBuilder.messages.reportNameRequired'), variant: 'error' } });
+      return null;
+    }
+    if (!meta.connectionKey || !meta.dataSourceType || !meta.dataSourceName) {
+      get().setUi({ toast: { message: tr('common.reportBuilder.messages.connectionDatasetRequired'), variant: 'error' } });
+      return null;
+    }
+    get().setUi({ saveLoading: true });
+    try {
+      const body = {
+        name: meta.name.trim(),
+        description: meta.description,
+        connectionKey: meta.connectionKey,
+        dataSourceType: meta.dataSourceType,
+        dataSourceName: meta.dataSourceName,
+        configJson: JSON.stringify(ensureWidgets(config)),
+        assignedUserIds: meta.assignedUserIds ?? [],
+      };
+      const report = await reportsApi.update(meta.id, body);
+      get().setUi({ saveLoading: false, toast: { message: tr('common.updated'), variant: 'success' } });
+      return report;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.updateFailed');
+      get().setUi({ saveLoading: false, toast: { message: msg, variant: 'error' } });
+      return null;
+    }
+  },
+
+  loadReportById: async (id) => {
+    get().setUi({ checkLoading: true, error: null });
+    try {
+      const report = await reportsApi.get(id);
+      get().hydrateFromReportDetail(report);
+      await get().checkDataSource();
+      get().setUi({ checkLoading: false });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : tr('common.reportBuilder.messages.loadReportFailed');
+      get().setUi({ checkLoading: false, error: msg });
+    }
+  },
+
+  setUi: (patch) =>
+    set((s) => ({ ui: { ...s.ui, ...patch } })),
+
+  setPreview: (data) =>
+    set({ preview: data }),
+
+  reset: () => set({ ...initialState, meta: { ...defaultMeta }, ui: { ...defaultUi } }),
+}));

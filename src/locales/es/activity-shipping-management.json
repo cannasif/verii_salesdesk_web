@@ -1,0 +1,82 @@
+{
+ "activityType": {
+   "table": {
+     "title": "Shipping List",
+     "id": "ID",
+      "name": "Nombre de envío",
+      "description": "Descripción",
+      "createdDate": "Fecha de creación",
+      "createdBy": "Creado por",
+      "showing": "Mostrando {{from}}-{{to}} / {{total}}",
+      "page": "Página {{current}} / {{total}}"
+    },
+    "error": "Se produjo un error",
+    "create": "Agregar nuevo envío",
+    "loading": "Cargando...",
+    "noData": "Sin datos",
+    "actions": "Acciones",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "form": {
+      "addTitle": "Agregar nuevo envío",
+      "editTitle": "Editar envío",
+      "addDescription": "Ingrese la información de envío",
+      "editDescription": "Edite la información de envío",
+      "name": "Nombre de envío",
+      "namePlaceholder": "Ingrese nombre de envío",
+      "nameRequired": "El nombre de envío es obligatorio",
+      "nameMaxLength": "El nombre de envío puede tener hasta 100 caracteres",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ingrese descripción (opcional)",
+      "descriptionMaxLength": "La descripción puede tener hasta 500 caracteres"
+    },
+    "stats": {
+      "totalActivityTypes": "Total de envíos",
+      "activeActivityTypes": "Envíos activos",
+      "newThisMonth": "Nuevos este mes"
+    },
+    "messages": {
+      "createSuccess": "El envío se creó correctamente",
+      "createError": "No se pudo crear el envío",
+      "updateSuccess": "El envío se actualizó correctamente",
+      "updateError": "No se pudo actualizar el envío",
+      "deleteSuccess": "El envío se eliminó correctamente",
+      "deleteError": "No se pudo eliminar el envío"
+    }
+  },
+  "menu": "Gestión de envíos",
+  "description": "Gestione y edite las definiciones de envío",
+  "addButton": "Agregar nuevo envío",
+  "loading": "Cargando...",
+  "noData": "Sin datos",
+  "actions": "Acciones",
+  "edit": "Editar",
+  "deleteButton": "Eliminar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "saving": "Kaydediliyor...",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "advancedFilter": {
+    "columnName": "Nombre de envío",
+    "columnDescription": "Descripción",
+    "columnCreatedBy": "Creado por"
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Eliminar envío",
+    "confirmMessage": "¿Está seguro de que desea eliminar {{name}}?"
+  },
+  "messages": {
+    "deleteSuccess": "El envío se eliminó correctamente",
+    "deleteError": "No se pudo eliminar el envío"
+  },
+  "table": {
+    "title": "Lista de envíos",
+    "id": "ID",
+    "name": "Nombre de envío",
+    "description": "Descripción",
+    "createdDate": "Fecha de creación",
+    "createdBy": "Creado por"
+  }
+}

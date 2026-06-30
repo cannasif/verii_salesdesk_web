@@ -1,0 +1,82 @@
+{
+  "menu": "Gestion des Sujets d'Intérêt",
+  "description": "Gérer et modifier les sujets d'intérêt",
+  "addButton": "Ajouter un Nouveau Sujet",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée",
+  "actions": "Actions",
+  "edit": "Modifier",
+  "deleteButton": "Supprimer",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "saving": "Enregistrement...",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "advancedFilter": {
+    "columnName": "Nom du Sujet",
+    "columnDescription": "Description",
+    "columnCreatedBy": "Créé Par"
+  },
+  "activityType": {
+    "form": {
+      "addTitle": "Ajouter un Nouveau Sujet",
+      "editTitle": "Modifier le Sujet",
+      "addDescription": "Entrez les informations du nouveau sujet",
+      "editDescription": "Modifier les informations du sujet",
+      "name": "Nom du Sujet",
+      "namePlaceholder": "Entrez le nom du sujet",
+      "nameRequired": "Le nom du sujet est requis",
+      "nameMaxLength": "Le nom du sujet peut contenir au maximum 100 caractères",
+      "description": "Description",
+      "descriptionPlaceholder": "Entrez la description (facultatif)",
+      "descriptionMaxLength": "La description peut contenir au maximum 500 caractères"
+    },
+    "table": {
+      "title": "Liste des Sujets d'Intérêt",
+      "id": "ID",
+      "name": "Nom du Sujet",
+      "description": "Description",
+      "createdDate": "Date de Création",
+      "createdBy": "Créé Par",
+      "showing": "Affichage {{from}}-{{to}} / {{total}}",
+      "page": "Page {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Total des Sujets",
+      "activeActivityTypes": "Sujets Actifs",
+      "newThisMonth": "Nouveau ce Mois-ci"
+    },
+    "messages": {
+      "createSuccess": "Sujet créé avec succès",
+      "createError": "Échec de la création du sujet",
+      "updateSuccess": "Sujet mis à jour avec succès",
+      "updateError": "Échec de la mise à jour du sujet",
+      "deleteSuccess": "Sujet supprimé avec succès",
+      "deleteError": "Échec de la suppression du sujet"
+    },
+    "error": "Une erreur est survenue",
+    "create": "Ajouter un Nouveau Sujet",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée",
+    "actions": "Actions",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement..."
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Supprimer le Sujet",
+    "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+  },
+  "messages": {
+    "deleteSuccess": "Sujet supprimé avec succès",
+    "deleteError": "Échec de la suppression du sujet"
+  },
+  "table": {
+    "title": "Liste des Sujets d'Intérêt",
+    "id": "ID",
+    "name": "Nom du Sujet",
+    "description": "Description",
+    "createdDate": "Date de Création",
+    "createdBy": "Créé Par"
+  }
+}

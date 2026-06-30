@@ -1,0 +1,247 @@
+{
+  "title": "Müşteri 360",
+  "notFound": "Müşteri bulunamadı",
+  "error": "Bir hata oluştu",
+  "retry": "Tekrar Dene",
+  "quickActivity": "Hızlı Aktivite",
+  "currencyFilter": {
+    "label": "Para birimi",
+    "all": "Tümü"
+  },
+  "balanceDialog": {
+    "openButton": "Cari bakiye özeti",
+    "title": "Cari Bakiye Özeti",
+    "error": "ERP bakiye özeti yüklenemedi."
+  },
+  "tabs": {
+    "quotations": "Teklifler",
+    "orders": "Siparişler",
+    "activities": "Aktiviteler",
+    "overview": "Özet",
+    "analytics": "Çözümleme",
+    "quickQuotations": "Hızlı Teklifler",
+    "erpMovements": "ERP Hareket",
+    "erpOrders": "ERP Sipariş",
+    "mailLogs": "E-posta Geçmişi",
+    "images": "Görseller",
+    "imagesDefaultDescription": "Kartvizit Görseli"
+  },
+  "quickQuotations": {
+    "empty": "Bu cariye ait hızlı teklif bulunamadı",
+    "error": "Hızlı teklifler yüklenemedi",
+    "draft": "Taslak",
+    "converted": "Teklife Döndü",
+    "sentToApproval": "Onaya Gönderildi",
+    "notSentToApproval": "Onaya Gitmedi",
+    "currency": "Para Birimi",
+    "total": "Toplam",
+    "quotationStatus": "Teklif Durumu",
+    "approvalStep": "Onay Adımı",
+    "stepValue": "Adım {{step}}",
+    "convertedAt": "Dönüşüm: {{date}}",
+    "notConvertedYet": "Henüz teklife dönüşmedi",
+    "openQuotation": "Teklifi Aç"
+  },
+  "erpMovements": {
+    "title": "ERP Hareket",
+    "tableTitle": "Cari Hareketleri",
+    "error": "ERP hareket verileri yüklenemedi",
+    "columns": {
+      "date": "Tarih",
+      "dueDate": "Vade Tarihi",
+      "documentNo": "Belge No",
+      "description": "Açıklama",
+      "currency": "Para Birimi",
+      "debit": "Borç",
+      "credit": "Alacak",
+      "tlBalanceByDate": "Tarih Sıralı TL Bakiye",
+      "tlBalanceByDueDate": "Vade Sıralı TL Bakiye",
+      "fxDebit": "Döviz Borç",
+      "fxCredit": "Döviz Alacak",
+      "fxBalanceByDate": "Tarih Sıralı Döviz Bakiye",
+      "fxBalanceByDueDate": "Vade Sıralı Döviz Bakiye"
+    },
+    "summary": {
+      "totalDebit": "Toplam Borç",
+      "totalCredit": "Toplam Alacak",
+      "balance": "Bakiye",
+      "closed": "Kapalı"
+    }
+  },
+  "erpOrders": {
+    "title": "Netsis Siparişleri",
+    "noCariCode": "Bu müşteri için ERP cari kodu tanımlı değil. Netsis siparişleri görüntülenemez.",
+    "forbidden": "ERP siparişlerini görüntüleme yetkiniz yok.",
+    "error": "ERP siparişleri yüklenemedi.",
+    "empty": "Bu cari için Netsis siparişi bulunamadı.",
+    "scopeHint": "Liste, oturum açmış kullanıcının Netsis kapsamındaki siparişlerle sınırlıdır.",
+    "columns": {
+      "branch": "Şube",
+      "orderNo": "Sipariş No",
+      "date": "Tarih",
+      "deliveryDate": "Teslim",
+      "gross": "Brüt",
+      "vat": "KDV",
+      "total": "Toplam",
+      "salesRep": "Plasiyer"
+    }
+  },
+  "mail": {
+    "providers": {
+      "google": "Google",
+      "outlook": "Outlook"
+    },
+    "columns": {
+      "date": "Tarih",
+      "sender": "Gönderen",
+      "to": "Alıcı",
+      "subject": "Konu",
+      "status": "Durum",
+      "template": "Şablon",
+      "errorCode": "Hata Kodu",
+      "body": "Mesaj"
+    }
+  },
+  "kpi": {
+    "totalDemands": "Toplam Teklif",
+    "totalQuotations": "Toplam Teklif",
+    "totalOrders": "Toplam Sipariş",
+    "openQuotations": "Açık Teklif",
+    "openOrders": "Bekleyen Sipariş"
+  },
+  "sections": {
+    "contacts": "İletişimler",
+    "shippingAddresses": "Sevk Adresleri",
+    "recentDemands": "Son Talepler",
+    "recentQuotations": "Son Teklifler",
+    "recentOrders": "Son Siparişler",
+    "recentActivities": "Son Aktiviteler",
+    "timeline": "Zaman Çizelgesi"
+  },
+  "analytics": {
+    "error": "Analitik verileri yüklenemedi",
+    "last12MonthsOrderAmount": "Son 12 Ay Sipariş Tutarı",
+    "openQuotationAmount": "Açık Teklif Tutarı",
+    "openOrderAmount": "Açık Sipariş Tutarı",
+    "activityCount": "Aktivite Sayısı",
+    "lastActivityDate": "Son Aktivite Tarihi"
+  },
+  "analyticsCharts": {
+    "demand": "Teklif",
+    "quotation": "Teklif",
+    "order": "Sipariş",
+    "last12MonthsOrderAmount": "Son 12 Ay Sipariş",
+    "openQuotationAmount": "Açık Teklif",
+    "openOrderAmount": "Açık Sipariş",
+    "distributionTitle": "Dağılım",
+    "monthlyTrendTitle": "Aylık Eğilim",
+    "amountComparisonTitle": "Tutar Karşılaştırması"
+  },
+  "currencyTotals": {
+    "currency": "Para Birimi",
+    "demandAmount": "Teklif Tutarı",
+    "quotationAmount": "Teklif Tutarı",
+    "orderAmount": "Sipariş Tutarı"
+  },
+  "revenueQuality": {
+    "title": "Gelir Kalitesi",
+    "churnRisk": "Kayıp Riski",
+    "upsell": "Ek Satış Eğilimi",
+    "payment": "Ödeme Davranışı",
+    "segment": "RFM Gruplandırması",
+    "ltv": "Yaşam Boyu Değer"
+  },
+  "cohort": {
+    "title": "Kohort Tutma",
+    "empty": "Kohort verisi yok",
+    "cohortKey": "Kohort"
+  },
+  "actions": {
+    "title": "Önerilen Aksiyonlar",
+    "empty": "Önerilen aksiyon yok",
+    "execute": "Uygula"
+  },
+  "explain": {
+    "revenueQualityTitle": "Gelir kalitesi, müşterinin satış potansiyeli ve risk profilini özetler.",
+    "churnRisk": "Kayıp riski, müşterinin yeniden sipariş vermeme olasılığını gösterir.",
+    "upsellPropensity": "Ek satış eğilimi, müşterinin daha yüksek hacimli veya ek ürün alım potansiyelini gösterir.",
+    "paymentBehavior": "Ödeme davranışı, müşterinin tahsilat ve ödeme düzenini özetler.",
+    "rfmSegment": "RFM gruplandırması; yakınlık, sıklık ve tutar verilerine göre müşterinin grubunu gösterir.",
+    "modelNote": "Bu alanlar analitik model çıktılarıdır ve karar desteği amacıyla gösterilir.",
+    "cohortRetentionTitle": "Kohort tutma, benzer dönemde kazanılan müşterilerin zaman içindeki devamlılığını gösterir.",
+    "noCohortData": "Bu müşteri için yeterli kohort verisi bulunamadı.",
+    "recommendedActionsTitle": "Sistem tarafından önerilen aksiyonlar bu alanda listelenir.",
+    "executeAction": "Aksiyonu uygula"
+  },
+  "hero": {
+    "statusActive": "Aktif",
+    "statusCrm": "SalesDesk Kaydı",
+    "since": "{{year}}'den beri",
+    "whatsapp": "WhatsApp",
+    "call": "Ara",
+    "email": "E-posta",
+    "quickQuote": "Hızlı Teklif",
+    "editCustomer": "Müşteriyi Düzenle",
+    "none": "Yok",
+    "emailLabel": "E-posta",
+    "phoneLabel": "Telefon",
+    "websiteLabel": "Web Sitesi",
+    "addressLabel": "Adres",
+    "infoTitle": "Bilgiler",
+    "taxNumber": "Vergi No",
+    "customerType": "Müşteri Tipi",
+    "salesRep": "Satış Temsilcisi",
+    "creditLimit": "Kredi Limiti"
+  },
+  "related": {
+    "newQuotation": "Yeni Teklif",
+    "newOrder": "Yeni Sipariş",
+    "newActivity": "Yeni Aktivite",
+    "error": "Liste yüklenemedi",
+    "emptyQuotations": "Bu müşteriye ait teklif bulunamadı",
+    "emptyOrders": "Bu müşteriye ait sipariş bulunamadı",
+    "emptyActivities": "Bu müşteriye ait aktivite bulunamadı",
+    "columns": {
+      "offerNo": "No",
+      "date": "Tarih",
+      "representative": "Temsilci",
+      "total": "Tutar",
+      "subject": "Konu",
+      "type": "Tip",
+      "assignee": "Sorumlu",
+      "status": "Durum"
+    },
+    "activityStatus": {
+      "scheduled": "Planlandı",
+      "completed": "Tamamlandı",
+      "cancelled": "İptal"
+    }
+  },
+  "images": {
+    "upload": "Görsel Yükle",
+    "delete": "Sil",
+    "emptyHint": "Görsel eklemek için tıklayın veya sürükleyin",
+    "deleteConfirmTitle": "Görseli sil",
+    "deleteConfirmDescription": "Bu görseli silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+  },
+  "button": "Müşteri 360",
+  "status": {
+    "havenotstarted": "Başlamadı",
+    "notstarted": "Başlamadı",
+    "inprogress": "Onay Sürecinde",
+    "pending": "Beklemede",
+    "waiting": "Bekliyor",
+    "approved": "Onaylandı",
+    "rejected": "Reddedildi",
+    "completed": "Tamamlandı",
+    "cancelled": "İptal Edildi",
+    "canceled": "İptal Edildi",
+    "draft": "Taslak",
+    "converted": "Teklife Döndü",
+    "sent": "Gönderildi",
+    "active": "Aktif",
+    "passive": "Pasif",
+    "closed": "Kapalı",
+    "open": "Açık"
+  }
+}

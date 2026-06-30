@@ -1,0 +1,82 @@
+{
+  "menu": "Gestion des réunions",
+  "description": "Gérer et modifier les définitions de réunions",
+  "addButton": "Ajouter une nouvelle réunion",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée",
+  "actions": "Actions",
+  "edit": "Modifier",
+  "deleteButton": "Supprimer",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "saving": "Enregistrement...",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "advancedFilter": {
+    "columnName": "Nom de la réunion",
+    "columnDescription": "Description",
+    "columnCreatedBy": "Créé par"
+  },
+  "activityType": {
+    "create": "Ajouter une nouvelle réunion",
+    "loading": "Chargement...",
+    "noData": "Aucune donnée",
+    "actions": "Actions",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "error": "Une erreur est survenue",
+    "form": {
+      "addTitle": "Ajouter une nouvelle réunion",
+      "editTitle": "Modifier la réunion",
+      "addDescription": "Saisissez les nouvelles informations de réunion",
+      "editDescription": "Modifiez les informations de la réunion",
+      "name": "Nom de la réunion",
+      "namePlaceholder": "Saisissez le nom de la réunion",
+      "nameRequired": "Le nom de la réunion est obligatoire",
+      "nameMaxLength": "Le nom de la réunion peut contenir au maximum 100 caractères",
+      "description": "Description",
+      "descriptionPlaceholder": "Saisissez une description (optionnelle)",
+      "descriptionMaxLength": "La description peut contenir au maximum 500 caractères"
+    },
+    "table": {
+      "title": "Liste des réunions",
+      "id": "ID",
+      "name": "Nom de la réunion",
+      "description": "Description",
+      "createdDate": "Date de création",
+      "createdBy": "Créé par",
+      "showing": "Affichage {{from}}-{{to}} / {{total}}",
+      "page": "Page {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Total des réunions",
+      "activeActivityTypes": "Réunions actives",
+      "newThisMonth": "Nouvelles ce mois-ci"
+    },
+    "messages": {
+      "createSuccess": "La réunion a été créée avec succès",
+      "createError": "Échec de la création de la réunion",
+      "updateSuccess": "La réunion a été mise à jour avec succès",
+      "updateError": "Échec de la mise à jour de la réunion",
+      "deleteSuccess": "La réunion a été supprimée avec succès",
+      "deleteError": "Échec de la suppression de la réunion"
+    }
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Supprimer la réunion",
+    "confirmMessage": "Voulez-vous vraiment supprimer {{name}} ?"
+  },
+  "messages": {
+    "deleteSuccess": "La réunion a été supprimée avec succès",
+    "deleteError": "Échec de la suppression de la réunion"
+  },
+  "table": {
+    "title": "Liste des réunions",
+    "id": "ID",
+    "name": "Nom de la réunion",
+    "description": "Description",
+    "createdDate": "Date de création",
+    "createdBy": "Créé par"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "menu": "Hangfire İzleme",
+  "title": "Hangfire İzleme",
+  "description": "İş sağlık durumunu, başarısız işleri ve teslim edilemeyen kuyruğunu izleyin.",
+  "summary": {
+    "title": "Sistem özeti",
+    "description": "Recurring job sağlığı ve kuyruk davranışını hızlıca gör.",
+    "totalJobs": "Toplam recurring job",
+    "withQueue": "Aktif kuyruklar",
+    "withErrors": "Hatalı işler",
+    "help": "İstatistikler Hangfire sunucunuzun anlık görüntüsüdür; listeleri yenileyerek güncelleyin."
+  },
+  "refresh": "Yenile",
+  "stats": {
+    "enqueued": "Kuyrukta",
+    "processing": "İşleniyor",
+    "succeeded": "Başarılı",
+    "failed": "Başarısız"
+  },
+  "table": {
+    "jobId": "İş Kimliği",
+    "jobName": "İş",
+    "state": "Durum",
+    "time": "Zaman",
+    "reason": "Neden",
+    "queue": "Kuyruk",
+    "duration": "Süre",
+    "retryCount": "Tekrar",
+    "recurringJobId": "Zamanlanmış İş"
+  },
+  "succeeded": {
+    "title": "Başarılı İşler",
+    "empty": "Başarılı iş bulunamadı.",
+    "description": "Son başarıyla tamamlanan Hangfire işlerinin listesi."
+  },
+  "failed": {
+    "title": "Başarısız İşler",
+    "empty": "Başarısız iş bulunamadı.",
+    "total": "Toplam",
+    "description": "Hata ile sonuçlanan veya yeniden denemeyi bekleyen işler."
+  },
+  "deadLetter": {
+    "title": "Teslim Edilemeyen Kuyruğu",
+    "empty": "Teslim edilemeyen kuyruğu boş.",
+    "enqueued": "Kuyruktaki",
+    "description": "Tüketiciye iletilemeyen ve manuel inceleme gerektiren mesajlar."
+  },
+  "recurring": {
+    "title": "Zamanlanmış İşler",
+    "description": "Buradan kayıtlı Hangfire işlerini görebilir ve seçtiğin işi hemen tetikleyebilirsin.",
+    "selectLabel": "Çalıştırılacak iş",
+    "selectPlaceholder": "Bir job seç",
+    "triggerButton": "Şimdi çalıştır",
+    "triggerSuccess": "{{jobName}} işi tetiklendi.",
+    "triggerError": "Job tetiklenirken bir hata oluştu.",
+    "empty": "Henüz kayıtlı recurring job bulunamadı.",
+    "tableTitle": "Zamanlanmış işler",
+    "tableDescription": "Tüm tekrarlayan Hangfire işleri ve zamanlama bilgileri.",
+    "labels": {
+      "schedule": "Zamanlama",
+      "method": "Metot",
+      "error": "Hata var",
+      "healthy": "Sağlıklı"
+    },
+    "table": {
+      "id": "Job Kimliği",
+      "job": "İş",
+      "cron": "Zamanlama",
+      "nextExecution": "Sonraki çalışma",
+      "lastExecution": "Son çalışma",
+      "queue": "Kuyruk"
+    }
+  }
+}

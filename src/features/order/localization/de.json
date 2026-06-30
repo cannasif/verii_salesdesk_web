@@ -1,0 +1,63 @@
+{
+  "lines": {
+    "doubleClickToEdit": "Zum Bearbeiten doppelklicken",
+    "unit": "Einheit",
+    "descriptionTooltipText": "Zeilenbezogene Produktionsnotiz. Bei der ERP-Übertragung gilt die Netsis-Zuordnung: Beschreibung 1 -> Zusatzfeld 1, Beschreibung 2 -> Zusatzfeld 2, Beschreibung 3 -> Zeilen-Zusatzbeschreibung 7.",
+    "profileErpTooltip": "Diese Profil-Auswahl wird bei der ERP-Übertragung als Netsis Zeilen-Zusatzfeld 2 / Zeilen-Zusatzbeschreibung 2 gespeichert.",
+    "rebarErpTooltip": "Diese Eisen-Auswahl wird bei der ERP-Übertragung als Netsis Zeilen-Zusatzbeschreibung 3 gespeichert.",
+    "screwErpTooltip": "Diese Schrauben-Auswahl wird bei der ERP-Übertragung als Netsis Zeilen-Zusatzbeschreibung 4 gespeichert.",
+    "printErpTooltip": "Diese Druck-Auswahl wird bei der ERP-Übertragung als Netsis Zeilen-Zusatzbeschreibung 8 gespeichert. Die Drucknotiz geht außerdem an Netsis Zeilenbeschreibung 9 und Zeilen-Zusatzbeschreibung 9.",
+    "lineItemDescriptionPlaceholder": "Zeilenbasierte Artikelbeschreibung"
+  },
+  "notes": {
+    "notesTooltipText": "Versand-/Rechnungsnotizen für die gesamte Bestellung. Sie werden der Reihe nach in Netsis Bestellkopf Zusatzbeschreibung 1-5 gespeichert; Notiz 2 geht an Netsis Zusatzbeschreibung 2."
+  },
+  "erpOrder": {
+    "title": "ERP-Bestellliste",
+    "description": "Netsis-Bestellköpfe und Positionen anzeigen, die für den angemeldeten Benutzer sichtbar sind.",
+    "currentUserScope": "Bereich des angemeldeten Benutzers",
+    "searchPlaceholder": "Bestellnummer, Kunde, Vertreter oder Datum suchen...",
+    "loading": "ERP-Bestellungen werden geladen...",
+    "loadError": "ERP-Bestellungen konnten nicht geladen werden.",
+    "noData": "Keine ERP-Bestellungen gefunden.",
+    "detailAction": "Details",
+    "detailTitle": "Details zur Bestellung {{orderNo}}",
+    "unknownCustomer": "Kein Kundenname",
+    "lineCount": "{{count}} Positionen",
+    "linesLoading": "Bestellpositionen werden geladen...",
+    "lineLoadError": "Bestellpositionen konnten nicht geladen werden.",
+    "noLines": "Für diese Bestellung wurden keine Positionen gefunden.",
+    "table": {
+      "title": "Bestellkopfinformationen",
+      "branchCode": "Filiale",
+      "orderNo": "Bestellnr.",
+      "customerCode": "Kundencode",
+      "customerName": "Kundenname",
+      "date": "Datum",
+      "deliveryDate": "Lieferdatum",
+      "grossTotal": "Bruttobetrag",
+      "vat": "MwSt.",
+      "grandTotal": "Gesamtsumme",
+      "salesRepCode": "Vertreter"
+    },
+    "lines": {
+      "rowNo": "Zeile",
+      "stockCode": "Artikelcode",
+      "stockName": "Artikelname",
+      "quantity": "Menge",
+      "unit": "Einheit",
+      "netPrice": "Nettopreis",
+      "vatRate": "MwSt.-Satz",
+      "warehouseCode": "Lager"
+    }
+  },
+  "header": {
+    "notes": "Notizen",
+    "descriptionErpTooltip": "Allgemeine Produktionsnotiz für die gesamte Bestellung. Bei der ERP-Übertragung wird sie im Netsis Bestellkopf-Feld Beschreibung (FatUst.Aciklama) gespeichert.",
+    "ozelKod1": "Sondercode 1",
+    "ozelKod1Placeholder": "Sondercode 1 auswählen",
+    "ozelKod2": "Sondercode 2",
+    "ozelKod2Placeholder": "Sondercode 2 auswählen",
+    "specialCodeSearchPlaceholder": "Sondercode suchen..."
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Müşteri Seç",
+  "description": "Tüm müşterilerde ERP ve potansiyel etiketleriyle ayırt edebilirsiniz; yalnızca potansiyel listesi için diğer sekmeyi kullanın.",
+  "badgeKindErp": "ERP",
+  "badgeKindPotential": "Potansiyel",
+  "erpCustomers": "ERP",
+  "crmCustomers": "SalesDesk Müşterileri",
+  "potentialCustomers": "Potansiyel",
+  "allCustomers": "Tümü",
+  "erp": "ERP",
+  "crm": "CRM",
+  "noErpCustomers": "ERP müşterisi bulunamadı",
+  "noCrmCustomers": "SalesDesk müşterisi bulunamadı",
+  "noPotentialCustomers": "Potansiyel müşteri bulunamadı",
+  "noCustomers": "Müşteri bulunamadı",
+  "noResults": "Arama sonucu bulunamadı",
+  "searchPlaceholder": "İsim veya kod ile ara...",
+  "voiceSearch": "Sesli arama",
+  "loading": "Yükleniyor",
+  "table": {
+    "type": "Tip",
+    "customerCode": "Müşteri Kodu",
+    "customerName": "Müşteri Adı",
+    "phone": "Telefon",
+    "city": "Şehir",
+    "email": "E-posta"
+  }
+}

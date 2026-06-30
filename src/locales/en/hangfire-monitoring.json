@@ -1,0 +1,74 @@
+{
+  "menu": "Hangfire Monitoring",
+  "title": "Hangfire Monitoring",
+  "description": "Observe job health, failed jobs and dead-letter queue.",
+  "summary": {
+    "title": "System summary",
+    "description": "Quick view of recurring job health and queue behavior.",
+    "totalJobs": "Total recurring jobs",
+    "withQueue": "Active queues",
+    "withErrors": "Jobs with errors",
+    "help": "Statistics reflect your Hangfire server snapshot; refresh lists to update."
+  },
+  "refresh": "Refresh",
+  "stats": {
+    "enqueued": "Enqueued",
+    "processing": "Processing",
+    "succeeded": "Succeeded",
+    "failed": "Failed"
+  },
+  "table": {
+    "jobId": "Job ID",
+    "jobName": "job",
+    "state": "State",
+    "time": "Time",
+    "reason": "Reason",
+    "queue": "Queue",
+    "duration": "Duration",
+    "retryCount": "Retry",
+    "recurringJobId": "Recurring Job"
+  },
+  "succeeded": {
+    "title": "Succeeded Jobs",
+    "empty": "No succeeded jobs found.",
+    "description": "Recently completed Hangfire jobs."
+  },
+  "failed": {
+    "title": "Failed Jobs",
+    "empty": "No failed jobs found.",
+    "total": "Total",
+    "description": "Jobs that failed or await retry."
+  },
+  "deadLetter": {
+    "title": "Dead-Letter Queue",
+    "empty": "Dead-letter queue is empty.",
+    "enqueued": "Enqueued",
+    "description": "Messages not delivered to workers; needs manual review."
+  },
+  "recurring": {
+    "title": "Recurring Jobs",
+    "description": "View registered Hangfire jobs here and trigger the selected job immediately.",
+    "selectLabel": "Job to run",
+    "selectPlaceholder": "Select a job",
+    "triggerButton": "Run now",
+    "triggerSuccess": "{{jobName}} has been triggered.",
+    "triggerError": "An error occurred while triggering the job.",
+    "empty": "No recurring jobs found yet.",
+    "tableTitle": "Recurring jobs",
+    "tableDescription": "All recurring Hangfire jobs and schedule details.",
+    "labels": {
+      "schedule": "Schedule",
+      "method": "Method",
+      "error": "Has error",
+      "healthy": "Healthy"
+    },
+    "table": {
+      "id": "Job ID",
+      "job": "Job",
+      "cron": "Schedule",
+      "nextExecution": "Next run",
+      "lastExecution": "Last run",
+      "queue": "Queue"
+    }
+  }
+}

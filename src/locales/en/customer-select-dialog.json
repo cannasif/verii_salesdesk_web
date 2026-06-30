@@ -1,0 +1,28 @@
+{
+  "title": "Select Customer",
+  "description": "In “All”, customers are labeled as ERP or potential. Use the other tab for potential customers only.",
+  "badgeKindErp": "ERP",
+  "badgeKindPotential": "Potential",
+  "erpCustomers": "ERP",
+  "crmCustomers": "SalesDesk Customers",
+  "potentialCustomers": "Potential",
+  "allCustomers": "All",
+  "erp": "ERP",
+  "crm": "CRM",
+  "noErpCustomers": "No ERP customers found",
+  "noCrmCustomers": "No SalesDesk customers found",
+  "noPotentialCustomers": "No potential customers found",
+  "noCustomers": "No customers found",
+  "noResults": "No search results found",
+  "searchPlaceholder": "Search by name or code...",
+  "voiceSearch": "Voice search",
+  "loading": "Loading",
+  "table": {
+    "type": "Type",
+    "customerCode": "Customer Code",
+    "customerName": "Customer Name",
+    "phone": "Phone",
+    "city": "City",
+    "email": "Email"
+  }
+}

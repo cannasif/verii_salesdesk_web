@@ -1,0 +1,82 @@
+{
+  "activityType": {
+    "table": {
+      "title": "Lieferungsliste",
+      "id": "ID",
+      "name": "Lieferungsname",
+      "description": "Beschreibung",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "showing": "Zeigt {{from}}-{{to}} von {{total}}",
+      "page": "Seite {{current}} / {{total}}"
+    },
+    "error": "Fehler ist aufgetreten",
+    "create": "Neue Lieferung hinzufügen",
+    "loading": "Wird geladen...",
+    "noData": "Keine Daten gefunden",
+    "actions": "Aktionen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert...",
+    "form": {
+      "addTitle": "Neue Lieferung hinzufügen",
+      "editTitle": "Lieferung bearbeiten",
+      "addDescription": "Geben Sie neue Versandinformationen ein",
+      "editDescription": "Versandinformationen bearbeiten",
+      "name": "Lieferungsname",
+      "namePlaceholder": "Lieferungsname eingeben",
+      "nameRequired": "Lieferungsname ist erforderlich",
+      "nameMaxLength": "Lieferungsname darf höchstens 100 Zeichen haben",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+      "descriptionMaxLength": "Beschreibung darf höchstens 500 Zeichen haben"
+    },
+    "stats": {
+      "totalActivityTypes": "Gesamte Lieferungen",
+      "activeActivityTypes": "Aktive Lieferungen",
+      "newThisMonth": "Neu diesen Monat"
+    },
+    "messages": {
+      "createSuccess": "Lieferung erfolgreich erstellt",
+      "createError": "Lieferung konnte nicht erstellt werden",
+      "updateSuccess": "Lieferung erfolgreich aktualisiert",
+      "updateError": "Lieferung konnte nicht aktualisiert werden",
+      "deleteSuccess": "Lieferung erfolgreich gelöscht",
+      "deleteError": "Lieferung konnte nicht gelöscht werden"
+    }
+  },
+  "menu": "Versandverwaltung",
+  "description": "Verwalten und bearbeiten Sie Versanddefinitionen",
+  "addButton": "Neue Lieferung hinzufügen",
+  "loading": "Wird geladen...",
+  "noData": "Keine Daten gefunden",
+  "actions": "Aktionen",
+  "edit": "Bearbeiten",
+  "deleteButton": "Löschen",
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Kaydediliyor...",
+  "previous": "Zurück",
+  "next": "Weiter",
+  "advancedFilter": {
+    "columnName": "Lieferungsname",
+    "columnDescription": "Beschreibung",
+    "columnCreatedBy": "Erstellt von"
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Lieferung löschen",
+    "confirmMessage": "Sind Sie sicher, dass Sie {{name}} löschen möchten?"
+  },
+  "messages": {
+    "deleteSuccess": "Lieferung erfolgreich gelöscht",
+    "deleteError": "Lieferung konnte nicht gelöscht werden"
+  },
+  "table": {
+    "title": "Lieferungsliste",
+    "id": "ID",
+    "name": "Lieferungsname",
+    "description": "Beschreibung",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von"
+  }
+}

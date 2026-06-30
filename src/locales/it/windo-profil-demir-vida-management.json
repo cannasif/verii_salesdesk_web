@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "Definizioni Windoform",
+    "description": "Gestisci profili, ferri, viti e stampa utilizzando lo stesso schema a tabella di altre schermate di definizione.",
+    "documentTitle": "Definizioni Windoform"
+  },
+  "sections": {
+    "profil": {
+      "title": "Definizioni profilo",
+      "description": "Gestisci le opzioni del profilo selezionabili nelle righe dei documenti."
+    },
+    "demir": {
+      "title": "Definizioni ferro",
+      "description": "Gestisci le opzioni del ferro selezionabili nelle righe dei documenti."
+    },
+    "vida": {
+      "title": "Definizioni vite",
+      "description": "Gestisci le opzioni della vite selezionabili nelle righe dei documenti."
+    },
+    "baski": {
+      "title": "Definizioni di stampa",
+      "description": "Gestisci le opzioni di stampa selezionabili sulle righe del documento."
+    },
+    "koliBaski": {
+      "title": "Definizioni di stampa pacchetti",
+      "description": "Gestisci le opzioni di stampa dei pacchetti selezionate nell'intestazione del preventivo e inviate alla descrizione dell'intestazione Netsis."
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nome",
+    "profilName": "Profilo",
+    "createdDate": "Creato il",
+    "updatedDate": "Aggiornato il",
+    "newRecord": "Nuovo record",
+    "searchPlaceholder": "Cerca definizioni...",
+    "refresh": "Aggiorna",
+    "loading": "Caricamento definizioni...",
+    "empty": "Nessun record trovato.",
+    "actions": "Azioni",
+    "previous": "Precedente",
+    "next": "Successivo",
+    "pagination": "Mostrando {{from}}-{{to}} di {{total}} record",
+    "filterName": "Nome",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "Aggiungi nuovo profilo",
+    "addNewRebar": "Aggiungi nuova armatura",
+    "addNewScrew": "Aggiungi nuova vite",
+    "addNewPrint": "Aggiungi nuova stampa",
+    "addNewKoliBaski": "Aggiungi nuova stampa imballaggio",
+    "editTitle": "Modifica {{section}}",
+    "addTitle": "Aggiungi {{section}}",
+    "nameLabel": "Nome",
+    "profilLabel": "Profilo collegato",
+    "profilPlaceholder": "Seleziona un profilo",
+    "profilSearchPlaceholder": "Cerca profilo",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "demirNameLabel": "Nome ferro",
+    "demirNamePlaceholder": "Nome ferro collegato",
+    "vidaNameLabel": "Nome vite",
+    "vidaNamePlaceholder": "Nome vite collegata"
+  },
+  "validation": {
+    "nameRequired": "Il nome è obbligatorio",
+    "profilRequired": "La selezione di un profilo è obbligatoria"
+  },
+  "toasts": {
+    "created": "Record {{section}} creato",
+    "updated": "Record {{section}} aggiornato",
+    "deleted": "Record {{section}} eliminato"
+  }
+}

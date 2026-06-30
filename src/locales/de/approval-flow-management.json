@@ -1,0 +1,99 @@
+{
+  "approvalFlow": {
+    "menu": "Genehmigungsablauf-Verwaltung",
+    "description": "Genehmigungsabläufe verwalten und bearbeiten",
+    "addButton": "Neuen Genehmigungsablauf hinzufügen",
+    "table": {
+      "id": "ID",
+      "documentType": "Dokumententyp",
+      "description": "Beschreibung",
+      "isActive": "Aktiv",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "actions": "Aktionen",
+      "showing": "Zeige {{from}}-{{to}} / {{total}}",
+      "page": "Seite {{current}} / {{total}}",
+      "title": "Genehmigungsflüsse"
+    },
+    "form": {
+      "addTitle": "Neuen Genehmigungsablauf hinzufügen",
+      "editTitle": "Genehmigungsablauf bearbeiten",
+      "addDescription": "Neue Genehmigungsablauf-Informationen eingeben",
+      "editDescription": "Bearbeiten Sie die Informationen des Genehmigungsablaufs",
+      "documentType": "Dokumententyp",
+      "selectDocumentType": "Dokumententyp auswählen",
+      "noDocumentTypeSelected": "Kein Dokumententyp ausgewählt",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+      "isActive": "Aktiv",
+      "isActiveDescription": "Status des Genehmigungsablaufs",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichern...",
+      "documentTypeRequired": "Auswahl des Dokumententyps ist erforderlich",
+      "descriptionMaxLength": "Die Beschreibung darf höchstens 200 Zeichen lang sein"
+    },
+    "loading": "Wird geladen...",
+    "noData": "Keine Daten",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "delete": {
+      "action": "Löschen",
+      "cancel": "Abbrechen",
+      "confirmTitle": "Genehmigungsablauf löschen",
+      "confirmMessage": "Möchten Sie diesen Genehmigungsablauf wirklich löschen?",
+      "title": "Genehmigungsablauf löschen",
+      "confirm": "Möchten Sie diesen Genehmigungsablauf wirklich löschen?"
+    },
+    "documentType": {
+      "offer": "Angebot",
+      "request": "Anfrage",
+      "order": "Bestellung",
+      "demand": "Anfrage",
+      "quotation": "Angebot"
+    },
+    "advancedFilter": {
+      "columnDocumentType": "Dokumententyp",
+      "columnDescription": "Beschreibung",
+      "columnIsActive": "Aktiv",
+      "columnCreatedBy": "Erstellt von"
+    },
+    "messages": {
+      "deleteSuccess": "Der Genehmigungsablauf wurde erfolgreich gelöscht",
+      "deleteError": "Beim Löschen des Genehmigungsablaufs ist ein Fehler aufgetreten"
+    },
+    "error": "Ein Fehler ist aufgetreten",
+    "steps": "Ablaufschritte"
+  },
+  "approvalFlowStep": {
+    "title": "Ablaufschritte",
+    "addButton": "Schritt hinzufügen",
+      "empty": "Noch keine Schritte hinzugefügt",
+      "unknownRoleGroup": "Keine Rollengruppe",
+      "stepDescription": "Genehmigungsreihenfolge: {{order}}",
+    "deleteDialog": {
+      "title": "Schritt löschen",
+      "description": "Möchten Sie diesen Schritt wirklich löschen?",
+      "confirm": "Löschen",
+      "cancel": "Abbrechen"
+    },
+    "form": {
+      "addTitle": "Neuen Schritt hinzufügen",
+      "editTitle": "Schritt bearbeiten",
+      "addDescription": "Neuen Schritt zum Fluss hinzufügen",
+      "editDescription": "Ablaufschritt bearbeiten",
+      "approvalRoleGroup": "Rollengruppe",
+      "selectRoleGroup": "Rollengruppe auswählen",
+      "noRoleGroupSelected": "Keine Rollengruppe ausgewählt",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichern...",
+      "approvalRoleGroupIdRequired": "Auswahl der Rollengruppe ist erforderlich"
+    },
+    "messages": {
+      "deleteConfirm": "Möchten Sie diesen Schritt wirklich löschen?"
+    }
+  }
+}

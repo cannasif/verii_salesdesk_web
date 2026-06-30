@@ -1,0 +1,522 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Chiave univoca usata dai guard di route e pagina. Preferire snake_case stabile o notazione con punti.",
+      "name": "Nome visualizzato agli amministratori durante la gestione dei permessi.",
+      "description": "Descrizione interna facoltativa di questo permesso.",
+      "isActive": "I permessi inattivi non vengono considerati nel calcolo dell’accesso.",
+      "save": "Le modifiche influiscono sui flussi di autorizzazione di ruoli e gruppi."
+    },
+    "permissionGroup": {
+      "name": "Nome del gruppo per identificarlo nell’assegnazione agli utenti.",
+      "isSystemAdmin": "I membri di questo gruppo accedono a tutte le pagine e azioni senza controlli individuali sui permessi.",
+      "isActive": "I gruppi inattivi non dovrebbero essere assegnati per nuove decisioni di accesso.",
+      "permissions": "I permessi selezionati definiscono a cosa possono accedere i membri del gruppo.",
+      "save": "Aggiorna l’accesso effettivo per tutti gli utenti assegnati a questo gruppo."
+    },
+    "userAssignment": {
+      "user": "Seleziona l’utente di cui vuoi gestire l’ambito di accesso.",
+      "groups": "L’utente riceve i permessi combinati di tutti i gruppi selezionati.",
+      "save": "Le assegnazioni hanno effetto immediato per i successivi controlli di autorizzazione. Potrebbe essere necessario aggiornare la sessione.",
+      "systemAdminNote": "Se l’utente appartiene a un gruppo amministratore di sistema, i permessi dettagliati vengono ignorati."
+    },
+    "userVisibilityAssignment": {
+      "user": "Seleziona l’utente la cui visibilità per le entità vuoi gestire.",
+      "policy": "Seleziona una policy attiva per entità o lascia vuoto."
+    },
+    "visibilityPolicy": {
+      "code": "Usa un codice univoco così la policy è riconoscibile nei flussi di assegnazione e audit.",
+      "name": "Nome visibile mostrato agli amministratori durante la gestione della policy.",
+      "includeSelf": "Se attivo, i record propri dell’utente rimangono visibili in questo ambito.",
+      "isActive": "Le policy inattive sono escluse da nuove assegnazioni e decisioni di accesso."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Definizioni permessi",
+    "description": "Gestisci i codici permesso usati nel sistema",
+    "add": "Aggiungi definizione",
+    "form": {
+      "editTitle": "Modifica definizione permesso",
+      "addTitle": "Aggiungi definizione permesso",
+      "editDescription": "Aggiorna i dettagli della definizione",
+      "addDescription": "Crea una nuova definizione permesso",
+      "code": "Codice",
+      "codePlaceholder": "Seleziona un codice",
+      "affectedRoutes": "Pagine interessate",
+      "affectedRoutesNone": "Nessuna route corrispondente per questo codice",
+      "name": "Nome",
+      "namePlaceholder": "Nome visualizzato",
+      "availableOnWeb": "Disponibile sul web",
+      "availableOnWebHint": "Questo permesso può essere usato per menu, pagine e azioni nell’app web.",
+      "availableOnMobile": "Disponibile su mobile",
+      "availableOnMobileHint": "Questo permesso può essere usato per menu, schermate e azioni nell’app mobile.",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione facoltativa",
+      "isActive": "Attivo",
+      "codeSearchPlaceholder": "Cerca...",
+      "codeEmpty": "Nessun risultato"
+    },
+    "table": {
+      "title": "Definizioni permessi",
+      "code": "Codice",
+      "name": "Nome",
+      "platform": "Piattaforma",
+      "isActive": "Attivo",
+      "updatedDate": "Aggiornato",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "platform": {
+      "web": "Web",
+      "mobile": "Mobile",
+      "both": "Web + Mobile"
+    },
+    "delete": {
+      "confirmTitle": "Elimina definizione permesso",
+      "confirmMessage": "Eliminare «{{name}}»? Questa azione non può essere annullata."
+    },
+    "syncFromRoutes": "Sincronizza dalle route"
+  },
+  "permissionGroups": {
+    "title": "Gruppi permessi",
+    "description": "Gestisci i gruppi permesso e le assegnazioni",
+    "systemAdminLocked": "Il gruppo amministratore di sistema non può essere modificato",
+    "add": "Aggiungi gruppo",
+    "selectAll": "Seleziona tutto",
+    "noDefinitions": "Nessuna definizione permesso disponibile",
+    "form": {
+      "editTitle": "Modifica gruppo permessi",
+      "addTitle": "Aggiungi gruppo permessi",
+      "editDescription": "Aggiorna i dettagli del gruppo",
+      "addDescription": "Crea un nuovo gruppo permessi",
+      "name": "Nome",
+      "namePlaceholder": "Nome gruppo",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione facoltativa",
+      "isSystemAdmin": "Amministratore di sistema",
+      "isActive": "Attivo",
+      "permissions": "Permessi"
+    },
+    "table": {
+      "title": "Gruppi permessi",
+      "name": "Nome",
+      "isSystemAdmin": "Amministratore di sistema",
+      "isActive": "Attivo",
+      "permissionCount": "Permessi",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "managePermissions": "Gestisci permessi",
+    "permissionsPanel": {
+      "title": "Modifica permessi del gruppo",
+      "description": "Seleziona i permessi per questo gruppo",
+      "currentCodes": "Codici permesso attuali",
+      "screen": "Schermata / area permessi",
+      "groupedRows": "Aree permesso",
+      "actionsMapped": "Permessi",
+      "actions": {
+        "create": "Crea",
+        "read": "Leggi",
+        "update": "Aggiorna",
+        "delete": "Elimina",
+        "other": "Altro"
+      }
+    },
+    "delete": {
+      "confirmTitle": "Elimina gruppo permessi",
+      "confirmMessage": "Eliminare «{{name}}»? Questa azione non può essere annullata."
+    },
+    "search": "Cerca..."
+  },
+  "userGroupAssignments": {
+    "title": "Assegnazioni utente ai gruppi",
+    "description": "Assegna gruppi permesso agli utenti",
+    "selectUser": "Seleziona utente",
+    "selectUserPlaceholder": "Cerca e seleziona utente...",
+    "selectUserHint": "Seleziona un utente per gestire le assegnazioni ai gruppi",
+    "assignedGroups": "Gruppi permesso assegnati",
+    "noUsers": "Nessun utente trovato",
+    "noGroups": "Nessun gruppo permesso disponibile",
+    "selectAll": "Seleziona tutto"
+  },
+  "userVisibilityAssignments": {
+    "title": "Assegnazioni visibilità utente",
+    "description": "Gestisci assegnazioni policy di visibilità per utente e entità",
+    "selectUser": "Seleziona utente",
+    "selectedUser": "Utente selezionato",
+    "selectUserPlaceholder": "Cerca e seleziona utente...",
+    "selectUserHint": "Seleziona un utente per gestire assegnazioni visibilità",
+    "assignedPolicies": "Policy assegnate",
+    "status": "Stato",
+    "ready": "Aggiornato",
+    "unassigned": "Non assegnato",
+    "cardDescription": "Seleziona la policy visibilità applicata ai record {{entity}} di questo utente.",
+    "selectPolicyPlaceholder": "Seleziona policy",
+    "noPolicy": "Nessuna policy"
+  },
+  "visibilityPolicies": {
+    "title": "Policy di visibilità",
+    "description": "Gestisci insiemi policy che definiscono chi può vedere quali record",
+    "add": "Aggiungi policy",
+    "search": "Cerca policy...",
+    "table": {
+      "title": "Elenco policy di visibilità",
+      "code": "Codice",
+      "name": "Nome",
+      "entityType": "Entità",
+      "scopeType": "Ambito",
+      "includeSelf": "Includi se stesso",
+      "isActive": "Attivo",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "stats": {
+      "total": "Totale policy",
+      "active": "Policy attive",
+      "entities": "Tipi entità"
+    },
+    "form": {
+      "addTitle": "Aggiungi policy visibilità",
+      "editTitle": "Modifica policy visibilità",
+      "addDescription": "Crea una nuova policy di visibilità",
+      "editDescription": "Aggiorna la policy di visibilità selezionata",
+      "code": "Codice",
+      "codePlaceholder": "example.quotation.team",
+      "name": "Nome",
+      "namePlaceholder": "Visibilità preventivo team",
+      "entityType": "Entità",
+      "entityTypePlaceholder": "Seleziona entità",
+      "scopeType": "Ambito",
+      "scopeTypePlaceholder": "Seleziona ambito",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione breve facoltativa",
+      "includeSelf": "Includi record propri",
+      "isActive": "Attivo",
+      "summaryTitle": "Riepilogo policy",
+      "summary": "L’ambito {{scope}} verrà applicato ai record {{entity}}."
+    },
+    "scope": {
+      "self": "Solo proprio",
+      "managerHierarchy": "Gerarchia manager",
+      "permissionGroup": "Gruppo permessi",
+      "company": "Azienda"
+    },
+    "entity": {
+      "activity": "Attività",
+      "quotation": "Preventivo",
+      "demand": "Richiesta",
+      "order": "Ordine",
+      "salesman360": "KPI venditore"
+    }
+  },
+  "visibilitySimulator": {
+    "title": "Simulatore visibilità",
+    "description": "Verifica quali record e override di approvazione sono visibili per utente ed entità selezionati.",
+    "selectUser": "Utente",
+    "helpUser": "Seleziona l’utente per simulare la visibilità.",
+    "selectUserPlaceholder": "Seleziona utente...",
+    "selectEntity": "Entità",
+    "helpEntity": "Seleziona il modulo per cui simulare la visibilità dei record.",
+    "selectEntityPlaceholder": "Seleziona entità",
+    "recordId": "ID record",
+    "recordIdPlaceholder": "es. 125",
+    "helpRecordId": "Inserisci un ID record per verificare se view, update, delete e approve sono consentiti.",
+    "selectedUser": "Utente selezionato",
+    "entity": "Entità",
+    "visibleUsers": "Utenti visibili",
+    "approvalOverrides": "Record override approvazione",
+    "visibleUsersTitle": "Utenti nel perimetro",
+    "policyDefined": "Policy definita",
+    "noPolicy": "Nessuna policy",
+    "companyWide": "Accesso aziendale",
+    "policyActive": "È applicata una policy visibilità attiva",
+    "includeSelf": "incluso se stesso",
+    "awaitingSelection": "Seleziona prima utente ed entità",
+    "overrideTitle": "Record override approvazione attivi",
+    "noOverrides": "Nessun record override approvazione attivo trovato",
+    "overrideRecord": "Record #{{id}}",
+    "auditTitle": "Audit override approvazione",
+    "noAudit": "Nessuna voce audit override attiva trovata",
+    "auditActionId": "Azione approvazione",
+    "auditRequestId": "Richiesta approvazione",
+    "auditFlow": "Flusso",
+    "auditApprover": "Approvatore",
+    "auditStepValue": "Passo {{step}} / attuale {{currentStep}}",
+    "actionPanelTitle": "Simulazione azioni per record",
+    "noRecordSimulation": "Inserendo un record ID appaiono i risultati di view/update/delete/approve.",
+    "actionAllowed": "Consentito",
+    "actionDenied": "Negato",
+    "action": {
+      "view": "Visualizza",
+      "update": "Aggiorna",
+      "delete": "Elimina",
+      "approve": "Approva"
+    }
+  },
+  "auditLogs": {
+    "title": "Log audit",
+    "description": "Traccia chi ha eseguito azioni critiche, con quale trace e con quale risultato.",
+    "search": "Cerca log audit...",
+    "results": {
+      "success": "Successo",
+      "succeeded": "Riuscito",
+      "warning": "Avviso",
+      "partial": "Parziale",
+      "error": "Errore",
+      "failed": "Fallito"
+    },
+    "filters": {
+      "result": "Risultato",
+      "actionType": "Azione",
+      "entityType": "Entità",
+      "entityId": "ID record",
+      "performedByUserEmail": "Eseguito da",
+      "source": "Fonte",
+      "branchCode": "Sede",
+      "requestPath": "Percorso richiesta",
+      "requestMethod": "Metodo",
+      "createdDate": "Data"
+    },
+    "clearTraceFilter": "Cancella filtro trace",
+    "viewDetail": "Dettaglio",
+    "filterTrace": "Filtra trace",
+    "loadError": "Impossibile caricare i log audit",
+    "stats": {
+      "total": "Totale record",
+      "errors": "Errori",
+      "traces": "Trace attive"
+    },
+    "table": {
+      "title": "Elenco log audit",
+      "createdDate": "Data",
+      "traceId": "Trace ID",
+      "actionType": "Azione",
+      "entityType": "Entità",
+      "entityId": "ID record",
+      "result": "Risultato",
+      "source": "Fonte",
+      "performedBy": "Eseguito da",
+      "branchCode": "Sede",
+      "requestPath": "Percorso richiesta",
+      "requestMethod": "Metodo",
+      "showing": "{{from}}-{{to}} / {{total}}"
+    },
+    "detail": {
+      "title": "Dettaglio log audit",
+      "description": "Ispeziona contesto richiesta e riepilogo modifiche del record selezionato.",
+      "contextTitle": "Contesto azione",
+      "requestTitle": "Riepilogo richiesta",
+      "reason": "Motivo",
+      "failureReason": "Dettaglio errore",
+      "changedFieldsTitle": "Campi modificati",
+      "noChangedFields": "Nessuna differenza di campo disponibile per questo record.",
+      "oldValuesTitle": "Valori precedenti",
+      "newValuesTitle": "Nuovi valori"
+    },
+    "traceDrillDown": {
+      "traceId": "Trace selezionata",
+      "startedAt": "Iniziato il",
+      "completedAt": "Completato il",
+      "entities": "Entità toccate",
+      "timelineTitle": "Riepilogo flusso trace",
+      "openTrace": "Apri questa trace"
+    }
+  },
+  "common": {
+    "cancel": "Annulla",
+    "saving": "Salvataggio...",
+    "save": "Salva e applica",
+    "loading": "Caricamento...",
+    "search": "Cerca...",
+    "noData": "Nessun dato",
+    "actions": "Azioni",
+    "yes": "Sì",
+    "no": "No",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "previous": "Precedente",
+    "next": "Successivo",
+    "processing": "Elaborazione..."
+  },
+  "sidebar": {
+    "accessControl": "Controllo accessi",
+    "permissionDefinitions": "Definizioni permessi",
+    "permissionGroups": "Gruppi permessi",
+    "userGroupAssignments": "Assegnazioni utente–gruppo",
+    "visibilityPolicies": "Policy di visibilità",
+    "userVisibilityAssignments": "Assegnazioni visibilità utente",
+    "auditLogs": "Log audit",
+    "visibilitySimulator": "Simulatore di visibilità",
+    "accessControlGuide": "Guida al controllo degli accessi"
+  },
+  "guide": {
+    "title": "Guida al controllo degli accessi",
+    "description": "Questa guida spiega cosa fa ciascuna schermata di controllo degli accessi e quali modifiche apporta ogni impostazione. L'obiettivo è rendere il sistema comprensibile anche per chi vede il modello per la prima volta.",
+    "hero": {
+      "coreLogicLabel": "Logica di base",
+      "coreLogicValue": "Le autorizzazioni consentono, la visibilità limita.",
+      "finalCheckLabel": "Controllo finale",
+      "finalCheckValue": "Convalida nel simulatore."
+    },
+    "quickRulesTitle": "Cinque regole fondamentali",
+    "quickRules": [
+      "I permessi della pagina e la visibilità dei record sono concetti diversi. Un utente può aprire una pagina ma vedere solo un sottoinsieme di record.",
+      "I gruppi di permessi decidono a quali pagine e azioni l'utente può accedere.",
+      "Le policy di visibilità decidono quali record all'interno di quelle pagine l'utente può vedere.",
+      "Le assegnazioni utente-gruppo associano i gruppi. Le assegnazioni visibilità utente associano eccezioni di visibilità per uno specifico utente.",
+      "Non pubblicare una regola di visibilità senza aver verificato il risultato nel Simulatore di visibilità."
+    ],
+    "screensTitle": "A cosa serve ciascuna schermata?",
+    "pageCards": [
+      {
+        "id": "permissionGroups",
+        "title": "Gruppi di permessi",
+        "summary": "Questa schermata controlla quali moduli un utente può aprire e quali azioni può eseguire.",
+        "bullets": [
+          "Se un utente deve aprire i Preventivi, ha bisogno di un permesso di visualizzazione come `sales.quotations.view`.",
+          "Se deve creare preventivi, lo stesso gruppo ha bisogno anche di `sales.quotations.create`.",
+          "Se deve aggiornare o eliminare, sono richiesti anche i relativi permessi di aggiornamento o eliminazione.",
+          "Questi permessi aprono gli accessi alle pagine e alle azioni; non definiscono di per sé la visibilità a livello di record."
+        ]
+      },
+      {
+        "id": "userGroupAssignments",
+        "title": "Assegnazioni utente-gruppo",
+        "summary": "Questa schermata associa uno o più gruppi di permessi a un utente.",
+        "bullets": [
+          "Si seleziona prima un utente, quindi si associano i gruppi che quell'utente dovrebbe ereditare.",
+          "Quando un utente ha più gruppi, i permessi vengono uniti.",
+          "Un'assegnazione di gruppo errata può esporre pagine a cui l'utente non dovrebbe avere accesso.",
+          "Questa schermata è solitamente l'area principale per la distribuzione dei ruoli: rappresentante di vendita, manager, operazioni, amministratore di sistema."
+        ]
+      },
+      {
+        "id": "visibilityPolicies",
+        "title": "Policy di visibilità",
+        "summary": "Questa schermata definisce chi può vedere record come preventivi, attività, richieste e ordini.",
+        "bullets": [
+          "Anche se l'utente può accedere alla pagina, questo livello di policy decide comunque quali record sono visibili.",
+          "L'ambito selezionato cambia il comportamento: solo i propri record, ambito del team, ambito aziendale e modelli simili.",
+          "Diverse entità come preventivi e attività possono utilizzare modelli di visibilità diversi.",
+          "Se una policy è attiva ma associata all'entità sbagliata, il risultato atteso non apparirà mai."
+        ]
+      },
+      {
+        "id": "userVisibilityAssignments",
+        "title": "Assegnazioni visibilità utente",
+        "summary": "Questa schermata serve per le eccezioni di visibilità specifiche dell'utente.",
+        "bullets": [
+          "Utilizzala quando la policy standard non è sufficiente e un utente necessita di un modello di visibilità diverso.",
+          "È ideale per le eccezioni senza modificare la regola aziendale.",
+          "Questa schermata non concede l'accesso alla pagina; modifica solo la visibilità dei record."
+        ]
+      },
+      {
+        "id": "visibilitySimulator",
+        "title": "Simulatore di visibilità",
+        "summary": "Questa schermata mostra cosa esporrà realmente il sistema per un utente e un'entità selezionati.",
+        "bullets": [
+          "Se non sei sicuro di una regola, seleziona l'utente e l'entità e ispeziona gli utenti visibili e il risultato dell'audit.",
+          "Se inserisci un ID record concreto, la simulazione diventa specifica per il record.",
+          "Anche le forzature di approvazione e le voci di audit vengono mostrate qui.",
+          "Questo è il posto più sicuro per convalidare il comportamento finale prima di affidarsi a una policy in produzione."
+        ]
+      },
+      {
+        "id": "permissionDefinitions",
+        "title": "Definizioni permessi",
+        "summary": "Questa schermata non è più una dipendenza operativa per l'amministrazione quotidiana.",
+        "bullets": [
+          "I codici di permesso vengono ora gestiti tramite un flusso di sincronizzazione automatica.",
+          "Le principali superfici operative sono i Gruppi di permessi e le schermate di assegnazione.",
+          "Il catalogo rimane utile come riferimento per comprendere il modello di permessi sottostante."
+        ]
+      }
+    ],
+    "scenariosTitle": "Esempi basati su scenari",
+    "expectedResultLabel": "Risultato atteso",
+    "scenarios": [
+      {
+        "id": "s1",
+        "title": "Scenario 1: Il rappresentante dovrebbe vedere solo i propri preventivi",
+        "target": "L'utente dovrebbe aprire i preventivi, magari crearli, ma non vedere i record di altre persone.",
+        "steps": [
+          "Aggiungi `sales.quotations.view` e, se necessario, `sales.quotations.create` al gruppo di permessi pertinente.",
+          "Assegna quel gruppo al rappresentante da Assegnazioni utente-gruppo.",
+          "Crea una policy di visibilità dei preventivi che limiti l'accesso ai soli record dell'utente.",
+          "Associa quella policy all'utente se è necessaria un'assegnazione a livello di utente."
+        ],
+        "result": "L'utente apre la pagina dei preventivi e può lavorarci, ma l'elenco è ancora limitato ai propri record consentiti."
+      },
+      {
+        "id": "s2",
+        "title": "Scenario 2: Il responsabile delle vendite dovrebbe vedere le attività del team",
+        "target": "Il manager dovrebbe monitorare le attività del team senza vedere record aziendali non correlati.",
+        "steps": [
+          "Aggiungi `activity.activity-management.view` al gruppo manager.",
+          "Aggiungi anche il permesso di aggiornamento se il manager deve modificare le attività.",
+          "Crea una policy di visibilità delle attività con un ambito orientato al team.",
+          "Assegna questa policy al manager o agli utenti interessati."
+        ],
+        "result": "Il manager può aprire le attività e vedere l'ambito del team, ma non i record non correlati."
+      },
+      {
+        "id": "s3",
+        "title": "Scenario 3: L'utente può visualizzare gli ordini ma non deve crearli",
+        "target": "La pagina dovrebbe aprirsi, ma il flusso di creazione dovrebbe rimanere chiuso.",
+        "steps": [
+          "Concedi `sales.orders.view`.",
+          "Non concedere `sales.orders.create`.",
+          "Assegna il gruppo all'utente."
+        ],
+        "result": "L'utente può sfogliare i dati degli ordini ma non può creare un nuovo ordine."
+      },
+      {
+        "id": "s4",
+        "title": "Scenario 4: Spiegare perché un preventivo diventa visibile durante l'approvazione",
+        "target": "Comprendere uno speciale risultato di visibilità attraverso le prove di audit invece di tirare a indovinare.",
+        "steps": [
+          "Apri il Simulatore di visibilità e seleziona l'utente.",
+          "Scegli Preventivo e inserisci l'ID del record.",
+          "Rivedi i dati di anteprima e le voci di audit."
+        ],
+        "result": "Se è coinvolta la logica di forzatura dell'approvazione, il simulatore mostra direttamente quella prova."
+      }
+    ],
+    "mistakesTitle": "Errori comuni",
+    "mistakes": [
+      "Definire la visibilità senza concedere il permesso per la pagina. Risultato: l'utente non può nemmeno aprire la pagina.",
+      "Concedere il permesso per la pagina senza considerare la visibilità. Risultato: l'utente potrebbe vedere troppi record.",
+      "Ignorare i permessi uniti quando un utente appartiene a più gruppi.",
+      "Pubblicare una policy senza testarla nel simulatore.",
+      "Confondere i tipi di entità come preventivo, attività, richiesta e ordine."
+    ],
+    "checklistTitle": "Ordine di configurazione consigliato",
+    "checklist": [
+      "Definisci prima a quale pagina deve accedere l'utente.",
+      "Quindi definisci quali azioni deve eseguire su quella pagina.",
+      "Infine limita quali record è autorizzato a vedere.",
+      "Usa le assegnazioni di visibilità a livello di utente solo quando hai bisogno di un'eccezione specifica.",
+      "Convalida il risultato finale nel Simulatore di visibilità."
+    ],
+    "faqTitle": "Domande frequenti",
+    "faqs": [
+      {
+        "id": "faq1",
+        "question": "Un utente può aprire i preventivi ma non vede alcun record. Perché?",
+        "answer": "Il permesso della pagina è probabilmente corretto, ma il livello di visibilità limita troppo i record o non è stato assegnato correttamente."
+      },
+      {
+        "id": "faq2",
+        "question": "Un utente non può creare preventivi. Perché?",
+        "answer": "La causa più comune è la mancanza del permesso `sales.quotations.create`. La visualizzazione apre la pagina; la creazione apre l'azione di creazione."
+      },
+      {
+        "id": "faq3",
+        "question": "Un utente vede troppi record. Da dove dovrei iniziare?",
+        "answer": "Controlla prima i gruppi di permessi assegnati, poi le policy di visibilità specifiche dell'entità e le assegnazioni di visibilità dell'utente, infine verifica il comportamento nel simulatore."
+      }
+    ],
+    "footer": {
+      "title": "Breve regola decisionale",
+      "body": "Se un utente non può eseguire un'azione, inizia con i Gruppi di permessi. Se un utente vede troppi o troppo pochi record, inizia con la Visibilità. Verifica sempre la decisione finale nel Simulatore di visibilità."
+    }
+  }
+}

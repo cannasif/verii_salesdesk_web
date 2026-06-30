@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "Définitions Windoform",
+    "description": "Gérez les profils, fers, vis et impressions à l'aide de la même structure de tableau que les autres écrans de définition.",
+    "documentTitle": "Définitions Windoform"
+  },
+  "sections": {
+    "profil": {
+      "title": "Définitions de profil",
+      "description": "Gérez les options de profil sélectionnables sur les lignes de document."
+    },
+    "demir": {
+      "title": "Définitions de fer",
+      "description": "Gérez les options de fer sélectionnables sur les lignes de document."
+    },
+    "vida": {
+      "title": "Définitions de vis",
+      "description": "Gérez les options de vis sélectionnables sur les lignes de document."
+    },
+    "baski": {
+      "title": "Définitions d'impression",
+      "description": "Gérer les options d'impression sélectionnables sur les lignes de document."
+    },
+    "koliBaski": {
+      "title": "Définitions d'impression de colis",
+      "description": "Gérer les options d'impression de colis sélectionnées dans l'en-tête du devis et envoyées à la description de l'en-tête Netsis."
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nom",
+    "profilName": "Profil",
+    "createdDate": "Créé le",
+    "updatedDate": "Mis à jour le",
+    "newRecord": "Nouvel enregistrement",
+    "searchPlaceholder": "Rechercher des définitions...",
+    "refresh": "Actualiser",
+    "loading": "Chargement des définitions...",
+    "empty": "Aucun enregistrement trouvé.",
+    "actions": "Actions",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "pagination": "Affichage de {{from}} à {{to}} sur {{total}} enregistrements",
+    "filterName": "Nom",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "Ajouter un nouveau profil",
+    "addNewRebar": "Ajouter une nouvelle armature",
+    "addNewScrew": "Ajouter une nouvelle vis",
+    "addNewPrint": "Ajouter une nouvelle impression",
+    "addNewKoliBaski": "Ajouter une nouvelle impression d'emballage",
+    "editTitle": "Modifier {{section}}",
+    "addTitle": "Ajouter {{section}}",
+    "nameLabel": "Nom",
+    "profilLabel": "Profil lié",
+    "profilPlaceholder": "Sélectionner un profil",
+    "profilSearchPlaceholder": "Rechercher un profil",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "demirNameLabel": "Nom du fer",
+    "demirNamePlaceholder": "Nom du fer lié",
+    "vidaNameLabel": "Nom de la vis",
+    "vidaNamePlaceholder": "Nom de la vis liée"
+  },
+  "validation": {
+    "nameRequired": "Le nom est requis",
+    "profilRequired": "La sélection d'un profil est requise"
+  },
+  "toasts": {
+    "created": "Enregistrement {{section}} créé",
+    "updated": "Enregistrement {{section}} mis à jour",
+    "deleted": "Enregistrement {{section}} supprimé"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "title": "Payment Type Management",
+  "headerDescription": "Manage and edit payment types",
+  "create": "New Payment Type",
+  "edit": "Edit Payment Type",
+  "editDescription": "Edit payment type information",
+  "createDescription": "Enter new payment type information",
+  "delete": {
+    "confirmTitle": "Delete Payment Type",
+    "confirmMessage": "Are you sure you want to delete {{name}} payment type? This action cannot be undone.",
+    "success": "Payment type deleted successfully",
+    "error": "Failed to delete payment type"
+  },
+  "deleteTitle": "Delete Payment Type",
+  "name": "Name",
+  "namePlaceholder": "Enter payment type name",
+  "description": "Description",
+  "descriptionPlaceholder": "Enter description (optional)",
+  "createdDate": "Created Date",
+  "updatedDate": "Updated Date",
+  "actions": "Actions",
+  "search": "Search",
+  "refresh": "Refresh",
+  "loading": "Loading...",
+  "previous": "Previous",
+  "next": "Next",
+  "advancedFilter": {
+    "columnName": "Name",
+    "columnDescription": "Description"
+  },
+  "cancel": "Cancel",
+  "save": "Save",
+  "saving": "Saving...",
+  "noData": "No data found",
+  "error": "An error occurred",
+  "confirmDelete": "Are you sure you want to delete this payment type?",
+  "createSuccess": "Payment type created successfully",
+  "updateSuccess": "Payment type updated successfully",
+  "deleteSuccess": "Payment type deleted successfully",
+  "createError": "Failed to create payment type",
+  "updateError": "Failed to update payment type",
+  "deleteError": "Failed to delete payment type",
+  "table": {
+    "title": "Payment Types",
+    "status": "Status",
+    "id": "ID",
+    "name": "Name",
+    "description": "Description",
+    "createdDate": "Created Date",
+    "updatedDate": "Updated Date",
+    "showing": "Showing {{from}}-{{to}} / {{total}}",
+    "page": "Page {{current}} / {{total}}"
+  },
+  "form": {
+    "name": {
+      "required": "Name is required",
+      "maxLength": "Name can be at most 100 characters"
+    },
+    "description": {
+      "maxLength": "Description can be at most 500 characters"
+    }
+  },
+  "status": {
+    "inactive": "Passive",
+    "active": "Active"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "title": "اختر العميل",
+  "description": "في «الكل» يُعرض نوع العميل: ERP أو محتمل. علامة التبويب الأخرى للعملاء المحتملين فقط.",
+  "badgeKindErp": "ERP",
+  "badgeKindPotential": "محتمل",
+  "erpCustomers": "عملاء ERP",
+  "crmCustomers": "عملاء CRM",
+  "allCustomers": "الكل",
+  "erp": "عملاء ERP",
+  "crm": "إدارة علاقات العملاء",
+  "noErpCustomers": "لم يتم العثور على عملاء ERP",
+  "noCrmCustomers": "لم يتم العثور على عملاء CRM",
+  "noCustomers": "لم يتم العثور على عملاء",
+  "noResults": "لم يتم العثور على نتائج بحث",
+  "searchPlaceholder": "البحث بالاسم أو الرمز...",
+  "voiceSearch": "البحث الصوتي",
+  "loading": "جاري التحميل",
+  "table": {
+    "type": "النوع",
+    "customerCode": "رمز العميل",
+    "customerName": "اسم العميل",
+    "phone": "الهاتف",
+    "city": "المدينة",
+    "email": "البريد الإلكتروني"
+  },
+  "potentialCustomers": "العملاء المحتملون",
+  "noPotentialCustomers": "لم يتم العثور على العملاء المحتملين"
+}

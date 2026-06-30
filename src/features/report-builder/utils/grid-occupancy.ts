@@ -1,0 +1,169 @@
+export interface GridSpan {
+  colSpan: number;
+  rowSpan: number;
+}
+
+export function clampGridSpan(value: number, min: number, max: number): number {
+  if (value < min) return min;
+  if (value > max) return max;
+  return value;
+}
+
+export function tryPlaceFirstFit(
+  grid: boolean[][],
+  cols: number,
+  rows: number,
+  maxCols: number,
+  maxRows: number,
+): { row: number; col: number } | null {
+  if (cols < 1 || rows < 1 || cols > maxCols || rows > maxRows) return null;
+  for (let row = 0; row <= maxRows - rows; row += 1) {
+    for (let col = 0; col <= maxCols - cols; col += 1) {
+      let canPlace = true;
+      for (let dr = 0; dr < rows && canPlace; dr += 1) {
+        for (let dc = 0; dc < cols && canPlace; dc += 1) {
+          if (grid[row + dr][col + dc]) canPlace = false;
+        }
+      }
+      if (canPlace) {
+        for (let dr = 0; dr < rows; dr += 1) {
+          for (let dc = 0; dc < cols; dc += 1) {
+            grid[row + dr][col + dc] = true;
+          }
+        }
+        return { row, col };
+      }
+    }
+  }
+  return null;
+}
+
+export function buildOccupancyGrid(
+  layouts: Record<string, GridSpan>,
+  ids: string[],
+  maxCols: number,
+  maxRows: number,
+): { grid: boolean[][]; placedAll: boolean } {
+  const grid: boolean[][] = Array.from({ length: maxRows }, () => Array<boolean>(maxCols).fill(false));
+  let placedAll = true;
+  ids.forEach((id) => {
+    const layout = layouts[id];
+    if (!layout) return;
+    const cols = clampGridSpan(layout.colSpan, 1, maxCols);
+    const rows = clampGridSpan(layout.rowSpan, 1, maxRows);
+    const placement = tryPlaceFirstFit(grid, cols, rows, maxCols, maxRows);
+    if (!placement) placedAll = false;
+  });
+  return { grid, placedAll };
+}
+
+export function canFitInGridOccupancy(
+  grid: boolean[][],
+  cols: number,
+  rows: number,
+  maxCols: number,
+  maxRows: number,
+): boolean {
+  if (cols < 1 || rows < 1 || cols > maxCols || rows > maxRows) return false;
+  for (let row = 0; row <= maxRows - rows; row += 1) {
+    for (let col = 0; col <= maxCols - cols; col += 1) {
+      let canPlace = true;
+      for (let dr = 0; dr < rows && canPlace; dr += 1) {
+        for (let dc = 0; dc < cols && canPlace; dc += 1) {
+          if (grid[row + dr][col + dc]) canPlace = false;
+        }
+      }
+      if (canPlace) return true;
+    }
+  }
+  return false;
+}
+
+export function canCanvasHoldAllSpans(
+  layouts: Record<string, GridSpan>,
+  ids: string[],
+  newMaxCols: number,
+  newMaxRows: number,
+): boolean {
+  return buildOccupancyGrid(layouts, ids, newMaxCols, newMaxRows).placedAll;
+}
+
+export function createEmptyOccupancyGrid(maxRows: number, maxCols: number): boolean[][] {
+  return Array.from({ length: maxRows }, () => Array<boolean>(maxCols).fill(false));
+}
+
+export function isRectangleFree(
+  grid: boolean[][],
+  row0: number,
+  col0: number,
+  rows: number,
+  cols: number,
+  maxRows: number,
+  maxCols: number,
+): boolean {
+  if (row0 < 0 || col0 < 0 || rows < 1 || cols < 1) return false;
+  if (row0 + rows > maxRows || col0 + cols > maxCols) return false;
+  for (let dr = 0; dr < rows; dr += 1) {
+    for (let dc = 0; dc < cols; dc += 1) {
+      if (grid[row0 + dr][col0 + dc]) return false;
+    }
+  }
+  return true;
+}
+
+export function occupyRectangle(
+  grid: boolean[][],
+  row0: number,
+  col0: number,
+  rows: number,
+  cols: number,
+): void {
+  for (let dr = 0; dr < rows; dr += 1) {
+    for (let dc = 0; dc < cols; dc += 1) {
+      grid[row0 + dr][col0 + dc] = true;
+    }
+  }
+}
+
+export function tryOccupyAt(
+  grid: boolean[][],
+  row0: number,
+  col0: number,
+  rows: number,
+  cols: number,
+  maxRows: number,
+  maxCols: number,
+): boolean {
+  if (!isRectangleFree(grid, row0, col0, rows, cols, maxRows, maxCols)) return false;
+  occupyRectangle(grid, row0, col0, rows, cols);
+  return true;
+}
+
+export function findRectanglePlacementContainingCell(
+  grid: boolean[][],
+  dropRow: number,
+  dropCol: number,
+  rows: number,
+  cols: number,
+  maxRows: number,
+  maxCols: number,
+): { row0: number; col0: number } | null {
+  if (rows < 1 || cols < 1) return null;
+  if (dropRow < 0 || dropCol < 0 || dropRow >= maxRows || dropCol >= maxCols) return null;
+  if (rows > maxRows || cols > maxCols) return null;
+  const rMin = Math.max(0, dropRow - rows + 1);
+  const rMax = Math.min(dropRow, maxRows - rows);
+  const cMin = Math.max(0, dropCol - cols + 1);
+  const cMax = Math.min(dropCol, maxCols - cols);
+  if (rMin > rMax || cMin > cMax) return null;
+  let best: { row0: number; col0: number } | null = null;
+  for (let r0 = rMin; r0 <= rMax; r0 += 1) {
+    for (let c0 = cMin; c0 <= cMax; c0 += 1) {
+      if (!isRectangleFree(grid, r0, c0, rows, cols, maxRows, maxCols)) continue;
+      if (best === null || r0 < best.row0 || (r0 === best.row0 && c0 < best.col0)) {
+        best = { row0: r0, col0: c0 };
+      }
+    }
+  }
+  return best;
+}

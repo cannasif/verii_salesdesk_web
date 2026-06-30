@@ -1,0 +1,53 @@
+{
+  "approvalUserRole": {
+    "menu": "Genehmigungsbenutzerrollen-Verwaltung",
+    "description": "Verwalten und bearbeiten Sie Genehmigungsbenutzerrollen",
+    "addButton": "Neue Rollen hinzufügen",
+    "searchPlaceholder": "Suchen...",
+    "refresh": "Aktualisieren",
+    "loading": "Laden...",
+    "noData": "Keine Daten",
+    "table": {
+      "id": "ID",
+      "userFullName": "Benutzer",
+      "approvalRoleName": "Genehmigungsrolle",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "actions": "Aktionen",
+      "showing": "Zeige {{from}}-{{to}} von {{total}}",
+      "page": "Seite {{current}} / {{total}}",
+      "previous": "Vorherige",
+      "next": "Nächste",
+      "title": "Genehmigungsbenutzerrollen"
+    },
+    "delete": {
+      "title": "Rolle löschen",
+      "confirmMessage": "Sind Sie sicher, dass Sie diese Benutzerrolle löschen möchten?",
+      "confirmButton": "Löschen",
+      "cancelButton": "Abbrechen"
+    },
+    "form": {
+      "editTitle": "Genehmigungsbenutzerrolle bearbeiten",
+      "addTitle": "Neue Genehmigungsbenutzerrolle hinzufügen",
+      "editDescription": "Genehmigungsbenutzerrollen-Informationen bearbeiten",
+      "addDescription": "Neue Genehmigungsbenutzerrollen-Informationen eingeben",
+      "userId": "Benutzer",
+      "selectUser": "Benutzer auswählen",
+      "noUserSelected": "Kein Benutzer ausgewählt",
+      "approvalRoleId": "Genehmigungsrolle",
+      "selectApprovalRole": "Genehmigungsrolle auswählen",
+      "noApprovalRoleSelected": "Keine Genehmigungsrolle ausgewählt",
+      "save": "Speichern",
+      "saving": "Wird gespeichert...",
+      "cancel": "Abbrechen",
+      "userIdRequired": "Benutzerauswahl ist erforderlich",
+      "approvalRoleIdRequired": "Auswahl der Genehmigungsrolle ist erforderlich"
+    },
+    "advancedFilter": {
+      "columnUserFullName": "Benutzer",
+      "columnApprovalRoleName": "Genehmigungsrolle",
+      "columnCreatedBy": "Erstellt von"
+    },
+    "error": "Fehler ist aufgetreten"
+  }
+}

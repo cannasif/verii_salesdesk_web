@@ -1,0 +1,146 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Eindeutiger Schlüssel für Routen- und Seitenwächter. Verwenden Sie stabile snake_case oder Punktbenennung.",
+      "name": "Anzeigename für Administratoren bei der Verwaltung von Berechtigungen.",
+      "description": "Optionale interne Erläuterung für diese Berechtigung.",
+      "isActive": "Inaktive Berechtigungen werden bei der Berechnung des Benutzerzugriffs nicht berücksichtigt.",
+      "save": "Änderungen beeinflussen Rollen- und Gruppenautorisierungsabläufe."
+    },
+    "permissionGroup": {
+      "name": "Gruppenname zur Identifikation bei der Zuweisung an Benutzer.",
+      "isSystemAdmin": "Mitglieder dieser Gruppe haben ohne individuelle Berechtigungsprüfung Zugriff auf alle Seiten und Aktionen.",
+      "isActive": "Inaktive Gruppen sollten nicht für neue Zugriffsentscheidungen zugewiesen werden.",
+      "permissions": "Ausgewählte Berechtigungen definieren, worauf Mitglieder dieser Gruppe zugreifen können.",
+      "save": "Aktualisiert den effektiven Zugriff für alle dieser Gruppe zugewiesenen Benutzer."
+    },
+    "userAssignment": {
+      "user": "Wählen Sie den Benutzer, dessen Zugriffsbereich Sie verwalten möchten.",
+      "groups": "Benutzer erhält kombinierte Berechtigungen aus allen ausgewählten Gruppen.",
+      "save": "Zuweisungen gelten sofort für die nächsten Autorisierungsprüfungen. Benutzer müssen möglicherweise ihre Sitzung aktualisieren.",
+      "systemAdminNote": "Hat der Benutzer eine System-Admin-Gruppe, werden detaillierte Berechtigungen umgangen."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Berechtigungsdefinitionen",
+    "description": "Verwalten Sie die im System verwendeten Berechtigungscodes.",
+    "add": "Berechtigung hinzufügen",
+    "form": {
+      "editTitle": "Berechtigungsdefinition bearbeiten",
+      "addTitle": "Berechtigungsdefinition hinzufügen",
+      "editDescription": "Details der Berechtigungsdefinition aktualisieren",
+      "addDescription": "Neue Berechtigungsdefinition erstellen",
+      "code": "Code",
+      "name": "Name",
+      "namePlaceholder": "Anzeigename",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "isActive": "Aktiv",
+      "codePlaceholder": "Code auswählen",
+      "affectedRoutes": "Betroffene Seiten",
+      "affectedRoutesNone": "Für diesen Code wurde keine passende Route gefunden",
+      "codeSearchPlaceholder": "Suchen...",
+      "codeEmpty": "Keine Ergebnisse gefunden"
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "isActive": "Aktiv",
+      "updatedDate": "Aktualisiert",
+      "showing": "{{from}}-{{to}} von {{total}}",
+      "title": "Berechtigungsdefinitionen"
+    },
+    "delete": {
+      "confirmTitle": "Berechtigungsdefinition löschen",
+      "confirmMessage": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Dieser Vorgang kann nicht rückgängig gemacht werden."
+    },
+    "syncFromRoutes": "Von Routen synchronisieren",
+    "syncSummaryTitle": "Routen-Synchronisierung"
+  },
+  "permissionGroups": {
+    "title": "Berechtigungsgruppen",
+    "description": "Berechtigungsgruppen und Zuweisungen verwalten",
+    "add": "Gruppe hinzufügen",
+    "selectAll": "Alle auswählen",
+    "noDefinitions": "Keine Berechtigungsdefinitionen verfügbar",
+    "form": {
+      "editTitle": "Berechtigungsgruppe bearbeiten",
+      "addTitle": "Berechtigungsgruppe hinzufügen",
+      "editDescription": "Details der Berechtigungsgruppe aktualisieren",
+      "addDescription": "Neue Berechtigungsgruppe erstellen",
+      "name": "Name",
+      "namePlaceholder": "Gruppenname",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Optionale Beschreibung",
+      "isSystemAdmin": "Systemadministrator",
+      "isActive": "Aktiv",
+      "permissions": "Berechtigungen"
+    },
+    "table": {
+      "name": "Name",
+      "isSystemAdmin": "Systemadministrator",
+      "isActive": "Aktiv",
+      "permissionCount": "Berechtigungen",
+      "showing": "{{from}}-{{to}} von {{total}}",
+      "title": "Berechtigungsgruppen"
+    },
+    "managePermissions": "Berechtigungen verwalten",
+    "permissionsPanel": {
+      "title": "Gruppenberechtigungen bearbeiten",
+      "description": "Wählen Sie Berechtigungen für diese Gruppe aus",
+      "currentCodes": "Aktuelle Berechtigungscodes",
+      "groupedRows": "Bildschirme",
+      "screen": "Ansicht",
+      "actionsMapped": "Aktionen",
+      "actions": {
+        "create": "Erstellen",
+        "read": "Lesen",
+        "update": "Aktualisieren",
+        "delete": "Löschen",
+        "other": "Aktionsberechtigungen"
+      }
+    },
+    "delete": {
+      "confirmTitle": "Berechtigungsgruppe löschen",
+      "confirmMessage": "Sind Sie sicher, dass Sie \"{{name}}\" löschen möchten? Dieser Vorgang kann nicht rückgängig gemacht werden."
+    },
+    "search": "Suchen...",
+    "systemAdminLocked": "System-Admin-Gruppe kann nicht geändert werden"
+  },
+  "userGroupAssignments": {
+    "title": "Benutzergruppen-Zuweisung",
+    "description": "Berechtigungsgruppen Benutzern zuweisen",
+    "selectUser": "Benutzer auswählen",
+    "selectUserPlaceholder": "Suchen und Benutzer auswählen...",
+    "selectUserHint": "Wählen Sie einen Benutzer aus, um Berechtigungsgruppen zuzuordnen",
+    "assignedGroups": "Zugewiesene Berechtigungsgruppen",
+    "noUsers": "Keine Benutzer gefunden",
+    "noGroups": "Keine Berechtigungsgruppen verfügbar",
+    "selectAll": "Alle auswählen",
+    "status": "Status",
+    "unsavedChanges": "Nicht gespeichert",
+    "upToDate": "Aktuell"
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "saving": "Wird gespeichert...",
+    "save": "Speichern und anwenden",
+    "loading": "Laden...",
+    "search": "Suchen...",
+    "noData": "Keine Daten",
+    "actions": "Aktionen",
+    "yes": "Ja",
+    "no": "NEIN",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "processing": "Verarbeitung..."
+  },
+  "sidebar": {
+    "accessControl": "Zugangskontrolle",
+    "permissionDefinitions": "Berechtigungsdefinitionen",
+    "permissionGroups": "Berechtigungsgruppen",
+    "userGroupAssignments": "Benutzergruppenzuweisungen"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "title": "Zahlungsart Verwaltung",
+  "headerDescription": "Zahlungsarten verwalten und bearbeiten",
+  "create": "Neue Zahlungsart",
+  "edit": "Zahlungsart bearbeiten",
+  "editDescription": "Zahlungsartinformationen bearbeiten",
+  "createDescription": "Neue Zahlungsartinformationen eingeben",
+  "delete": {
+    "confirmTitle": "Zahlungsart löschen",
+    "confirmMessage": "{{name}} Zahlungsart wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+    "success": "Zahlungsart erfolgreich gelöscht",
+    "error": "Fehler beim Löschen der Zahlungsart"
+  },
+  "deleteTitle": "Zahlungsart löschen",
+  "name": "Name",
+  "namePlaceholder": "Zahlungsartname eingeben",
+  "description": "Beschreibung",
+  "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+  "createdDate": "Erstellungsdatum",
+  "updatedDate": "Aktualisierungsdatum",
+  "actions": "Aktionen",
+  "search": "Suchen",
+  "refresh": "Aktualisieren",
+  "loading": "Laden...",
+  "previous": "Zurück",
+  "next": "Weiter",
+  "advancedFilter": {
+    "columnName": "Name",
+    "columnDescription": "Beschreibung"
+  },
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Wird gespeichert...",
+  "noData": "Keine Daten gefunden",
+  "error": "Ein Fehler ist aufgetreten",
+  "confirmDelete": "Sind Sie sicher, dass Sie diesen Zahlungstypen löschen möchten?",
+  "createSuccess": "Zahlungsart erfolgreich erstellt",
+  "updateSuccess": "Zahlungsart erfolgreich aktualisiert",
+  "deleteSuccess": "Zahlungsart erfolgreich gelöscht",
+  "createError": "Fehler beim Erstellen der Zahlungsart",
+  "updateError": "Fehler beim Aktualisieren der Zahlungsart",
+  "deleteError": "Fehler beim Löschen der Zahlungsart",
+  "table": {
+    "title": "Zahlungstypen",
+    "status": "Status",
+    "id": "ID",
+    "name": "Name",
+    "description": "Beschreibung",
+    "createdDate": "Erstellungsdatum",
+    "updatedDate": "Aktualisierungsdatum",
+    "showing": "Anzeige {{from}}-{{to}} / {{total}}",
+    "page": "Seite {{current}} / {{total}}"
+  },
+  "form": {
+    "name": {
+      "required": "Name ist erforderlich",
+      "maxLength": "Name darf maximal 100 Zeichen lang sein"
+    },
+    "description": {
+      "maxLength": "Beschreibung darf maximal 500 Zeichen lang sein"
+    }
+  },
+  "status": {
+    "inactive": "Inaktiv",
+    "active": "Aktiv"
+  }
+}

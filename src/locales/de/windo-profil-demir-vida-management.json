@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "Windoform-Definitionen",
+    "description": "Verwalten Sie Profil-, Eisen-, Schrauben- und Druckdatensätze in derselben Tabellenansicht wie andere Definitionsseiten.",
+    "documentTitle": "Windoform-Definitionen"
+  },
+  "sections": {
+    "profil": {
+      "title": "Profil-Definitionen",
+      "description": "Verwalten Sie in Dokumentzeilen wählbare Profiloptionen."
+    },
+    "demir": {
+      "title": "Eisen-Definitionen",
+      "description": "Verwalten Sie in Dokumentzeilen wählbare Eisenoptionen."
+    },
+    "vida": {
+      "title": "Schrauben-Definitionen",
+      "description": "Verwalten Sie in Dokumentzeilen wählbare Schraubenoptionen."
+    },
+    "baski": {
+      "title": "Druckdefinitionen",
+      "description": "Verwalten Sie Druckoptionen, die in Belegzeilen ausgewählt werden können."
+    },
+    "koliBaski": {
+      "title": "Verpackungsdruckdefinitionen",
+      "description": "Verwalten Sie Verpackungsdruckoptionen, die im Angebotskopf ausgewählt und an die Netsis-Kopfbeschreibung gesendet werden."
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Name",
+    "profilName": "Profil",
+    "createdDate": "Erstellt am",
+    "updatedDate": "Aktualisiert am",
+    "newRecord": "Neuer Datensatz",
+    "searchPlaceholder": "Definitionen durchsuchen...",
+    "refresh": "Aktualisieren",
+    "loading": "Definitionen werden geladen...",
+    "empty": "Keine Datensätze gefunden.",
+    "actions": "Aktionen",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "pagination": "Zeige {{from}}-{{to}} von {{total}} Datensätzen",
+    "filterName": "Name",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "Neues Profil hinzufügen",
+    "addNewRebar": "Neues Eisen hinzufügen",
+    "addNewScrew": "Neue Schraube hinzufügen",
+    "addNewPrint": "Neuen Druck hinzufügen",
+    "addNewKoliBaski": "Neuen Verpackungsdruck hinzufügen",
+    "editTitle": "{{section}} bearbeiten",
+    "addTitle": "{{section}} hinzufügen",
+    "nameLabel": "Name",
+    "profilLabel": "Verknüpftes Profil",
+    "profilPlaceholder": "Ein Profil auswählen",
+    "profilSearchPlaceholder": "Profil suchen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "demirNameLabel": "Eisen Name",
+    "demirNamePlaceholder": "Verknüpfter Eisen Name",
+    "vidaNameLabel": "Schrauben Name",
+    "vidaNamePlaceholder": "Verknüpfter Schrauben Name"
+  },
+  "validation": {
+    "nameRequired": "Name ist erforderlich",
+    "profilRequired": "Profilauswahl ist erforderlich"
+  },
+  "toasts": {
+    "created": "{{section}}-Datensatz erstellt",
+    "updated": "{{section}}-Datensatz aktualisiert",
+    "deleted": "{{section}}-Datensatz gelöscht"
+  }
+}

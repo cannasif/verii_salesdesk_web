@@ -1,0 +1,60 @@
+{
+  "approvalRole": {
+    "menu": "Genehmigungsrollen-Verwaltung",
+    "description": "Verwalten und bearbeiten Sie Genehmigungsrollen",
+    "addButton": "Neue Genehmigungsrolle hinzufügen",
+    "searchPlaceholder": "Suchen...",
+    "refresh": "Aktualisieren",
+    "loading": "Laden...",
+    "noData": "Keine Daten",
+    "table": {
+      "id": "ID",
+      "approvalRoleGroupName": "Rollengruppe",
+      "name": "Rollenname",
+      "maxAmount": "Maximaler Betrag",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "actions": "Aktionen",
+      "totalRecords": "Insgesamt {{count}} Einträge.",
+      "page": "Seite {{current}} / {{total}}",
+      "previous": "Vorherige",
+      "next": "Nächste",
+      "title": "Genehmigungsrollen"
+    },
+    "delete": {
+      "confirmTitle": "Löschen bestätigen",
+      "confirmMessage": "Sind Sie sicher, dass Sie diesen Datensatz löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "cancelButton": "Abbrechen",
+      "confirmButton": "Löschen",
+      "deleting": "Wird gelöscht..."
+    },
+    "form": {
+      "editTitle": "Genehmigungsrolle bearbeiten",
+      "addTitle": "Neue Genehmigungsrolle hinzufügen",
+      "editDescription": "Bearbeiten Sie die Details der Genehmigungsrolle",
+      "addDescription": "Geben Sie die Details der neuen Genehmigungsrolle ein",
+      "approvalRoleGroupId": "Genehmigungsrollengruppe",
+      "selectApprovalRoleGroup": "Wählen Sie eine Genehmigungsrollengruppe",
+      "noApprovalRoleGroupSelected": "Keine Genehmigungsrollengruppe ausgewählt",
+      "name": "Rollenname",
+      "namePlaceholder": "Geben Sie den Rollennamen ein",
+      "maxAmount": "Maximaler Betrag",
+      "maxAmountPlaceholder": "Geben Sie den maximalen Betrag ein",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichern...",
+      "approvalRoleGroupIdRequired": "Die Auswahl der Genehmigungsrollengruppe ist erforderlich",
+      "nameRequired": "Der Rollenname ist erforderlich",
+      "nameMaxLength": "Der Rollenname darf maximal 100 Zeichen haben",
+      "maxAmountMin": "Der Höchstbetrag darf nicht kleiner als 0 sein"
+    },
+    "advancedFilter": {
+      "columnName": "Rollenname",
+      "columnApprovalRoleGroupName": "Rollengruppe",
+      "columnMaxAmount": "Höchstbetrag"
+    },
+    "messages": {
+      "error": "Ein Fehler ist aufgetreten"
+    }
+  }
+}

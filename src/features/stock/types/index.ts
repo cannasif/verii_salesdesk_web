@@ -1,0 +1,190 @@
+export interface StockGetDto {
+  id: number;
+  erpStockCode: string;
+  stockName: string;
+  englishStockName?: string | null;
+  unit?: string;
+  balance?: number | null;
+  balanceText?: string | null;
+  ureticiKodu?: string;
+  grupKodu?: string;
+  grupAdi?: string;
+  kod1?: string;
+  kod1Adi?: string;
+  kod2?: string;
+  kod2Adi?: string;
+  kod3?: string;
+  kod3Adi?: string;
+  kod4?: string;
+  kod4Adi?: string;
+  kod5?: string;
+  kod5Adi?: string;
+  branchCode: number;
+  isERPIntegrated?: boolean;
+  erpIntegrationNumber?: string | null;
+  lastSyncDate?: string | null;
+  countTriedBy?: number | null;
+  isFavorite?: boolean;
+  favoriteId?: number | null;
+  stockDetail?: StockDetailGetDto;
+  stockImages?: StockImageDto[];
+  parentRelations?: StockRelationDto[];
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: number;
+  updatedBy?: number;
+}
+
+export interface WarehouseStockBalanceDto {
+  id: number;
+  stockId: number;
+  warehouseId: number;
+  erpStockCode: string;
+  stockName?: string | null;
+  warehouseCode: number;
+  warehouseName?: string | null;
+  branchCode: number;
+  balance: number;
+  lastSyncDate?: string | null;
+}
+
+export interface StockCodeFilterOptionDto {
+  value: string;
+  label: string;
+  count?: number;
+}
+
+export interface StockCodeFilterOptionsDto {
+  grupKodu: StockCodeFilterOptionDto[];
+  kod1: StockCodeFilterOptionDto[];
+  kod2: StockCodeFilterOptionDto[];
+  kod3: StockCodeFilterOptionDto[];
+  kod4: StockCodeFilterOptionDto[];
+  kod5: StockCodeFilterOptionDto[];
+}
+
+export interface StockDetailGetDto {
+  id: number;
+  stockId: number;
+  stockName?: string;
+  htmlDescription: string;
+  technicalSpecsJson?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StockDetailCreateDto {
+  stockId: number;
+  htmlDescription: string;
+  technicalSpecsJson?: string;
+}
+
+export interface StockDetailUpdateDto {
+  stockId: number;
+  htmlDescription: string;
+  technicalSpecsJson?: string;
+}
+
+export interface StockImageDto {
+  id: number;
+  stockId: number;
+  stockName?: string;
+  filePath: string;
+  altText?: string;
+  sortOrder: number;
+  isPrimary: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StockImageBulkImportQueuedDto {
+  jobId: string;
+  originalFileName: string;
+  queuedAt: string;
+}
+
+export interface StockRelationDto {
+  id: number;
+  stockId: number;
+  stockName?: string;
+  relatedStockId: number;
+  relatedStockCode?: string;
+  relatedStockName?: string;
+  quantity: number;
+  description?: string;
+  isMandatory: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface StockRelationCreateDto {
+  stockId: number;
+  relatedStockId: number;
+  quantity: number;
+  description?: string;
+  isMandatory?: boolean;
+}
+
+export interface StockRelationUpdateDto {
+  stockId: number;
+  relatedStockId: number;
+  quantity: number;
+  description?: string;
+  isMandatory: boolean;
+}
+
+export interface StockCreateDto {
+  erpStockCode: string;
+  stockName: string;
+  englishStockName?: string | null;
+  unit?: string;
+  ureticiKodu?: string;
+  grupKodu?: string;
+  grupAdi?: string;
+  kod1?: string;
+  kod1Adi?: string;
+  kod2?: string;
+  kod2Adi?: string;
+  kod3?: string;
+  kod3Adi?: string;
+  kod4?: string;
+  kod4Adi?: string;
+  kod5?: string;
+  kod5Adi?: string;
+  branchCode: number;
+}
+
+export interface StockUpdateDto {
+  erpStockCode: string;
+  stockName: string;
+  englishStockName?: string | null;
+  unit?: string;
+  ureticiKodu?: string;
+  grupKodu?: string;
+  grupAdi?: string;
+  kod1?: string;
+  kod1Adi?: string;
+  kod2?: string;
+  kod2Adi?: string;
+  kod3?: string;
+  kod3Adi?: string;
+  kod4?: string;
+  kod4Adi?: string;
+  kod5?: string;
+  kod5Adi?: string;
+  branchCode: number;
+}
+
+export interface StockGetWithMainImageDto extends StockGetDto {
+  mainImage?: StockImageDto;
+}
+
+export interface StockFavoriteToggleDto {
+  isFavorite?: boolean;
+}
+
+export interface StockFavoriteToggleResultDto {
+  stockId: number;
+  isFavorite: boolean;
+  favoriteId?: number | null;
+}

@@ -1,0 +1,247 @@
+{
+  "title": "عميل 360",
+  "notFound": "العميل غير موجود",
+  "error": "حدث خطأ",
+  "retry": "إعادة المحاولة",
+  "quickActivity": "نشاط سريع",
+  "currencyFilter": {
+    "label": "العملة",
+    "all": "الكل"
+  },
+  "balanceDialog": {
+    "openButton": "Customer balance summary",
+    "title": "Customer Balance Summary",
+    "error": "Could not load ERP balance summary."
+  },
+  "tabs": {
+    "quotations": "عروض الأسعار",
+    "orders": "الطلبات",
+    "activities": "الأنشطة",
+    "overview": "نظرة عامة",
+    "analytics": "التحليلات",
+    "quickQuotations": "عروض الأسعار السريعة",
+    "mailLogs": "سجل البريد",
+    "images": "الصور",
+    "imagesDefaultDescription": "صورة البطاقة الشخصية",
+    "erpMovements": "حركات ERP",
+    "erpOrders": "طلبات ERP"
+  },
+  "quickQuotations": {
+    "empty": "لم يتم العثور على عروض أسعار سريعة لهذا العميل",
+    "error": "تعذر تحميل عروض الأسعار السريعة",
+    "draft": "مسودة",
+    "converted": "تم التحويل",
+    "sentToApproval": "تم الإرسال للموافقة",
+    "notSentToApproval": "لم يتم الإرسال للموافقة",
+    "currency": "العملة",
+    "total": "المجموع",
+    "quotationStatus": "حالة عرض السعر",
+    "approvalStep": "خطوة الموافقة",
+    "stepValue": "الخطوة {{step}}",
+    "convertedAt": "تم التحويل: {{date}}",
+    "notConvertedYet": "لم يتم التحويل بعد",
+    "openQuotation": "فتح عرض السعر"
+  },
+  "mail": {
+    "providers": {
+      "google": "Google",
+      "outlook": "Outlook"
+    },
+    "columns": {
+      "date": "التاريخ",
+      "sender": "المرسل",
+      "to": "المستلم",
+      "subject": "الموضوع",
+      "status": "الحالة",
+      "template": "القالب",
+      "errorCode": "رمز الخطأ",
+      "body": "الرسالة"
+    }
+  },
+  "kpi": {
+    "totalDemands": "إجمالي عروض الأسعار",
+    "totalQuotations": "إجمالي عروض الأسعار",
+    "totalOrders": "إجمالي الطلبات",
+    "openQuotations": "عروض الأسعار المفتوحة",
+    "openOrders": "الطلبات المعلقة"
+  },
+  "sections": {
+    "contacts": "جهات الاتصال",
+    "shippingAddresses": "عناوين الشحن",
+    "recentDemands": "أحدث الطلبات الواردة",
+    "recentQuotations": "عروض الأسعار الأخيرة",
+    "recentOrders": "الطلبات الأخيرة",
+    "recentActivities": "الأنشطة الأخيرة",
+    "timeline": "الجدول الزمني"
+  },
+  "analytics": {
+    "error": "تعذر تحميل بيانات التحليلات",
+    "last12MonthsOrderAmount": "مبلغ الطلبات آخر 12 شهراً",
+    "openQuotationAmount": "مبلغ عرض السعر المفتوح",
+    "openOrderAmount": "مبلغ الطلب المفتوح",
+    "activityCount": "عدد الأنشطة",
+    "lastActivityDate": "تاريخ آخر نشاط"
+  },
+  "analyticsCharts": {
+    "demand": "عرض السعر",
+    "quotation": "عرض السعر",
+    "order": "الطلب",
+    "last12MonthsOrderAmount": "طلبات آخر 12 شهراً",
+    "openQuotationAmount": "عرض السعر المفتوح",
+    "openOrderAmount": "الطلب المفتوح",
+    "distributionTitle": "التوزيع",
+    "monthlyTrendTitle": "الاتجاه الشهري",
+    "amountComparisonTitle": "مقارنة المبالغ"
+  },
+  "currencyTotals": {
+    "currency": "العملة",
+    "demandAmount": "مبلغ عرض السعر",
+    "quotationAmount": "مبلغ عرض السعر",
+    "orderAmount": "مبلغ الطلب"
+  },
+  "revenueQuality": {
+    "title": "جودة الإيرادات",
+    "churnRisk": "خطر الفقدان",
+    "upsell": "الميل للبيع الإضافي",
+    "payment": "سلوك الدفع",
+    "segment": "تجميع RFM",
+    "ltv": "القيمة الدائمة"
+  },
+  "cohort": {
+    "title": "الاحتفاظ بالمجموعة",
+    "empty": "لا توجد بيانات مجموعة",
+    "cohortKey": "المجموعة"
+  },
+  "actions": {
+    "title": "الإجراءات الموصى بها",
+    "empty": "لا توجد إجراءات موصى بها",
+    "execute": "تنفيذ"
+  },
+  "explain": {
+    "revenueQualityTitle": "تلخص جودة الإيرادات إمكانات المبيعات والملف الشخصي للمخاطر للعميل.",
+    "churnRisk": "يشير خطر الفقدان إلى احتمال عدم قيام العميل بتقديم طلبات مرة أخرى.",
+    "upsellPropensity": "يُظهر الميل للبيع الإضافي إمكانات العميل للمشتريات ذات الحجم الأعلى أو المنتجات الإضافية.",
+    "paymentBehavior": "يلخص سلوك الدفع نمط التحصيل والدفع للعميل.",
+    "rfmSegment": "يُظهر تجميع RFM مجموعة العميل بناءً على بيانات الحداثة والتردد والمبلغ.",
+    "modelNote": "هذه الحقول هي مخرجات النموذج التحليلي ويتم عرضها لأغراض دعم القرار.",
+    "cohortRetentionTitle": "يُظهر الاحتفاظ بالمجموعة استمرارية العملاء المكتسبين في فترة مماثلة بمرور الوقت.",
+    "noCohortData": "بيانات مجموعة غير كافية لهذا العميل.",
+    "recommendedActionsTitle": "يتم سرد الإجراءات الموصى بها من قبل النظام في هذا القسم.",
+    "executeAction": "تنفيذ الإجراء"
+  },
+  "button": "عميل 360",
+  "status": {
+    "havenotstarted": "لم يبدأ",
+    "notstarted": "لم يبدأ",
+    "inprogress": "قيد الموافقة",
+    "pending": "قيد الانتظار",
+    "waiting": "في الانتظار",
+    "approved": "تمت الموافقة",
+    "rejected": "مرفوض",
+    "completed": "مكتمل",
+    "cancelled": "ملغى",
+    "canceled": "ملغى",
+    "draft": "مسودة",
+    "converted": "تم التحويل",
+    "sent": "تم الإرسال",
+    "active": "نشط",
+    "passive": "غير نشط",
+    "closed": "مغلق",
+    "open": "مفتوح"
+  },
+  "erpMovements": {
+    "title": "حركات ERP",
+    "tableTitle": "حركات الحساب الجاري",
+    "error": "تعذر تحميل بيانات حركات ERP",
+    "columns": {
+      "date": "التاريخ",
+      "dueDate": "تاريخ الاستحقاق",
+      "documentNo": "رقم المستند",
+      "description": "الوصف",
+      "currency": "العملة",
+      "debit": "مدين",
+      "credit": "دائن",
+      "tlBalanceByDate": "الرصيد بالليرة التركية حسب التاريخ",
+      "tlBalanceByDueDate": "الرصيد بالليرة التركية حسب تاريخ الاستحقاق",
+      "fxDebit": "مدين بالعملة الأجنبية",
+      "fxCredit": "دائن بالعملة الأجنبية",
+      "fxBalanceByDate": "رصيد العملة الأجنبية حسب التاريخ",
+      "fxBalanceByDueDate": "رصيد العملة الأجنبية حسب تاريخ الاستحقاق"
+    },
+    "summary": {
+      "totalDebit": "إجمالي المدين",
+      "totalCredit": "إجمالي الدائن",
+      "balance": "الرصيد",
+      "closed": "مغلق"
+    }
+  },
+  "erpOrders": {
+    "title": "Netsis Orders",
+    "noCariCode": "No ERP customer code is defined for this customer.",
+    "forbidden": "You do not have permission to view ERP orders.",
+    "error": "ERP orders could not be loaded.",
+    "empty": "No Netsis orders were found for this customer.",
+    "scopeHint": "Limited to the logged-in user's Netsis scope.",
+    "columns": {
+      "branch": "Branch",
+      "orderNo": "Order No",
+      "date": "Date",
+      "deliveryDate": "Delivery",
+      "gross": "Gross",
+      "vat": "VAT",
+      "total": "Total",
+      "salesRep": "Sales Rep"
+    }
+  },
+  "hero": {
+    "statusActive": "نشط",
+    "statusCrm": "سجل CRM",
+    "since": "منذ {{year}}",
+    "whatsapp": "واتساب",
+    "call": "اتصال",
+    "email": "بريد",
+    "quickQuote": "عرض سعر سريع",
+    "editCustomer": "تعديل العميل",
+    "none": "لا يوجد",
+    "emailLabel": "البريد",
+    "phoneLabel": "الهاتف",
+    "websiteLabel": "الموقع",
+    "addressLabel": "العنوان",
+    "infoTitle": "التفاصيل",
+    "taxNumber": "الرقم الضريبي",
+    "customerType": "نوع العميل",
+    "salesRep": "مندوب المبيعات",
+    "creditLimit": "حد الائتمان"
+  },
+  "related": {
+    "newQuotation": "عرض سعر جديد",
+    "newOrder": "طلب جديد",
+    "newActivity": "نشاط جديد",
+    "error": "تعذّر تحميل القائمة",
+    "emptyQuotations": "لا توجد عروض أسعار لهذا العميل",
+    "emptyOrders": "لا توجد طلبات لهذا العميل",
+    "emptyActivities": "لا توجد أنشطة لهذا العميل",
+    "columns": {
+      "offerNo": "رقم",
+      "date": "التاريخ",
+      "representative": "المندوب",
+      "total": "الإجمالي",
+      "subject": "الموضوع",
+      "type": "النوع",
+      "assignee": "المسؤول",
+      "status": "الحالة"
+    },
+    "activityStatus": {
+      "scheduled": "مجدول",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    }
+  },
+  "images": {
+    "upload": "رفع صورة",
+    "delete": "حذف",
+    "emptyHint": "انقر أو اسحب لإضافة صورة",
+    "deleteConfirmTitle": "حذف الصورة",
+    "deleteConfirmDescription": "هل أنت متأكد من حذف هذه الصورة؟ لا يمكن التراجع عن هذا الإجراء."
+  }
+}

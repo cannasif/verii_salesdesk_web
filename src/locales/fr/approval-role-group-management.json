@@ -1,0 +1,62 @@
+{
+  "advancedFilter": {
+    "columnName": "Nom du groupe",
+    "columnCreatedBy": "Créé par"
+  },
+  "menu": "Gestion des groupes de rôles d'approbation",
+  "description": "Gérer et modifier les groupes de rôles d'approbation",
+  "addButton": "Ajouter un groupe d'approbation",
+  "refresh": "Actualiser",
+  "searchPlaceholder": "Rechercher...",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée trouvée",
+  "noDataDescription": "Aucun enregistrement correspondant à vos critères de recherche n'a été trouvé ou aucun enregistrement n'a encore été ajouté.",
+  "approvalRoleGroup": {
+    "menu": "Gestion des groupes de rôles d'approbation",
+    "description": "Gérer et modifier les groupes de rôles d'approbation",
+    "addButton": "Ajouter un groupe de rôles",
+    "searchPlaceholder": "Rechercher...",
+    "noData": "Aucune donnée trouvée",
+    "table": {
+      "title": "Liste des groupes",
+      "id": "ID",
+      "name": "Nom du groupe",
+      "createdDate": "Date de création",
+      "createdBy": "Créé par",
+      "actions": "Actions",
+      "showing": "Affichage de {{from}} à {{to}} sur {{total}} enregistrements"
+    },
+    "delete": {
+      "title": "Confirmation de suppression",
+      "confirmMessage": "Voulez-vous vraiment supprimer le groupe {{name}} ?",
+      "success": "Le groupe a été supprimé avec succès",
+      "error": "Une erreur est survenue lors de la suppression du groupe"
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nom du groupe",
+    "createdDate": "Date de création",
+    "createdBy": "Créé par",
+    "actions": "Actions",
+    "showing": "Affichage de {{from}} à {{to}} sur {{total}} enregistrements"
+  },
+  "delete": {
+    "confirmTitle": "Suppression",
+    "confirmMessage": "Cette action ne peut pas être annulée. Voulez-vous continuer ?"
+  },
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "saving": "Enregistrement...",
+  "deleteButton": "Supprimer",
+  "form": {
+    "editTitle": "Modifier le groupe de rôles d'approbation",
+    "addTitle": "Ajouter un groupe de rôles d'approbation",
+    "editDescription": "Modifier les informations du groupe de rôles d'approbation",
+    "addDescription": "Ajouter un nouveau groupe de rôles d'approbation",
+    "name": "Nom du groupe",
+    "namePlaceholder": "Entrez le nom du groupe",
+    "nameRequired": "Le nom du groupe est obligatoire",
+    "nameMaxLength": "Le nom du groupe peut contenir au maximum 100 caractères"
+  }
+}

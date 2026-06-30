@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "تعريفات Windoform",
+    "description": "إدارة سجلات الملف والحديد والبراغي والطباعة باستخدام نفس نمط الجدول كشاشات التعريف الأخرى.",
+    "documentTitle": "تعريفات Windoform"
+  },
+  "sections": {
+    "profil": {
+      "title": "تعريفات الملف",
+      "description": "إدارة خيارات الملف القابلة للتحديد في أسطر المستندات."
+    },
+    "demir": {
+      "title": "تعريفات الحديد",
+      "description": "إدارة خيارات الحديد القابلة للتحديد في أسطر المستندات."
+    },
+    "vida": {
+      "title": "تعريفات البراغي",
+      "description": "إدارة خيارات البراغي القابلة للتحديد في أسطر المستندات."
+    },
+    "baski": {
+      "title": "تعريفات الطباعة",
+      "description": "إدارة خيارات الطباعة القابلة للتحديد في سطور المستند."
+    },
+    "koliBaski": {
+      "title": "تعريفات طباعة العبوة",
+      "description": "إدارة خيارات طباعة العبوة المحددة في رأس عرض السعر والتي يتم إرسالها إلى وصف رأس Netsis."
+    }
+  },
+  "table": {
+    "id": "المعرف",
+    "name": "الاسم",
+    "profilName": "الملف",
+    "createdDate": "تاريخ الإنشاء",
+    "updatedDate": "تاريخ التحديث",
+    "newRecord": "سجل جديد",
+    "searchPlaceholder": "البحث في التعريفات...",
+    "refresh": "تحديث",
+    "loading": "جاري تحميل التعريفات...",
+    "empty": "لم يتم العثور على سجلات.",
+    "actions": "إجراءات",
+    "previous": "السابق",
+    "next": "التالي",
+    "pagination": "عرض {{from}}-{{to}} من {{total}} سجلات",
+    "filterName": "الاسم",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "إضافة ملف تعريف جديد",
+    "addNewRebar": "إضافة حديد جديد",
+    "addNewScrew": "إضافة برغي جديد",
+    "addNewPrint": "إضافة طباعة جديدة",
+    "addNewKoliBaski": "إضافة طباعة تغليف جديدة",
+    "editTitle": "تعديل {{section}}",
+    "addTitle": "إضافة {{section}}",
+    "nameLabel": "الاسم",
+    "profilLabel": "الملف المرتبط",
+    "profilPlaceholder": "اختر ملفاً",
+    "profilSearchPlaceholder": "البحث عن ملف",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "demirNameLabel": "اسم الحديد",
+    "demirNamePlaceholder": "اسم الحديد المرتبط",
+    "vidaNameLabel": "اسم البرغي",
+    "vidaNamePlaceholder": "اسم البرغي المرتبط"
+  },
+  "validation": {
+    "nameRequired": "الاسم مطلوب",
+    "profilRequired": "تحديد الملف مطلوب"
+  },
+  "toasts": {
+    "created": "تم إنشاء السجل {{section}}",
+    "updated": "تم تحديث السجل {{section}}",
+    "deleted": "تم حذف السجل {{section}}"
+  }
+}

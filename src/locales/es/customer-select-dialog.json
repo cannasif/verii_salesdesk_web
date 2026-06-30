@@ -1,0 +1,28 @@
+{
+  "title": "Seleccionar cliente",
+  "description": "En «Todos», los clientes se muestran como ERP o potencial. La otra pestaña es solo potenciales.",
+  "badgeKindErp": "ERP",
+  "badgeKindPotential": "Potencial",
+  "erpCustomers": "Clientes ERP",
+  "crmCustomers": "Clientes CRM",
+  "allCustomers": "Todos",
+  "erp": "Clientes ERP",
+  "crm": "CRM",
+  "noErpCustomers": "No se encontraron clientes ERP",
+  "noCrmCustomers": "No se encontraron clientes CRM",
+  "noCustomers": "No se encontraron clientes",
+  "noResults": "No se encontraron resultados",
+  "searchPlaceholder": "Buscar por nombre o código...",
+  "voiceSearch": "Búsqueda por voz",
+  "loading": "Cargando",
+  "table": {
+    "type": "Tipo",
+    "customerCode": "Código de cliente",
+    "customerName": "Nombre del cliente",
+    "phone": "Teléfono",
+    "city": "Ciudad",
+    "email": "Correo electrónico"
+  },
+  "potentialCustomers": "Potencial",
+  "noPotentialCustomers": "No se encontraron clientes potenciales"
+}

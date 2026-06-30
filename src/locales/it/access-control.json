@@ -1,0 +1,146 @@
+{
+  "help": {
+    "permissionDefinition": {
+      "code": "Chiave univoca usata dalle guardie di route e pagina. Preferire naming snake_case o con punto stabile.",
+      "name": "Nome mostrato agli amministratori nella gestione dei permessi.",
+      "description": "Spiegazione interna opzionale per questo permesso.",
+      "isActive": "I permessi inattivi non vengono considerati nel calcolo dell'accesso utente.",
+      "save": "Le modifiche influenzano i flussi di autorizzazione di ruoli e gruppi."
+    },
+    "permissionGroup": {
+      "name": "Nome del gruppo per l'identificazione nell'assegnazione agli utenti.",
+      "isSystemAdmin": "I membri di questo gruppo possono accedere a tutte le pagine e azioni senza controlli individuali sui permessi.",
+      "isActive": "I gruppi inattivi non devono essere assegnati per nuove decisioni di accesso.",
+      "permissions": "I permessi selezionati definiscono a cosa possono accedere i membri di questo gruppo.",
+      "save": "Aggiorna l'accesso effettivo per tutti gli utenti assegnati a questo gruppo."
+    },
+    "userAssignment": {
+      "user": "Scegli l'utente di cui desideri gestire l'ambito di accesso.",
+      "groups": "L'utente riceve permessi combinati da tutti i gruppi selezionati.",
+      "save": "Le assegnazioni si applicano immediatamente per i prossimi controlli di autorizzazione. Gli utenti potrebbero dover aggiornare la sessione.",
+      "systemAdminNote": "Se l'utente ha un gruppo amministratore di sistema, i permessi dettagliati vengono ignorati."
+    }
+  },
+  "permissionDefinitions": {
+    "title": "Definizioni di autorizzazione",
+    "description": "Gestisci i codici autorizzazione usati dal sistema",
+    "add": "Aggiungi definizione",
+    "form": {
+      "editTitle": "Modifica definizione autorizzazione",
+      "addTitle": "Aggiungi definizione autorizzazione",
+      "editDescription": "Aggiorna i dettagli della definizione autorizzazione",
+      "addDescription": "Crea una nuova definizione autorizzazione",
+      "code": "Codice",
+      "name": "Nome",
+      "namePlaceholder": "Nome visualizzato",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione facoltativa",
+      "isActive": "Attivo",
+      "codePlaceholder": "Scegli il codice",
+      "affectedRoutes": "Pagine interessate",
+      "affectedRoutesNone": "Nessun percorso corrispondente trovato per questo codice",
+      "codeSearchPlaceholder": "Cerca...",
+      "codeEmpty": "Nessun risultato trovato"
+    },
+    "table": {
+      "code": "Codice",
+      "name": "Nome",
+      "isActive": "Attivo",
+      "updatedDate": "Aggiornato",
+      "showing": "{{from}}-{{to}} di {{total}}",
+      "title": "Definizioni di autorizzazione"
+    },
+    "delete": {
+      "confirmTitle": "Elimina definizione autorizzazione",
+      "confirmMessage": "Sei sicuro di voler eliminare \"{{name}}\"? Questa azione non può essere annullata."
+    },
+    "syncFromRoutes": "Sincronizza dai percorsi",
+    "syncSummaryTitle": "Riepilogo sincronizzazione percorsi"
+  },
+  "permissionGroups": {
+    "title": "Gruppi autorizzazioni",
+    "description": "Gestisci i gruppi di autorizzazione e le relative assegnazioni",
+    "add": "Aggiungi gruppo",
+    "selectAll": "Seleziona tutto",
+    "noDefinitions": "Nessuna definizione autorizzazione disponibile",
+    "form": {
+      "editTitle": "Modifica gruppo autorizzazioni",
+      "addTitle": "Aggiungi gruppo autorizzazioni",
+      "editDescription": "Aggiorna i dettagli del gruppo autorizzazione",
+      "addDescription": "Crea un nuovo gruppo autorizzazione",
+      "name": "Nome",
+      "namePlaceholder": "Nome gruppo",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Descrizione facoltativa",
+      "isSystemAdmin": "Amministratore di sistema",
+      "isActive": "Attivo",
+      "permissions": "Autorizzazioni"
+    },
+    "table": {
+      "name": "Nome",
+      "isSystemAdmin": "Amministratore di sistema",
+      "isActive": "Attivo",
+      "permissionCount": "Autorizzazioni",
+      "showing": "{{from}}-{{to}} di {{total}}",
+      "title": "Gruppi autorizzazioni"
+    },
+    "managePermissions": "Gestisci autorizzazioni",
+    "permissionsPanel": {
+      "title": "Modifica autorizzazioni del gruppo",
+      "description": "Seleziona autorizzazioni per questo gruppo",
+      "currentCodes": "Codici autorizzazione correnti",
+      "groupedRows": "Schermate",
+      "screen": "Schermata",
+      "actionsMapped": "Azioni",
+      "actions": {
+        "create": "Crea",
+        "read": "Visualizza",
+        "update": "Aggiorna",
+        "delete": "Elimina",
+        "other": "Autorizzazioni operative"
+      }
+    },
+    "delete": {
+      "confirmTitle": "Elimina gruppo autorizzazione",
+      "confirmMessage": "Sei sicuro di voler eliminare \"{{name}}\"? Questa azione non può essere annullata."
+    },
+    "search": "Cerca...",
+    "systemAdminLocked": "Il gruppo amministratore di sistema non può essere modificato"
+  },
+  "userGroupAssignments": {
+    "title": "Assegnazioni gruppi utente",
+    "description": "Assegna i gruppi autorizzazione agli utenti",
+    "selectUser": "Seleziona utente",
+    "selectUserPlaceholder": "Cerca e seleziona utente...",
+    "selectUserHint": "Seleziona un utente per gestire le sue assegnazioni di gruppo",
+    "assignedGroups": "Gruppi autorizzazione assegnati",
+    "noUsers": "Nessun utente trovato",
+    "noGroups": "Nessun gruppo autorizzazione disponibile",
+    "selectAll": "Seleziona tutto",
+    "status": "Stato",
+    "unsavedChanges": "Non salvato",
+    "upToDate": "Aggiornato"
+  },
+  "common": {
+    "cancel": "Annulla",
+    "saving": "Registrazione...",
+    "save": "Salva e applica",
+    "loading": "Caricamento...",
+    "search": "Cerca...",
+    "noData": "Nessun dato",
+    "actions": "Azioni",
+    "yes": "SÌ",
+    "no": "No",
+    "edit": "Modificare",
+    "delete": "Eliminare",
+    "previous": "Precedente",
+    "next": "Prossimo",
+    "processing": "Elaborazione..."
+  },
+  "sidebar": {
+    "accessControl": "Controllo Accessi",
+    "permissionDefinitions": "Definizioni di autorizzazione",
+    "permissionGroups": "Gruppi autorizzazioni",
+    "userGroupAssignments": "Assegnazioni gruppi utente"
+  }
+}

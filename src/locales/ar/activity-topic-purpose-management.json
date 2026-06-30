@@ -1,0 +1,82 @@
+{
+  "menu": "إدارة مواضيع الاهتمام",
+  "description": "إدارة وتعديل مواضيع الاهتمام",
+  "addButton": "إضافة موضوع جديد",
+  "loading": "جارٍ التحميل...",
+  "noData": "لا توجد بيانات",
+  "actions": "إجراءات",
+  "edit": "تعديل",
+  "deleteButton": "حذف",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "saving": "جارٍ الحفظ...",
+  "previous": "السابق",
+  "next": "التالي",
+  "advancedFilter": {
+    "columnName": "اسم الموضوع",
+    "columnDescription": "الوصف",
+    "columnCreatedBy": "تم الإنشاء بواسطة"
+  },
+  "activityType": {
+    "form": {
+      "addTitle": "إضافة موضوع جديد",
+      "editTitle": "تعديل الموضوع",
+      "addDescription": "أدخل معلومات الموضوع الجديد",
+      "editDescription": "تعديل معلومات الموضوع",
+      "name": "اسم الموضوع",
+      "namePlaceholder": "أدخل اسم الموضوع",
+      "nameRequired": "اسم الموضوع مطلوب",
+      "nameMaxLength": "يمكن أن يحتوي اسم الموضوع على 100 حرف كحد أقصى",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أدخل الوصف (اختياري)",
+      "descriptionMaxLength": "يمكن أن يحتوي الوصف على 500 حرف كحد أقصى"
+    },
+    "table": {
+      "title": "قائمة مواضيع الاهتمام",
+      "id": "المعرف",
+      "name": "اسم الموضوع",
+      "description": "الوصف",
+      "createdDate": "تاريخ الإنشاء",
+      "createdBy": "تم الإنشاء بواسطة",
+      "showing": "عرض {{from}}-{{to}} / {{total}}",
+      "page": "صفحة {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "إجمالي المواضيع",
+      "activeActivityTypes": "المواضيع النشطة",
+      "newThisMonth": "جديد هذا الشهر"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الموضوع بنجاح",
+      "createError": "فشل في إنشاء الموضوع",
+      "updateSuccess": "تم تحديث الموضوع بنجاح",
+      "updateError": "فشل في تحديث الموضوع",
+      "deleteSuccess": "تم حذف الموضوع بنجاح",
+      "deleteError": "فشل في حذف الموضوع"
+    },
+    "error": "حدث خطأ",
+    "create": "إضافة موضوع جديد",
+    "loading": "جارٍ التحميل...",
+    "noData": "لا توجد بيانات",
+    "actions": "إجراءات",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ..."
+  },
+  "deleteConfirm": {
+    "confirmTitle": "حذف الموضوع",
+    "confirmMessage": "هل أنت متأكد أنك تريد حذف {{name}}؟"
+  },
+  "messages": {
+    "deleteSuccess": "تم حذف الموضوع بنجاح",
+    "deleteError": "فشل في حذف الموضوع"
+  },
+  "table": {
+    "title": "قائمة مواضيع الاهتمام",
+    "id": "المعرف",
+    "name": "اسم الموضوع",
+    "description": "الوصف",
+    "createdDate": "تاريخ الإنشاء",
+    "createdBy": "تم الإنشاء بواسطة"
+  }
+}

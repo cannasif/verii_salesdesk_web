@@ -1,0 +1,13 @@
+{
+  "title": "Seleccione stocks relacionados",
+  "description": "Seleccione los stocks relacionados que desea agregar junto con el stock principal. Los stocks obligatorios se seleccionan automáticamente.",
+  "cancel": "Cancelar",
+  "mandatoryStocks": "Stocks obligatorios",
+  "optionalStocks": "Stocks opcionales",
+  "unknownStock": "Stock desconocido",
+  "quantity": "Cantidad",
+  "mandatory": "Obligatorio",
+  "noRelatedStocks": "No se encontraron stocks relacionados",
+  "add": "Agregar",
+  "calculating": "Calculando..."
+}

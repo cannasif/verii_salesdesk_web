@@ -1,0 +1,82 @@
+{
+  "menu": "Interessengebiete Verwaltung",
+  "description": "Interessengebiete verwalten und bearbeiten",
+  "addButton": "Neues Thema hinzufügen",
+  "loading": "Wird geladen...",
+  "noData": "Keine Daten",
+  "actions": "Aktionen",
+  "edit": "Bearbeiten",
+  "deleteButton": "Löschen",
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Wird gespeichert...",
+  "previous": "Zurück",
+  "next": "Weiter",
+  "advancedFilter": {
+    "columnName": "Themenname",
+    "columnDescription": "Beschreibung",
+    "columnCreatedBy": "Erstellt von"
+  },
+  "activityType": {
+    "form": {
+      "addTitle": "Neues Thema hinzufügen",
+      "editTitle": "Thema bearbeiten",
+      "addDescription": "Geben Sie neue Themeninformationen ein",
+      "editDescription": "Themeninformationen bearbeiten",
+      "name": "Themenname",
+      "namePlaceholder": "Themennamen eingeben",
+      "nameRequired": "Themenname ist erforderlich",
+      "nameMaxLength": "Themenname darf maximal 100 Zeichen lang sein",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreibung eingeben (optional)",
+      "descriptionMaxLength": "Beschreibung darf maximal 500 Zeichen lang sein"
+    },
+    "table": {
+      "title": "Liste der Interessengebiete",
+      "id": "ID",
+      "name": "Themenname",
+      "description": "Beschreibung",
+      "createdDate": "Erstellungsdatum",
+      "createdBy": "Erstellt von",
+      "showing": "Zeige {{from}}-{{to}} / {{total}}",
+      "page": "Seite {{current}} / {{total}}"
+    },
+    "stats": {
+      "totalActivityTypes": "Gesamte Themen",
+      "activeActivityTypes": "Aktive Themen",
+      "newThisMonth": "Neu diesen Monat"
+    },
+    "messages": {
+      "createSuccess": "Thema erfolgreich erstellt",
+      "createError": "Fehler beim Erstellen des Themas",
+      "updateSuccess": "Thema erfolgreich aktualisiert",
+      "updateError": "Fehler beim Aktualisieren des Themas",
+      "deleteSuccess": "Thema erfolgreich gelöscht",
+      "deleteError": "Fehler beim Löschen des Themas"
+    },
+    "error": "Ein Fehler ist aufgetreten",
+    "create": "Neues Thema hinzufügen",
+    "loading": "Wird geladen...",
+    "noData": "Keine Daten",
+    "actions": "Aktionen",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert..."
+  },
+  "deleteConfirm": {
+    "confirmTitle": "Thema löschen",
+    "confirmMessage": "Sind Sie sicher, dass Sie {{name}} löschen möchten?"
+  },
+  "messages": {
+    "deleteSuccess": "Thema erfolgreich gelöscht",
+    "deleteError": "Fehler beim Löschen des Themas"
+  },
+  "table": {
+    "title": "Liste der Interessengebiete",
+    "id": "ID",
+    "name": "Themenname",
+    "description": "Beschreibung",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von"
+  }
+}

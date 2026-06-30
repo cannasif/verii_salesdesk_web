@@ -1,0 +1,63 @@
+{
+  "addButton": "Neuen Titel hinzufügen",
+  "loading": "Laden...",
+  "noData": "Keine Daten gefunden",
+  "error": "Ein Fehler ist aufgetreten",
+  "search": "Suchen...",
+  "refresh": "Aktualisieren",
+  "previous": "Previous",
+  "next": "Weiter",
+  "menu": "Titelverwaltung",
+  "description": "Titel verwalten und bearbeiten",
+  "advancedFilter": {
+    "columnTitleName": "Titelname",
+    "columnCode": "Code"
+  },
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "saving": "Speichern...",
+  "delete": {
+    "confirmTitle": "Titel löschen",
+    "confirmMessage": "Möchten Sie den Titel {{titleName}} wirklich löschen?",
+    "button": "Löschen"
+  },
+  "deleting": "Wird gelöscht...",
+  "actions": "Aktionen",
+  "edit": "Bearbeiten",
+  "header": {
+    "title": "Titelverwaltung",
+    "description": "Verwalten Sie Titeldefinitionen hier."
+  },
+  "table": {
+    "id": "ID",
+    "name": "Titelname",
+    "code": "Code",
+    "createdDate": "Erstellungsdatum",
+    "createdBy": "Erstellt von",
+    "showing": "Anzeigen {{from}}-{{to}} / {{total}}",
+    "page": "Seite {{current}} / {{total}}",
+    "title": "Titel Listesi"
+  },
+  "form": {
+    "addTitle": "Neuen Titel hinzufügen",
+    "editTitle": "Titel bearbeiten",
+    "addDescription": "Geben Sie die neuen Titelinformationen ein",
+    "editDescription": "Titelinformationen bearbeiten",
+    "titleName": "Titelname",
+    "titleNamePlaceholder": "Titelname eingeben",
+    "titleCode": "Titelcode",
+    "codePlaceholder": "Code eingeben (opsiyonel)",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Speichern..."
+  },
+  "stats": {
+    "totalTitles": "Toplam Titel",
+    "activeTitles": "Aktive Titel",
+    "newThisMonth": "Neu diesen Monat"
+  },
+  "messages": {
+    "deleteSuccess": "Titel erfolgreich gelöscht",
+    "deleteError": "Titel konnte nicht gelöscht werden"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "title": "Kunden auswählen",
+  "description": "Unter „Alle“ sind Kunden als ERP oder Potenzial gekennzeichnet. Der andere Tab zeigt nur Potenzialkunden.",
+  "badgeKindErp": "ERP",
+  "badgeKindPotential": "Potenzial",
+  "erpCustomers": "ERP-Kunden",
+  "crmCustomers": "CRM-Kunden",
+  "allCustomers": "Alle",
+  "erp": "ERP",
+  "crm": "CRM",
+  "noErpCustomers": "Keine ERP-Kunden gefunden",
+  "noCrmCustomers": "Keine CRM-Kunden gefunden",
+  "noCustomers": "Keine Kunden gefunden",
+  "noResults": "Keine Suchergebnisse gefunden",
+  "searchPlaceholder": "Nach Name oder Code suchen...",
+  "voiceSearch": "Sprachsuche",
+  "loading": "Laden",
+  "table": {
+    "type": "Typ",
+    "customerCode": "Kundencode",
+    "customerName": "Kundenname",
+    "phone": "Phone",
+    "city": "Stadt",
+    "email": "E-Mail"
+  },
+  "potentialCustomers": "Potenziell",
+  "noPotentialCustomers": "Keine potenziellen Kunden gefunden"
+}

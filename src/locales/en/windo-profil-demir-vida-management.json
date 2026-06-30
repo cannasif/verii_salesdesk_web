@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "Windoform Definitions",
+    "description": "Manage profile, rebar, screw, and print records using the same paged table pattern as other definition screens.",
+    "documentTitle": "Windoform Definitions"
+  },
+  "sections": {
+    "profil": {
+      "title": "Profile definitions",
+      "description": "Manage profile options selectable on document lines."
+    },
+    "demir": {
+      "title": "Rebar definitions",
+      "description": "Manage rebar options selectable on document lines."
+    },
+    "vida": {
+      "title": "Screw definitions",
+      "description": "Manage screw options selectable on document lines."
+    },
+    "baski": {
+      "title": "Print definitions",
+      "description": "Manage print options selectable on document lines."
+    },
+    "koliBaski": {
+      "title": "Package print definitions",
+      "description": "Manage package print options selected on the quotation header and sent to the Netsis header description."
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Name",
+    "profilName": "Profile",
+    "createdDate": "Created",
+    "updatedDate": "Updated",
+    "newRecord": "New record",
+    "searchPlaceholder": "Search definitions...",
+    "refresh": "Refresh",
+    "loading": "Loading definitions...",
+    "empty": "No records found.",
+    "actions": "Actions",
+    "previous": "Previous",
+    "next": "Next",
+    "pagination": "Showing {{from}}-{{to}} of {{total}} records",
+    "filterName": "Name",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "Add new profile",
+    "addNewRebar": "Add new rebar",
+    "addNewScrew": "Add new screw",
+    "addNewPrint": "Add new print",
+    "addNewKoliBaski": "Add new package print",
+    "editTitle": "Edit {{section}}",
+    "addTitle": "Add {{section}}",
+    "nameLabel": "Name",
+    "profilLabel": "Linked profile",
+    "profilPlaceholder": "Select a profile",
+    "profilSearchPlaceholder": "Search profile",
+    "cancel": "Cancel",
+    "save": "Save",
+    "demirNameLabel": "Rebar name",
+    "demirNamePlaceholder": "Linked rebar name",
+    "vidaNameLabel": "Screw name",
+    "vidaNamePlaceholder": "Linked screw name"
+  },
+  "validation": {
+    "nameRequired": "Name is required",
+    "profilRequired": "Profile selection is required"
+  },
+  "toasts": {
+    "created": "{{section}} record created",
+    "updated": "{{section}} record updated",
+    "deleted": "{{section}} record deleted"
+  }
+}

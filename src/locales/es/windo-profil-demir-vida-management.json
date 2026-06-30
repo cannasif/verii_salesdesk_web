@@ -1,0 +1,75 @@
+{
+  "page": {
+    "title": "Definiciones Windoform",
+    "description": "Gestione perfiles, hierros, tornillos e impresiones utilizando el mismo formato de tabla que otras pantallas de definición.",
+    "documentTitle": "Definiciones Windoform"
+  },
+  "sections": {
+    "profil": {
+      "title": "Definiciones de perfil",
+      "description": "Gestione opciones de perfil seleccionables en las líneas de documentos."
+    },
+    "demir": {
+      "title": "Definiciones de hierro",
+      "description": "Gestione opciones de hierro seleccionables en las líneas de documentos."
+    },
+    "vida": {
+      "title": "Definiciones de tornillo",
+      "description": "Gestione opciones de tornillo seleccionables en las líneas de documentos."
+    },
+    "baski": {
+      "title": "Definiciones de impresión",
+      "description": "Administre las opciones de impresión seleccionables en las líneas del documento."
+    },
+    "koliBaski": {
+      "title": "Definiciones de impresión de paquetes",
+      "description": "Administre las opciones de impresión de paquetes seleccionadas en el encabezado de la cotización y enviadas a la descripción del encabezado de Netsis."
+    }
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nombre",
+    "profilName": "Perfil",
+    "createdDate": "Fecha de creación",
+    "updatedDate": "Fecha de actualización",
+    "newRecord": "Nuevo registro",
+    "searchPlaceholder": "Buscar definiciones...",
+    "refresh": "Actualizar",
+    "loading": "Cargando definiciones...",
+    "empty": "No se encontraron registros.",
+    "actions": "Acciones",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "pagination": "Mostrando {{from}}-{{to}} de {{total}} registros",
+    "filterName": "Nombre",
+    "dateDash": "-"
+  },
+  "dialog": {
+    "addNewProfile": "Agregar nuevo perfil",
+    "addNewRebar": "Agregar nueva armadura",
+    "addNewScrew": "Agregar nuevo tornillo",
+    "addNewPrint": "Agregar nueva impresión",
+    "addNewKoliBaski": "Agregar nueva impresión de embalaje",
+    "editTitle": "Editar {{section}}",
+    "addTitle": "Añadir {{section}}",
+    "nameLabel": "Nombre",
+    "profilLabel": "Perfil vinculado",
+    "profilPlaceholder": "Seleccione un perfil",
+    "profilSearchPlaceholder": "Buscar perfil",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "demirNameLabel": "Nombre del hierro",
+    "demirNamePlaceholder": "Nombre del hierro vinculado",
+    "vidaNameLabel": "Nombre del tornillo",
+    "vidaNamePlaceholder": "Nombre del tornillo vinculado"
+  },
+  "validation": {
+    "nameRequired": "El nombre es obligatorio",
+    "profilRequired": "Es obligatorio seleccionar un perfil"
+  },
+  "toasts": {
+    "created": "Registro de {{section}} creado",
+    "updated": "Registro de {{section}} actualizado",
+    "deleted": "Registro de {{section}} eliminado"
+  }
+}

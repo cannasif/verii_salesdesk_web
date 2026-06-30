@@ -1,0 +1,120 @@
+{
+  "countryManagement": {
+    "menu": "Gestion des pays",
+    "description": "Gérer et modifier les pays",
+    "addButton": "Ajouter un pays",
+    "searchPlaceholder": "Rechercher...",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "table": {
+      "id": "ID",
+      "name": "Nom du pays",
+      "code": "Code",
+      "erpCode": "Code ERP",
+      "createdDate": "Date de création",
+      "createdBy": "Créé par",
+      "noData": "Aucune donnée trouvée",
+      "title": "Liste des pays"
+    },
+    "delete": {
+      "confirmTitle": "Supprimer le pays",
+      "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+    },
+    "messages": {
+      "deleteSuccess": "Pays supprimé avec succès",
+      "deleteError": "Impossible de supprimer le pays",
+      "createSuccess": "Pays créé avec succès",
+      "createError": "Impossible de créer le pays",
+      "updateSuccess": "Pays mis à jour avec succès",
+      "updateError": "Impossible de mettre à jour le pays"
+    },
+    "form": {
+      "addCountry": "Ajouter un pays",
+      "editCountry": "Modifier le pays",
+      "addDescription": "Saisissez les informations du nouveau pays",
+      "editDescription": "Modifier les informations du pays",
+      "name": "Nom du pays",
+      "namePlaceholder": "Entrez le nom du pays",
+      "code": "Code du pays",
+      "codePlaceholder": "Entrez le code du pays (ex: TR, US)",
+      "erpCode": "Code ERP",
+      "erpCodePlaceholder": "Entrez le code ERP (facultatif)",
+      "nameRequired": "Le nom du pays est requis",
+      "nameMaxLength": "Le nom du pays ne peut pas dépasser 100 caractères",
+      "codeMinLength": "Le code du pays doit contenir au moins 2 caractères",
+      "codeMaxLength": "Le code du pays ne peut pas dépasser 5 caractères",
+      "erpCodeMaxLength": "Le code ERP ne peut pas dépasser 10 caractères",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "tabs": {
+        "header": "Informations générales"
+      }
+    },
+    "stats": {
+      "totalCountries": "Total des pays",
+      "activeCountries": "Pays actifs",
+      "newThisMonth": "Nouveaux ce mois-ci"
+    }
+  },
+  "menu": "Gestion des pays",
+  "description": "Gérer et modifier les pays",
+  "addButton": "Ajouter un pays",
+  "searchPlaceholder": "Rechercher...",
+  "loading": "Chargement...",
+  "noData": "Aucune donnée trouvée",
+  "actions": "Actions",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "deleteConfirmTitle": "Confirmation de suppression",
+  "cancel": "Annuler",
+  "deleting": "Suppression...",
+  "delete": {
+    "confirmTitle": "Supprimer le pays",
+    "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+  },
+  "saving": "Enregistrement...",
+  "save": "Enregistrer",
+  "stats": {
+    "totalCountries": "Total des pays",
+    "activeCountries": "Pays actifs",
+    "newThisMonth": "Nouveaux ce mois-ci"
+  },
+  "table": {
+    "id": "ID",
+    "name": "Nom du pays",
+    "code": "Code",
+    "erpCode": "Code ERP",
+    "createdDate": "Date de création",
+    "createdBy": "Créé par",
+    "showing": "Affichage {{from}}-{{to}} / {{total}}",
+    "page": "Page {{current}} / {{total}}",
+    "noData": "Aucune donnée trouvée",
+    "title": "Liste des pays"
+  },
+  "advancedFilter": {
+    "columnName": "Nom du pays",
+    "columnCode": "Code du pays",
+    "columnErpCode": "Code ERP"
+  },
+  "form": {
+    "addCountry": "Ajouter un pays",
+    "editCountry": "Modifier le pays",
+    "addDescription": "Saisissez les informations du nouveau pays",
+    "editDescription": "Modifier les informations du pays",
+    "name": "Nom du pays",
+    "namePlaceholder": "Entrez le nom du pays",
+    "code": "Code du pays",
+    "codePlaceholder": "Entrez le code du pays (ex: TR, US)",
+    "erpCode": "Code ERP",
+    "erpCodePlaceholder": "Entrez le code ERP (facultatif)",
+    "nameRequired": "Le nom du pays est requis",
+    "nameMaxLength": "Le nom du pays ne peut pas dépasser 100 caractères",
+    "codeMinLength": "Le code du pays doit contenir au moins 2 caractères",
+    "codeMaxLength": "Le code du pays ne peut pas dépasser 5 caractères",
+    "erpCodeMaxLength": "Le code ERP ne peut pas dépasser 10 caractères"
+  },
+  "deleteConfirm": {
+    "confirmMessage": "Êtes-vous sûr de vouloir supprimer {{name}} ?"
+  },
+  "search": "Rechercher..."
+}

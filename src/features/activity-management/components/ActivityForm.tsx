@@ -1,0 +1,973 @@
+import { type ReactElement, type ReactNode, useEffect, useMemo, useState, useRef } from 'react';
+import { useForm, useFieldArray, type FieldErrors } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Combobox } from '@/components/ui/combobox';
+import { VoiceSearchCombobox } from '@/components/shared/VoiceSearchCombobox';
+import {
+  useActivityTypeOptionsInfinite,
+  useActivityMeetingTypeOptionsInfinite,
+  useActivityShippingOptionsInfinite,
+  useActivityTopicPurposeOptionsInfinite,
+  usePaymentTypeOptionsInfinite,
+  useUserOptionsInfinite,
+} from '@/components/shared/dropdown/useDropdownEntityInfinite';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  activityFormSchema,
+  ActivityPriority,
+  ActivityStatus,
+  ReminderChannel,
+  type ActivityDto,
+  type ActivityFormSchema,
+} from '../types/activity-types';
+import { ACTIVITY_STATUSES, ACTIVITY_PRIORITIES, REMINDER_MINUTE_PRESETS } from '../utils/activity-constants';
+import { useCustomerOptions } from '@/features/customer-management/hooks/useCustomerOptions';
+import { useQuery } from '@tanstack/react-query';
+import { contactApi } from '@/features/contact-management/api/contact-api';
+import { useAuthStore } from '@/stores/auth-store';
+import type { PagedFilter } from '@/types/api';
+import { CustomerSelectDialog, type CustomerSelectionResult } from '@/components/shared';
+import { FormSubmitTooltipWrap } from '@/components/shared/FormSubmitTooltipWrap';
+import { buildActivitySaveRequiredHintLines } from '@/lib/activity-save-required-hints';
+import { resolveActivityCustomerDisplayName } from '@/lib/activity-customer-display';
+import { Search, Calendar, FileText, List, CheckSquare, Building2, User, AlertCircle, X, Bell, Plus, Trash2, Image } from 'lucide-react';
+import { ActivityImageTab } from '@/features/activity-image-management';
+import { isZodFieldRequired } from '@/lib/zod-required';
+
+interface ActivityFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (
+    data: ActivityFormSchema,
+    pendingImages?: { file: File; description: string }[],
+    pendingDeletedImageIds?: number[],
+    pendingUpdatedImageDescriptions?: Record<number, string>
+  ) => void | Promise<void>;
+  activity?: ActivityDto | null;
+  isLoading?: boolean;
+  initialDate?: string | null;
+  initialStartDateTime?: string | null;
+  initialEndDateTime?: string | null;
+  initialPotentialCustomerId?: number | null;
+  initialErpCustomerCode?: string | null;
+  initialContactId?: number | null;
+  initialCustomerDisplayName?: string | null;
+  /** Müşteri 360 / hızlı aktivite: ön doldurulan müşteri dropdown listesinde olmasa da korunur */
+  preservePrefilledCustomer?: boolean;
+}
+
+const INPUT_STYLE = `
+  h-11 rounded-lg
+  bg-slate-50 dark:bg-white/5
+  border border-slate-200 dark:border-white/10
+  text-slate-900 dark:text-white text-sm
+  placeholder:text-slate-400 dark:placeholder:text-slate-500
+  focus-visible:bg-white dark:focus-visible:bg-white/5
+  focus-visible:border-pink-500/70 focus-visible:ring-2 focus-visible:ring-pink-500/10 focus-visible:ring-offset-0
+  transition-all duration-200 w-full
+`;
+
+const LABEL_STYLE = 'text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2';
+
+function FormSection({ title, children, className = '' }: { title: string; children: ReactNode; className?: string }): ReactElement {
+  return (
+    <section className={className}>
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">{title}</h3>
+      <div className="space-y-4">{children}</div>
+    </section>
+  );
+}
+
+function normalizeStatus(value: number | string | undefined): number {
+  if (typeof value === 'number') return value;
+  if (value === 'Completed') return ActivityStatus.Completed;
+  if (value === 'Cancelled' || value === 'Canceled') return ActivityStatus.Cancelled;
+  return ActivityStatus.Scheduled;
+}
+
+function normalizePriority(value: number | string | undefined): number {
+  if (typeof value === 'number') return value;
+  if (value === 'Low') return ActivityPriority.Low;
+  if (value === 'High') return ActivityPriority.High;
+  return ActivityPriority.Medium;
+}
+
+function toDateTimeInputValue(value?: string | null): string {
+  if (!value) return '';
+  const localDateTimeMatch = value.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+  if (localDateTimeMatch && !/[zZ]|[+-]\d{2}:\d{2}$/.test(value)) {
+    return `${localDateTimeMatch[1]}T${localDateTimeMatch[2]}`;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function toDateInputValue(value?: string | null): string {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatLocalDateTime(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function toDefaultStartDateTime(initialDate?: string | null, initialStart?: string | null): string {
+  if (initialStart && initialStart.length >= 16) return initialStart;
+  if (initialDate && initialDate.length === 10) {
+    const now = new Date();
+    const year = initialDate.slice(0, 4);
+    const month = initialDate.slice(5, 7);
+    const day = initialDate.slice(8, 10);
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+  const now = new Date();
+  now.setSeconds(0, 0);
+  return formatLocalDateTime(now);
+}
+
+function toDefaultEndDateTime(initialEnd?: string | null, startValue?: string): string {
+  if (initialEnd && initialEnd.length >= 16) return initialEnd;
+
+  const start = startValue && startValue.length >= 16 ? new Date(startValue) : new Date();
+  if (Number.isNaN(start.getTime())) {
+    const fallback = new Date();
+    fallback.setHours(fallback.getHours() + 1, 0, 0, 0);
+    return formatLocalDateTime(fallback);
+  }
+
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  return formatLocalDateTime(end);
+}
+
+export function ActivityForm({
+  open,
+  onOpenChange,
+  onSubmit,
+  activity,
+  isLoading = false,
+  initialDate,
+  initialStartDateTime,
+  initialEndDateTime,
+  initialPotentialCustomerId,
+  initialErpCustomerCode,
+  initialContactId,
+  initialCustomerDisplayName,
+  preservePrefilledCustomer = false,
+}: ActivityFormProps): ReactElement {
+  const { t } = useTranslation(['activity-management', 'common']);
+  const { user } = useAuthStore();
+  const [activityTypeSearchTerm, setActivityTypeSearchTerm] = useState('');
+  const [assignedUserSearchTerm, setAssignedUserSearchTerm] = useState('');
+  const [paymentTypeSearchTerm, setPaymentTypeSearchTerm] = useState('');
+  const [meetingTypeSearchTerm, setMeetingTypeSearchTerm] = useState('');
+  const [topicPurposeSearchTerm, setTopicPurposeSearchTerm] = useState('');
+  const [shippingSearchTerm, setShippingSearchTerm] = useState('');
+  const activityTypeDropdown = useActivityTypeOptionsInfinite(activityTypeSearchTerm, open);
+  const assignedUserDropdown = useUserOptionsInfinite(assignedUserSearchTerm, open);
+  const paymentTypeDropdown = usePaymentTypeOptionsInfinite(paymentTypeSearchTerm, open);
+  const meetingTypeDropdown = useActivityMeetingTypeOptionsInfinite(meetingTypeSearchTerm, open);
+  const topicPurposeDropdown = useActivityTopicPurposeOptionsInfinite(topicPurposeSearchTerm, open);
+  const shippingDropdown = useActivityShippingOptionsInfinite(shippingSearchTerm, open);
+  const [customerSelectDialogOpen, setCustomerSelectDialogOpen] = useState(false);
+  const [selectedCustomerDisplayName, setSelectedCustomerDisplayName] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('details');
+  const [pendingImages, setPendingImages] = useState<{ id: string; file: File; description: string; previewUrl: string }[]>([]);
+  const [pendingDeletedImageIds, setPendingDeletedImageIds] = useState<number[]>([]);
+  const [pendingUpdatedImageDescriptions, setPendingUpdatedImageDescriptions] = useState<Record<number, string>>({});
+  const pendingImagesRef = useRef(pendingImages);
+  useEffect(() => {
+    pendingImagesRef.current = pendingImages;
+  }, [pendingImages]);
+  const reminderChannelOptions = [
+    { value: String(ReminderChannel.InApp), label: t('reminderChannelInApp') },
+    { value: String(ReminderChannel.Email), label: t('reminderChannelEmail') },
+  ] as const;
+
+  const defaultStartDateTime = useMemo(
+    () => toDefaultStartDateTime(initialDate, initialStartDateTime),
+    [initialDate, initialStartDateTime]
+  );
+  const defaultEndDateTime = useMemo(() => toDefaultEndDateTime(initialEndDateTime, defaultStartDateTime), [initialEndDateTime, defaultStartDateTime]);
+
+  const form = useForm<ActivityFormSchema>({
+    resolver: zodResolver(activityFormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      subject: '',
+      description: '',
+      activityType: '',
+      activityTypeId: undefined,
+      status: ActivityStatus.Scheduled,
+      priority: ActivityPriority.Medium,
+      assignedUserId: user?.id ?? 0,
+      paymentTypeId: undefined,
+      activityMeetingTypeId: undefined,
+      activityTopicPurposeId: undefined,
+      activityShippingId: undefined,
+      startDateTime: defaultStartDateTime,
+      endDateTime: defaultEndDateTime,
+      isAllDay: false,
+      reminders: [],
+    },
+  });
+  const watchedAssignedUserId = form.watch('assignedUserId');
+  const prevAssignedUserIdRef = useRef<number | null | undefined>(watchedAssignedUserId);
+  const {
+    data: customerOptions = [],
+    isFetched: hasCustomerOptionsLoaded,
+  } = useCustomerOptions(watchedAssignedUserId);
+
+  const { fields: reminderFields, append: appendReminder, remove: removeReminder } = useFieldArray({
+    control: form.control,
+    name: 'reminders',
+  });
+
+  const isFormValid = form.formState.isValid;
+  const isSubmitting = isLoading;
+  const watchedFormValues = form.watch();
+  const saveHintLines = useMemo(
+    () =>
+      buildActivitySaveRequiredHintLines(watchedFormValues, (key) =>
+        t(key, { ns: 'activity-management', defaultValue: key })
+      ),
+    [watchedFormValues, t],
+  );
+
+  const watchedCustomerId = form.watch('potentialCustomerId');
+  const watchedReminders = form.watch('reminders') || [];
+  const watchedIsAllDay = form.watch('isAllDay');
+
+  const { data: contactData } = useQuery({
+    queryKey: ['contactOptions', watchedCustomerId],
+    queryFn: async () => {
+      const response = await contactApi.getList({
+        pageNumber: 1,
+        pageSize: 1000,
+        sortBy: 'Id',
+        sortDirection: 'asc',
+        filters: watchedCustomerId ? [{ column: 'CustomerId', operator: 'eq', value: watchedCustomerId.toString() }] as PagedFilter[] : undefined,
+      });
+      return response.data || [];
+    },
+    enabled: !!watchedCustomerId,
+    staleTime: 5 * 60 * 1000,
+  });
+  const contactOptions = contactData || [];
+
+  useEffect(() => {
+    if (open) {
+      setActiveTab('details');
+      if (!activity && (initialStartDateTime || initialDate)) {
+        const start = toDefaultStartDateTime(initialDate, initialStartDateTime);
+        form.setValue('startDateTime', start);
+        form.setValue('endDateTime', toDefaultEndDateTime(initialEndDateTime, start));
+      }
+    }
+  }, [open, initialDate, initialStartDateTime, initialEndDateTime, activity, form]);
+
+  useEffect(() => {
+    if (activity) {
+      form.reset({
+        subject: activity.subject,
+        description: activity.description || '',
+        activityType: activity.activityTypeId ? String(activity.activityTypeId) : '',
+        activityTypeId: activity.activityTypeId || undefined,
+        potentialCustomerId: activity.potentialCustomerId || undefined,
+        erpCustomerCode: activity.erpCustomerCode || '',
+        status: normalizeStatus(activity.status),
+        priority: normalizePriority(activity.priority),
+        contactId: activity.contactId || undefined,
+        assignedUserId: activity.assignedUserId || undefined,
+        paymentTypeId: activity.paymentTypeId || undefined,
+        activityMeetingTypeId: activity.activityMeetingTypeId || undefined,
+        activityTopicPurposeId: activity.activityTopicPurposeId || undefined,
+        activityShippingId: activity.activityShippingId || undefined,
+        startDateTime: toDateTimeInputValue(activity.startDateTime) || toDefaultStartDateTime(),
+        endDateTime: toDateTimeInputValue(activity.endDateTime) || toDefaultEndDateTime(undefined, toDateTimeInputValue(activity.startDateTime)),
+        isAllDay: activity.isAllDay,
+        reminders: (activity.reminders || []).map((reminder) => ({
+          offsetMinutes: reminder.offsetMinutes,
+          channel: reminder.channel,
+        })),
+      });
+      setSelectedCustomerDisplayName(resolveActivityCustomerDisplayName(activity));
+      prevAssignedUserIdRef.current = activity.assignedUserId;
+      pendingImagesRef.current.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+      setPendingImages([]);
+      return;
+    }
+
+    pendingImagesRef.current.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+    setPendingImages([]);
+    form.reset({
+      subject: '',
+      description: '',
+      activityType: '',
+      activityTypeId: undefined,
+      potentialCustomerId: initialPotentialCustomerId ?? undefined,
+      erpCustomerCode: initialErpCustomerCode ?? '',
+      status: ActivityStatus.Scheduled,
+      priority: ActivityPriority.Medium,
+      contactId: initialContactId ?? undefined,
+      assignedUserId: user?.id ?? 0,
+      paymentTypeId: undefined,
+      activityMeetingTypeId: undefined,
+      activityTopicPurposeId: undefined,
+      activityShippingId: undefined,
+      startDateTime: defaultStartDateTime,
+      endDateTime: toDefaultEndDateTime(initialEndDateTime, defaultStartDateTime),
+      isAllDay: false,
+      reminders: [],
+    });
+    setSelectedCustomerDisplayName(initialCustomerDisplayName ?? null);
+    prevAssignedUserIdRef.current = user?.id ?? 0;
+  }, [
+    activity,
+    defaultStartDateTime,
+    form,
+    initialContactId,
+    initialCustomerDisplayName,
+    initialDate,
+    initialEndDateTime,
+    initialErpCustomerCode,
+    initialPotentialCustomerId,
+    initialStartDateTime,
+    user?.id,
+  ]);
+
+  useEffect(() => {
+    if (!watchedCustomerId) form.setValue('contactId', undefined);
+  }, [watchedCustomerId, form]);
+
+  // Müşteriyi yalnızca atanan kullanıcı değişince doğrula (teklif formu ile aynı).
+  // Dialogdan potansiyel seçildiğinde customerOptions (1000 kayıt) listesinde olmasa da silinmesin.
+  useEffect(() => {
+    if (preservePrefilledCustomer) return;
+    if (!hasCustomerOptionsLoaded) return;
+
+    const previousAssignedUserId = prevAssignedUserIdRef.current ?? null;
+    const currentAssignedUserId = watchedAssignedUserId ?? null;
+
+    if (previousAssignedUserId === currentAssignedUserId) {
+      return;
+    }
+
+    prevAssignedUserIdRef.current = watchedAssignedUserId;
+
+    const watchedErpCustomerCode = form.getValues('erpCustomerCode');
+    if (!watchedCustomerId && !watchedErpCustomerCode) return;
+
+    const hasMatchingCustomer = customerOptions.some(
+      (option) =>
+        (watchedCustomerId != null && option.id === watchedCustomerId) ||
+        (!!watchedErpCustomerCode && option.customerCode === watchedErpCustomerCode)
+    );
+
+    if (hasMatchingCustomer) {
+      return;
+    }
+
+    form.setValue('potentialCustomerId', undefined, { shouldDirty: true, shouldValidate: true });
+    form.setValue('erpCustomerCode', '', { shouldDirty: true, shouldValidate: true });
+    form.setValue('contactId', undefined, { shouldDirty: true, shouldValidate: true });
+    setSelectedCustomerDisplayName(null);
+  }, [
+    customerOptions,
+    form,
+    hasCustomerOptionsLoaded,
+    preservePrefilledCustomer,
+    watchedAssignedUserId,
+    watchedCustomerId,
+  ]);
+
+  useEffect(() => {
+    if (!open) return;
+    const startVal = form.getValues('startDateTime');
+    const endVal = form.getValues('endDateTime');
+    const startDate = toDateInputValue(startVal);
+    const endDate = toDateInputValue(endVal);
+    if (!startDate || !endDate) return;
+    if (watchedIsAllDay) {
+      form.setValue('startDateTime', `${startDate}T09:00`);
+      form.setValue('endDateTime', `${endDate}T18:00`);
+    }
+  }, [watchedIsAllDay, open, form]);
+
+  const handleSubmit = async (data: ActivityFormSchema): Promise<void> => {
+    const imagesToUpload = pendingImages.map(img => ({
+      file: img.file,
+      description: img.description,
+    }));
+    await onSubmit(data, imagesToUpload, pendingDeletedImageIds, pendingUpdatedImageDescriptions);
+    if (!isLoading) {
+      pendingImages.forEach((img) => URL.revokeObjectURL(img.previewUrl));
+      setPendingImages([]);
+      setPendingDeletedImageIds([]);
+      setPendingUpdatedImageDescriptions({});
+      form.reset();
+      onOpenChange(false);
+    }
+  };
+
+  const handleInvalidSubmit = (errors: FieldErrors<ActivityFormSchema>): void => {
+    setActiveTab('details');
+    const fieldNames = Object.keys(errors);
+    const firstField = fieldNames[0] as keyof ActivityFormSchema | undefined;
+    if (firstField) {
+      form.setFocus(firstField);
+    }
+  };
+
+  const addPresetReminder = (offsetMinutes: number): void => {
+    const exists = watchedReminders.some((reminder) => reminder.offsetMinutes === offsetMinutes);
+    if (exists) return;
+    appendReminder({ offsetMinutes, channel: ReminderChannel.InApp });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent showCloseButton={false} className="bg-white dark:bg-[#130822] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-[96vw] xl:max-w-[1000px] max-h-[92vh] flex flex-col p-0 overflow-hidden rounded-2xl shadow-2xl">
+        <DialogHeader className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex flex-row items-center justify-between sticky top-0 z-10 backdrop-blur-md bg-white/95 dark:bg-[#130822]/95 shrink-0">
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="h-12 w-12 rounded-2xl bg-linear-to-br from-pink-500 to-orange-500 flex items-center justify-center shadow-lg shadow-pink-500/20 shrink-0">
+              <Calendar size={24} className="text-white" />
+            </div>
+            <div className="min-w-0 space-y-1">
+              <DialogTitle className="text-xl font-bold tracking-tight text-zinc-900 dark:text-white truncate">
+                {activity ? t('edit') : t('create')}
+              </DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-sm truncate">
+                {activity ? t('editDescription') : t('createDescription')}
+              </DialogDescription>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onOpenChange(false)}
+            className="group h-10 w-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-pink-500 hover:text-white transition-all duration-300 hover:scale-110 shadow-sm"
+            aria-label={t('close', { ns: 'common' })}
+          >
+            <X size={20} className="relative z-10" />
+          </Button>
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto px-6 py-5 min-h-0">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="bg-muted/50 h-auto p-1 rounded-xl gap-1 mb-4">
+              <TabsTrigger value="details" className="rounded-lg px-4 py-2">
+                <FileText className="h-4 w-4 mr-2" />
+                {t('detailsTab')}
+              </TabsTrigger>
+              <TabsTrigger value="images" className="rounded-lg px-4 py-2">
+                <Image className="h-4 w-4 mr-2" />
+                {t('imagesTab')}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="details" className="mt-0">
+              <Form {...form}>
+                <form id="activity-form" onSubmit={form.handleSubmit(handleSubmit, handleInvalidSubmit)} className="space-y-8">
+                  <FormSection title={t('basicInfo')}>
+                    <FormField control={form.control} name="subject" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'subject')}><FileText size={16} className="text-pink-500 shrink-0" /> {t('subject')}</FormLabel>
+                        <FormControl><Input {...field} className={INPUT_STYLE} placeholder={t('enterSubject')} /></FormControl>
+                        <FormMessage className="text-xs text-red-500" />
+                      </FormItem>
+                    )} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="activityType" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'activityType')}><List size={16} className="text-pink-500 shrink-0" /> {t('activityType')}</FormLabel>
+                          <FormControl>
+                            <VoiceSearchCombobox
+                              options={activityTypeDropdown.options}
+                              value={field.value ? String(field.value) : ''}
+                              onSelect={(v) => {
+                                field.onChange(v ?? '');
+                                form.setValue('activityTypeId', v ? Number(v) : undefined);
+                              }}
+                              onDebouncedSearchChange={setActivityTypeSearchTerm}
+                              onFetchNextPage={activityTypeDropdown.fetchNextPage}
+                              hasNextPage={activityTypeDropdown.hasNextPage}
+                              isLoading={activityTypeDropdown.isLoading}
+                              isFetchingNextPage={activityTypeDropdown.isFetchingNextPage}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="status" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'status')}><CheckSquare size={16} className="text-pink-500 shrink-0" /> {t('status')}</FormLabel>
+                          <FormControl>
+                            <Combobox
+                              options={ACTIVITY_STATUSES.map((statusOption) => ({ value: String(statusOption.value), label: t(statusOption.labelKey, statusOption.label) }))}
+                              value={String(field.value)}
+                              onValueChange={(value) => field.onChange(Number(value))}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="isAllDay" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}><Calendar size={16} className="text-pink-500 shrink-0" /> {t('allDay')}</FormLabel>
+                          <FormControl>
+                            <div className="h-11 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 flex items-center gap-3">
+                              <Checkbox checked={!!field.value} onCheckedChange={(checked) => field.onChange(Boolean(checked))} />
+                              <span className="text-sm text-slate-700 dark:text-slate-300">{t('allDay')}</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="priority" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}><AlertCircle size={16} className="text-pink-500 shrink-0" /> {t('priority')}</FormLabel>
+                          <FormControl>
+                            <Combobox
+                              options={ACTIVITY_PRIORITIES.map((priorityOption) => ({ value: String(priorityOption.value), label: t(priorityOption.labelKey, priorityOption.label) }))}
+                              value={String(field.value ?? ActivityPriority.Medium)}
+                              onValueChange={(value) => field.onChange(Number(value))}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                    </div>
+                    {watchedIsAllDay ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField control={form.control} name="startDateTime" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'startDateTime')}><Calendar size={16} className="text-pink-500 shrink-0" /> {t('activityDate')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="date"
+                                className={INPUT_STYLE}
+                                value={toDateInputValue(field.value) || ''}
+                                onChange={(e) => {
+                                  const date = e.target.value;
+                                  if (date) {
+                                    field.onChange(`${date}T00:00`);
+                                    const endVal = form.getValues('endDateTime');
+                                    const endDate = toDateInputValue(endVal);
+                                    if (!endDate || endDate < date) form.setValue('endDateTime', `${date}T23:59`);
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage className="text-xs text-red-500" />
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name="endDateTime" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'endDateTime')}><Calendar size={16} className="text-pink-500 shrink-0" /> {t('endDate')}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="date"
+                                className={INPUT_STYLE}
+                                value={toDateInputValue(field.value) || ''}
+                                onChange={(e) => {
+                                  const date = e.target.value;
+                                  if (date) field.onChange(`${date}T23:59`);
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage className="text-xs text-red-500" />
+                          </FormItem>
+                        )} />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField control={form.control} name="startDateTime" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'startDateTime')}><Calendar size={16} className="text-pink-500 shrink-0" /> {t('activityDate')}</FormLabel>
+                            <FormControl><Input {...field} type="datetime-local" className={INPUT_STYLE} value={field.value || ''} /></FormControl>
+                            <FormMessage className="text-xs text-red-500" />
+                          </FormItem>
+                        )} />
+                        <FormField control={form.control} name="endDateTime" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'endDateTime')}><Calendar size={16} className="text-pink-500 shrink-0" /> {t('endDate')}</FormLabel>
+                            <FormControl><Input type="datetime-local" className={INPUT_STYLE} value={field.value || ''} onChange={(event) => field.onChange(event.target.value || '')} /></FormControl>
+                            <FormMessage className="text-xs text-red-500" />
+                          </FormItem>
+                        )} />
+                      </div>
+                    )}
+                  </FormSection>
+
+                  <FormSection title={t('relations')}>
+                    <FormField
+                      control={form.control}
+                      name="potentialCustomerId"
+                      render={({ field }) => {
+                        const watchedErpCode = form.watch('erpCustomerCode');
+                        const linkedCustomerLabel = resolveActivityCustomerDisplayName(activity);
+                        const fallbackCustomerLabel = selectedCustomerDisplayName ?? linkedCustomerLabel;
+                        const selectedCustomer = customerOptions.find((customer) => customer.id === field.value);
+                        const displayValue = selectedCustomer
+                          ? selectedCustomer.name || selectedCustomer.customerCode || String(field.value)
+                          : field.value && fallbackCustomerLabel
+                            ? fallbackCustomerLabel
+                            : watchedErpCode
+                              ? fallbackCustomerLabel
+                                ? `${fallbackCustomerLabel} (${t('activity-management:erpLabel', { code: watchedErpCode, defaultValue: `ERP: ${watchedErpCode}` })})`
+                                : t('activity-management:erpLabel', { code: watchedErpCode, defaultValue: `ERP: ${watchedErpCode}` })
+                              : '';
+
+                        return (
+                          <FormItem>
+                            <FormLabel className={LABEL_STYLE}><Building2 size={16} className="text-pink-500 shrink-0" /> {t('customer')}</FormLabel>
+                            <div className="flex w-full items-center gap-2">
+                              <FormControl>
+                                <Input
+                                  readOnly
+                                  value={displayValue}
+                                  placeholder={t('selectCustomer')}
+                                  className={`${INPUT_STYLE} flex-1 cursor-pointer`}
+                                  onClick={() => setCustomerSelectDialogOpen(true)}
+                                />
+                              </FormControl>
+                              <Button type="button" variant="outline" onClick={() => setCustomerSelectDialogOpen(true)} className="h-11 w-11 shrink-0 rounded-lg border-slate-200 dark:border-white/10" aria-label={t('selectCustomer')}>
+                                <Search size={18} />
+                              </Button>
+                              {(field.value != null || watchedErpCode) && (
+                                <Button type="button" variant="ghost" size="icon" className="h-11 w-11 shrink-0 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={(event) => { event.stopPropagation(); field.onChange(undefined); form.setValue('erpCustomerCode', ''); setSelectedCustomerDisplayName(null); }} aria-label={t('clear', { ns: 'common' })}>
+                                  <X size={18} />
+                                </Button>
+                              )}
+                            </div>
+                            <FormMessage className="text-xs text-red-500" />
+                          </FormItem>
+                        );
+                      }}
+                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="contactId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}><User size={16} className="text-pink-500 shrink-0" /> {t('contactId')}</FormLabel>
+                          <FormControl>
+                            <Combobox
+                              options={[{ value: 'none', label: t('noContactSelected') }, ...contactOptions.map((contact) => ({ value: contact.id.toString(), label: contact.fullName }))]}
+                              value={field.value && field.value !== 0 ? field.value.toString() : 'none'}
+                              onValueChange={(value) => field.onChange(value && value !== 'none' ? Number(value) : undefined)}
+                              placeholder={watchedCustomerId ? t('select') : t('selectCustomerFirst')}
+                              disabled={!watchedCustomerId}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="assignedUserId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE} required={isZodFieldRequired(activityFormSchema, 'assignedUserId')}><User size={16} className="text-pink-500 shrink-0" /> {t('assignedUser')}</FormLabel>
+                          <FormControl>
+                            <VoiceSearchCombobox
+                              options={assignedUserDropdown.options}
+                              value={field.value && field.value !== 0 ? field.value.toString() : ''}
+                              onSelect={(v) => field.onChange(v ? Number(v) : 0)}
+                              onDebouncedSearchChange={setAssignedUserSearchTerm}
+                              onFetchNextPage={assignedUserDropdown.fetchNextPage}
+                              hasNextPage={assignedUserDropdown.hasNextPage}
+                              isLoading={assignedUserDropdown.isLoading}
+                              isFetchingNextPage={assignedUserDropdown.isFetchingNextPage}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="paymentTypeId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}>{t('paymentType')}</FormLabel>
+                          <FormControl>
+                            <VoiceSearchCombobox
+                              options={paymentTypeDropdown.options}
+                              value={field.value ? String(field.value) : ''}
+                              onSelect={(v) => field.onChange(v ? Number(v) : undefined)}
+                              onDebouncedSearchChange={setPaymentTypeSearchTerm}
+                              onFetchNextPage={paymentTypeDropdown.fetchNextPage}
+                              hasNextPage={paymentTypeDropdown.hasNextPage}
+                              isLoading={paymentTypeDropdown.isLoading}
+                              isFetchingNextPage={paymentTypeDropdown.isFetchingNextPage}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="activityMeetingTypeId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}>{t('activityMeetingType')}</FormLabel>
+                          <FormControl>
+                            <VoiceSearchCombobox
+                              options={meetingTypeDropdown.options}
+                              value={field.value ? String(field.value) : ''}
+                              onSelect={(v) => field.onChange(v ? Number(v) : undefined)}
+                              onDebouncedSearchChange={setMeetingTypeSearchTerm}
+                              onFetchNextPage={meetingTypeDropdown.fetchNextPage}
+                              hasNextPage={meetingTypeDropdown.hasNextPage}
+                              isLoading={meetingTypeDropdown.isLoading}
+                              isFetchingNextPage={meetingTypeDropdown.isFetchingNextPage}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="activityTopicPurposeId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}>{t('activityTopicPurpose')}</FormLabel>
+                          <FormControl>
+                            <VoiceSearchCombobox
+                              options={topicPurposeDropdown.options}
+                              value={field.value ? String(field.value) : ''}
+                              onSelect={(v) => field.onChange(v ? Number(v) : undefined)}
+                              onDebouncedSearchChange={setTopicPurposeSearchTerm}
+                              onFetchNextPage={topicPurposeDropdown.fetchNextPage}
+                              hasNextPage={topicPurposeDropdown.hasNextPage}
+                              isLoading={topicPurposeDropdown.isLoading}
+                              isFetchingNextPage={topicPurposeDropdown.isFetchingNextPage}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="activityShippingId" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className={LABEL_STYLE}>{t('activityShipping')}</FormLabel>
+                          <FormControl>
+                            <VoiceSearchCombobox
+                              options={shippingDropdown.options}
+                              value={field.value ? String(field.value) : ''}
+                              onSelect={(v) => field.onChange(v ? Number(v) : undefined)}
+                              onDebouncedSearchChange={setShippingSearchTerm}
+                              onFetchNextPage={shippingDropdown.fetchNextPage}
+                              hasNextPage={shippingDropdown.hasNextPage}
+                              isLoading={shippingDropdown.isLoading}
+                              isFetchingNextPage={shippingDropdown.isFetchingNextPage}
+                              placeholder={t('select')}
+                              className={INPUT_STYLE}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs text-red-500" />
+                        </FormItem>
+                      )} />
+                    </div>
+                  </FormSection>
+
+                  <FormSection title={t('details')}>
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className={LABEL_STYLE}><FileText size={16} className="text-pink-500 shrink-0" /> {t('descriptionLabel')}</FormLabel>
+                        <FormControl><Textarea {...field} maxLength={2000} className={`${INPUT_STYLE} min-h-[88px] py-3 resize-none`} placeholder={t('enterDescription')} /></FormControl>
+                        <FormMessage className="text-xs text-red-500" />
+                      </FormItem>
+                    )} />
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <FormLabel className={LABEL_STYLE}><Bell size={16} className="text-pink-500 shrink-0" /> {t('reminders')}</FormLabel>
+                        <Button type="button" variant="outline" size="sm" onClick={() => appendReminder({ offsetMinutes: 15, channel: ReminderChannel.InApp })}>
+                          <Plus size={14} className="mr-1" /> {t('add', { ns: 'common' })}
+                        </Button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {REMINDER_MINUTE_PRESETS.map((offset) => (
+                          <Button key={offset} type="button" variant="ghost" size="sm" className="border border-slate-200 dark:border-white/10" onClick={() => addPresetReminder(offset)}>
+                            {offset >= 1440
+                              ? t('reminderPresetDays', { count: Math.floor(offset / 1440) })
+                              : t('reminderPresetMinutes', { count: offset })}
+                          </Button>
+                        ))}
+                      </div>
+
+                      {reminderFields.length === 0 && (
+                        <div className="text-xs text-slate-500 dark:text-slate-400 rounded-lg border border-dashed border-slate-200 dark:border-white/10 p-3">
+                          {t('noReminder')}
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        {reminderFields.map((field, index) => (
+                          <div key={field.id} className="grid grid-cols-12 gap-2 items-center rounded-lg border border-slate-200 dark:border-white/10 p-2">
+                            <div className="col-span-5">
+                              <FormField
+                                control={form.control}
+                                name={`reminders.${index}.offsetMinutes`}
+                                render={({ field: reminderOffsetField }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Input
+                                        type="number"
+                                        min={0}
+                                        max={525600}
+                                        value={String(reminderOffsetField.value ?? 0)}
+                                        onChange={(event) => reminderOffsetField.onChange(Number(event.target.value || 0))}
+                                        className={INPUT_STYLE}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <div className="col-span-5">
+                              <FormField
+                                control={form.control}
+                                name={`reminders.${index}.channel`}
+                                render={({ field: reminderChannelField }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Combobox
+                                        options={reminderChannelOptions.map((option) => ({
+                                          value: option.value,
+                                          label: option.label,
+                                        }))}
+                                        value={String(reminderChannelField.value ?? ReminderChannel.InApp)}
+                                        onValueChange={(value) => reminderChannelField.onChange(Number(value))}
+                                        placeholder={t('select')}
+                                        className={INPUT_STYLE}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <div className="col-span-2 flex justify-end">
+                              <Button type="button" variant="ghost" size="icon" className="text-red-500" onClick={() => removeReminder(index)}>
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </FormSection>
+
+                  <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2 border-t border-slate-100 dark:border-white/5">
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-5 rounded-lg font-medium">
+                      {t('cancel', { ns: 'common' })}
+                    </Button>
+                    <FormSubmitTooltipWrap
+                      schema={activityFormSchema}
+                      value={watchedFormValues}
+                      isValid={isFormValid}
+                      isPending={isSubmitting}
+                      manualHintLines={saveHintLines}
+                      triggerClassName="w-full sm:w-auto"
+                    >
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="h-11 w-full px-6 rounded-xl bg-linear-to-r from-pink-600 to-orange-600 hover:from-pink-500 hover:to-orange-500 text-white font-black shadow-lg shadow-pink-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 border-0 sm:w-auto"
+                      >
+                        {isSubmitting ? t('saving', { ns: 'common' }) : activity ? t('update', { ns: 'common' }) : t('save', { ns: 'common' })}
+                      </Button>
+                    </FormSubmitTooltipWrap>
+                  </div>
+                </form>
+              </Form>
+            </TabsContent>
+
+            <TabsContent value="images" className="mt-0">
+              <ActivityImageTab
+                activityId={activity?.id}
+                deferMode={true}
+                pendingImages={pendingImages}
+                onAddPendingImages={(newImages) => setPendingImages((prev) => [...prev, ...newImages])}
+                onRemovePendingImage={(id) => {
+                  setPendingImages((prev) => {
+                    const target = prev.find((img) => img.id === id);
+                    if (target) URL.revokeObjectURL(target.previewUrl);
+                    return prev.filter((img) => img.id !== id);
+                  });
+                }}
+                onUpdatePendingImageDescription={(id, description) => {
+                  setPendingImages((prev) =>
+                    prev.map((img) => (img.id === id ? { ...img, description } : img))
+                  );
+                }}
+                deletedExistingIds={pendingDeletedImageIds}
+                onQueueDeleteExisting={(id) => setPendingDeletedImageIds((prev) => [...prev, id])}
+                updatedExistingDescriptions={pendingUpdatedImageDescriptions}
+                onQueueUpdateExisting={(id, description) => setPendingUpdatedImageDescriptions((prev) => ({ ...prev, [id]: description }))}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </DialogContent>
+
+      <CustomerSelectDialog
+        open={customerSelectDialogOpen}
+        onOpenChange={setCustomerSelectDialogOpen}
+        contextUserId={watchedAssignedUserId ?? undefined}
+        onSelect={(customer: CustomerSelectionResult) => {
+          form.setValue('potentialCustomerId', customer.customerId ?? undefined);
+          form.setValue('erpCustomerCode', customer.erpCustomerCode ?? '');
+          setSelectedCustomerDisplayName(customer.customerName ?? null);
+          setCustomerSelectDialogOpen(false);
+        }}
+      />
+    </Dialog>
+  );
+}

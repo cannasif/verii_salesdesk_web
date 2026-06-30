@@ -1,0 +1,28 @@
+{
+  "title": "Sélectionner un Client",
+  "description": "Dans « Tous », les clients sont étiquetés ERP ou potentiel. L’autre onglet liste uniquement les potentiels.",
+  "badgeKindErp": "ERP",
+  "badgeKindPotential": "Potentiel",
+  "erpCustomers": "Clients ERP",
+  "crmCustomers": "Clients CRM",
+  "allCustomers": "Tous",
+  "erp": "Clients ERP",
+  "crm": "GRC",
+  "noErpCustomers": "Aucun client ERP trouvé",
+  "noCrmCustomers": "Aucun client SalesDesk trouvé",
+  "noCustomers": "Aucun client trouvé",
+  "noResults": "Aucun résultat de recherche trouvé",
+  "searchPlaceholder": "Rechercher par nom ou code...",
+  "voiceSearch": "Recherche vocale",
+  "loading": "Chargement",
+  "table": {
+    "type": "Type",
+    "customerCode": "Code Client",
+    "customerName": "Nom du Client",
+    "phone": "Téléphone",
+    "city": "Ville",
+    "email": "E-mail"
+  },
+  "potentialCustomers": "Potentiel",
+  "noPotentialCustomers": "Aucun client potentiel trouvé"
+}
