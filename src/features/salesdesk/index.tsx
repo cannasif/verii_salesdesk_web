@@ -360,7 +360,6 @@ export function SalesDeskDashboardPage(): ReactElement {
         <div>
           <h1 className="text-4xl font-semibold">Iyi Aksamlar, <span className="text-violet-400">Sistem Yoneticisi</span></h1>
           <p className="mt-4 flex items-center gap-2 text-slate-400"><CalendarDays size={16} /> 30.06.2026</p>
-          <p className="mt-6 text-slate-500">Dashboard verileri yuklenemedi.</p>
         </div>
         <div className="relative flex gap-3">
           <GhostButton icon={<Edit3 size={15} />} label="Duzenle" />
@@ -368,6 +367,14 @@ export function SalesDeskDashboardPage(): ReactElement {
           {quickOpen && <QuickActionsPanel />}
         </div>
       </div>
+      <MetricGrid
+        metrics={[
+          { label: 'Aylik Satis', value: '₺168.192,00', hint: 'Kesilen faturalar toplami' },
+          { label: 'Acil Aksiyon', value: '2', hint: 'Kritik acik madde', variant: 'red' },
+          { label: 'Bugunku Ziyaret', value: '2', hint: 'Planlanan gorusmeler', variant: 'cyan' },
+          { label: 'Onayli Teklif', value: '4', hint: 'Faturaya donusturulebilir', variant: 'green' },
+        ]}
+      />
       <div className={`max-w-xl rounded-xl p-5 ${surfaceClass}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
