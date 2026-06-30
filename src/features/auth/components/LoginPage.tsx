@@ -98,6 +98,11 @@ export function LoginPage(): React.JSX.Element {
     perfMeasureOnNextPaint('login:mount_to_branches_ready_paint', 'login:mount:start', `branches=${branches.length}`);
   }, [branches, didMeasureBranchesReady]);
 
+  useEffect(() => {
+    if (!branches || branches.length === 0 || form.getValues('branchId')) return;
+    form.setValue('branchId', branches[0].id, { shouldDirty: false, shouldValidate: true });
+  }, [branches, form]);
+
   const onSubmit = (data: z.output<typeof loginRequestSchema>): void => {
     login({ ...data });
   };

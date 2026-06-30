@@ -10,13 +10,6 @@ export const loginRequestSchema = z.object({
 
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
-export const registerRequestSchema = z.object({
-  email: z.string().email('auth.validation.emailInvalid'),
-  password: z.string().min(8, 'auth.validation.passwordMinLength'),
-});
-
-export type RegisterRequest = z.infer<typeof registerRequestSchema>;
-
 export interface LoginWithSessionResponseDto {
   token: string;
   refreshToken: string;
