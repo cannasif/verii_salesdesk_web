@@ -233,9 +233,17 @@ function buildQuery(params: PagedParams = {}): string {
   return query ? `?${query}` : '';
 }
 
+function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T {
+  if (response.success && response.data != null) {
+    return response.data;
+  }
+  throw new Error(response.message || fallbackMessage);
+}
+
 async function getPaged<T>(path: string, params?: PagedParams): Promise<PagedResponse<T>> {
   const response = await api.get<ApiResponse<PagedResponse<T>>>(`${BASE}/${path}${buildQuery(params)}`);
-  return normalizePagedResponse<T>(response.data, {
+  const paged = unwrapApiData(response, 'Liste yuklenemedi');
+  return normalizePagedResponse<T>(paged, {
     pageNumber: params?.pageNumber,
     pageSize: params?.pageSize,
   });
@@ -243,7 +251,8 @@ async function getPaged<T>(path: string, params?: PagedParams): Promise<PagedRes
 
 async function postPaged<T>(path: string, params?: PagedParams): Promise<PagedResponse<T>> {
   const response = await api.post<ApiResponse<PagedResponse<T>>>(`${BASE}/${path}/query`, params ?? {});
-  return normalizePagedResponse<T>(response.data, {
+  const paged = unwrapApiData(response, 'Liste yuklenemedi');
+  return normalizePagedResponse<T>(paged, {
     pageNumber: params?.pageNumber,
     pageSize: params?.pageSize,
   });
@@ -251,31 +260,34 @@ async function postPaged<T>(path: string, params?: PagedParams): Promise<PagedRe
 
 async function getOne<T>(path: string, id: number): Promise<T> {
   const response = await api.get<ApiResponse<T>>(`${BASE}/${path}/${id}`);
-  return response.data;
+  return unwrapApiData(response, 'Kayit bulunamadi');
 }
 
 async function createOne<T, TBody>(path: string, body: TBody): Promise<T> {
   const response = await api.post<ApiResponse<T>>(`${BASE}/${path}`, body);
-  return response.data;
+  return unwrapApiData(response, 'Kayit olusturulamadi');
 }
 
 async function updateOne<T, TBody>(path: string, id: number, body: TBody): Promise<T> {
-  const response = await api.put<ApiResponse<T>>(`${BASE}/${path}/${id}`, body);
-  return response.data;
+  const response = await api.put<ApiResponse<T>>(`${BASE}/${path}/${id}`, body, { useNativeHttpMethod: true });
+  return unwrapApiData(response, 'Kayit guncellenemedi');
 }
 
 async function deleteOne(path: string, id: number): Promise<void> {
-  await api.delete<ApiResponse<unknown>>(`${BASE}/${path}/${id}`);
+  const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${path}/${id}`, { useNativeHttpMethod: true });
+  if (!response.success) {
+    throw new Error(response.message || 'Kayit silinemedi');
+  }
 }
 
 export const salesDeskApi = {
   async dashboard(): Promise<SalesDeskDashboardDto> {
     const response = await api.get<ApiResponse<SalesDeskDashboardDto>>(`${BASE}/dashboard`);
-    return response.data;
+    return unwrapApiData(response, 'Dashboard yuklenemedi');
   },
   async search(q: string, take = 12): Promise<SalesDeskSearchResultDto[]> {
     const response = await api.get<ApiResponse<SalesDeskSearchResultDto[]>>(`${BASE}/search`, { params: { q, take } });
-    return response.data;
+    return unwrapApiData(response, 'Arama yapilamadi');
   },
 
   customers: {
