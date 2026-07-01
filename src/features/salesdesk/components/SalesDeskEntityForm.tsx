@@ -3,6 +3,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -26,12 +27,26 @@ import {
 import { type DefaultValues, type FieldValues, type Path, useForm, type Resolver, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ZodTypeAny } from 'zod';
-import { fieldClass, NONE_SELECT_VALUE, normalizeSelectValue, sanitizeSelectOptions } from '../lib/salesdesk-shared';
+import { FilePenLine, Loader2, X } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { NONE_SELECT_VALUE, normalizeSelectValue, sanitizeSelectOptions } from '../lib/salesdesk-shared';
 import {
+  SD_DIALOG_BODY_FORM,
+  SD_DIALOG_CLOSE,
+  SD_DIALOG_CONTENT_FORM,
+  SD_DIALOG_DESC,
+  SD_DIALOG_FOOTER_FORM,
+  SD_DIALOG_HEADER_FORM,
+  SD_DIALOG_ICON,
+  SD_DIALOG_ICON_RING_FORM,
+  SD_DIALOG_TITLE,
+  SD_FORM_GRID_MD,
+  SD_FORM_INPUT_MD,
   SD_FORM_LABEL,
-  SD_PRIMARY_BUTTON,
-  SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
+  SD_FORM_MESSAGE,
+  SD_PRIMARY_BUTTON_FORM,
+  SD_SECONDARY_BUTTON_FORM,
+  SD_SELECT_CONTENT,
 } from '../lib/salesdesk-popup-styles';
 
 export type SalesDeskFieldType = 'text' | 'email' | 'number' | 'date' | 'time' | 'textarea' | 'select' | 'checkbox';
@@ -67,6 +82,13 @@ interface SalesDeskEntityFormProps<T extends FieldValues> {
   onSubmit: (values: T) => void | Promise<void>;
   isLoading?: boolean;
   submitLabel?: string;
+  icon?: LucideIcon;
+}
+
+function colSpanClass(colSpan?: 1 | 2 | 3): string {
+  if (colSpan === 2) return 'sm:col-span-2';
+  if (colSpan === 3) return 'sm:col-span-3';
+  return '';
 }
 
 function renderField<T extends FieldValues>(
@@ -81,7 +103,7 @@ function renderField<T extends FieldValues>(
         control={form.control}
         name={field.name}
         render={({ field: controlField }) => (
-          <FormItem className={field.colSpan === 2 ? 'sm:col-span-2' : field.colSpan === 3 ? 'sm:col-span-3' : ''}>
+          <FormItem className={colSpanClass(field.colSpan)}>
             <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
             <Select
               value={normalizeSelectValue(String(controlField.value ?? ''))}
@@ -90,11 +112,11 @@ function renderField<T extends FieldValues>(
               }
             >
               <FormControl>
-                <SelectTrigger className={fieldClass}>
+                <SelectTrigger className={SD_FORM_INPUT_MD}>
                   <SelectValue placeholder={field.placeholder ?? 'Secin'} />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent>
+              <SelectContent className={SD_SELECT_CONTENT}>
                 {selectOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -102,7 +124,7 @@ function renderField<T extends FieldValues>(
                 ))}
               </SelectContent>
             </Select>
-            <FormMessage />
+            <FormMessage className={SD_FORM_MESSAGE} />
           </FormItem>
         )}
       />
@@ -122,11 +144,11 @@ function renderField<T extends FieldValues>(
                 type="checkbox"
                 checked={Boolean(controlField.value)}
                 onChange={(event) => controlField.onChange(event.target.checked)}
-                className="h-4 w-4 rounded border-white/20 bg-transparent"
+                className="h-4 w-4 rounded border-[var(--crm-app-border)] bg-transparent"
               />
             </FormControl>
             <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
-            <FormMessage />
+            <FormMessage className={SD_FORM_MESSAGE} />
           </FormItem>
         )}
       />
@@ -140,23 +162,32 @@ function renderField<T extends FieldValues>(
         control={form.control}
         name={field.name}
         render={({ field: controlField }) => (
-          <FormItem className={field.colSpan === 2 ? 'sm:col-span-2' : field.colSpan === 3 ? 'sm:col-span-3' : ''}>
+          <FormItem className={colSpanClass(field.colSpan)}>
             <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
             <FormControl>
               <textarea
                 {...controlField}
-                className={`min-h-24 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-[var(--crm-brand-primary)] focus:ring-4 focus:ring-[var(--crm-brand-ring)]`}
+                className={`min-h-24 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-[var(--crm-brand-primary)] focus:shadow-[0_0_0_2px_var(--crm-brand-ring)]`}
                 placeholder={field.placeholder}
               />
             </FormControl>
-            <FormMessage />
+            <FormMessage className={SD_FORM_MESSAGE} />
           </FormItem>
         )}
       />
     );
   }
 
-  const inputType = field.type === 'number' ? 'number' : field.type === 'email' ? 'email' : field.type === 'date' ? 'date' : field.type === 'time' ? 'time' : 'text';
+  const inputType =
+    field.type === 'number'
+      ? 'number'
+      : field.type === 'email'
+        ? 'email'
+        : field.type === 'date'
+          ? 'date'
+          : field.type === 'time'
+            ? 'time'
+            : 'text';
 
   return (
     <FormField
@@ -164,8 +195,8 @@ function renderField<T extends FieldValues>(
       control={form.control}
       name={field.name}
       render={({ field: controlField }) => (
-        <FormItem className={field.colSpan === 2 ? 'sm:col-span-2' : field.colSpan === 3 ? 'sm:col-span-3' : ''}>
-          <FormLabel className="text-slate-300">{field.label}</FormLabel>
+        <FormItem className={colSpanClass(field.colSpan)}>
+          <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
           <FormControl>
             <Input
               {...controlField}
@@ -173,7 +204,7 @@ function renderField<T extends FieldValues>(
               min={field.min}
               max={field.max}
               step={field.step}
-              className={fieldClass}
+              className={SD_FORM_INPUT_MD}
               placeholder={field.placeholder}
               onChange={(event) => {
                 if (field.type === 'number') {
@@ -184,7 +215,7 @@ function renderField<T extends FieldValues>(
               }}
             />
           </FormControl>
-          <FormMessage />
+          <FormMessage className={SD_FORM_MESSAGE} />
         </FormItem>
       )}
     />
@@ -204,8 +235,10 @@ export function SalesDeskEntityForm<T extends FieldValues>({
   onSubmit,
   isLoading = false,
   submitLabel,
+  icon: Icon = FilePenLine,
 }: SalesDeskEntityFormProps<T>): ReactElement {
   const isEditMode = entity != null;
+  const formId = 'salesdesk-entity-form';
   const form = useForm<T>({
     resolver: zodResolver(schema as never) as Resolver<T>,
     mode: 'onChange',
@@ -226,31 +259,61 @@ export function SalesDeskEntityForm<T extends FieldValues>({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {open ? (
-      <DialogContent className={`max-h-[90vh] overflow-y-auto sm:max-w-2xl ${SD_SURFACE_DIALOG}`}>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription className="text-[var(--crm-app-text-muted)]">{description}</DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">{fields.map((field) => renderField(form, field))}</div>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                className={SD_SECONDARY_BUTTON}
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-              >
-                Iptal
-              </Button>
-              <Button type="submit" variant="ghost" className={SD_PRIMARY_BUTTON} disabled={isLoading}>
-                {isLoading ? 'Kaydediliyor...' : submitLabel ?? (isEditMode ? 'Guncelle' : 'Kaydet')}
-              </Button>
+        <DialogContent className={SD_DIALOG_CONTENT_FORM} showCloseButton={false}>
+          <DialogHeader className={SD_DIALOG_HEADER_FORM}>
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className={SD_DIALOG_ICON_RING_FORM}>
+                <Icon className={`h-5 w-5 ${SD_DIALOG_ICON}`} aria-hidden />
+              </div>
+              <div className="min-w-0 space-y-0.5">
+                <DialogTitle className={SD_DIALOG_TITLE}>{title}</DialogTitle>
+                <DialogDescription className={SD_DIALOG_DESC}>{description}</DialogDescription>
+              </div>
             </div>
-          </form>
-        </Form>
-      </DialogContent>
+            <button
+              type="button"
+              className={SD_DIALOG_CLOSE}
+              onClick={() => onOpenChange(false)}
+              aria-label="Kapat"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form id={formId} onSubmit={handleSubmit} className={SD_DIALOG_BODY_FORM}>
+              <div className={SD_FORM_GRID_MD}>{fields.map((field) => renderField(form, field))}</div>
+            </form>
+          </Form>
+
+          <DialogFooter className={SD_DIALOG_FOOTER_FORM}>
+            <Button
+              type="button"
+              variant="ghost"
+              className={SD_SECONDARY_BUTTON_FORM}
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
+              Iptal
+            </Button>
+            <Button
+              type="submit"
+              form={formId}
+              variant="ghost"
+              className={SD_PRIMARY_BUTTON_FORM}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Kaydediliyor...
+                </>
+              ) : (
+                submitLabel ?? (isEditMode ? 'Guncelle' : 'Kaydet')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       ) : null}
     </Dialog>
   );
