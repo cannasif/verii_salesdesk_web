@@ -20,6 +20,18 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { PAGE_SIZE_OPTIONS, surfaceClass } from '../lib/salesdesk-shared';
+import {
+  SD_ADD_BUTTON,
+  SD_FORM_INPUT,
+  SD_PAGE_ICON_BOX,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+  SD_TABLE_SHELL,
+} from '../lib/salesdesk-popup-styles';
+import {
+  MANAGEMENT_LIST_CARD_CLASSNAME,
+  MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
+} from '@/lib/management-list-layout';
 
 export interface SalesDeskMetric {
   label: string;
@@ -70,13 +82,13 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
 }
 
 const metricTone: Record<NonNullable<SalesDeskMetric['tone']>, string> = {
-  blue: 'text-blue-300',
-  green: 'text-emerald-300',
-  yellow: 'text-amber-300',
-  red: 'text-rose-300',
-  violet: 'text-violet-300',
-  pink: 'text-pink-300',
-  cyan: 'text-cyan-300',
+  blue: 'text-[var(--crm-brand-text)]',
+  green: 'text-emerald-400',
+  yellow: 'text-amber-400',
+  red: 'text-rose-400',
+  violet: 'text-slate-200',
+  pink: 'text-slate-200',
+  cyan: 'text-[var(--crm-brand-text)]',
 };
 
 export function SalesDeskListLayout<T extends { id: number }>({
@@ -85,7 +97,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
   tableTitle,
   actionLabel,
   icon,
-  accentClass = 'border-violet-400/20 bg-violet-500/15 text-violet-300 shadow-[0_0_28px_rgba(124,58,237,.18)]',
+  accentClass = SD_PAGE_ICON_BOX,
   metrics,
   columns,
   rows,
@@ -120,12 +132,12 @@ export function SalesDeskListLayout<T extends { id: number }>({
     <div className="space-y-5 text-slate-100">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl border ${accentClass}`}>
+          <div className={accentClass}>
             {icon}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-7 w-1 rounded-full bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,.7)]" />
+              <span className="h-7 w-1 rounded-full bg-[var(--crm-brand-primary)] shadow-[0_0_24px_var(--crm-brand-ring)]" />
               <h1 className="text-2xl font-semibold tracking-normal text-slate-50">{title}</h1>
             </div>
             <p className="mt-1 text-sm text-slate-400">{subtitle}</p>
@@ -134,7 +146,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
         <button
           type="button"
           onClick={onAdd}
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white shadow-lg shadow-violet-950/40 hover:bg-violet-400"
+          className={SD_ADD_BUTTON}
         >
           <Plus size={16} />
           {actionLabel}
@@ -152,13 +164,13 @@ export function SalesDeskListLayout<T extends { id: number }>({
         </div>
       )}
 
-      <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4">
-        <h2 className="text-xl font-semibold">{tableTitle}</h2>
-        <div className="mt-3 flex flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0f1e]/70 p-4 md:flex-row md:items-center md:justify-between">
+      <section className={`rounded-xl p-4 ${MANAGEMENT_LIST_CARD_CLASSNAME}`}>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{tableTitle}</h2>
+        <div className="mt-3 flex flex-col gap-3 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card-header)] p-4 md:flex-row md:items-center md:justify-between">
           <div className="relative w-full md:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)]" size={16} />
             <input
-              className="h-10 w-full rounded-lg border border-white/10 bg-[#050711]/80 pl-10 pr-3 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10"
+              className={`h-10 w-full pl-10 pr-3 ${SD_FORM_INPUT}`}
               placeholder="Ara"
               value={searchTerm}
               onChange={(event) => onSearchChange(event.target.value)}
@@ -166,7 +178,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <select
-              className="h-10 rounded-lg border border-white/10 bg-[#050711]/80 px-3 text-sm text-slate-200 outline-none"
+              className={`h-10 px-3 text-sm ${SD_FORM_INPUT} ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}`}
               value={pageSize}
               onChange={(event) => onPageSizeChange(Number(event.target.value))}
             >
@@ -180,7 +192,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
               type="button"
               onClick={onRefresh}
               disabled={isFetching}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-white/20 bg-white/[.02] px-4 text-sm font-medium text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white disabled:opacity-60"
+              className={`inline-flex h-10 items-center gap-2 px-4 text-sm font-medium disabled:opacity-60 ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME} border-dashed hover:border-[var(--crm-brand-primary)] hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-on-soft)]`}
             >
               {isFetching ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />}
               Yenile
@@ -194,10 +206,10 @@ export function SalesDeskListLayout<T extends { id: number }>({
           </div>
         )}
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#070a13]/72">
+        <div className={`mt-4 ${SD_TABLE_SHELL}`}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[820px] text-left text-sm">
-              <thead className="border-b border-white/10 bg-white/[.025] text-xs uppercase text-slate-300">
+              <thead className="border-b border-[var(--crm-app-border)] bg-[var(--crm-app-table-head)] text-xs uppercase text-slate-300">
                 <tr>
                   {columns.map((column) => (
                     <th key={column.key} className="px-4 py-4 font-semibold">
@@ -225,7 +237,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
                   rows.map((row) => (
                     <tr
                       key={row.id}
-                      className="border-b border-white/10 text-slate-300 last:border-b-0 hover:bg-white/[.025]"
+                      className="border-b border-[var(--crm-app-border)] text-slate-300 last:border-b-0 hover:bg-[var(--crm-app-table-row-hover)]"
                     >
                       {columns.map((column) => (
                         <td key={column.key} className={`px-4 py-3 ${column.cellClassName ?? ''}`}>
@@ -236,7 +248,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
                         <div className="flex justify-end gap-3 text-slate-500">
                           <button
                             type="button"
-                            className="transition hover:text-violet-300"
+                            className="transition hover:text-[var(--crm-brand-accent)]"
                             onClick={() => onEdit(row)}
                             aria-label="Duzenle"
                           >
@@ -267,7 +279,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
               type="button"
               disabled={pageNumber <= 1}
               onClick={() => onPageChange(Math.max(1, pageNumber - 1))}
-              className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-200 disabled:opacity-40"
+              className={`inline-flex h-9 items-center gap-1 px-3 disabled:opacity-40 ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}`}
             >
               <ChevronLeft size={16} />
               Onceki
@@ -279,7 +291,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
               type="button"
               disabled={pageNumber >= totalPages}
               onClick={() => onPageChange(Math.min(totalPages, pageNumber + 1))}
-              className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-200 disabled:opacity-40"
+              className={`inline-flex h-9 items-center gap-1 px-3 disabled:opacity-40 ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}`}
             >
               Sonraki
               <ChevronRight size={16} />
@@ -291,17 +303,17 @@ export function SalesDeskListLayout<T extends { id: number }>({
       {formDialog}
 
       <AlertDialog open={deletingRow != null} onOpenChange={(open) => !open && onDeleteCancel()}>
-        <AlertDialogContent className="border border-white/10 bg-[#0a0f1e] text-slate-100">
+        <AlertDialogContent className={SD_SURFACE_DIALOG}>
           <AlertDialogHeader>
             <AlertDialogTitle>Kaydi sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-[var(--crm-app-text-muted)]">
               {deletingRow
                 ? `"${deleteLabel?.(deletingRow) ?? deletingRow.id}" kaydini silmek istediginize emin misiniz?`
                 : 'Bu islem geri alinamaz.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/10 bg-transparent text-slate-200 hover:bg-white/5">
+            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>
               Iptal
             </AlertDialogCancel>
             <AlertDialogAction

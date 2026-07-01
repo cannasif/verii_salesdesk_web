@@ -61,7 +61,7 @@ export function SalesDeskSalesTrackingPage(): ReactElement {
             label: 'Siparise Donen',
             value: orderedQuotes,
             hint: 'Teklif durumu',
-            tone: 'text-pink-300',
+            tone: 'text-[var(--crm-brand-on-soft)]',
           },
         ].map((metric) => (
           <div key={metric.label} className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>

@@ -9,6 +9,7 @@ import {
 import { Columns3, EyeOff, Eye, ArrowUp, ArrowDown } from 'lucide-react';
 import { saveColumnPreferences } from '@/lib/column-preferences';
 import { cn } from '@/lib/utils';
+import { CRM_APP_POPOVER_SURFACE } from '@/lib/management-list-layout';
 
 const ID_COLUMN_KEY = 'id';
 
@@ -213,7 +214,7 @@ export function ColumnPreferencesPopover({
           {t('common.editColumns')}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-72 p-0 bg-white/95 dark:bg-[#1a1025]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl rounded-xl z-50">
+      <PopoverContent align="end" className={cn('z-50 w-72 p-0', CRM_APP_POPOVER_SURFACE)}>
         <ColumnPreferencesPanel
           pageKey={pageKey}
           userId={userId}

@@ -1,8 +1,10 @@
 export const surfaceClass =
-  'border border-white/10 bg-[#0d1222]/72 shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] backdrop-blur-xl';
+  'border border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_72%,transparent)] shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] backdrop-blur-xl';
 
-export const fieldClass =
-  'h-11 rounded-lg border border-white/10 bg-[#070a13]/85 px-4 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10';
+export const fieldClass = [
+  'h-11 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 text-sm text-slate-200 outline-none transition',
+  'focus:border-[var(--crm-brand-primary)] focus:ring-4 focus:ring-[var(--crm-brand-ring)]',
+].join(' ');
 
 export const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 

@@ -34,8 +34,20 @@ import {
   type SalesDeskPotentialFormValues,
 } from '../types/potential-types';
 
-const surfaceClass =
-  'border border-white/10 bg-[#0d1222]/72 shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] backdrop-blur-xl';
+import { surfaceClass } from '../lib/salesdesk-shared';
+import {
+  SD_ADD_BUTTON,
+  SD_FORM_INPUT,
+  SD_PAGE_ICON_BOX,
+  SD_PAGE_TITLE_BAR,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+  SD_TABLE_SHELL,
+} from '../lib/salesdesk-popup-styles';
+import {
+  MANAGEMENT_LIST_CARD_CLASSNAME,
+  MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
+} from '@/lib/management-list-layout';
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 
@@ -47,10 +59,10 @@ function StatusBadge({ status }: { status: SalesDeskPotentialStatus }): ReactEle
       : status === 3
         ? 'border-amber-400/50 bg-amber-500/10 text-amber-300'
         : status === 5
-          ? 'border-cyan-400/50 bg-cyan-500/10 text-cyan-300'
+          ? 'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]'
           : status === 6
             ? 'border-rose-400/50 bg-rose-500/10 text-rose-300'
-            : 'border-violet-400/40 bg-violet-500/10 text-violet-200';
+            : 'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]';
 
   return <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${tone}`}>{label}</span>;
 }
@@ -131,12 +143,12 @@ export function SalesDeskPotentialsPage(): ReactElement {
     <div className="space-y-5 text-slate-100">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-pink-400/20 bg-pink-500/15 text-pink-300 shadow-[0_0_28px_rgba(236,72,153,.18)]">
+          <div className={SD_PAGE_ICON_BOX}>
             <Sparkles size={22} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-7 w-1 rounded-full bg-pink-500 shadow-[0_0_24px_rgba(236,72,153,.7)]" />
+              <span className={SD_PAGE_TITLE_BAR} />
               <h1 className="text-2xl font-semibold tracking-normal text-slate-50">Potansiyel Cariler</h1>
             </div>
             <p className="mt-1 text-sm text-slate-400">
@@ -147,7 +159,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
         <button
           type="button"
           onClick={handleCreateClick}
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white shadow-lg shadow-violet-950/40 hover:bg-violet-400"
+          className={SD_ADD_BUTTON}
         >
           <Plus size={16} />
           Potansiyel Ekle
@@ -157,11 +169,11 @@ export function SalesDeskPotentialsPage(): ReactElement {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <div className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
           <p className="text-xs font-semibold uppercase text-slate-500">Toplam Potansiyel</p>
-          <p className="mt-3 text-3xl font-semibold text-blue-300">{totalPotentialCount}</p>
+          <p className="mt-3 text-3xl font-semibold text-[var(--crm-brand-on-soft)]">{totalPotentialCount}</p>
         </div>
         <div className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
           <p className="text-xs font-semibold uppercase text-slate-500">Bekleyen</p>
-          <p className="mt-3 text-3xl font-semibold text-violet-300">{waitingCount}</p>
+          <p className="mt-3 text-3xl font-semibold text-[var(--crm-brand-on-soft)]">{waitingCount}</p>
         </div>
         <div className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
           <p className="text-xs font-semibold uppercase text-slate-500">Guclu Aday</p>
@@ -169,14 +181,14 @@ export function SalesDeskPotentialsPage(): ReactElement {
         </div>
       </div>
 
-      <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4">
-        <h2 className="text-xl font-semibold">Potansiyel Cari Listesi</h2>
+      <section className={`rounded-xl p-4 ${MANAGEMENT_LIST_CARD_CLASSNAME}`}>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Potansiyel Cari Listesi</h2>
 
-        <div className="mt-3 flex flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0f1e]/70 p-4 md:flex-row md:items-center md:justify-between">
+        <div className="mt-3 flex flex-col gap-3 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card-header)] p-4 md:flex-row md:items-center md:justify-between">
           <div className="relative w-full md:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)]" size={16} />
             <input
-              className="h-10 w-full rounded-lg border border-white/10 bg-[#050711]/80 pl-10 pr-3 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10"
+              className={`h-10 w-full pl-10 pr-3 ${SD_FORM_INPUT}`}
               placeholder="Ara"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
@@ -184,7 +196,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <select
-              className="h-10 rounded-lg border border-white/10 bg-[#050711]/80 px-3 text-sm text-slate-200 outline-none"
+              className={`h-10 px-3 text-sm ${SD_FORM_INPUT} ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}`}
               value={pageSize}
               onChange={(event) => setPageSize(Number(event.target.value))}
             >
@@ -198,7 +210,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
               type="button"
               onClick={() => refetch()}
               disabled={isFetching}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-white/20 bg-white/[.02] px-4 text-sm font-medium text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white disabled:opacity-60"
+              className={`inline-flex h-10 items-center gap-2 px-4 text-sm font-medium disabled:opacity-60 ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME} border-dashed hover:border-[var(--crm-brand-primary)] hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-on-soft)]`}
             >
               {isFetching ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />}
               Yenile
@@ -212,10 +224,10 @@ export function SalesDeskPotentialsPage(): ReactElement {
           </div>
         )}
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#070a13]/72">
+        <div className={`mt-4 ${SD_TABLE_SHELL}`}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[820px] text-left text-sm">
-              <thead className="border-b border-white/10 bg-white/[.025] text-xs uppercase text-slate-300">
+              <thead className="border-b border-[var(--crm-app-border)] bg-[var(--crm-app-table-head)] text-xs uppercase text-slate-300">
                 <tr>
                   {['KOD', 'CARI ADI', 'YETKILI', 'TELEFON', 'E-POSTA', 'DURUM', 'IL', 'ILCE'].map((column) => (
                     <th key={column} className="px-4 py-4 font-semibold">
@@ -243,7 +255,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
                   potentials.map((potential) => (
                     <tr
                       key={potential.id}
-                      className="border-b border-white/10 text-slate-300 last:border-b-0 hover:bg-white/[.025]"
+                      className="border-b border-[var(--crm-app-border)] text-slate-300 last:border-b-0 hover:bg-[var(--crm-app-table-row-hover)]"
                     >
                       <td className="px-4 py-3">{potential.code}</td>
                       <td className="px-4 py-3 font-semibold text-slate-100">{potential.companyName}</td>
@@ -259,7 +271,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
                         <div className="flex justify-end gap-3 text-slate-500">
                           <button
                             type="button"
-                            className="transition hover:text-violet-300"
+                            className="transition hover:text-[var(--crm-brand-on-soft)]"
                             onClick={() => handleEditClick(potential)}
                             aria-label="Duzenle"
                           >
@@ -290,7 +302,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
               type="button"
               disabled={pageNumber <= 1}
               onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-              className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-200 disabled:opacity-40"
+              className={`inline-flex h-9 items-center gap-1 px-3 disabled:opacity-40 ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}`}
             >
               <ChevronLeft size={16} />
               Onceki
@@ -302,7 +314,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
               type="button"
               disabled={pageNumber >= totalPages}
               onClick={() => setPageNumber((current) => Math.min(totalPages, current + 1))}
-              className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-200 disabled:opacity-40"
+              className={`inline-flex h-9 items-center gap-1 px-3 disabled:opacity-40 ${MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}`}
             >
               Sonraki
               <ChevronRight size={16} />
@@ -320,19 +332,17 @@ export function SalesDeskPotentialsPage(): ReactElement {
       />
 
       <AlertDialog open={deletingPotential != null} onOpenChange={(open) => !open && setDeletingPotential(null)}>
-        <AlertDialogContent className="border border-white/10 bg-[#0a0f1e] text-slate-100">
+        <AlertDialogContent className={SD_SURFACE_DIALOG}>
           <AlertDialogHeader>
             <AlertDialogTitle>Potansiyel cariyi sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
+            <AlertDialogDescription className="text-[var(--crm-app-text-muted)]">
               {deletingPotential
                 ? `"${deletingPotential.companyName}" kaydini silmek istediginize emin misiniz?`
                 : 'Bu islem geri alinamaz.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/10 bg-transparent text-slate-200 hover:bg-white/5">
-              Iptal
-            </AlertDialogCancel>
+            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
             <AlertDialogAction
               className="bg-rose-600 hover:bg-rose-500"
               onClick={handleDeleteConfirm}

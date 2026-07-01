@@ -17,6 +17,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { LanguageSwitcher } from '@/components/shared/LanguageSwitcher';
 import { LockKeyIcon, ViewIcon, ViewOffIcon } from 'hugeicons-react';
+import {
+  AUTH_CARD,
+  AUTH_CARD_ANIMATE,
+  AUTH_ICON,
+  AUTH_INPUT,
+  AUTH_PRIMARY_BUTTON,
+  AUTH_SHELL,
+} from '../lib/auth-page-styles';
+
 const loginImage = '/veriicrmlogo-sm.png';
 
 export function ResetPasswordPage(): React.JSX.Element {
@@ -66,25 +75,25 @@ export function ResetPasswordPage(): React.JSX.Element {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#0f0518] text-white font-['Outfit']">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-      `}</style>
+    <div className={AUTH_SHELL}>
+      <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,var(--crm-app-panel-strong)_0%,var(--crm-app-background)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute top-[-10%] right-[-10%] h-[55vw] w-[55vw] rounded-full bg-[var(--crm-app-aura-end)] blur-[120px] mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-10%] h-[55vw] w-[55vw] rounded-full bg-[var(--crm-app-aura-start)] blur-[120px] mix-blend-screen" />
+      </div>
 
-      <div className="fixed inset-0 z-0 bg-[radial-gradient(circle_at_50%_50%,#1a0b2e_0%,#000000_100%)]" />
-
-      <div className="relative z-10 w-full h-full flex flex-col items-center px-4 py-8 overflow-y-auto">
-        <div className="absolute top-6 right-6 z-20">
+      <div className="relative z-10 flex h-full w-full flex-col items-center overflow-y-auto px-4 py-8">
+        <div className="absolute right-6 top-6 z-20">
           <LanguageSwitcher />
         </div>
-        <div className="w-full max-w-md p-10 rounded-3xl bg-[#140a1e]/70 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4),_inset_0_0_20px_rgba(255,255,255,0.07)] animate-[fadeIn_0.8s_ease-out] my-auto">
-          <div className="text-center mb-8">
+        <div className={`${AUTH_CARD} ${AUTH_CARD_ANIMATE} my-auto`}>
+          <div className="mb-8 text-center">
             <img
               src={loginImage}
               alt="Logo"
-              className="inline-flex items-center justify-center w-80 h-50 object-contain p-2"
+              className="inline-flex h-50 w-80 items-center justify-center object-contain p-2"
             />
-            <p className="text-slate-400 text-xs uppercase tracking-[0.15em] mt-2 font-medium">
+            <p className="mt-2 text-xs font-medium uppercase tracking-[0.15em] text-[var(--crm-app-text-muted)]">
               {t('auth.resetPassword.title')}
             </p>
           </div>
@@ -97,21 +106,21 @@ export function ResetPasswordPage(): React.JSX.Element {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <div className="relative group">
+                      <div className="group relative">
                         <LockKeyIcon
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-400"
+                          className={`absolute left-4 top-1/2 -translate-y-1/2 ${AUTH_ICON}`}
                           size={18}
                         />
                         <Input
                           {...field}
                           type={isPasswordVisible ? 'text' : 'password'}
                           placeholder={t('auth.resetPassword.newPasswordPlaceholder')}
-                          className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-6 pl-12 pr-10 text-sm text-white placeholder-slate-500 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-pink-500 focus:bg-black/50"
+                          className={AUTH_INPUT}
                         />
                         <button
                           type="button"
                           onClick={() => setIsPasswordVisible((v) => !v)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)] hover:text-white"
                         >
                           {isPasswordVisible ? (
                             <ViewOffIcon size={20} />
@@ -132,21 +141,21 @@ export function ResetPasswordPage(): React.JSX.Element {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <div className="relative group">
+                      <div className="group relative">
                         <LockKeyIcon
-                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-400"
+                          className={`absolute left-4 top-1/2 -translate-y-1/2 ${AUTH_ICON}`}
                           size={18}
                         />
                         <Input
                           {...field}
                           type={isConfirmPasswordVisible ? 'text' : 'password'}
                           placeholder={t('auth.resetPassword.confirmPasswordPlaceholder')}
-                          className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-6 pl-12 pr-10 text-sm text-white placeholder-slate-500 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-pink-500 focus:bg-black/50"
+                          className={AUTH_INPUT}
                         />
                         <button
                           type="button"
                           onClick={() => setIsConfirmPasswordVisible((v) => !v)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)] hover:text-white"
                         >
                           {isConfirmPasswordVisible ? (
                             <ViewOffIcon size={20} />
@@ -164,7 +173,7 @@ export function ResetPasswordPage(): React.JSX.Element {
               <button
                 type="submit"
                 disabled={isPending || !token}
-                className="w-full py-4 rounded-xl bg-linear-to-r from-pink-600 via-orange-500 to-yellow-500 hover:from-pink-500 hover:via-orange-400 hover:to-yellow-400 text-white font-bold text-sm mt-6 shadow-lg shadow-orange-900/20 tracking-wide uppercase transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                className={AUTH_PRIMARY_BUTTON}
               >
                 {isPending ? t('auth.resetPassword.processing') : t('auth.resetPassword.submitButton')}
               </button>

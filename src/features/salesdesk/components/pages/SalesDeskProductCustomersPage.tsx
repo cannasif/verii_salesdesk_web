@@ -28,6 +28,12 @@ import {
   toProductCustomerPayload,
   type ProductCustomerFormValues,
 } from '../../types/salesdesk-schemas';
+import {
+  SD_ADD_BUTTON,
+  SD_PAGE_ICON_BOX,
+  SD_PAGE_TITLE_BAR,
+  SD_SURFACE_DIALOG,
+} from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskProductCustomersPage(): ReactElement {
   const productListPage = useSalesDeskListPage(20);
@@ -73,12 +79,12 @@ export function SalesDeskProductCustomersPage(): ReactElement {
     <div className="space-y-5 text-slate-100">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-500/15 text-cyan-300">
+          <div className={SD_PAGE_ICON_BOX}>
             <Link2 size={22} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="h-7 w-1 rounded-full bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,.7)]" />
+              <span className={SD_PAGE_TITLE_BAR} />
               <h1 className="text-2xl font-semibold text-slate-50">Urun Bazli Musteriler</h1>
             </div>
             <p className="mt-1 text-sm text-slate-400">
@@ -90,7 +96,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
           type="button"
           disabled={!selectedProduct}
           onClick={() => setLinkOpen(true)}
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white hover:bg-violet-400 disabled:opacity-50"
+          className={SD_ADD_BUTTON}
         >
           <Plus size={16} />
           Baglanti Ekle
@@ -101,7 +107,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
         {[
           { label: 'Urun', value: productData?.totalCount ?? products.length },
           { label: 'Cari', value: customerCount, tone: 'text-emerald-300' },
-          { label: 'Potansiyel', value: potentialCount, tone: 'text-pink-300' },
+          { label: 'Potansiyel', value: potentialCount, tone: 'text-[var(--crm-brand-on-soft)]' },
         ].map((metric) => (
           <div key={metric.label} className={`min-h-[100px] rounded-xl p-5 ${surfaceClass}`}>
             <p className="text-xs font-semibold uppercase text-slate-500">{metric.label}</p>
@@ -142,7 +148,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
                   type="button"
                   onClick={() => setSelectedProduct(product)}
                   className={`block w-full border-b border-white/10 px-4 py-3 text-left text-sm transition hover:bg-white/[.04] ${
-                    selectedProduct?.id === product.id ? 'bg-violet-500/15 text-violet-100' : 'text-slate-300'
+                    selectedProduct?.id === product.id ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]' : 'text-slate-300'
                   }`}
                 >
                   <p className="font-semibold">{product.name}</p>
@@ -257,7 +263,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
       )}
 
       <AlertDialog open={deletingLink != null} onOpenChange={(open) => !open && setDeletingLink(null)}>
-        <AlertDialogContent className="border border-white/10 bg-[#0a0f1e] text-slate-100">
+        <AlertDialogContent className={SD_SURFACE_DIALOG}>
           <AlertDialogHeader>
             <AlertDialogTitle>Baglantiyi sil</AlertDialogTitle>
             <AlertDialogDescription className="text-slate-400">

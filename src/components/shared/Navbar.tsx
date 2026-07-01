@@ -9,6 +9,7 @@ import { UserProfileModal } from '@/features/user-detail-management/components/U
 import { useAppShellStore } from '@/stores/app-shell-store';
 import { getImageUrl } from '@/features/user-detail-management/utils/image-url';
 import { cn } from '@/lib/utils';
+import { CRM_APP_PANEL_GLASS } from '@/lib/management-list-layout';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
 const pageTitles: Record<string, string> = {
@@ -85,8 +86,9 @@ export function Navbar(): ReactElement {
   return (
     <>
       <header className={cn(
-        "min-h-[76px] h-auto pt-[env(safe-area-inset-top)] px-4 sm:px-6 flex items-center justify-between border-b transition-all sticky top-0 z-40 backdrop-blur-xl",
-        "border-white/10 bg-[#080915]/82 shadow-[0_10px_26px_rgba(0,0,0,.18)]"
+        "min-h-[76px] h-auto pt-[env(safe-area-inset-top)] px-4 sm:px-6 flex items-center justify-between border-b transition-all sticky top-0 z-40",
+        CRM_APP_PANEL_GLASS,
+        "shadow-[0_10px_26px_rgba(0,0,0,.18)]"
       )}>
         <div className="flex h-[76px] min-w-0 flex-1 items-center gap-4">
           <button

@@ -24,9 +24,9 @@ const toneClasses: Record<BadgeTone, string> = {
   green: 'border-emerald-400/50 bg-emerald-500/10 text-emerald-300',
   yellow: 'border-amber-400/50 bg-amber-500/10 text-amber-300',
   red: 'border-rose-400/50 bg-rose-500/10 text-rose-300',
-  purple: 'border-violet-400/40 bg-violet-500/10 text-violet-200',
-  cyan: 'border-cyan-400/50 bg-cyan-500/10 text-cyan-300',
-  pink: 'border-pink-400/50 bg-pink-500/10 text-pink-300',
+  purple: 'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]',
+  cyan: 'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]',
+  pink: 'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]',
 };
 
 function Badge({ children, tone = 'purple' }: { children: string; tone?: BadgeTone }): ReactElement {

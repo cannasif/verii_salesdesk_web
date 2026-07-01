@@ -38,11 +38,10 @@ export function MainLayout({ navItems }: MainLayoutProps): ReactElement {
   }, [navItems, defaultNavItems, permissions, isLoading, isError]);
 
   return (
-    <div className="salesdesk-shell dark relative flex min-h-dvh h-[100dvh] w-full overflow-hidden bg-[var(--crm-app-background)] font-['Outfit'] text-slate-100 transition-colors duration-300">
-      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(14,165,233,.08),transparent_26%,rgba(124,58,237,.08)_72%,transparent)]" />
-        <div className="absolute inset-0 opacity-[.18] [background-image:linear-gradient(120deg,transparent_0_38%,rgba(255,255,255,.08)_38.2%,transparent_58%),linear-gradient(62deg,transparent_0_63%,rgba(34,211,238,.08)_63.2%,transparent_79%)]" />
-        <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(18deg,transparent_0_48%,rgba(15,23,42,.72)_48.2%_63%,transparent_63.2%),linear-gradient(143deg,transparent_0_55%,rgba(88,28,135,.24)_55.2%_68%,transparent_68.2%)]" />
+    <div className="salesdesk-shell theme-v3rii dark relative flex min-h-dvh h-[100dvh] w-full overflow-hidden bg-[var(--crm-app-background)] font-['Outfit'] text-slate-100 transition-colors duration-300">
+      <div className="pointer-events-none absolute inset-0 z-0 w-full overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] aspect-square w-[80vw] max-w-[800px] rounded-full bg-[var(--crm-app-aura-start)] blur-[80px] mix-blend-multiply transition-colors duration-500 dark:mix-blend-normal md:blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] aspect-square w-[60vw] max-w-[600px] rounded-full bg-[var(--crm-app-aura-end)] blur-[60px] mix-blend-multiply transition-colors duration-500 dark:mix-blend-normal md:blur-[100px]" />
       </div>
 
       {/* Sidebar - Mobile handles itself with fixed position, Desktop uses sticky/relative */}

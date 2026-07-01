@@ -61,7 +61,6 @@ export function SalesDeskInvoicesPage(): ReactElement {
       tableTitle="Fatura Listesi"
       actionLabel="Yeni Fatura Ekle"
       icon={<CreditCard size={22} />}
-      accentClass="border-pink-400/20 bg-pink-500/15 text-pink-300"
       metrics={[
         { label: 'Toplam Fatura', value: statsData?.totalCount ?? 0 },
         { label: 'Kesilecek', value: toIssueCount, tone: 'yellow' },

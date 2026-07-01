@@ -23,6 +23,7 @@ import {
 import { useCreateSalesDeskInvoice, useSalesDeskCustomerOptions } from '../../hooks/useSalesDeskModules';
 import { enumToSelectOptions, fieldClass, normalizeSelectValue, NONE_SELECT_VALUE, surfaceClass } from '../../lib/salesdesk-shared';
 import { DOCUMENT_STATUS_LABELS } from '../../lib/salesdesk-labels';
+import { SD_PAGE_ICON_BOX, SD_PRIMARY_BUTTON } from '../../lib/salesdesk-popup-styles';
 import {
   invoiceFormSchema,
   toInvoiceFormValues,
@@ -54,7 +55,7 @@ export function SalesDeskInvoiceCreatePage(): ReactElement {
   return (
     <div className="space-y-5 text-slate-100">
       <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-pink-400/20 bg-pink-500/15 text-pink-300">
+        <div className={SD_PAGE_ICON_BOX}>
           <CreditCard size={22} />
         </div>
         <div>
@@ -224,7 +225,7 @@ export function SalesDeskInvoiceCreatePage(): ReactElement {
                 >
                   Iptal
                 </Button>
-                <Button type="submit" className="bg-violet-500 hover:bg-violet-400" disabled={createInvoice.isPending}>
+                <Button type="submit" variant="ghost" className={SD_PRIMARY_BUTTON} disabled={createInvoice.isPending}>
                   {createInvoice.isPending ? 'Kaydediliyor...' : 'Faturayi Olustur'}
                 </Button>
               </div>

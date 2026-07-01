@@ -87,26 +87,36 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --crm-brand-primary: #7367ff;
-  --crm-brand-secondary: #8b5cf6;
-  --crm-brand-accent: #22d3ee;
-  --crm-brand-on-primary: #ffffff;
-  --crm-brand-text: #5b5cf6;
-  --crm-brand-on-soft: #4338ca;
-  --crm-brand-muted: #eef2ff;
-  --crm-brand-soft: rgb(115 103 255 / 12%);
-  --crm-brand-ring: rgb(115 103 255 / 28%);
-  --crm-brand-shadow: rgb(115 103 255 / 34%);
-  --crm-brand-gradient: linear-gradient(90deg, #5b5cf6 0%, #8b5cf6 55%, #22d3ee 100%);
-  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(91 92 246 / 14%) 0%, rgb(139 92 246 / 12%) 55%, rgb(34 211 238 / 12%) 100%);
-  --crm-app-background: #f7f9ff;
+  --crm-brand-primary: #c9a227;
+  --crm-brand-secondary: #1e3a5f;
+  --crm-brand-accent: #d4af37;
+  --crm-brand-on-primary: #0a0e17;
+  --crm-brand-text: #92650a;
+  --crm-brand-on-soft: #64748b;
+  --crm-brand-muted: #faf8f3;
+  --crm-brand-soft: rgb(201 162 39 / 9%);
+  --crm-brand-ring: rgb(201 162 39 / 22%);
+  --crm-brand-shadow: rgb(10 14 23 / 20%);
+  --crm-brand-gradient: linear-gradient(180deg, #d4af37 0%, #a67c00 100%);
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(30 58 95 / 6%) 0%, rgb(201 162 39 / 7%) 100%);
+  --crm-app-background: #f7f6f2;
   --crm-app-panel: #ffffff;
-  --crm-app-panel-muted: #f8fafc;
-  --crm-app-panel-strong: #f1f5f9;
-  --crm-app-border: rgb(226 232 240 / 90%);
+  --crm-app-panel-muted: #faf9f6;
+  --crm-app-panel-strong: #f1efe8;
+  --crm-app-border: rgb(212 175 55 / 14%);
   --crm-app-text-muted: #64748b;
-  --crm-app-aura-start: rgb(115 103 255 / 16%);
-  --crm-app-aura-end: rgb(34 211 238 / 12%);
+  --crm-app-aura-start: rgb(30 58 95 / 5%);
+  --crm-app-aura-end: rgb(201 162 39 / 5%);
+  --crm-app-dialog: rgb(255 255 255 / 90%);
+  --crm-app-dialog-footer: rgb(248 250 252 / 50%);
+  --crm-app-input: #f8fafc;
+  --crm-app-popover: rgb(255 255 255 / 95%);
+  --crm-app-list-card: rgb(250 250 249 / 95%);
+  --crm-app-list-card-header: rgb(241 245 249 / 90%);
+  --crm-app-list-card-content: rgb(250 250 249 / 80%);
+  --crm-app-table-shell: rgb(245 245 244 / 80%);
+  --crm-app-table-head: rgb(241 245 249 / 90%);
+  --crm-app-table-row-hover: rgb(248 250 252 / 70%);
   --primary: var(--crm-brand-primary);
   --primary-foreground: var(--crm-brand-on-primary);
   --accent: var(--crm-brand-soft);
@@ -128,7 +138,7 @@
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
   --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: #0d1222;
+  --popover: #101828;
   --popover-foreground: oklch(0.984 0.003 247.858);
   --primary: oklch(0.929 0.013 255.508);
   --primary-foreground: oklch(0.208 0.042 265.755);
@@ -155,16 +165,26 @@
   --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.551 0.027 264.364);
-  --crm-app-background: #070b18;
-  --crm-app-panel: #0d1222;
-  --crm-app-panel-muted: rgb(255 255 255 / 5%);
-  --crm-app-panel-strong: #111827;
-  --crm-app-border: rgb(148 163 184 / 12%);
+  --crm-app-background: #0a0e17;
+  --crm-app-panel: #0f1623;
+  --crm-app-panel-muted: rgb(212 175 55 / 4%);
+  --crm-app-panel-strong: #161f30;
+  --crm-app-border: rgb(212 175 55 / 11%);
   --crm-app-text-muted: #94a3b8;
-  --crm-app-aura-start: rgb(115 103 255 / 10%);
-  --crm-app-aura-end: rgb(34 211 238 / 7%);
-  --crm-brand-text: #a5b4fc;
-  --crm-brand-on-soft: #ddd6fe;
+  --crm-app-aura-start: rgb(30 58 95 / 5%);
+  --crm-app-aura-end: rgb(201 162 39 / 3%);
+  --crm-app-dialog: rgb(12 18 30 / 97%);
+  --crm-app-dialog-footer: rgb(22 31 48 / 55%);
+  --crm-app-input: #0c1320;
+  --crm-app-popover: rgb(15 22 36 / 98%);
+  --crm-app-list-card: rgb(12 18 30 / 82%);
+  --crm-app-list-card-header: rgb(212 175 55 / 3%);
+  --crm-app-list-card-content: transparent;
+  --crm-app-table-shell: transparent;
+  --crm-app-table-head: rgb(212 175 55 / 4%);
+  --crm-app-table-row-hover: rgb(212 175 55 / 3%);
+  --crm-brand-text: #d4af37;
+  --crm-brand-on-soft: #e2c875;
   --primary: var(--crm-brand-primary);
   --primary-foreground: var(--crm-brand-on-primary);
   --accent: var(--crm-brand-soft);
@@ -181,18 +201,20 @@
 }
 
 .theme-v3rii {
-  --crm-brand-primary: #7367ff;
-  --crm-brand-secondary: #8b5cf6;
-  --crm-brand-accent: #22d3ee;
-  --crm-brand-on-primary: #ffffff;
-  --crm-brand-text: #5b5cf6;
-  --crm-brand-on-soft: #4338ca;
-  --crm-brand-muted: #eef2ff;
-  --crm-brand-soft: rgb(115 103 255 / 12%);
-  --crm-brand-ring: rgb(115 103 255 / 28%);
-  --crm-brand-shadow: rgb(115 103 255 / 34%);
-  --crm-brand-gradient: linear-gradient(90deg, #5b5cf6 0%, #8b5cf6 55%, #22d3ee 100%);
-  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(91 92 246 / 14%) 0%, rgb(139 92 246 / 12%) 55%, rgb(34 211 238 / 12%) 100%);
+  --crm-brand-primary: #c9a227;
+  --crm-brand-secondary: #1e3a5f;
+  --crm-brand-accent: #d4af37;
+  --crm-brand-on-primary: #0a0e17;
+  --crm-brand-text: #92650a;
+  --crm-brand-on-soft: #64748b;
+  --crm-brand-muted: #faf8f3;
+  --crm-brand-soft: rgb(201 162 39 / 9%);
+  --crm-brand-ring: rgb(201 162 39 / 22%);
+  --crm-brand-shadow: rgb(10 14 23 / 20%);
+  --crm-brand-gradient: linear-gradient(180deg, #d4af37 0%, #a67c00 100%);
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(30 58 95 / 6%) 0%, rgb(201 162 39 / 7%) 100%);
+  --crm-app-aura-start: rgb(30 58 95 / 5%);
+  --crm-app-aura-end: rgb(201 162 39 / 5%);
 }
 
 .theme-corporate-blue {
@@ -406,10 +428,18 @@
 }
 
 .dark.theme-v3rii {
-  --crm-brand-text: #a5b4fc;
-  --crm-brand-on-soft: #ddd6fe;
-  --crm-app-aura-start: rgb(115 103 255 / 10%);
-  --crm-app-aura-end: rgb(34 211 238 / 7%);
+  --crm-brand-text: #d4af37;
+  --crm-brand-on-soft: #e2c875;
+  --crm-brand-on-primary: #0a0e17;
+  --crm-app-background: #0a0e17;
+  --crm-app-panel: #0f1623;
+  --crm-app-panel-strong: #161f30;
+  --crm-app-border: rgb(212 175 55 / 11%);
+  --crm-app-aura-start: rgb(30 58 95 / 5%);
+  --crm-app-aura-end: rgb(201 162 39 / 3%);
+  --crm-app-dialog: rgb(12 18 30 / 97%);
+  --crm-app-input: #0c1320;
+  --crm-app-popover: rgb(15 22 36 / 98%);
 }
 
 .dark.theme-corporate-blue {
@@ -703,6 +733,77 @@
   :where([class*='shadow-pink'], [class*='shadow-purple'], [class*='shadow-orange']) {
     --tw-shadow-color: var(--crm-brand-shadow) !important;
     --tw-shadow: var(--tw-shadow-colored) !important;
+  }
+
+  /* SalesDesk / Auth — popup & marka butonlari */
+  .salesdesk-shell .sd-brand-primary,
+  .auth-shell .sd-brand-primary {
+    border: 1px solid rgb(212 175 55 / 28%) !important;
+    background-color: var(--crm-brand-primary) !important;
+    background-image: var(--crm-brand-gradient) !important;
+    color: var(--crm-brand-on-primary) !important;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 22%), 0 4px 16px rgb(201 162 39 / 14%) !important;
+  }
+
+  .salesdesk-shell .sd-brand-primary:hover,
+  .auth-shell .sd-brand-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .salesdesk-shell .sd-brand-secondary,
+  .auth-shell .sd-brand-secondary {
+    border: 1px solid var(--crm-app-border) !important;
+    background-color: var(--crm-app-panel-muted) !important;
+    background-image: none !important;
+    color: inherit !important;
+  }
+
+  .salesdesk-shell .sd-brand-secondary:hover,
+  .auth-shell .sd-brand-secondary:hover {
+    background-color: var(--crm-app-panel-strong) !important;
+  }
+
+  .salesdesk-shell [data-slot='dialog-content'] {
+    background: var(--crm-app-dialog) !important;
+    border-color: var(--crm-app-border) !important;
+    color: inherit;
+  }
+
+  .salesdesk-shell [data-slot='select-content'],
+  .salesdesk-shell [data-slot='popover-content'],
+  .auth-shell [data-slot='select-content'] {
+    background: var(--crm-app-popover) !important;
+    border-color: var(--crm-app-border) !important;
+  }
+
+  .salesdesk-shell :where(
+    [class*='text-cyan'],
+    [class*='text-teal'],
+    [class*='text-pink'],
+    [class*='text-orange']
+  ) {
+    color: var(--crm-brand-on-soft) !important;
+  }
+
+  .salesdesk-shell :where(
+    [class*='bg-cyan'],
+    [class*='bg-teal'],
+    [class*='bg-pink'],
+    [class*='bg-orange']
+  ):not([class*='bg-cyan-950']):not([class*='bg-teal-950']) {
+    background-color: var(--crm-brand-soft) !important;
+  }
+
+  .salesdesk-shell :where(
+    [class*='bg-violet-500']:not([class*='bg-violet-500/']),
+    [class*='bg-violet-600']:not([class*='bg-violet-600/']),
+    [class*='hover:bg-violet-400'],
+    [class*='hover:bg-violet-500']
+  ) {
+    background-color: var(--crm-brand-primary) !important;
+    background-image: var(--crm-brand-gradient) !important;
+    color: var(--crm-brand-on-primary) !important;
+    border-color: rgb(212 175 55 / 28%) !important;
   }
 
   .crm-ms-2 {

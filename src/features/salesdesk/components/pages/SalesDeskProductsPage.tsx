@@ -55,7 +55,6 @@ export function SalesDeskProductsPage(): ReactElement {
       tableTitle="Urun Listesi"
       actionLabel="Yeni Urun Ekle"
       icon={<ShoppingCart size={22} />}
-      accentClass="border-emerald-400/20 bg-emerald-500/15 text-emerald-300 shadow-[0_0_28px_rgba(16,185,129,.18)]"
       metrics={[
         { label: 'Toplam Urun', value: statsData?.totalCount ?? data?.totalCount ?? 0 },
         { label: 'Dusuk Stok', value: lowStockCount, tone: 'red' },

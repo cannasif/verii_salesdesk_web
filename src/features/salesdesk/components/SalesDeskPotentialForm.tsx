@@ -32,9 +32,13 @@ import {
   toPotentialFormValues,
   type SalesDeskPotentialFormValues,
 } from '../types/potential-types';
-
-const fieldClass =
-  'h-11 rounded-lg border border-white/10 bg-[#070a13]/85 px-4 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10';
+import {
+  SD_FORM_INPUT,
+  SD_FORM_LABEL,
+  SD_PRIMARY_BUTTON,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+} from '../lib/salesdesk-popup-styles';
 
 const STATUS_OPTIONS = [1, 2, 3, 4, 5, 6] as const;
 
@@ -74,10 +78,10 @@ export function SalesDeskPotentialForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto border border-white/10 bg-[#0a0f1e] text-slate-100 sm:max-w-xl">
+      <DialogContent className={`max-h-[90vh] overflow-y-auto sm:max-w-xl ${SD_SURFACE_DIALOG}`}>
         <DialogHeader>
           <DialogTitle>{isEditMode ? 'Potansiyel Duzenle' : 'Potansiyel Ekle'}</DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogDescription className="text-[var(--crm-app-text-muted)]">
             {isEditMode ? 'Potansiyel cari bilgilerini guncelleyin.' : 'Yeni potansiyel cari kaydi olusturun.'}
           </DialogDescription>
         </DialogHeader>
@@ -90,9 +94,9 @@ export function SalesDeskPotentialForm({
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Kod</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Kod</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} placeholder="Otomatik uretilir" />
+                      <Input {...field} className={SD_FORM_INPUT} placeholder="Otomatik uretilir" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,7 +107,7 @@ export function SalesDeskPotentialForm({
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Durum</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Durum</FormLabel>
                     <Select
                       value={String(field.value)}
                       onValueChange={(value) =>
@@ -111,7 +115,7 @@ export function SalesDeskPotentialForm({
                       }
                     >
                       <FormControl>
-                        <SelectTrigger className={fieldClass}>
+                        <SelectTrigger className={SD_FORM_INPUT}>
                           <SelectValue placeholder="Durum secin" />
                         </SelectTrigger>
                       </FormControl>
@@ -134,9 +138,9 @@ export function SalesDeskPotentialForm({
               name="companyName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-slate-300">Firma Adi *</FormLabel>
+                  <FormLabel className={SD_FORM_LABEL}>Firma Adi *</FormLabel>
                   <FormControl>
-                    <Input {...field} className={fieldClass} placeholder="Firma veya sirket adi" />
+                    <Input {...field} className={SD_FORM_INPUT} placeholder="Firma veya sirket adi" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -149,9 +153,9 @@ export function SalesDeskPotentialForm({
                 name="contactName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Yetkili</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Yetkili</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -162,9 +166,9 @@ export function SalesDeskPotentialForm({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Telefon</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Telefon</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -177,9 +181,9 @@ export function SalesDeskPotentialForm({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-slate-300">E-posta</FormLabel>
+                  <FormLabel className={SD_FORM_LABEL}>E-posta</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" className={fieldClass} />
+                    <Input {...field} type="email" className={SD_FORM_INPUT} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,9 +196,9 @@ export function SalesDeskPotentialForm({
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Il</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Il</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -205,9 +209,9 @@ export function SalesDeskPotentialForm({
                 name="district"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Ilce</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Ilce</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -218,14 +222,14 @@ export function SalesDeskPotentialForm({
                 name="matchScore"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-slate-300">Eslesme Skoru</FormLabel>
+                    <FormLabel className={SD_FORM_LABEL}>Eslesme Skoru</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         type="number"
                         min={0}
                         max={100}
-                        className={fieldClass}
+                        className={SD_FORM_INPUT}
                         onChange={(event) => field.onChange(Number(event.target.value))}
                       />
                     </FormControl>
@@ -238,14 +242,14 @@ export function SalesDeskPotentialForm({
             <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"
-                variant="outline"
-                className="border-white/10 bg-transparent text-slate-200 hover:bg-white/5"
+                variant="ghost"
+                className={SD_SECONDARY_BUTTON}
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
               >
                 Iptal
               </Button>
-              <Button type="submit" className="bg-violet-500 hover:bg-violet-400" disabled={isLoading}>
+              <Button type="submit" variant="ghost" className={SD_PRIMARY_BUTTON} disabled={isLoading}>
                 {isLoading ? 'Kaydediliyor...' : isEditMode ? 'Guncelle' : 'Kaydet'}
               </Button>
             </div>

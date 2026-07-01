@@ -61,7 +61,6 @@ export function SalesDeskSoftwareResearchPage(): ReactElement {
       tableTitle="Arastirma Sonuclari"
       actionLabel="Yeni Arastirma"
       icon={<Search size={22} />}
-      accentClass="border-yellow-400/20 bg-yellow-500/15 text-yellow-300"
       metrics={[
         { label: 'Toplam', value: statsData?.totalCount ?? 0 },
         { label: 'Bekleyen', value: statsRows.filter((item) => item.status === 1).length },

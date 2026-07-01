@@ -20,6 +20,7 @@ import { GridExportMenu, GridExportMenuItems } from './GridExportMenu';
 import type { FilterColumnConfig, FilterRow } from '@/lib/advanced-filter-types';
 import type { GridExportColumn } from '@/lib/grid-export';
 import { cn } from '@/lib/utils';
+import { CRM_APP_POPOVER_SURFACE } from '@/lib/management-list-layout';
 
 export interface DataTableSearchConfig {
   value?: string;
@@ -75,7 +76,43 @@ export interface DataTableActionBarProps {
   additionalFilterActions?: React.ReactNode;
   compactSearchOnMobile?: boolean;
   mobileMoreOptionsSlot?: React.ReactNode;
+  /** CRM varsayilan pembe; SalesDesk icin `brand` kullanin. */
+  accentTone?: 'crm' | 'brand';
 }
+
+const ACCENT_TONE_CLASSES = {
+  crm: {
+    toolbarActive:
+      'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-500/30 hover:bg-pink-500/30',
+    searchIconFocus:
+      'group-focus-within/search:text-pink-500 dark:group-focus-within/search:text-pink-400',
+    searchFocus: [
+      'focus:border-pink-500 focus:ring-[3px] focus:ring-pink-500/15',
+      'focus-visible:border-pink-500 focus-visible:ring-[3px] focus-visible:ring-pink-500/15',
+      'dark:focus:border-pink-500/60 dark:focus:ring-pink-500/10',
+      'dark:focus-visible:border-pink-500/60 dark:focus-visible:ring-pink-500/10',
+    ].join(' '),
+    filterBadge:
+      'crm-ms-auto inline-flex min-w-5 items-center justify-center rounded-full bg-pink-500/20 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-pink-700 dark:text-pink-300',
+  },
+  brand: {
+    toolbarActive: [
+      'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-text)] dark:text-[var(--crm-brand-on-soft)]',
+      'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
+      'hover:bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)]',
+    ].join(' '),
+    searchIconFocus:
+      'group-focus-within/search:text-[var(--crm-brand-accent)] dark:group-focus-within/search:text-[var(--crm-brand-accent)]',
+    searchFocus: [
+      'focus:border-[var(--crm-brand-primary)] focus:ring-[3px] focus:ring-[var(--crm-brand-ring)]',
+      'focus-visible:border-[var(--crm-brand-primary)] focus-visible:ring-[3px] focus-visible:ring-[var(--crm-brand-ring)]',
+      'dark:focus:border-[var(--crm-brand-primary)] dark:focus:ring-[var(--crm-brand-ring)]',
+      'dark:focus-visible:border-[var(--crm-brand-primary)] dark:focus-visible:ring-[var(--crm-brand-ring)]',
+    ].join(' '),
+    filterBadge:
+      'crm-ms-auto inline-flex min-w-5 items-center justify-center rounded-full bg-[var(--crm-brand-soft)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[var(--crm-brand-on-soft)]',
+  },
+} as const;
 
 export function DataTableActionBar({
   pageKey,
@@ -110,7 +147,9 @@ export function DataTableActionBar({
   additionalFilterActions,
   compactSearchOnMobile = false,
   mobileMoreOptionsSlot,
+  accentTone = 'crm',
 }: DataTableActionBarProps): ReactElement {
+  const accent = ACCENT_TONE_CLASSES[accentTone];
   const { t } = useTranslation([translationNamespace, 'common']);
   const MISSING_TRANSLATION = 'Çeviri eksik';
   const resolveAdvancedFilterTitle = (): string => {
@@ -244,15 +283,13 @@ export function DataTableActionBar({
   const filterButtonClassName = cn(
     'h-9 border-dashed border-slate-300 dark:border-white/20 text-xs sm:text-sm',
     showFilters || appliedFilterCount > 0
-      ? 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-500/30 hover:bg-pink-500/30'
+      ? accent.toolbarActive
       : 'bg-transparent hover:bg-slate-50 dark:hover:bg-white/5'
   );
 
   const columnsButtonClassName = cn(
     'h-9 border-dashed border-slate-300 dark:border-white/20 text-xs sm:text-sm',
-    columnsOpen
-      ? 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-500/30 hover:bg-pink-500/30'
-      : 'bg-transparent hover:bg-slate-50 dark:hover:bg-white/5'
+    columnsOpen ? accent.toolbarActive : 'bg-transparent hover:bg-slate-50 dark:hover:bg-white/5'
   );
 
 
@@ -282,7 +319,10 @@ export function DataTableActionBar({
             )}
           >
             <Search
-              className="pointer-events-none absolute crm-start-2-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within/search:text-pink-500 dark:text-slate-500 dark:group-focus-within/search:text-pink-400"
+              className={cn(
+                'pointer-events-none absolute crm-start-2-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors dark:text-slate-500',
+                accent.searchIconFocus
+              )}
               aria-hidden
             />
             <Input
@@ -293,10 +333,7 @@ export function DataTableActionBar({
                 resolvedSearchClassName,
                 'w-full border-slate-300 bg-white crm-ps-9 shadow-sm transition-all dark:border-white/15 dark:bg-transparent dark:shadow-none',
                 compactSearchOnMobile && isMobileSearchActive && 'crm-pe-8',
-                'focus:border-pink-500 focus:ring-[3px] focus:ring-pink-500/15',
-                'focus-visible:border-pink-500 focus-visible:ring-[3px] focus-visible:ring-pink-500/15',
-                'dark:focus:border-pink-500/60 dark:focus:ring-pink-500/10',
-                'dark:focus-visible:border-pink-500/60 dark:focus-visible:ring-pink-500/10'
+                accent.searchFocus
               )}
             />
             {compactSearchOnMobile && isMobileSearchActive && (
@@ -397,7 +434,7 @@ export function DataTableActionBar({
                 {t('common.editColumns')}
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-72 p-0 bg-white/95 dark:bg-[#1a1025]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-xl rounded-xl z-50">
+            <PopoverContent align="end" className={cn('z-50 w-72 p-0', CRM_APP_POPOVER_SURFACE)}>
               <ColumnPreferencesPanel
                 pageKey={pageKey}
                 userId={userId}
@@ -446,7 +483,7 @@ export function DataTableActionBar({
                 <Filter className="crm-me-2 h-4 w-4" />
                 {t('filters', { ns: 'common' })}
                 {appliedFilterCount > 0 ? (
-                  <span className="crm-ms-auto inline-flex min-w-5 items-center justify-center rounded-full bg-pink-500/20 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-pink-700 dark:text-pink-300">
+                  <span className={accent.filterBadge}>
                     {appliedFilterCount}
                   </span>
                 ) : null}

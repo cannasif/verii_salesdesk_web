@@ -8,10 +8,10 @@ export function SalesDeskDashboardPage(): ReactElement {
   const today = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'long' }).format(new Date());
 
   const metrics = [
-    { label: 'Aylik Satis', value: formatMoney(data?.monthlySalesTotal ?? 0), hint: 'Kesilen faturalar toplami', tone: 'text-blue-300' },
-    { label: 'Acik Gorev', value: data?.openTaskCount ?? 0, hint: 'Takip edilen isler', tone: 'text-rose-300' },
-    { label: 'Bugunku Ziyaret', value: data?.todayVisitCount ?? 0, hint: 'Planlanan gorusmeler', tone: 'text-cyan-300' },
-    { label: 'Bekleyen Teklif', value: data?.pendingQuoteCount ?? 0, hint: 'Onay bekleyen teklifler', tone: 'text-emerald-300' },
+    { label: 'Aylik Satis', value: formatMoney(data?.monthlySalesTotal ?? 0), hint: 'Kesilen faturalar toplami', tone: 'text-slate-100' },
+    { label: 'Acik Gorev', value: data?.openTaskCount ?? 0, hint: 'Takip edilen isler', tone: 'text-amber-400' },
+    { label: 'Bugunku Ziyaret', value: data?.todayVisitCount ?? 0, hint: 'Planlanan gorusmeler', tone: 'text-[var(--crm-brand-text)]' },
+    { label: 'Bekleyen Teklif', value: data?.pendingQuoteCount ?? 0, hint: 'Onay bekleyen teklifler', tone: 'text-emerald-400' },
   ];
 
   return (
@@ -19,7 +19,7 @@ export function SalesDeskDashboardPage(): ReactElement {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
           <h1 className="text-4xl font-semibold">
-            Sales Desk <span className="text-violet-400">Dashboard</span>
+            Sales Desk <span className="text-[var(--crm-brand-text)]">Dashboard</span>
           </h1>
           <p className="mt-4 flex items-center gap-2 text-slate-400">
             <CalendarDays size={16} /> {today}
@@ -38,7 +38,7 @@ export function SalesDeskDashboardPage(): ReactElement {
           <div key={metric.label} className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
             <p className="text-xs font-semibold uppercase text-slate-500">{metric.label}</p>
             {isLoading ? (
-              <Loader2 className="mt-3 animate-spin text-violet-300" size={28} />
+              <Loader2 className="mt-3 animate-spin text-[var(--crm-brand-on-soft)]" size={28} />
             ) : (
               <>
                 <p className={`mt-3 text-3xl font-semibold ${metric.tone}`}>{metric.value}</p>
@@ -65,7 +65,7 @@ export function SalesDeskDashboardPage(): ReactElement {
 
       <div className={`max-w-xl rounded-xl p-5 ${surfaceClass}`}>
         <div className="flex items-center gap-3">
-          <Mail className="text-violet-300" size={22} />
+          <Mail className="text-[var(--crm-brand-on-soft)]" size={22} />
           <div>
             <h2 className="text-lg font-semibold">Yaklasan Toplantilar</h2>
             <p className="text-sm text-slate-400">Gmail entegrasyonu ile toplanti davetleri burada listelenir.</p>

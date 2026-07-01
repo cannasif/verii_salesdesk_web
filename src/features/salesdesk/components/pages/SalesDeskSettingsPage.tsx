@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Settings } from 'lucide-react';
 import { getApiUrl } from '@/lib/axios';
 import { surfaceClass } from '../../lib/salesdesk-shared';
+import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskSettingsPage(): ReactElement {
   const apiUrl = getApiUrl();
@@ -10,7 +11,7 @@ export function SalesDeskSettingsPage(): ReactElement {
   return (
     <div className="space-y-5 text-slate-100">
       <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-400/20 bg-slate-500/15 text-slate-300">
+        <div className={SD_PAGE_ICON_BOX}>
           <Settings size={22} />
         </div>
         <div>
@@ -28,7 +29,7 @@ export function SalesDeskSettingsPage(): ReactElement {
             </p>
             <p>
               API URL:{' '}
-              <span className="break-all font-semibold text-violet-300">{apiUrl}</span>
+              <span className="break-all font-semibold text-[var(--crm-brand-on-soft)]">{apiUrl}</span>
             </p>
             <p>Surum: 1.0.0</p>
           </div>
@@ -41,7 +42,7 @@ export function SalesDeskSettingsPage(): ReactElement {
           </p>
           <Link
             to="/user-management"
-            className="mt-5 inline-flex h-11 items-center rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white hover:bg-violet-400"
+            className={SD_ADD_BUTTON}
           >
             Kullanici Yonetimine Git
           </Link>

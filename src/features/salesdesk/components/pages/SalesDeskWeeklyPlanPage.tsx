@@ -15,12 +15,13 @@ import {
   type TaskFormValues,
 } from '../../types/salesdesk-schemas';
 import { PriorityBadge, TaskStatusBadge } from './salesdesk-badges';
+import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
 
 const GROUP_COLORS = [
   'border-l-rose-400',
-  'border-l-violet-500',
+  'border-l-[var(--crm-brand-primary)]',
   'border-l-emerald-400',
-  'border-l-cyan-400',
+  'border-l-[color-mix(in_srgb,var(--crm-brand-primary)_70%,white)]',
   'border-l-amber-400',
 ];
 
@@ -63,7 +64,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
     <div className="space-y-5 text-slate-100">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/15 text-violet-300">
+          <div className={SD_PAGE_ICON_BOX}>
             <CalendarDays size={22} />
           </div>
           <div>
@@ -74,7 +75,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         <button
           type="button"
           onClick={() => setFormOpen(true)}
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white hover:bg-violet-400"
+          className={SD_ADD_BUTTON}
         >
           <Plus size={16} />
           Yeni Madde

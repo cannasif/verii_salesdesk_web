@@ -61,7 +61,6 @@ export function SalesDeskQuotesPage(): ReactElement {
       tableTitle="Teklif Listesi"
       actionLabel="Yeni Teklif Ekle"
       icon={<FileText size={22} />}
-      accentClass="border-violet-400/20 bg-violet-500/15 text-violet-300"
       metrics={[
         { label: 'Toplam Teklif', value: statsData?.totalCount ?? 0 },
         { label: 'Bekleyen', value: pendingCount, tone: 'yellow' },

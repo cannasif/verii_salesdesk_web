@@ -1,10 +1,11 @@
 import { type ReactElement, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -25,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { BriefcaseBusiness, Loader2, X } from 'lucide-react';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
 import {
   SALES_DESK_CUSTOMER_KIND_LABELS,
@@ -32,9 +34,17 @@ import {
   toCustomerFormValues,
   type SalesDeskCustomerFormValues,
 } from '../types/customer-types';
-
-const fieldClass =
-  'h-11 rounded-lg border border-white/10 bg-[#070a13]/85 px-4 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10';
+import {
+  SD_DIALOG_CLOSE,
+  SD_DIALOG_ICON,
+  SD_DIALOG_ICON_RING,
+  SD_FORM_INPUT,
+  SD_FORM_LABEL,
+  SD_FORM_MESSAGE,
+  SD_PRIMARY_BUTTON,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+} from '../lib/salesdesk-popup-styles';
 
 interface SalesDeskCustomerFormProps {
   open: boolean;
@@ -65,34 +75,66 @@ export function SalesDeskCustomerForm({
     }
   }, [open, customer, form]);
 
-  const handleSubmit = form.handleSubmit(async (values) => {
+  const handleSubmit = async (values: SalesDeskCustomerFormValues): Promise<void> => {
     await onSubmit(values);
-    onOpenChange(false);
-  });
+    if (!isLoading) {
+      onOpenChange(false);
+    }
+  };
+
+  const handleInvalidSubmit = (errors: FieldErrors<SalesDeskCustomerFormValues>): void => {
+    const firstField = Object.keys(errors)[0] as keyof SalesDeskCustomerFormValues | undefined;
+    if (firstField) {
+      form.setFocus(firstField);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto border border-white/10 bg-[#0a0f1e] text-slate-100 sm:max-w-xl">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Cari Duzenle' : 'Yeni Cari Ekle'}</DialogTitle>
-          <DialogDescription className="text-slate-400">
-            {isEditMode ? 'Cari bilgilerini guncelleyin.' : 'Yeni cari kaydi olusturun.'}
-          </DialogDescription>
+      <DialogContent
+        showCloseButton={false}
+        className={`flex max-h-[92vh] w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl p-0 sm:w-[calc(50vw-2rem)] !max-w-[96vw] xl:max-w-[700px] ${SD_SURFACE_DIALOG}`}
+      >
+        <DialogHeader className="sticky top-0 z-10 flex shrink-0 flex-row items-center justify-between space-y-0 border-b border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] px-6 py-6 backdrop-blur-sm sm:px-8">
+          <div className="flex items-center gap-4">
+            <div className={SD_DIALOG_ICON_RING}>
+              <BriefcaseBusiness size={22} className={SD_DIALOG_ICON} />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
+                {isEditMode ? 'Cari Duzenle' : 'Yeni Cari Ekle'}
+              </DialogTitle>
+              <DialogDescription className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                {isEditMode ? 'Cari bilgilerini guncelleyin.' : 'Yeni cari kaydi olusturun.'}
+              </DialogDescription>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className={SD_DIALOG_CLOSE}
+          >
+            <X size={20} className="relative z-10" />
+          </button>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-2">
+        <div className="custom-scrollbar flex-1 overflow-y-auto p-6 sm:p-8">
+          <Form {...form}>
+            <form
+              id="salesdesk-customer-form"
+              onSubmit={form.handleSubmit(handleSubmit, handleInvalidSubmit)}
+              className="grid animate-in grid-cols-1 gap-6 fade-in slide-in-from-bottom-4 duration-500 sm:grid-cols-2"
+            >
               <FormField
                 control={form.control}
                 name="code"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Kod</FormLabel>
+                  <FormItem className="space-y-0">
+                    <FormLabel className={SD_FORM_LABEL}>Kod</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} placeholder="Otomatik uretilir" />
+                      <Input {...field} className={SD_FORM_INPUT} placeholder="Otomatik uretilir" />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
@@ -100,14 +142,16 @@ export function SalesDeskCustomerForm({
                 control={form.control}
                 name="kind"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Tip</FormLabel>
+                  <FormItem className="space-y-0">
+                    <FormLabel className={SD_FORM_LABEL}>Tip</FormLabel>
                     <Select
                       value={String(field.value)}
-                      onValueChange={(value) => field.onChange(Number(value) as SalesDeskCustomerFormValues['kind'])}
+                      onValueChange={(value) =>
+                        field.onChange(Number(value) as SalesDeskCustomerFormValues['kind'])
+                      }
                     >
                       <FormControl>
-                        <SelectTrigger className={fieldClass}>
+                        <SelectTrigger className={SD_FORM_INPUT}>
                           <SelectValue placeholder="Tip secin" />
                         </SelectTrigger>
                       </FormControl>
@@ -119,37 +163,35 @@ export function SalesDeskCustomerForm({
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
-            </div>
 
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-slate-300">Cari Adi *</FormLabel>
-                  <FormControl>
-                    <Input {...field} className={fieldClass} placeholder="Firma veya kisi adi" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="space-y-0 sm:col-span-2">
+                    <FormLabel className={SD_FORM_LABEL}>Cari Adi *</FormLabel>
+                    <FormControl>
+                      <Input {...field} className={SD_FORM_INPUT} placeholder="Firma veya kisi adi" />
+                    </FormControl>
+                    <FormMessage className={SD_FORM_MESSAGE} />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="contactName"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Yetkili</FormLabel>
+                  <FormItem className="space-y-0">
+                    <FormLabel className={SD_FORM_LABEL}>Yetkili</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
@@ -157,42 +199,40 @@ export function SalesDeskCustomerForm({
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Telefon</FormLabel>
+                  <FormItem className="space-y-0">
+                    <FormLabel className={SD_FORM_LABEL}>Telefon</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
-            </div>
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-slate-300">E-posta</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="email" className={fieldClass} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="space-y-0 sm:col-span-2">
+                    <FormLabel className={SD_FORM_LABEL}>E-posta</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" className={SD_FORM_INPUT} />
+                    </FormControl>
+                    <FormMessage className={SD_FORM_MESSAGE} />
+                  </FormItem>
+                )}
+              />
 
-            <div className="grid gap-4 sm:grid-cols-3">
               <FormField
                 control={form.control}
                 name="city"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Il</FormLabel>
+                  <FormItem className="space-y-0">
+                    <FormLabel className={SD_FORM_LABEL}>Il</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
@@ -200,12 +240,12 @@ export function SalesDeskCustomerForm({
                 control={form.control}
                 name="district"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Ilce</FormLabel>
+                  <FormItem className="space-y-0">
+                    <FormLabel className={SD_FORM_LABEL}>Ilce</FormLabel>
                     <FormControl>
-                      <Input {...field} className={fieldClass} />
+                      <Input {...field} className={SD_FORM_INPUT} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
@@ -213,39 +253,54 @@ export function SalesDeskCustomerForm({
                 control={form.control}
                 name="balance"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-slate-300">Bakiye</FormLabel>
+                  <FormItem className="space-y-0 sm:col-span-2">
+                    <FormLabel className={SD_FORM_LABEL}>Bakiye</FormLabel>
                     <FormControl>
                       <Input
-                        {...field}
                         type="number"
                         step="0.01"
-                        className={fieldClass}
+                        className={SD_FORM_INPUT}
+                        value={field.value}
                         onChange={(event) => field.onChange(Number(event.target.value))}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
-            </div>
+            </form>
+          </Form>
+        </div>
 
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="border-white/10 bg-transparent text-slate-200 hover:bg-white/5"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-              >
-                Iptal
-              </Button>
-              <Button type="submit" className="bg-violet-500 hover:bg-violet-400" disabled={isLoading}>
-                {isLoading ? 'Kaydediliyor...' : isEditMode ? 'Guncelle' : 'Kaydet'}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <DialogFooter className="flex shrink-0 flex-row justify-end gap-4 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-6 backdrop-blur-sm sm:px-8">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+            className={SD_SECONDARY_BUTTON}
+          >
+            Iptal
+          </Button>
+          <Button
+            type="submit"
+            variant="ghost"
+            form="salesdesk-customer-form"
+            disabled={isLoading}
+            className={SD_PRIMARY_BUTTON}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Kaydediliyor...
+              </>
+            ) : isEditMode ? (
+              'Guncelle'
+            ) : (
+              'Kaydet'
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

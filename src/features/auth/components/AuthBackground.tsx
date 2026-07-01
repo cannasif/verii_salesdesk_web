@@ -28,7 +28,7 @@ export const AuthBackground: React.FC<AuthBackgroundProps> = ({ isActive }) => {
       }
 
       const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x1a0b2e, 20, 100);
+      scene.fog = new THREE.Fog(0x0a0e17, 20, 100);
 
       const camera = new THREE.PerspectiveCamera(
         60,
@@ -69,19 +69,19 @@ export const AuthBackground: React.FC<AuthBackgroundProps> = ({ isActive }) => {
         new THREE.BufferAttribute(particlesPositions, 3)
       );
       const particlesMaterial = new THREE.PointsMaterial({
-        color: 0xffedd5,
+        color: 0xd4af37,
         size: 0.4,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.55,
         blending: THREE.AdditiveBlending,
       });
       const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
       scene.add(particlesMesh);
 
       const lineMaterial = new THREE.LineBasicMaterial({
-        color: 0xec4899,
+        color: 0x1e3a5f,
         transparent: true,
-        opacity: 0.12,
+        opacity: 0.18,
       });
       const maxLines = particleCount * particleCount;
       const linePositions = new Float32Array(maxLines * 3);
@@ -96,10 +96,10 @@ export const AuthBackground: React.FC<AuthBackgroundProps> = ({ isActive }) => {
       const pulsesGeoAttr = new THREE.BufferAttribute(pulsesPos, 3);
       pulsesGeo.setAttribute('position', pulsesGeoAttr);
       const pulsesMat = new THREE.PointsMaterial({
-        color: 0xfbbf24,
+        color: 0xc9a227,
         size: 0.9,
         transparent: true,
-        opacity: 1,
+        opacity: 0.95,
         blending: THREE.AdditiveBlending,
       });
       const pulsesMesh = new THREE.Points(pulsesGeo, pulsesMat);

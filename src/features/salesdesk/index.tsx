@@ -29,10 +29,10 @@ export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
 
 export const salesDeskNavItems = [
-  { title: 'Dashboard', href: '/', icon: <Home size={22} className="text-violet-300" /> },
+  { title: 'Dashboard', href: '/', icon: <Home size={22} className="text-slate-400" /> },
   {
     title: 'Cari & Potansiyel',
-    icon: <UsersRound size={22} className="text-cyan-300" />,
+    icon: <UsersRound size={22} className="text-slate-400" />,
     defaultExpanded: true,
     children: [
       { title: 'Cari Yonetimi', href: '/salesdesk/customers' },
@@ -50,7 +50,7 @@ export const salesDeskNavItems = [
   },
   {
     title: 'Satis & Finans',
-    icon: <CreditCard size={22} className="text-pink-300" />,
+    icon: <CreditCard size={22} className="text-slate-400" />,
     defaultExpanded: true,
     children: [
       { title: 'Teklifler', href: '/salesdesk/quotes' },
@@ -61,7 +61,7 @@ export const salesDeskNavItems = [
   },
   {
     title: 'Operasyon',
-    icon: <CalendarDays size={22} className="text-teal-300" />,
+    icon: <CalendarDays size={22} className="text-slate-400" />,
     defaultExpanded: true,
     children: [
       { title: 'Haftalik Ziyaretler', href: '/salesdesk/weekly-visits' },

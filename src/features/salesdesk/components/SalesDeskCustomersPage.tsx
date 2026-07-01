@@ -1,26 +1,42 @@
-import { type ReactElement, useEffect, useMemo, useState } from 'react';
+import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  BriefcaseBusiness,
   ChevronLeft,
   ChevronRight,
   Edit3,
   Loader2,
   Plus,
-  RefreshCw,
-  Search,
   Trash2,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { DataTableActionBar } from '@/components/shared';
+import type { ColumnDef } from '@/components/shared/ColumnPreferencesPopover';
+import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
+import type { FilterRow } from '@/lib/advanced-filter-types';
+import type { GridExportColumn } from '@/lib/grid-export';
+import {
+  MANAGEMENT_DATA_GRID_CLASSNAME,
+  MANAGEMENT_LIST_CARD_CLASSNAME,
+  MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME,
+  MANAGEMENT_LIST_CARD_HEADER_CLASSNAME,
+  MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
+  MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
+  MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
+  ADD_BUTTON_CLASS,
+} from '@/lib/management-list-layout';
+import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/auth-store';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
+import { SD_PAGE_PULSE } from '../lib/salesdesk-popup-styles';
+import { SalesDeskCustomerDeleteDialog } from './SalesDeskCustomerDeleteDialog';
 import { SalesDeskCustomerForm } from './SalesDeskCustomerForm';
 import {
   useCreateSalesDeskCustomer,
@@ -30,29 +46,70 @@ import {
   useUpdateSalesDeskCustomer,
 } from '../hooks/useSalesDeskCustomers';
 import {
+  applySalesDeskCustomerFilters,
+  SALES_DESK_CUSTOMER_FILTER_COLUMNS,
+} from '../types/salesdesk-customer-filter.types';
+import {
   formatCustomerBalance,
   SALES_DESK_CUSTOMER_KIND_LABELS,
   type SalesDeskCustomerFormValues,
 } from '../types/customer-types';
 
-const surfaceClass =
-  'border border-white/10 bg-[#0d1222]/72 shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] backdrop-blur-xl';
-
+const PAGE_KEY = 'salesdesk-customer-management';
 const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
+
+type CustomerColumnKey = 'code' | 'name' | 'contactName' | 'phone' | 'email' | 'kind' | 'balance' | 'city';
+
+const BASE_COLUMNS: ColumnDef[] = [
+  { key: 'code', label: 'Kod' },
+  { key: 'name', label: 'Cari Adi' },
+  { key: 'contactName', label: 'Yetkili' },
+  { key: 'phone', label: 'Telefon' },
+  { key: 'email', label: 'E-posta' },
+  { key: 'kind', label: 'Tip' },
+  { key: 'balance', label: 'Bakiye' },
+  { key: 'city', label: 'Il' },
+];
+
+const DEFAULT_COLUMN_ORDER = BASE_COLUMNS.map((column) => column.key);
 
 function KindBadge({ kind }: { kind: SalesDeskCustomerDto['kind'] }): ReactElement {
   const label = SALES_DESK_CUSTOMER_KIND_LABELS[kind];
   const tone =
     kind === 1
-      ? 'border-emerald-400/50 bg-emerald-500/10 text-emerald-300'
+      ? 'border-emerald-400/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
       : kind === 2
-        ? 'border-amber-400/50 bg-amber-500/10 text-amber-300'
-        : 'border-violet-400/40 bg-violet-500/10 text-violet-200';
+        ? 'border-amber-400/50 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+        : 'border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]';
 
   return <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${tone}`}>{label}</span>;
 }
 
+function renderCustomerCell(row: SalesDeskCustomerDto, key: CustomerColumnKey): ReactElement | string {
+  switch (key) {
+    case 'code':
+      return row.code;
+    case 'name':
+      return <span className="font-semibold text-slate-900 dark:text-white">{row.name}</span>;
+    case 'contactName':
+      return row.contactName || '-';
+    case 'phone':
+      return row.phone || '-';
+    case 'email':
+      return row.email || '-';
+    case 'kind':
+      return <KindBadge kind={row.kind} />;
+    case 'balance':
+      return formatCustomerBalance(row.balance);
+    case 'city':
+      return row.city || '-';
+    default:
+      return '-';
+  }
+}
+
 export function SalesDeskCustomersPage(): ReactElement {
+  const user = useAuthStore((state) => state.user);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
@@ -60,6 +117,15 @@ export function SalesDeskCustomersPage(): ReactElement {
   const [formOpen, setFormOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<SalesDeskCustomerDto | null>(null);
   const [deletingCustomer, setDeletingCustomer] = useState<SalesDeskCustomerDto | null>(null);
+  const [draftFilterRows, setDraftFilterRows] = useState<FilterRow[]>([]);
+  const [appliedFilterRows, setAppliedFilterRows] = useState<FilterRow[]>([]);
+
+  const initialColumnPrefs = useMemo(
+    () => loadColumnPreferences(PAGE_KEY, user?.id, DEFAULT_COLUMN_ORDER, 'id', false),
+    [user?.id]
+  );
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(initialColumnPrefs.visibleKeys);
+  const [columnOrder, setColumnOrder] = useState<string[]>(initialColumnPrefs.order);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
@@ -70,13 +136,17 @@ export function SalesDeskCustomersPage(): ReactElement {
     setPageNumber(1);
   }, [debouncedSearch, pageSize]);
 
+  useEffect(() => {
+    saveColumnPreferences(PAGE_KEY, user?.id, { visibleKeys: visibleColumns, order: columnOrder });
+  }, [visibleColumns, columnOrder, user?.id]);
+
   const listParams = useMemo(
     () => ({
       pageNumber,
       pageSize,
       search: debouncedSearch || undefined,
       sortBy: 'Name',
-      sortDirection: 'asc',
+      sortDirection: 'asc' as const,
     }),
     [pageNumber, pageSize, debouncedSearch]
   );
@@ -87,7 +157,12 @@ export function SalesDeskCustomersPage(): ReactElement {
   const updateCustomer = useUpdateSalesDeskCustomer();
   const deleteCustomer = useDeleteSalesDeskCustomer();
 
-  const customers = data?.data ?? [];
+  const customers = useMemo(() => {
+    const rows = data?.data ?? [];
+    if (appliedFilterRows.length === 0) return rows;
+    return applySalesDeskCustomerFilters(rows, appliedFilterRows);
+  }, [data?.data, appliedFilterRows]);
+
   const totalCount = data?.totalCount ?? 0;
   const totalPages = Math.max(1, data?.totalPages ?? 1);
   const startRow = totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
@@ -97,6 +172,37 @@ export function SalesDeskCustomersPage(): ReactElement {
   const customerCount = statsData?.totalCount ?? totalCount;
   const musteriCount = statsRows.filter((item) => item.kind === 1 || item.kind === 3).length;
   const tedarikciCount = statsRows.filter((item) => item.kind === 2 || item.kind === 3).length;
+
+  const appliedFilterCount = appliedFilterRows.filter((row) => row.value.trim()).length;
+
+  const displayColumns = useMemo(
+    () => columnOrder.filter((key) => visibleColumns.includes(key)) as CustomerColumnKey[],
+    [columnOrder, visibleColumns]
+  );
+
+  const exportColumns: GridExportColumn[] = useMemo(
+    () =>
+      displayColumns.map((key) => ({
+        key,
+        label: BASE_COLUMNS.find((column) => column.key === key)?.label ?? key,
+      })),
+    [displayColumns]
+  );
+
+  const exportRows = useMemo(
+    () =>
+      customers.map((row) =>
+        Object.fromEntries(
+          displayColumns.map((key) => {
+            if (key === 'kind') return [key, SALES_DESK_CUSTOMER_KIND_LABELS[row.kind]];
+            if (key === 'balance') return [key, row.balance];
+            const value = row[key as keyof SalesDeskCustomerDto];
+            return [key, value ?? ''];
+          })
+        )
+      ),
+    [customers, displayColumns]
+  );
 
   const handleCreateClick = (): void => {
     setEditingCustomer(null);
@@ -122,193 +228,196 @@ export function SalesDeskCustomersPage(): ReactElement {
     setDeletingCustomer(null);
   };
 
+  const handleRefresh = useCallback((): void => {
+    void refetch();
+  }, [refetch]);
+
   const isSaving = createCustomer.isPending || updateCustomer.isPending;
 
   return (
-    <div className="space-y-5 text-slate-100">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-violet-400/20 bg-violet-500/15 text-violet-300 shadow-[0_0_28px_rgba(124,58,237,.18)]">
-            <BriefcaseBusiness size={22} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="h-7 w-1 rounded-full bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,.7)]" />
-              <h1 className="text-2xl font-semibold tracking-normal text-slate-50">Cari Yonetimi</h1>
-            </div>
-            <p className="mt-1 text-sm text-slate-400">
-              Gelismis filtre, sutun tercihi ve sayfalama ile cari listesi
-            </p>
-          </div>
+    <div className="relative w-full space-y-6">
+      <div className="flex flex-col justify-between gap-6 pt-2 md:flex-row md:items-center">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 transition-colors dark:text-white">
+            Cari Yonetimi
+          </h1>
+          <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+            <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
+            Gelismis filtre, sutun tercihi ve sayfalama ile cari listesi
+          </p>
         </div>
-        <button
-          type="button"
-          onClick={handleCreateClick}
-          className="inline-flex h-11 items-center gap-2 rounded-lg bg-violet-500 px-5 text-sm font-semibold text-white shadow-lg shadow-violet-950/40 hover:bg-violet-400"
-        >
-          <Plus size={16} />
+        <Button onClick={handleCreateClick} variant="ghost" className={ADD_BUTTON_CLASS}>
+          <Plus size={20} className="mr-2 stroke-[3px]" />
           Yeni Cari Ekle
-        </button>
+        </Button>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <div className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
-          <p className="text-xs font-semibold uppercase text-slate-500">Toplam Cari</p>
-          <p className="mt-3 text-3xl font-semibold text-blue-300">{customerCount}</p>
-        </div>
-        <div className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
-          <p className="text-xs font-semibold uppercase text-slate-500">Musteri</p>
-          <p className="mt-3 text-3xl font-semibold text-emerald-300">{musteriCount}</p>
-        </div>
-        <div className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
-          <p className="text-xs font-semibold uppercase text-slate-500">Tedarikci</p>
-          <p className="mt-3 text-3xl font-semibold text-amber-300">{tedarikciCount}</p>
-        </div>
+        {[
+          { label: 'Toplam Cari', value: customerCount },
+          { label: 'Musteri', value: musteriCount },
+          { label: 'Tedarikci', value: tedarikciCount },
+        ].map((metric) => (
+          <div key={metric.label} className="min-h-[116px] rounded-2xl border border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-strong)_72%,transparent)] p-5 backdrop-blur-xl">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{metric.label}</p>
+            <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{metric.value}</p>
+          </div>
+        ))}
       </div>
 
-      <section className="rounded-xl border border-white/8 bg-slate-900/35 p-4">
-        <h2 className="text-xl font-semibold">Cari Listesi</h2>
-
-        <div className="mt-3 flex flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0f1e]/70 p-4 md:flex-row md:items-center md:justify-between">
-          <div className="relative w-full md:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
-            <input
-              className="h-10 w-full rounded-lg border border-white/10 bg-[#050711]/80 pl-10 pr-3 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10"
-              placeholder="Ara"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              className="h-10 rounded-lg border border-white/10 bg-[#050711]/80 px-3 text-sm text-slate-200 outline-none"
-              value={pageSize}
-              onChange={(event) => setPageSize(Number(event.target.value))}
-            >
-              {PAGE_SIZE_OPTIONS.map((size) => (
-                <option key={size} value={size}>
-                  {size} / sayfa
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              disabled={isFetching}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-dashed border-white/20 bg-white/[.02] px-4 text-sm font-medium text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/10 hover:text-white disabled:opacity-60"
-            >
-              {isFetching ? <Loader2 size={15} className="animate-spin" /> : <RefreshCw size={15} />}
-              Yenile
-            </button>
-          </div>
-        </div>
-
-        {isError && (
-          <div className="mt-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-            {(error as Error)?.message || 'Cari listesi yuklenemedi. API baglantisini kontrol edin.'}
-          </div>
-        )}
-
-        <div className="mt-4 overflow-hidden rounded-xl border border-white/10 bg-[#070a13]/72">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px] text-left text-sm">
-              <thead className="border-b border-white/10 bg-white/[.025] text-xs uppercase text-slate-300">
-                <tr>
-                  {['KOD', 'CARI ADI', 'YETKILI', 'TELEFON', 'E-POSTA', 'TIP', 'BAKIYE', 'IL'].map((column) => (
-                    <th key={column} className="px-4 py-4 font-semibold">
-                      {column}
-                    </th>
-                  ))}
-                  <th className="px-4 py-4 text-right font-semibold">Islem</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-slate-400">
-                      <Loader2 className="mx-auto mb-2 animate-spin" size={24} />
-                      Yukleniyor...
-                    </td>
-                  </tr>
-                ) : customers.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="px-4 py-10 text-center text-slate-400">
-                      Kayit bulunamadi.
-                    </td>
-                  </tr>
-                ) : (
-                  customers.map((customer) => (
-                    <tr
-                      key={customer.id}
-                      className="border-b border-white/10 text-slate-300 last:border-b-0 hover:bg-white/[.025]"
-                    >
-                      <td className="px-4 py-3">{customer.code}</td>
-                      <td className="px-4 py-3 font-semibold text-slate-100">{customer.name}</td>
-                      <td className="px-4 py-3">{customer.contactName || '-'}</td>
-                      <td className="px-4 py-3">{customer.phone || '-'}</td>
-                      <td className="px-4 py-3">{customer.email || '-'}</td>
-                      <td className="px-4 py-3">
-                        <KindBadge kind={customer.kind} />
-                      </td>
-                      <td className="px-4 py-3">{formatCustomerBalance(customer.balance)}</td>
-                      <td className="px-4 py-3">{customer.city || '-'}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex justify-end gap-3 text-slate-500">
-                          <button
-                            type="button"
-                            className="transition hover:text-violet-300"
-                            onClick={() => handleEditClick(customer)}
-                            aria-label="Duzenle"
-                          >
-                            <Edit3 size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            className="transition hover:text-rose-300"
-                            onClick={() => setDeletingCustomer(customer)}
-                            aria-label="Sil"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+      <Card className={MANAGEMENT_LIST_CARD_CLASSNAME}>
+        <CardHeader className={MANAGEMENT_LIST_CARD_HEADER_CLASSNAME}>
+          <CardTitle className={MANAGEMENT_LIST_CARD_TITLE_CLASSNAME}>Cari Listesi</CardTitle>
+          <DataTableActionBar
+            accentTone="brand"
+            pageKey={PAGE_KEY}
+            userId={user?.id}
+            columns={BASE_COLUMNS}
+            visibleColumns={visibleColumns}
+            columnOrder={columnOrder}
+            onVisibleColumnsChange={setVisibleColumns}
+            onColumnOrderChange={setColumnOrder}
+            exportFileName="salesdesk-cariler"
+            exportColumns={exportColumns}
+            exportRows={exportRows}
+            filterColumns={SALES_DESK_CUSTOMER_FILTER_COLUMNS}
+            defaultFilterColumn="name"
+            draftFilterRows={draftFilterRows}
+            onDraftFilterRowsChange={setDraftFilterRows}
+            onApplyFilters={() => setAppliedFilterRows(draftFilterRows)}
+            onClearFilters={() => {
+              setDraftFilterRows([]);
+              setAppliedFilterRows([]);
+            }}
+            translationNamespace="customer-management"
+            appliedFilterCount={appliedFilterCount}
+            searchValue={searchTerm}
+            searchPlaceholder="Ara"
+            onSearchChange={setSearchTerm}
+            compactSearchOnMobile
+            refresh={{
+              onRefresh: handleRefresh,
+              isLoading: isFetching,
+            }}
+            leftSlot={
+              <select
+                className={cn(
+                  'h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-700 shadow-sm dark:border-white/15 dark:bg-transparent dark:text-slate-200 sm:text-sm',
+                  MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                value={pageSize}
+                onChange={(event) => setPageSize(Number(event.target.value))}
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <option key={size} value={size}>
+                    {size} / sayfa
+                  </option>
+                ))}
+              </select>
+            }
+          />
+        </CardHeader>
 
-        <div className="mt-4 flex flex-col gap-3 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-          <p>
-            {totalCount === 0 ? 'Kayit yok' : `${startRow}-${endRow} / ${totalCount} kayit`}
-          </p>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled={pageNumber <= 1}
-              onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-              className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-200 disabled:opacity-40"
-            >
-              <ChevronLeft size={16} />
-              Onceki
-            </button>
-            <span className="px-2 text-slate-300">
-              {pageNumber} / {totalPages}
-            </span>
-            <button
-              type="button"
-              disabled={pageNumber >= totalPages}
-              onClick={() => setPageNumber((current) => Math.min(totalPages, current + 1))}
-              className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-200 disabled:opacity-40"
-            >
-              Sonraki
-              <ChevronRight size={16} />
-            </button>
+        <CardContent className={MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME}>
+          {isError && (
+            <div className="mb-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200">
+              {(error as Error)?.message || 'Cari listesi yuklenemedi. API baglantisini kontrol edin.'}
+            </div>
+          )}
+
+          <div className={MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME}>
+            <div className={MANAGEMENT_DATA_GRID_CLASSNAME}>
+              <Table containerClassName="min-w-[820px]">
+                <TableHeader>
+                  <TableRow>
+                    {displayColumns.map((key) => (
+                      <TableHead key={key}>
+                        {BASE_COLUMNS.find((column) => column.key === key)?.label ?? key}
+                      </TableHead>
+                    ))}
+                    <TableHead className="text-right">Islem</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={displayColumns.length + 1} className="py-10 text-center text-slate-500">
+                        <Loader2 className="mx-auto mb-2 animate-spin" size={24} />
+                        Yukleniyor...
+                      </TableCell>
+                    </TableRow>
+                  ) : customers.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={displayColumns.length + 1} className="py-10 text-center text-slate-500">
+                        Kayit bulunamadi.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    customers.map((customer) => (
+                      <TableRow key={customer.id}>
+                        {displayColumns.map((key) => (
+                          <TableCell key={key}>{renderCustomerCell(customer, key)}</TableCell>
+                        ))}
+                        <TableCell>
+                          <div className="flex justify-end gap-3 text-slate-500">
+                            <button
+                              type="button"
+                              className="transition hover:text-[var(--crm-brand-accent)]"
+                              onClick={() => handleEditClick(customer)}
+                              aria-label="Duzenle"
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              className="transition hover:text-red-600 dark:hover:text-red-400"
+                              onClick={() => setDeletingCustomer(customer)}
+                              aria-label="Sil"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
-        </div>
-      </section>
+
+          <div className="mt-4 flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+            <p>{totalCount === 0 ? 'Kayit yok' : `${startRow}-${endRow} / ${totalCount} kayit`}</p>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={pageNumber <= 1}
+                onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
+                className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
+              >
+                <ChevronLeft size={16} className="mr-1" />
+                Onceki
+              </Button>
+              <span className="px-2 text-slate-700 dark:text-slate-300">
+                {pageNumber} / {totalPages}
+              </span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={pageNumber >= totalPages}
+                onClick={() => setPageNumber((current) => Math.min(totalPages, current + 1))}
+                className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
+              >
+                Sonraki
+                <ChevronRight size={16} className="ml-1" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <SalesDeskCustomerForm
         open={formOpen}
@@ -318,30 +427,13 @@ export function SalesDeskCustomersPage(): ReactElement {
         isLoading={isSaving}
       />
 
-      <AlertDialog open={deletingCustomer != null} onOpenChange={(open) => !open && setDeletingCustomer(null)}>
-        <AlertDialogContent className="border border-white/10 bg-[#0a0f1e] text-slate-100">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Cariyi sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
-              {deletingCustomer
-                ? `"${deletingCustomer.name}" kaydini silmek istediginize emin misiniz?`
-                : 'Bu islem geri alinamaz.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-white/10 bg-transparent text-slate-200 hover:bg-white/5">
-              Iptal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-rose-600 hover:bg-rose-500"
-              onClick={handleDeleteConfirm}
-              disabled={deleteCustomer.isPending}
-            >
-              {deleteCustomer.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskCustomerDeleteDialog
+        customer={deletingCustomer}
+        open={deletingCustomer != null}
+        onOpenChange={(open) => !open && setDeletingCustomer(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={deleteCustomer.isPending}
+      />
     </div>
   );
 }

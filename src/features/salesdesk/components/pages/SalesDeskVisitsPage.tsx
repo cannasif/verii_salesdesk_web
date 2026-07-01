@@ -71,7 +71,6 @@ export function SalesDeskVisitsPage(): ReactElement {
       tableTitle="Ziyaret Listesi"
       actionLabel="Yeni Ziyaret Ekle"
       icon={<CalendarDays size={22} />}
-      accentClass="border-teal-400/20 bg-teal-500/15 text-teal-300"
       metrics={[
         { label: 'Bugun', value: todayCount, tone: 'cyan' },
         { label: 'Planlandi', value: plannedCount },

@@ -27,6 +27,12 @@ import { type DefaultValues, type FieldValues, type Path, useForm, type Resolver
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ZodTypeAny } from 'zod';
 import { fieldClass, NONE_SELECT_VALUE, normalizeSelectValue, sanitizeSelectOptions } from '../lib/salesdesk-shared';
+import {
+  SD_FORM_LABEL,
+  SD_PRIMARY_BUTTON,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+} from '../lib/salesdesk-popup-styles';
 
 export type SalesDeskFieldType = 'text' | 'email' | 'number' | 'date' | 'time' | 'textarea' | 'select' | 'checkbox';
 
@@ -76,7 +82,7 @@ function renderField<T extends FieldValues>(
         name={field.name}
         render={({ field: controlField }) => (
           <FormItem className={field.colSpan === 2 ? 'sm:col-span-2' : field.colSpan === 3 ? 'sm:col-span-3' : ''}>
-            <FormLabel className="text-slate-300">{field.label}</FormLabel>
+            <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
             <Select
               value={normalizeSelectValue(String(controlField.value ?? ''))}
               onValueChange={(value) =>
@@ -119,7 +125,7 @@ function renderField<T extends FieldValues>(
                 className="h-4 w-4 rounded border-white/20 bg-transparent"
               />
             </FormControl>
-            <FormLabel className="text-slate-300">{field.label}</FormLabel>
+            <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
             <FormMessage />
           </FormItem>
         )}
@@ -135,11 +141,11 @@ function renderField<T extends FieldValues>(
         name={field.name}
         render={({ field: controlField }) => (
           <FormItem className={field.colSpan === 2 ? 'sm:col-span-2' : field.colSpan === 3 ? 'sm:col-span-3' : ''}>
-            <FormLabel className="text-slate-300">{field.label}</FormLabel>
+            <FormLabel className={SD_FORM_LABEL}>{field.label}</FormLabel>
             <FormControl>
               <textarea
                 {...controlField}
-                className={`min-h-24 w-full rounded-lg border border-white/10 bg-[#070a13]/85 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-violet-400/70 focus:ring-4 focus:ring-violet-500/10`}
+                className={`min-h-24 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-[var(--crm-brand-primary)] focus:ring-4 focus:ring-[var(--crm-brand-ring)]`}
                 placeholder={field.placeholder}
               />
             </FormControl>
@@ -220,10 +226,10 @@ export function SalesDeskEntityForm<T extends FieldValues>({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {open ? (
-      <DialogContent className="max-h-[90vh] overflow-y-auto border border-white/10 bg-[#0a0f1e] text-slate-100 sm:max-w-2xl">
+      <DialogContent className={`max-h-[90vh] overflow-y-auto sm:max-w-2xl ${SD_SURFACE_DIALOG}`}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription className="text-slate-400">{description}</DialogDescription>
+          <DialogDescription className="text-[var(--crm-app-text-muted)]">{description}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -231,14 +237,14 @@ export function SalesDeskEntityForm<T extends FieldValues>({
             <div className="flex justify-end gap-2 pt-2">
               <Button
                 type="button"
-                variant="outline"
-                className="border-white/10 bg-transparent text-slate-200 hover:bg-white/5"
+                variant="ghost"
+                className={SD_SECONDARY_BUTTON}
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
               >
                 Iptal
               </Button>
-              <Button type="submit" className="bg-violet-500 hover:bg-violet-400" disabled={isLoading}>
+              <Button type="submit" variant="ghost" className={SD_PRIMARY_BUTTON} disabled={isLoading}>
                 {isLoading ? 'Kaydediliyor...' : submitLabel ?? (isEditMode ? 'Guncelle' : 'Kaydet')}
               </Button>
             </div>
