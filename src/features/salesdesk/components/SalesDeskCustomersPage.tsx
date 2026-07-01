@@ -1,43 +1,34 @@
-import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Edit3,
-  Loader2,
-  Plus,
-  Trash2,
-} from 'lucide-react';
+import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Building2, Plus, Truck, UsersRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { DataTableActionBar } from '@/components/shared';
+import { DataTableActionBar, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
 import type { ColumnDef } from '@/components/shared/ColumnPreferencesPopover';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import type { FilterRow } from '@/lib/advanced-filter-types';
 import type { GridExportColumn } from '@/lib/grid-export';
 import {
-  MANAGEMENT_DATA_GRID_CLASSNAME,
   MANAGEMENT_LIST_CARD_CLASSNAME,
   MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME,
   MANAGEMENT_LIST_CARD_HEADER_CLASSNAME,
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
+  MANAGEMENT_LIST_ID_COLUMN_CELL_CLASSNAME,
+  MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
-  MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
   ADD_BUTTON_CLASS,
 } from '@/lib/management-list-layout';
-import { cn } from '@/lib/utils';
+import { loadTableSortPreference, saveTableSortPreference } from '@/lib/table-sort-preferences';
+import { arraysEqual } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
 import { SD_PAGE_PULSE } from '../lib/salesdesk-popup-styles';
 import { SalesDeskCustomerDeleteDialog } from './SalesDeskCustomerDeleteDialog';
 import { SalesDeskCustomerForm } from './SalesDeskCustomerForm';
+import { SalesDeskKpiCards } from './SalesDeskKpiCards';
+import {
+  SalesDeskCustomerTable,
+  type SalesDeskCustomerColumnKey,
+} from './SalesDeskCustomerTable';
 import {
   useCreateSalesDeskCustomer,
   useDeleteSalesDeskCustomer,
@@ -58,9 +49,23 @@ import {
 const PAGE_KEY = 'salesdesk-customer-management';
 const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
 
-type CustomerColumnKey = 'code' | 'name' | 'contactName' | 'phone' | 'email' | 'kind' | 'balance' | 'city';
+const DEFAULT_SORT_BY: SalesDeskCustomerColumnKey = 'name';
+const DEFAULT_SORT_DIRECTION: 'asc' | 'desc' = 'asc';
+
+const SORT_API_FIELD: Record<SalesDeskCustomerColumnKey, string> = {
+  id: 'Id',
+  code: 'Code',
+  name: 'Name',
+  contactName: 'ContactName',
+  phone: 'Phone',
+  email: 'Email',
+  kind: 'Kind',
+  balance: 'Balance',
+  city: 'City',
+};
 
 const BASE_COLUMNS: ColumnDef[] = [
+  { key: 'id', label: 'ID' },
   { key: 'code', label: 'Kod' },
   { key: 'name', label: 'Cari Adi' },
   { key: 'contactName', label: 'Yetkili' },
@@ -85,12 +90,14 @@ function KindBadge({ kind }: { kind: SalesDeskCustomerDto['kind'] }): ReactEleme
   return <span className={`rounded-md border px-2 py-1 text-xs font-semibold ${tone}`}>{label}</span>;
 }
 
-function renderCustomerCell(row: SalesDeskCustomerDto, key: CustomerColumnKey): ReactElement | string {
+function renderCustomerCell(row: SalesDeskCustomerDto, key: SalesDeskCustomerColumnKey): ReactElement | string {
   switch (key) {
+    case 'id':
+      return <span className="tabular-nums">{row.id}</span>;
     case 'code':
       return row.code;
     case 'name':
-      return <span className="font-semibold text-slate-900 dark:text-white">{row.name}</span>;
+      return <span className="font-bold text-slate-900 dark:text-white">{row.name}</span>;
     case 'contactName':
       return row.contactName || '-';
     case 'phone':
@@ -120,39 +127,77 @@ export function SalesDeskCustomersPage(): ReactElement {
   const [draftFilterRows, setDraftFilterRows] = useState<FilterRow[]>([]);
   const [appliedFilterRows, setAppliedFilterRows] = useState<FilterRow[]>([]);
 
-  const initialColumnPrefs = useMemo(
-    () => loadColumnPreferences(PAGE_KEY, user?.id, DEFAULT_COLUMN_ORDER, 'id', false),
-    [user?.id]
+  const defaultColumnKeys = DEFAULT_COLUMN_ORDER;
+  const [sortBy, setSortBy] = useState<SalesDeskCustomerColumnKey>(() => {
+    const prefs = loadTableSortPreference(
+      PAGE_KEY,
+      user?.id,
+      { sortBy: DEFAULT_SORT_BY, sortDirection: DEFAULT_SORT_DIRECTION },
+      defaultColumnKeys
+    );
+    return prefs.sortBy as SalesDeskCustomerColumnKey;
+  });
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
+    const prefs = loadTableSortPreference(
+      PAGE_KEY,
+      user?.id,
+      { sortBy: DEFAULT_SORT_BY, sortDirection: DEFAULT_SORT_DIRECTION },
+      defaultColumnKeys
+    );
+    return prefs.sortDirection;
+  });
+
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
+    loadColumnPreferences(PAGE_KEY, user?.id, DEFAULT_COLUMN_ORDER, 'id', true).visibleKeys
   );
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(initialColumnPrefs.visibleKeys);
-  const [columnOrder, setColumnOrder] = useState<string[]>(initialColumnPrefs.order);
+  const [columnOrder, setColumnOrder] = useState<string[]>(() =>
+    loadColumnPreferences(PAGE_KEY, user?.id, DEFAULT_COLUMN_ORDER, 'id', true).order
+  );
+
+  const prevParamsRef = useRef({ pageSize, debouncedSearch, appliedFilterRows, sortBy, sortDirection });
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
+    const timer = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 700);
     return () => window.clearTimeout(timer);
   }, [searchTerm]);
 
   useEffect(() => {
-    setPageNumber(1);
-  }, [debouncedSearch, pageSize]);
+    const prefs = loadColumnPreferences(PAGE_KEY, user?.id, DEFAULT_COLUMN_ORDER, 'id', true);
+    setVisibleColumns((current) => (arraysEqual(current, prefs.visibleKeys) ? current : prefs.visibleKeys));
+    setColumnOrder((current) => (arraysEqual(current, prefs.order) ? current : prefs.order));
+  }, [user?.id]);
 
   useEffect(() => {
     saveColumnPreferences(PAGE_KEY, user?.id, { visibleKeys: visibleColumns, order: columnOrder });
   }, [visibleColumns, columnOrder, user?.id]);
+
+  useEffect(() => {
+    const paramsChanged =
+      prevParamsRef.current.pageSize !== pageSize ||
+      prevParamsRef.current.debouncedSearch !== debouncedSearch ||
+      prevParamsRef.current.sortBy !== sortBy ||
+      prevParamsRef.current.sortDirection !== sortDirection ||
+      JSON.stringify(prevParamsRef.current.appliedFilterRows) !== JSON.stringify(appliedFilterRows);
+
+    if (paramsChanged) {
+      setPageNumber((current) => (current === 1 ? current : 1));
+      prevParamsRef.current = { pageSize, debouncedSearch, appliedFilterRows, sortBy, sortDirection };
+    }
+  }, [pageSize, debouncedSearch, appliedFilterRows, sortBy, sortDirection]);
 
   const listParams = useMemo(
     () => ({
       pageNumber,
       pageSize,
       search: debouncedSearch || undefined,
-      sortBy: 'Name',
-      sortDirection: 'asc' as const,
+      sortBy: SORT_API_FIELD[sortBy],
+      sortDirection,
     }),
-    [pageNumber, pageSize, debouncedSearch]
+    [pageNumber, pageSize, debouncedSearch, sortBy, sortDirection]
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } = useSalesDeskCustomerList(listParams);
-  const { data: statsData } = useSalesDeskCustomerStats();
+  const { data: statsData, isLoading: statsLoading } = useSalesDeskCustomerStats();
   const createCustomer = useCreateSalesDeskCustomer();
   const updateCustomer = useUpdateSalesDeskCustomer();
   const deleteCustomer = useDeleteSalesDeskCustomer();
@@ -173,27 +218,42 @@ export function SalesDeskCustomersPage(): ReactElement {
   const musteriCount = statsRows.filter((item) => item.kind === 1 || item.kind === 3).length;
   const tedarikciCount = statsRows.filter((item) => item.kind === 2 || item.kind === 3).length;
 
+  const kpiShareHint = (count: number): string | undefined =>
+    customerCount > 0 ? `%${Math.round((count / customerCount) * 100)} pay` : undefined;
+
   const appliedFilterCount = appliedFilterRows.filter((row) => row.value.trim()).length;
 
-  const displayColumns = useMemo(
-    () => columnOrder.filter((key) => visibleColumns.includes(key)) as CustomerColumnKey[],
+  const orderedVisibleColumns = useMemo(
+    () => columnOrder.filter((key) => visibleColumns.includes(key)) as SalesDeskCustomerColumnKey[],
     [columnOrder, visibleColumns]
+  );
+
+  const gridColumns = useMemo<DataTableGridColumn<SalesDeskCustomerColumnKey>[]>(
+    () =>
+      BASE_COLUMNS.map((column) => ({
+        key: column.key as SalesDeskCustomerColumnKey,
+        label: column.label,
+        sortable: true,
+        headClassName: column.key === 'id' ? MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME : undefined,
+        cellClassName: column.key === 'id' ? MANAGEMENT_LIST_ID_COLUMN_CELL_CLASSNAME : undefined,
+      })),
+    []
   );
 
   const exportColumns: GridExportColumn[] = useMemo(
     () =>
-      displayColumns.map((key) => ({
+      orderedVisibleColumns.map((key) => ({
         key,
         label: BASE_COLUMNS.find((column) => column.key === key)?.label ?? key,
       })),
-    [displayColumns]
+    [orderedVisibleColumns]
   );
 
   const exportRows = useMemo(
     () =>
       customers.map((row) =>
         Object.fromEntries(
-          displayColumns.map((key) => {
+          orderedVisibleColumns.map((key) => {
             if (key === 'kind') return [key, SALES_DESK_CUSTOMER_KIND_LABELS[row.kind]];
             if (key === 'balance') return [key, row.balance];
             const value = row[key as keyof SalesDeskCustomerDto];
@@ -201,7 +261,7 @@ export function SalesDeskCustomersPage(): ReactElement {
           })
         )
       ),
-    [customers, displayColumns]
+    [customers, orderedVisibleColumns]
   );
 
   const handleCreateClick = (): void => {
@@ -232,6 +292,41 @@ export function SalesDeskCustomersPage(): ReactElement {
     void refetch();
   }, [refetch]);
 
+  const handleSort = useCallback(
+    (key: SalesDeskCustomerColumnKey): void => {
+      let nextBy: SalesDeskCustomerColumnKey = sortBy;
+      let nextDir: 'asc' | 'desc' = sortDirection;
+      if (sortBy === key) {
+        nextDir = sortDirection === 'asc' ? 'desc' : 'asc';
+        setSortDirection(nextDir);
+      } else {
+        nextBy = key;
+        nextDir = 'asc';
+        setSortBy(key);
+        setSortDirection('asc');
+      }
+      saveTableSortPreference(PAGE_KEY, user?.id, {
+        sortBy: nextBy,
+        sortDirection: nextDir,
+      });
+    },
+    [sortBy, sortDirection, user?.id]
+  );
+
+  const renderSortIcon = useCallback(
+    (key: SalesDeskCustomerColumnKey): ReactElement => {
+      if (sortBy !== key) {
+        return <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground/70" />;
+      }
+      return sortDirection === 'asc' ? (
+        <ArrowUp className="h-3.5 w-3.5 text-foreground" />
+      ) : (
+        <ArrowDown className="h-3.5 w-3.5 text-foreground" />
+      );
+    },
+    [sortBy, sortDirection]
+  );
+
   const isSaving = createCustomer.isPending || updateCustomer.isPending;
 
   return (
@@ -252,18 +347,35 @@ export function SalesDeskCustomersPage(): ReactElement {
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {[
-          { label: 'Toplam Cari', value: customerCount },
-          { label: 'Musteri', value: musteriCount },
-          { label: 'Tedarikci', value: tedarikciCount },
-        ].map((metric) => (
-          <div key={metric.label} className="min-h-[116px] rounded-2xl border border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-strong)_72%,transparent)] p-5 backdrop-blur-xl">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{metric.label}</p>
-            <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{metric.value}</p>
-          </div>
-        ))}
-      </div>
+      <SalesDeskKpiCards
+        isLoading={statsLoading}
+        items={[
+          {
+            key: 'total',
+            label: 'Toplam Cari',
+            value: customerCount,
+            hint: 'Sistemdeki tum cari kayitlari',
+            tone: 'brand',
+            icon: UsersRound,
+          },
+          {
+            key: 'musteri',
+            label: 'Musteri',
+            value: musteriCount,
+            hint: kpiShareHint(musteriCount),
+            tone: 'emerald',
+            icon: Building2,
+          },
+          {
+            key: 'tedarikci',
+            label: 'Tedarikci',
+            value: tedarikciCount,
+            hint: kpiShareHint(tedarikciCount),
+            tone: 'amber',
+            icon: Truck,
+          },
+        ]}
+      />
 
       <Card className={MANAGEMENT_LIST_CARD_CLASSNAME}>
         <CardHeader className={MANAGEMENT_LIST_CARD_HEADER_CLASSNAME}>
@@ -299,122 +411,55 @@ export function SalesDeskCustomersPage(): ReactElement {
               onRefresh: handleRefresh,
               isLoading: isFetching,
             }}
-            leftSlot={
-              <select
-                className={cn(
-                  'h-9 rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-700 shadow-sm dark:border-white/15 dark:bg-transparent dark:text-slate-200 sm:text-sm',
-                  MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME
-                )}
-                value={pageSize}
-                onChange={(event) => setPageSize(Number(event.target.value))}
-              >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size}>
-                    {size} / sayfa
-                  </option>
-                ))}
-              </select>
-            }
           />
         </CardHeader>
 
         <CardContent className={MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME}>
-          {isError && (
-            <div className="mb-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200">
-              {(error as Error)?.message || 'Cari listesi yuklenemedi. API baglantisini kontrol edin.'}
-            </div>
-          )}
-
           <div className={MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME}>
-            <div className={MANAGEMENT_DATA_GRID_CLASSNAME}>
-              <Table containerClassName="min-w-[820px]">
-                <TableHeader>
-                  <TableRow>
-                    {displayColumns.map((key) => (
-                      <TableHead key={key}>
-                        {BASE_COLUMNS.find((column) => column.key === key)?.label ?? key}
-                      </TableHead>
-                    ))}
-                    <TableHead className="text-right">Islem</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={displayColumns.length + 1} className="py-10 text-center text-slate-500">
-                        <Loader2 className="mx-auto mb-2 animate-spin" size={24} />
-                        Yukleniyor...
-                      </TableCell>
-                    </TableRow>
-                  ) : customers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={displayColumns.length + 1} className="py-10 text-center text-slate-500">
-                        Kayit bulunamadi.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    customers.map((customer) => (
-                      <TableRow key={customer.id}>
-                        {displayColumns.map((key) => (
-                          <TableCell key={key}>{renderCustomerCell(customer, key)}</TableCell>
-                        ))}
-                        <TableCell>
-                          <div className="flex justify-end gap-3 text-slate-500">
-                            <button
-                              type="button"
-                              className="transition hover:text-[var(--crm-brand-accent)]"
-                              onClick={() => handleEditClick(customer)}
-                              aria-label="Duzenle"
-                            >
-                              <Edit3 size={16} />
-                            </button>
-                            <button
-                              type="button"
-                              className="transition hover:text-red-600 dark:hover:text-red-400"
-                              onClick={() => setDeletingCustomer(customer)}
-                              aria-label="Sil"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-            <p>{totalCount === 0 ? 'Kayit yok' : `${startRow}-${endRow} / ${totalCount} kayit`}</p>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={pageNumber <= 1}
-                onClick={() => setPageNumber((current) => Math.max(1, current - 1))}
-                className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
-              >
-                <ChevronLeft size={16} className="mr-1" />
-                Onceki
-              </Button>
-              <span className="px-2 text-slate-700 dark:text-slate-300">
-                {pageNumber} / {totalPages}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={pageNumber >= totalPages}
-                onClick={() => setPageNumber((current) => Math.min(totalPages, current + 1))}
-                className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
-              >
-                Sonraki
-                <ChevronRight size={16} className="ml-1" />
-              </Button>
-            </div>
+            <ManagementDataTableChrome>
+              <SalesDeskCustomerTable
+                columns={gridColumns}
+                visibleColumnKeys={orderedVisibleColumns}
+                rows={customers}
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                onSort={handleSort}
+                renderSortIcon={renderSortIcon}
+                renderCell={renderCustomerCell}
+                isLoading={isLoading}
+                isError={isError}
+                loadingText="Yukleniyor..."
+                errorText={(error as Error)?.message || 'Cari listesi yuklenemedi. API baglantisini kontrol edin.'}
+                emptyText="Kayit bulunamadi."
+                onEdit={handleEditClick}
+                onDelete={setDeletingCustomer}
+                pageSize={pageSize}
+                pageSizeOptions={PAGE_SIZE_OPTIONS}
+                onPageSizeChange={(size) => {
+                  setPageSize(size);
+                  setPageNumber(1);
+                }}
+                pageNumber={pageNumber}
+                totalPages={totalPages}
+                hasPreviousPage={data?.hasPreviousPage ?? pageNumber > 1}
+                hasNextPage={data?.hasNextPage ?? pageNumber < totalPages}
+                onPreviousPage={() => setPageNumber((current) => Math.max(1, current - 1))}
+                onNextPage={() => setPageNumber((current) => Math.min(totalPages, current + 1))}
+                previousLabel="Onceki"
+                nextLabel="Sonraki"
+                paginationInfoText={
+                  totalCount === 0 ? 'Kayit yok' : `${startRow}–${endRow} / ${totalCount}`
+                }
+                onColumnOrderChange={(newVisibleOrder) => {
+                  setColumnOrder((currentOrder) => {
+                    const hiddenCols = currentOrder.filter((key) => !newVisibleOrder.includes(key as SalesDeskCustomerColumnKey));
+                    const finalOrder = [...newVisibleOrder, ...hiddenCols];
+                    saveColumnPreferences(PAGE_KEY, user?.id, { visibleKeys: visibleColumns, order: finalOrder });
+                    return finalOrder;
+                  });
+                }}
+              />
+            </ManagementDataTableChrome>
           </div>
         </CardContent>
       </Card>

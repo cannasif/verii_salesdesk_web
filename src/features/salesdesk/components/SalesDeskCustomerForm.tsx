@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect } from 'react';
+import { type ReactElement, type ReactNode, useEffect } from 'react';
 import { useForm, type FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,7 +27,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BriefcaseBusiness, Loader2, X } from 'lucide-react';
+import {
+  Building2,
+  CreditCard,
+  Hash,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  Tag,
+  User,
+  X,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
 import {
   SALES_DESK_CUSTOMER_KIND_LABELS,
@@ -35,15 +48,24 @@ import {
   type SalesDeskCustomerFormValues,
 } from '../types/customer-types';
 import {
+  SD_DIALOG_BODY_FORM,
   SD_DIALOG_CLOSE,
+  SD_DIALOG_CONTENT_FORM,
+  SD_DIALOG_DESC,
+  SD_DIALOG_FOOTER_FORM,
+  SD_DIALOG_HEADER_FORM,
   SD_DIALOG_ICON,
-  SD_DIALOG_ICON_RING,
-  SD_FORM_INPUT,
-  SD_FORM_LABEL,
+  SD_DIALOG_ICON_RING_FORM,
+  SD_DIALOG_TITLE,
+  SD_FORM_GRID_MD,
+  SD_FORM_HINT,
+  SD_FORM_INPUT_MD,
+  SD_FORM_LABEL_ICON,
+  SD_FORM_LABEL_ICON_SVG,
   SD_FORM_MESSAGE,
-  SD_PRIMARY_BUTTON,
-  SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
+  SD_PRIMARY_BUTTON_FORM,
+  SD_SECONDARY_BUTTON_FORM,
+  SD_SELECT_CONTENT,
 } from '../lib/salesdesk-popup-styles';
 
 interface SalesDeskCustomerFormProps {
@@ -52,6 +74,26 @@ interface SalesDeskCustomerFormProps {
   onSubmit: (values: SalesDeskCustomerFormValues) => void | Promise<void>;
   customer?: SalesDeskCustomerDto | null;
   isLoading?: boolean;
+}
+
+function IconLabel({
+  icon: Icon,
+  children,
+  required,
+}: {
+  icon: LucideIcon;
+  children: ReactNode;
+  required?: boolean;
+}): ReactElement {
+  return (
+    <FormLabel className={SD_FORM_LABEL_ICON}>
+      <Icon size={14} className={SD_FORM_LABEL_ICON_SVG} strokeWidth={2.2} />
+      <span>
+        {children}
+        {required ? <span className="ml-0.5 text-red-400">*</span> : null}
+      </span>
+    </FormLabel>
+  );
 }
 
 export function SalesDeskCustomerForm({
@@ -91,59 +133,76 @@ export function SalesDeskCustomerForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className={`flex max-h-[92vh] w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl p-0 sm:w-[calc(50vw-2rem)] !max-w-[96vw] xl:max-w-[700px] ${SD_SURFACE_DIALOG}`}
-      >
-        <DialogHeader className="sticky top-0 z-10 flex shrink-0 flex-row items-center justify-between space-y-0 border-b border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] px-6 py-6 backdrop-blur-sm sm:px-8">
-          <div className="flex items-center gap-4">
-            <div className={SD_DIALOG_ICON_RING}>
-              <BriefcaseBusiness size={22} className={SD_DIALOG_ICON} />
+      <DialogContent showCloseButton={false} className={SD_DIALOG_CONTENT_FORM}>
+        <DialogHeader className={SD_DIALOG_HEADER_FORM}>
+          <div className="flex min-w-0 items-center gap-3.5">
+            <div className={SD_DIALOG_ICON_RING_FORM}>
+              <Building2 size={20} className={SD_DIALOG_ICON} />
             </div>
-            <div>
-              <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <DialogTitle className={`${SD_DIALOG_TITLE} text-lg`}>
                 {isEditMode ? 'Cari Duzenle' : 'Yeni Cari Ekle'}
               </DialogTitle>
-              <DialogDescription className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+              <DialogDescription className={`${SD_DIALOG_DESC} mt-0.5`}>
                 {isEditMode ? 'Cari bilgilerini guncelleyin.' : 'Yeni cari kaydi olusturun.'}
               </DialogDescription>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className={SD_DIALOG_CLOSE}
-          >
-            <X size={20} className="relative z-10" />
+          <button type="button" onClick={() => onOpenChange(false)} className={SD_DIALOG_CLOSE}>
+            <X size={18} className="relative z-10" />
           </button>
         </DialogHeader>
 
-        <div className="custom-scrollbar flex-1 overflow-y-auto p-6 sm:p-8">
+        <div className={SD_DIALOG_BODY_FORM}>
           <Form {...form}>
             <form
               id="salesdesk-customer-form"
               onSubmit={form.handleSubmit(handleSubmit, handleInvalidSubmit)}
-              className="grid animate-in grid-cols-1 gap-6 fade-in slide-in-from-bottom-4 duration-500 sm:grid-cols-2"
+              className={SD_FORM_GRID_MD}
             >
               <FormField
                 control={form.control}
-                name="code"
+                name="name"
                 render={({ field }) => (
-                  <FormItem className="space-y-0">
-                    <FormLabel className={SD_FORM_LABEL}>Kod</FormLabel>
+                  <FormItem className="space-y-0 sm:col-span-2">
+                    <IconLabel icon={Building2} required>
+                      Cari Adi
+                    </IconLabel>
                     <FormControl>
-                      <Input {...field} className={SD_FORM_INPUT} placeholder="Otomatik uretilir" />
+                      <Input
+                        {...field}
+                        className={SD_FORM_INPUT_MD}
+                        placeholder="Firma veya kisi adini girin"
+                      />
                     </FormControl>
                     <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem className="space-y-0">
+                    <IconLabel icon={Hash}>Kod</IconLabel>
+                    <FormControl>
+                      <Input {...field} className={SD_FORM_INPUT_MD} placeholder="Bos birakilirsa otomatik" />
+                    </FormControl>
+                    <FormDescription className={SD_FORM_HINT}>
+                      Kod bos birakilirsa sistem tarafindan uretilir.
+                    </FormDescription>
+                    <FormMessage className={SD_FORM_MESSAGE} />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="kind"
                 render={({ field }) => (
                   <FormItem className="space-y-0">
-                    <FormLabel className={SD_FORM_LABEL}>Tip</FormLabel>
+                    <IconLabel icon={Tag}>Tip</IconLabel>
                     <Select
                       value={String(field.value)}
                       onValueChange={(value) =>
@@ -151,11 +210,11 @@ export function SalesDeskCustomerForm({
                       }
                     >
                       <FormControl>
-                        <SelectTrigger className={SD_FORM_INPUT}>
+                        <SelectTrigger className={SD_FORM_INPUT_MD}>
                           <SelectValue placeholder="Tip secin" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className={SD_SELECT_CONTENT}>
                         {([1, 2, 3] as const).map((kind) => (
                           <SelectItem key={kind} value={String(kind)}>
                             {SALES_DESK_CUSTOMER_KIND_LABELS[kind]}
@@ -170,12 +229,12 @@ export function SalesDeskCustomerForm({
 
               <FormField
                 control={form.control}
-                name="name"
+                name="contactName"
                 render={({ field }) => (
-                  <FormItem className="space-y-0 sm:col-span-2">
-                    <FormLabel className={SD_FORM_LABEL}>Cari Adi *</FormLabel>
+                  <FormItem className="space-y-0">
+                    <IconLabel icon={User}>Yetkili</IconLabel>
                     <FormControl>
-                      <Input {...field} className={SD_FORM_INPUT} placeholder="Firma veya kisi adi" />
+                      <Input {...field} className={SD_FORM_INPUT_MD} placeholder="Yetkili kisi" />
                     </FormControl>
                     <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
@@ -184,25 +243,12 @@ export function SalesDeskCustomerForm({
 
               <FormField
                 control={form.control}
-                name="contactName"
-                render={({ field }) => (
-                  <FormItem className="space-y-0">
-                    <FormLabel className={SD_FORM_LABEL}>Yetkili</FormLabel>
-                    <FormControl>
-                      <Input {...field} className={SD_FORM_INPUT} />
-                    </FormControl>
-                    <FormMessage className={SD_FORM_MESSAGE} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="phone"
                 render={({ field }) => (
                   <FormItem className="space-y-0">
-                    <FormLabel className={SD_FORM_LABEL}>Telefon</FormLabel>
+                    <IconLabel icon={Phone}>Telefon</IconLabel>
                     <FormControl>
-                      <Input {...field} className={SD_FORM_INPUT} />
+                      <Input {...field} className={SD_FORM_INPUT_MD} placeholder="+90 5xx xxx xx xx" />
                     </FormControl>
                     <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
@@ -214,9 +260,14 @@ export function SalesDeskCustomerForm({
                 name="email"
                 render={({ field }) => (
                   <FormItem className="space-y-0 sm:col-span-2">
-                    <FormLabel className={SD_FORM_LABEL}>E-posta</FormLabel>
+                    <IconLabel icon={Mail}>E-posta</IconLabel>
                     <FormControl>
-                      <Input {...field} type="email" className={SD_FORM_INPUT} />
+                      <Input
+                        {...field}
+                        type="email"
+                        className={SD_FORM_INPUT_MD}
+                        placeholder="ornek@sirket.com"
+                      />
                     </FormControl>
                     <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
@@ -228,38 +279,40 @@ export function SalesDeskCustomerForm({
                 name="city"
                 render={({ field }) => (
                   <FormItem className="space-y-0">
-                    <FormLabel className={SD_FORM_LABEL}>Il</FormLabel>
+                    <IconLabel icon={MapPin}>Il</IconLabel>
                     <FormControl>
-                      <Input {...field} className={SD_FORM_INPUT} />
+                      <Input {...field} className={SD_FORM_INPUT_MD} placeholder="Il" />
                     </FormControl>
                     <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="district"
                 render={({ field }) => (
                   <FormItem className="space-y-0">
-                    <FormLabel className={SD_FORM_LABEL}>Ilce</FormLabel>
+                    <IconLabel icon={MapPin}>Ilce</IconLabel>
                     <FormControl>
-                      <Input {...field} className={SD_FORM_INPUT} />
+                      <Input {...field} className={SD_FORM_INPUT_MD} placeholder="Ilce" />
                     </FormControl>
                     <FormMessage className={SD_FORM_MESSAGE} />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="balance"
                 render={({ field }) => (
                   <FormItem className="space-y-0 sm:col-span-2">
-                    <FormLabel className={SD_FORM_LABEL}>Bakiye</FormLabel>
+                    <IconLabel icon={CreditCard}>Bakiye (TRY)</IconLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
-                        className={SD_FORM_INPUT}
+                        className={`${SD_FORM_INPUT_MD} sm:max-w-[280px]`}
                         value={field.value}
                         onChange={(event) => field.onChange(Number(event.target.value))}
                       />
@@ -272,13 +325,13 @@ export function SalesDeskCustomerForm({
           </Form>
         </div>
 
-        <DialogFooter className="flex shrink-0 flex-row justify-end gap-4 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-6 backdrop-blur-sm sm:px-8">
+        <DialogFooter className={SD_DIALOG_FOOTER_FORM}>
           <Button
             type="button"
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
-            className={SD_SECONDARY_BUTTON}
+            className={SD_SECONDARY_BUTTON_FORM}
           >
             Iptal
           </Button>
@@ -287,7 +340,7 @@ export function SalesDeskCustomerForm({
             variant="ghost"
             form="salesdesk-customer-form"
             disabled={isLoading}
-            className={SD_PRIMARY_BUTTON}
+            className={SD_PRIMARY_BUTTON_FORM}
           >
             {isLoading ? (
               <>
