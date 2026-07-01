@@ -10,6 +10,7 @@ import {
   type SalesDeskTaskDto,
 } from '../api/salesdesk-api';
 import { createSalesDeskCrudHooks } from './createSalesDeskCrudHooks';
+import { userApi } from '@/features/user-management/api/user-api';
 import type {
   AssetFormValues,
   ErpNewsFormValues,
@@ -455,6 +456,29 @@ export function useSalesDeskPotentialOptions(): UseQueryResult<
     queryFn: async () => {
       const response = await salesDeskApi.potentials.list({ pageNumber: 1, pageSize: 200, sortBy: 'CompanyName', sortDirection: 'asc' });
       return response.data;
+    },
+    staleTime: 60000,
+  });
+}
+
+export interface SalesDeskUserOption {
+  id: number;
+  name: string;
+}
+
+export function useSalesDeskUserOptions(): UseQueryResult<SalesDeskUserOption[]> {
+  return useQuery({
+    queryKey: ['salesdesk', 'users', 'options'],
+    queryFn: async () => {
+      const response = await userApi.getList({ pageNumber: 1, pageSize: 200, sortBy: 'Id', sortDirection: 'asc' });
+      return (response.data ?? []).map((user) => {
+        const fullName = user.fullName?.trim();
+        const composed = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+        return {
+          id: user.id,
+          name: fullName || composed || user.username,
+        } satisfies SalesDeskUserOption;
+      });
     },
     staleTime: 60000,
   });

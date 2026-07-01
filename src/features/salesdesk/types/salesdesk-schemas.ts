@@ -213,11 +213,17 @@ export function toInvoicePayload(
   };
 }
 
+const optionalUserIdSchema = z
+  .string()
+  .optional()
+  .transform((value) => optionalIdFromSelect(value));
+
 export const taskFormSchema = z.object({
   title: z.string().trim().min(1, 'Baslik zorunludur').max(220),
   description: z.string().max(2000).optional(),
   groupName: z.string().max(80).optional(),
   customerId: optionalCustomerIdSchema,
+  assignedUserId: optionalUserIdSchema,
   priority: prioritySchema,
   status: taskStatusSchema,
   dueDate: z.string().optional(),
@@ -231,6 +237,7 @@ export function toTaskFormValues(task?: SalesDeskTaskDto | null): TaskFormValues
     description: task?.description ?? '',
     groupName: task?.groupName ?? '',
     customerId: idToSelectValue(task?.customerId),
+    assignedUserId: idToSelectValue(task?.assignedUserId),
     priority: String(task?.priority ?? 2),
     status: String(task?.status ?? 1),
     dueDate: task?.dueDate ? toDateInputValue(task.dueDate) : '',
@@ -244,6 +251,7 @@ export function toTaskPayload(values: TaskFormValues): Partial<SalesDeskTaskDto>
     description: parsed.description?.trim() || undefined,
     groupName: parsed.groupName?.trim() || undefined,
     customerId: parsed.customerId,
+    assignedUserId: parsed.assignedUserId,
     priority: parsed.priority,
     status: parsed.status,
     dueDate: parsed.dueDate || undefined,

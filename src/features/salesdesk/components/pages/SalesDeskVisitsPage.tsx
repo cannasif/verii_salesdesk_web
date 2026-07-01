@@ -1,12 +1,16 @@
 import { type ReactElement, useMemo, useState } from 'react';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, CalendarPlus, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ADD_BUTTON_CLASS } from '@/lib/management-list-layout';
 import type { SalesDeskVisitDto } from '../../api/salesdesk-api';
 import { SalesDeskEntityForm } from '../SalesDeskEntityForm';
 import { SalesDeskListLayout } from '../SalesDeskListLayout';
 import {
+  useCreateSalesDeskTask,
   useCreateSalesDeskVisit,
   useDeleteSalesDeskVisit,
   useSalesDeskCustomerOptions,
+  useSalesDeskUserOptions,
   useSalesDeskVisitList,
   useSalesDeskVisitStats,
   useUpdateSalesDeskVisit,
@@ -14,12 +18,15 @@ import {
 import { useSalesDeskListPage } from '../../hooks/useSalesDeskListPage';
 import { enumToSelectOptions, formatDate, formatTime, withNoneOption } from '../../lib/salesdesk-shared';
 import { VISIT_STATUS_LABELS } from '../../lib/salesdesk-labels';
+import { SD_SECONDARY_BUTTON } from '../../lib/salesdesk-popup-styles';
 import {
   toVisitFormValues,
   visitFormSchema,
+  type TaskFormValues,
   type VisitFormValues,
 } from '../../types/salesdesk-schemas';
 import { VisitStatusBadge } from './salesdesk-badges';
+import { SalesDeskWeeklyPlanEntryDialog } from '../weekly-plan/SalesDeskWeeklyPlanEntryDialog';
 
 const VISIT_TYPE_OPTIONS = [
   { value: 'Yuz Yuze', label: 'Yuz Yuze' },
@@ -30,6 +37,7 @@ const VISIT_TYPE_OPTIONS = [
 export function SalesDeskVisitsPage(): ReactElement {
   const listPage = useSalesDeskListPage();
   const [formOpen, setFormOpen] = useState(false);
+  const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [editing, setEditing] = useState<SalesDeskVisitDto | null>(null);
   const [deleting, setDeleting] = useState<SalesDeskVisitDto | null>(null);
 
@@ -41,9 +49,11 @@ export function SalesDeskVisitsPage(): ReactElement {
   const { data, isLoading, isFetching, isError, error, refetch } = useSalesDeskVisitList(listParams);
   const { data: statsData } = useSalesDeskVisitStats();
   const { data: customers } = useSalesDeskCustomerOptions();
+  const { data: users } = useSalesDeskUserOptions();
   const createVisit = useCreateSalesDeskVisit();
   const updateVisit = useUpdateSalesDeskVisit();
   const deleteVisit = useDeleteSalesDeskVisit();
+  const createTask = useCreateSalesDeskTask();
 
   const rows = data?.data ?? [];
   const statsRows = statsData?.data ?? [];
@@ -64,6 +74,11 @@ export function SalesDeskVisitsPage(): ReactElement {
     await createVisit.mutateAsync(values);
   };
 
+  const handlePlanTaskSubmit = async (values: TaskFormValues): Promise<void> => {
+    await createTask.mutateAsync(values);
+    setPlanDialogOpen(false);
+  };
+
   return (
     <SalesDeskListLayout
       pageKey="salesdesk-visits"
@@ -72,6 +87,30 @@ export function SalesDeskVisitsPage(): ReactElement {
       tableTitle="Ziyaret Listesi"
       actionLabel="Yeni Ziyaret Ekle"
       icon={<CalendarDays size={22} />}
+      headerActions={
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className={SD_SECONDARY_BUTTON}
+            onClick={() => setPlanDialogOpen(true)}
+          >
+            <CalendarPlus size={16} className="mr-2" />
+            Plana Gorev Ekle
+          </Button>
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setFormOpen(true);
+            }}
+            variant="ghost"
+            className={ADD_BUTTON_CLASS}
+          >
+            <Plus size={20} className="mr-2 stroke-[3px]" />
+            Yeni Ziyaret Ekle
+          </Button>
+        </div>
+      }
       metrics={[
         { label: 'Bugun', value: todayCount, tone: 'cyan' },
         { label: 'Planlandi', value: plannedCount },
@@ -119,33 +158,43 @@ export function SalesDeskVisitsPage(): ReactElement {
       isDeleting={deleteVisit.isPending}
       deleteLabel={(row) => row.title}
       formDialog={
-        <SalesDeskEntityForm
-          open={formOpen}
-          onOpenChange={setFormOpen}
-          title={editing ? 'Ziyareti Duzenle' : 'Yeni Ziyaret'}
-          description="Ziyaret planlama bilgilerini girin."
-          schema={visitFormSchema}
-          defaultValues={toVisitFormValues()}
-          entity={editing}
-          mapEntityToForm={(entity) => toVisitFormValues(entity as SalesDeskVisitDto)}
-          onSubmit={handleSubmit}
-          isLoading={createVisit.isPending || updateVisit.isPending}
-          fields={[
-            { name: 'visitDate', label: 'Tarih', type: 'date', required: true },
-            { name: 'visitTime', label: 'Saat', type: 'time' },
-            { name: 'title', label: 'Baslik', required: true, colSpan: 2 },
-            { name: 'customerId', label: 'Cari', type: 'select', options: customerOptions },
-            { name: 'visitType', label: 'Ziyaret Tipi', type: 'select', options: VISIT_TYPE_OPTIONS, required: true },
-            {
-              name: 'status',
-              label: 'Durum',
-              type: 'select',
-              options: enumToSelectOptions(VISIT_STATUS_LABELS),
-              required: true,
-            },
-            { name: 'notes', label: 'Notlar', type: 'textarea', colSpan: 2 },
-          ]}
-        />
+        <>
+          <SalesDeskEntityForm
+            open={formOpen}
+            onOpenChange={setFormOpen}
+            title={editing ? 'Ziyareti Duzenle' : 'Yeni Ziyaret'}
+            description="Ziyaret planlama bilgilerini girin."
+            schema={visitFormSchema}
+            defaultValues={toVisitFormValues()}
+            entity={editing}
+            mapEntityToForm={(entity) => toVisitFormValues(entity as SalesDeskVisitDto)}
+            onSubmit={handleSubmit}
+            isLoading={createVisit.isPending || updateVisit.isPending}
+            fields={[
+              { name: 'visitDate', label: 'Tarih', type: 'date', required: true },
+              { name: 'visitTime', label: 'Saat', type: 'time' },
+              { name: 'title', label: 'Baslik', required: true, colSpan: 2 },
+              { name: 'customerId', label: 'Cari', type: 'select', options: customerOptions },
+              { name: 'visitType', label: 'Ziyaret Tipi', type: 'select', options: VISIT_TYPE_OPTIONS, required: true },
+              {
+                name: 'status',
+                label: 'Durum',
+                type: 'select',
+                options: enumToSelectOptions(VISIT_STATUS_LABELS),
+                required: true,
+              },
+              { name: 'notes', label: 'Notlar', type: 'textarea', colSpan: 2 },
+            ]}
+          />
+          <SalesDeskWeeklyPlanEntryDialog
+            open={planDialogOpen}
+            onOpenChange={setPlanDialogOpen}
+            userOptions={users ?? []}
+            customerOptions={customerOptions}
+            onSubmit={handlePlanTaskSubmit}
+            isSaving={createTask.isPending}
+          />
+        </>
       }
     />
   );
