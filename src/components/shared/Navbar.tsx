@@ -13,7 +13,7 @@ import { CRM_APP_PANEL_GLASS } from '@/lib/management-list-layout';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
 const pageTitles: Record<string, string> = {
-  '/': 'Dashboard',
+  '/': 'Ana Sayfa',
   '/salesdesk/customers': 'Cari Yonetimi',
   '/salesdesk/potentials': 'Potansiyel Cariler',
   '/salesdesk/products': 'Stok / Urunler',

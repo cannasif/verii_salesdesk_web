@@ -29,7 +29,7 @@ export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
 
 export const salesDeskNavItems = [
-  { title: 'Dashboard', href: '/', icon: <Home size={22} className="text-slate-400" /> },
+  { title: 'Ana Sayfa', href: '/', icon: <Home size={22} className="text-slate-400" /> },
   {
     title: 'Cari & Potansiyel',
     icon: <UsersRound size={22} className="text-slate-400" />,
