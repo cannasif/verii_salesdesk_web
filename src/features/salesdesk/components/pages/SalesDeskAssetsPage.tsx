@@ -50,6 +50,7 @@ export function SalesDeskAssetsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-assets"
       title="Demirbaslar"
       subtitle="Sirket uzerine kayitli sabit kiymetler ve alim kayitlari"
       tableTitle="Demirbas Listesi"

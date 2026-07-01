@@ -50,6 +50,7 @@ export function SalesDeskProductsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-products"
       title="Stok / Urunler"
       subtitle="Gelismis filtre, sutun tercihi ve sayfalama ile urun listesi"
       tableTitle="Urun Listesi"

@@ -37,6 +37,7 @@ import {
 } from '../../types/salesdesk-schemas';
 import {
   SD_PAGE_PULSE,
+  SD_SEARCH_FOCUS,
   SD_SECONDARY_BUTTON,
   SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
@@ -154,7 +155,8 @@ export function SalesDeskProductCustomersPage(): ReactElement {
                 type="search"
                 className={cn(
                   'h-9 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] py-0 pl-9 pr-3 text-sm text-slate-100 shadow-sm placeholder:text-[var(--crm-app-text-muted)]',
-                  'focus:border-[var(--crm-brand-primary)] focus:outline-none focus:ring-[3px] focus:ring-[var(--crm-brand-ring)]'
+                  'focus:outline-none',
+                  SD_SEARCH_FOCUS
                 )}
                 placeholder="Stok ara..."
                 value={productListPage.searchTerm}

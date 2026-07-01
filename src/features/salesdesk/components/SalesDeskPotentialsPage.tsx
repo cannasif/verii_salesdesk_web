@@ -52,6 +52,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-potentials"
       title="Potansiyel Cariler"
       subtitle="Gelismis filtre, sutun tercihi ve sayfalama ile potansiyel cari listesi"
       tableTitle="Potansiyel Cari Listesi"

@@ -59,6 +59,7 @@ export function SalesDeskOpenItemsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-open-items"
       title="Acik Maddeler"
       subtitle="Takip edilmesi gereken is ve aksiyonlar"
       tableTitle="Madde Listesi"

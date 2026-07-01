@@ -56,6 +56,7 @@ export function SalesDeskSoftwareResearchPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-software-research"
       title="Yazilim Arastirma"
       subtitle="Potansiyel cariler icin yazilim kullanim arastirmasi"
       tableTitle="Arastirma Sonuclari"

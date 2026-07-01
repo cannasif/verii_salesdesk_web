@@ -431,7 +431,7 @@ export function DataTableActionBar({
                 className={cn(columnsButtonClassName, 'max-sm:absolute max-sm:opacity-0 max-sm:pointer-events-none crm-end-0 sm:inline-flex')}
               >
                 <Columns3 className="crm-me-2 h-4 w-4" />
-                {t('common.editColumns')}
+                {t('editColumns', { ns: 'common', defaultValue: 'Sutunlari Duzenle' })}
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className={cn('z-50 w-72 p-0', CRM_APP_POPOVER_SURFACE)}>
@@ -497,7 +497,7 @@ export function DataTableActionBar({
                 }}
               >
                 <Columns3 className="crm-me-2 h-4 w-4" />
-                {t('common.editColumns')}
+                {t('editColumns', { ns: 'common', defaultValue: 'Sutunlari Duzenle' })}
               </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="cursor-pointer">

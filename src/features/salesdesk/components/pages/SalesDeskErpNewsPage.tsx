@@ -50,6 +50,7 @@ export function SalesDeskErpNewsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-erp-news"
       title="ERP Haber Takibi"
       subtitle="GIB, Netsis, IK ve ERP gundemi"
       tableTitle="Haber Listesi"

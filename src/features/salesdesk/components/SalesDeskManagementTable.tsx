@@ -24,6 +24,7 @@ interface SalesDeskManagementTableProps<T extends { id: number }> {
   hasNextPage?: boolean;
   onPageChange: (page: number) => void;
   totalCount: number;
+  onColumnOrderChange?: (order: string[]) => void;
 }
 
 export function SalesDeskManagementTable<T extends { id: number }>({
@@ -45,17 +46,20 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   hasNextPage,
   onPageChange,
   totalCount,
+  onColumnOrderChange,
 }: SalesDeskManagementTableProps<T>): ReactElement {
   const defaultOrder = useMemo(() => columns.map((column) => column.key), [columns]);
-  const [columnOrder, setColumnOrder] = useState<string[]>(defaultOrder);
+  const [internalColumnOrder, setInternalColumnOrder] = useState<string[]>(defaultOrder);
 
   useEffect(() => {
-    setColumnOrder((current) => (arraysEqual(current, defaultOrder) ? current : defaultOrder));
+    setInternalColumnOrder((current) => (arraysEqual(current, defaultOrder) ? current : defaultOrder));
   }, [defaultOrder]);
 
-  const orderedColumns = columnOrder
-    .map((key) => columns.find((column) => column.key === key))
-    .filter((column): column is SalesDeskColumn<T> => column != null);
+  const orderedColumns = onColumnOrderChange
+    ? columns
+    : internalColumnOrder
+        .map((key) => columns.find((column) => column.key === key))
+        .filter((column): column is SalesDeskColumn<T> => column != null);
 
   const gridColumns: DataTableGridColumn<string>[] = orderedColumns.map((column) => ({
     key: column.key,
@@ -142,7 +146,13 @@ export function SalesDeskManagementTable<T extends { id: number }>({
       centerColumnHeaders
       enableColumnDragAndDrop
       enableColumnResize
-      onColumnOrderChange={(newOrder) => setColumnOrder(newOrder)}
+      onColumnOrderChange={(newOrder) => {
+        if (onColumnOrderChange) {
+          onColumnOrderChange(newOrder);
+          return;
+        }
+        setInternalColumnOrder(newOrder);
+      }}
     />
   );
 }

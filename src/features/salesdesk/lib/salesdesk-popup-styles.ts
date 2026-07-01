@@ -13,12 +13,18 @@ export const SD_SURFACE_PANEL =
 export const SD_FORM_LABEL =
   'mb-1.5 ml-1 block text-[11px] font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]';
 
+/** Popup input focus — sari/altin parlama (Navy Gold). */
+export const SD_FORM_FOCUS_GLOW = [
+  'focus-visible:!border-[var(--crm-brand-accent)] focus-visible:!ring-0 focus-visible:!ring-offset-0',
+  'focus-visible:!shadow-[0_0_0_3px_var(--crm-brand-focus-glow)]',
+  'focus:!border-[var(--crm-brand-accent)] focus:!shadow-[0_0_0_3px_var(--crm-brand-focus-glow)]',
+].join(' ');
+
 export const SD_FORM_INPUT = [
   'h-9 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-100',
   'placeholder:text-[var(--crm-app-text-muted)]',
-  'focus-visible:border-[var(--crm-brand-primary)] focus-visible:ring-0 focus-visible:ring-offset-0',
-  'focus:border-[var(--crm-brand-primary)] focus:shadow-[0_0_0_2px_var(--crm-brand-ring)]',
-  'transition-colors duration-150',
+  SD_FORM_FOCUS_GLOW,
+  'transition-[color,box-shadow,border-color] duration-150',
 ].join(' ');
 
 export const SD_FORM_SECTION =
@@ -57,9 +63,8 @@ export const SD_DIALOG_ICON_RING_FORM =
 export const SD_FORM_INPUT_MD = [
   'h-10 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-100',
   'placeholder:text-[var(--crm-app-text-muted)]',
-  'focus-visible:border-[var(--crm-brand-primary)] focus-visible:ring-0 focus-visible:ring-offset-0',
-  'focus:border-[var(--crm-brand-primary)] focus:shadow-[0_0_0_2px_var(--crm-brand-ring)]',
-  'transition-colors duration-150',
+  SD_FORM_FOCUS_GLOW,
+  'transition-[color,box-shadow,border-color] duration-150',
 ].join(' ');
 
 export const SD_FORM_LABEL_ICON =
@@ -167,8 +172,8 @@ export const SD_TOOLBAR_ACTIVE = [
 ].join(' ');
 
 export const SD_SEARCH_FOCUS = [
-  'focus:border-[var(--crm-brand-primary)] focus:ring-[2px] focus:ring-[var(--crm-brand-ring)]',
-  'focus-visible:border-[var(--crm-brand-primary)] focus-visible:ring-[2px] focus-visible:ring-[var(--crm-brand-ring)]',
+  'focus:border-[var(--crm-brand-accent)] focus:shadow-[0_0_0_3px_var(--crm-brand-focus-glow)]',
+  'focus-visible:border-[var(--crm-brand-accent)] focus-visible:shadow-[0_0_0_3px_var(--crm-brand-focus-glow)]',
 ].join(' ');
 
 export const SD_SEARCH_ICON_FOCUS =

@@ -52,6 +52,7 @@ export function SalesDeskVisitFormsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-visit-forms"
       title="Ziyaret Formu"
       subtitle="Cari ziyaretlerini kayit altina alin"
       tableTitle="Ziyaret Formlari"

@@ -40,6 +40,7 @@ import {
   SD_DIALOG_ICON,
   SD_DIALOG_ICON_RING_FORM,
   SD_DIALOG_TITLE,
+  SD_FORM_FOCUS_GLOW,
   SD_FORM_GRID_MD,
   SD_FORM_INPUT_MD,
   SD_FORM_LABEL,
@@ -167,7 +168,7 @@ function renderField<T extends FieldValues>(
             <FormControl>
               <textarea
                 {...controlField}
-                className={`min-h-24 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-[var(--crm-brand-primary)] focus:shadow-[0_0_0_2px_var(--crm-brand-ring)]`}
+                className={`min-h-24 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 py-3 text-sm text-slate-200 outline-none ${SD_FORM_FOCUS_GLOW} transition-[color,box-shadow,border-color] duration-150`}
                 placeholder={field.placeholder}
               />
             </FormControl>

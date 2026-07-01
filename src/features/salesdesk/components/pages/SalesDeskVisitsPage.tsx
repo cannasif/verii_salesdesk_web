@@ -66,6 +66,7 @@ export function SalesDeskVisitsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-visits"
       title="Haftalik Ziyaretler"
       subtitle="Planlanan ve tamamlanan musteri ziyaretleri"
       tableTitle="Ziyaret Listesi"

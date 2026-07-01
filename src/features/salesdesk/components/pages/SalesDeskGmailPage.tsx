@@ -50,6 +50,7 @@ export function SalesDeskGmailPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-gmail"
       title="Gmail"
       subtitle="Bagli Gmail hesabinizdan gelen kutusunu Sales Desk icinde goruntuleyin"
       tableTitle="Gelen Kutusu"

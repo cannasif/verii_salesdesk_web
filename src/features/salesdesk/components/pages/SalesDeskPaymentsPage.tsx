@@ -58,6 +58,7 @@ export function SalesDeskPaymentsPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-payments"
       title="Standart Odemeler & Gelirler"
       subtitle="Aylik sabit gider ve gelir kalemlerini planlayin"
       tableTitle="Kalem Listesi"
