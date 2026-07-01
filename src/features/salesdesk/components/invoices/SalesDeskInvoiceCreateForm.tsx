@@ -1,0 +1,223 @@
+import { type ReactElement, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FormProvider, useForm, type Resolver } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
+import { Calculator, Eye, FileText, Layers, Loader2, Save, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  useCreateSalesDeskInvoice,
+  useSalesDeskCustomerOptions,
+  useSalesDeskProductOptions,
+} from '../../hooks/useSalesDeskModules';
+import {
+  invoiceFormSchema,
+  toInvoiceFormValues,
+  type InvoiceFormValues,
+} from '../../types/salesdesk-schemas';
+import {
+  invoiceLinesToPayload,
+  type InvoiceLineFormState,
+} from '../../types/invoice-create-types';
+import {
+  SALES_DESK_INVOICE_TYPE,
+  SALES_DESK_INVOICE_TYPE_LABELS,
+  type SalesDeskInvoiceType,
+} from '../../types/invoice-types';
+import {
+  SD_CREATE_ACTION_BAR_CLASSNAME,
+  SD_CREATE_HEADER_FORM_SURFACE_CLASSNAME,
+  SD_CREATE_MAIN_GRID_CLASSNAME,
+  SD_CREATE_PAGE_CONTAINER_CLASSNAME,
+  SD_CREATE_SECTION_BADGE_CLASSNAME,
+  SD_CREATE_SECTION_BADGE_SUMMARY_CLASSNAME,
+  SD_CREATE_SECTION_BODY_CLASSNAME,
+  SD_CREATE_SECTION_CARD_CLASSNAME,
+  SD_CREATE_SECTION_HEADER_CLASSNAME,
+  SD_CREATE_SECTION_TITLE_CLASSNAME,
+} from '../../lib/salesdesk-document-create-styles';
+import {
+  SD_DOCUMENT_BUTTON_BASE,
+  SD_DOCUMENT_BUTTON_PREVIEW,
+  SD_DOCUMENT_BUTTON_SAVE,
+} from '../../lib/salesdesk-document-button-styles';
+import { SalesDeskDocumentCreatePageHeader } from './SalesDeskDocumentCreatePageHeader';
+import { SalesDeskInvoiceHeaderForm } from './SalesDeskInvoiceHeaderForm';
+import { SalesDeskDocumentLineTable } from './SalesDeskDocumentLineTable';
+import { SalesDeskDocumentSummaryCard } from './SalesDeskDocumentSummaryCard';
+import { cn } from '@/lib/utils';
+
+const INVOICE_DUE_DAYS = 30;
+
+function addDaysToDateOnly(dateValue: string, days: number): string {
+  const date = new Date(`${dateValue}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return dateValue;
+  date.setDate(date.getDate() + days);
+  return date.toISOString().split('T')[0];
+}
+
+interface SalesDeskInvoiceCreateFormProps {
+  invoiceType: SalesDeskInvoiceType;
+}
+
+export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCreateFormProps): ReactElement {
+  const navigate = useNavigate();
+  const createInvoice = useCreateSalesDeskInvoice();
+  const { data: customers, isLoading: customersLoading } = useSalesDeskCustomerOptions();
+  const { data: products, isLoading: productsLoading } = useSalesDeskProductOptions();
+  const [lines, setLines] = useState<InvoiceLineFormState[]>([]);
+
+  const isPurchase = invoiceType === SALES_DESK_INVOICE_TYPE.purchase;
+  const title = isPurchase ? 'Yeni Alis Faturasi' : 'Yeni Satis Faturasi';
+  const subtitle = isPurchase
+    ? 'Tedarikci cari secerek alis faturasi kaydi olusturun.'
+    : 'Musteri cari secerek satis faturasi kaydi olusturun.';
+  const partyLabel = isPurchase ? 'Tedarikci / Cari' : 'Musteri / Cari';
+
+  const customerOptions = (customers ?? []).map((item) => ({ value: String(item.id), label: item.name }));
+
+  const form = useForm<InvoiceFormValues>({
+    resolver: zodResolver(invoiceFormSchema as never) as Resolver<InvoiceFormValues>,
+    defaultValues: toInvoiceFormValues(undefined, invoiceType),
+  });
+
+  useEffect(() => {
+    form.reset(toInvoiceFormValues(undefined, invoiceType));
+    setLines([]);
+  }, [form, invoiceType]);
+
+  const watchedInvoiceDate = form.watch('invoiceDate');
+
+  useEffect(() => {
+    if (!watchedInvoiceDate) return;
+    form.setValue('dueDate', addDaysToDateOnly(watchedInvoiceDate, INVOICE_DUE_DAYS), {
+      shouldValidate: true,
+    });
+  }, [form, watchedInvoiceDate]);
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    if (lines.length === 0) {
+      toast.error('Kaydetmeden once en az bir kalem ekleyin.');
+      return;
+    }
+
+    await createInvoice.mutateAsync({
+      values: {
+        ...values,
+        invoiceType: String(invoiceType) as InvoiceFormValues['invoiceType'],
+      },
+      lines: invoiceLinesToPayload(lines),
+    });
+    toast.success('Fatura basariyla olusturuldu.');
+    navigate('/salesdesk/invoices');
+  });
+
+  const handlePreview = (): void => {
+    toast.info('Onizleme yakinda eklenecek.');
+  };
+
+  const isLoading = customersLoading || productsLoading;
+
+  return (
+    <div className={SD_CREATE_PAGE_CONTAINER_CLASSNAME}>
+      <SalesDeskDocumentCreatePageHeader
+        title={title}
+        description={subtitle}
+        onBack={() => navigate('/salesdesk/invoices')}
+        backLabel="Faturalara don"
+        helpTitle={`${SALES_DESK_INVOICE_TYPE_LABELS[invoiceType]} olusturma`}
+        helpSteps={[
+          'Cari ve fatura bilgilerini doldurun.',
+          'Kalem Ekle ile urun satirlari ekleyin.',
+          'Ozette toplamlari kontrol edip kaydedin.',
+        ]}
+      />
+
+      {isLoading ? (
+        <div className="flex justify-center py-24">
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--crm-brand-primary)]" />
+        </div>
+      ) : (
+        <FormProvider {...form}>
+          <form onSubmit={handleSubmit}>
+            <div className={SD_CREATE_MAIN_GRID_CLASSNAME}>
+              <div className="flex min-w-0 flex-col gap-6">
+                <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
+                  <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
+                    <div className={SD_CREATE_SECTION_BADGE_CLASSNAME}>1</div>
+                    <FileText className="h-4 w-4 text-zinc-400" />
+                    <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Bilgileri</h3>
+                  </div>
+                  <div className={cn(SD_CREATE_SECTION_BODY_CLASSNAME, SD_CREATE_HEADER_FORM_SURFACE_CLASSNAME)}>
+                    <SalesDeskInvoiceHeaderForm
+                      partyLabel={partyLabel}
+                      isPurchase={isPurchase}
+                      customerOptions={customerOptions}
+                    />
+                  </div>
+                </section>
+
+                <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
+                  <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
+                    <div className={SD_CREATE_SECTION_BADGE_CLASSNAME}>2</div>
+                    <Layers className="h-4 w-4 text-zinc-400" />
+                    <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Kalemleri</h3>
+                  </div>
+                  <div className="overflow-x-auto p-0">
+                    <SalesDeskDocumentLineTable
+                      lines={lines}
+                      onLinesChange={setLines}
+                      products={products ?? []}
+                      title="Fatura Kalemleri"
+                    />
+                  </div>
+                </section>
+              </div>
+
+              <aside className="w-full xl:sticky xl:top-6">
+                <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
+                  <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
+                    <div className={SD_CREATE_SECTION_BADGE_SUMMARY_CLASSNAME}>3</div>
+                    <Calculator className="h-4 w-4 text-zinc-400" />
+                    <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Ozet</h3>
+                  </div>
+                  <SalesDeskDocumentSummaryCard lines={lines} title="Fatura Ozeti" />
+                </section>
+              </aside>
+            </div>
+
+            <div className={SD_CREATE_ACTION_BAR_CLASSNAME}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/salesdesk/invoices')}
+                className="w-full sm:w-auto"
+              >
+                <X className="mr-2 h-4 w-4" />
+                Iptal
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handlePreview}
+                className={cn(SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_PREVIEW)}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Onizle
+              </Button>
+
+              <Button
+                type="submit"
+                disabled={createInvoice.isPending}
+                className={cn('sm:min-w-[140px]', SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_SAVE)}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {createInvoice.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+              </Button>
+            </div>
+          </form>
+        </FormProvider>
+      )}
+    </div>
+  );
+}

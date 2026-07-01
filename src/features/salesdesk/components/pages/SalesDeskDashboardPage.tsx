@@ -153,7 +153,7 @@ export function SalesDeskDashboardPage(): ReactElement {
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onClick={() => navigate('/salesdesk/invoices/new')}
+                onClick={() => navigate('/salesdesk/invoices/sales/new')}
                 className="group mb-1 cursor-pointer rounded-lg px-2 py-2.5 outline-none transition-colors duration-150 hover:bg-[var(--crm-brand-soft)] focus:bg-[var(--crm-brand-soft)]"
               >
                 <div className="flex items-center gap-3">

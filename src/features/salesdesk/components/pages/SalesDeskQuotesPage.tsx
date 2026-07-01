@@ -1,4 +1,5 @@
 import { type ReactElement, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FileText } from 'lucide-react';
 import type { SalesDeskQuoteDto } from '../../api/salesdesk-api';
 import { SalesDeskEntityForm } from '../SalesDeskEntityForm';
@@ -22,6 +23,7 @@ import {
 import { DocumentStatusBadge } from './salesdesk-badges';
 
 export function SalesDeskQuotesPage(): ReactElement {
+  const navigate = useNavigate();
   const listPage = useSalesDeskListPage();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<SalesDeskQuoteDto | null>(null);
@@ -56,6 +58,7 @@ export function SalesDeskQuotesPage(): ReactElement {
 
   return (
     <SalesDeskListLayout
+      pageKey="salesdesk-quotes"
       title="Teklifler"
       subtitle="Teklif olusturma, durum takibi ve cari bazli listeleme"
       tableTitle="Teklif Listesi"
@@ -88,10 +91,7 @@ export function SalesDeskQuotesPage(): ReactElement {
       totalCount={data?.totalCount ?? 0}
       onPageChange={listPage.setPageNumber}
       onRefresh={() => refetch()}
-      onAdd={() => {
-        setEditing(null);
-        setFormOpen(true);
-      }}
+      onAdd={() => navigate('/salesdesk/quotes/new')}
       onEdit={(row) => {
         setEditing(row);
         setFormOpen(true);

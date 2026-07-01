@@ -10,6 +10,7 @@ export type SalesDeskTaskStatus = 1 | 2 | 3 | 4;
 export type SalesDeskVisitStatus = 1 | 2 | 3;
 export type SalesDeskFixedAssetStatus = 1 | 2 | 3;
 export type SalesDeskRecurringPaymentType = 1 | 2;
+export type SalesDeskInvoiceType = 1 | 2;
 
 export interface SalesDeskDashboardDto {
   customerCount: number;
@@ -92,6 +93,17 @@ export interface SalesDeskLineDto {
   lineTotal: number;
 }
 
+export interface SalesDeskLineUpsertDto {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+  vatRate: number;
+}
+
+export type SalesDeskInvoiceCreateBody = Omit<Partial<SalesDeskInvoiceDto>, 'lines'> & {
+  lines?: SalesDeskLineUpsertDto[];
+};
+
 export interface SalesDeskQuoteDto {
   id: number;
   quoteNumber: string;
@@ -99,6 +111,8 @@ export interface SalesDeskQuoteDto {
   customerName: string;
   quoteDate: string;
   status: SalesDeskDocumentStatus;
+  discountRate?: number;
+  discountTotal?: number;
   subTotal: number;
   vatTotal: number;
   grandTotal: number;
@@ -106,9 +120,15 @@ export interface SalesDeskQuoteDto {
   lines: SalesDeskLineDto[];
 }
 
+export type SalesDeskQuoteCreateBody = Omit<Partial<SalesDeskQuoteDto>, 'lines'> & {
+  lines?: SalesDeskLineUpsertDto[];
+};
+
 export interface SalesDeskInvoiceDto {
   id: number;
   invoiceNumber: string;
+  /** 1 = satis, 2 = alis */
+  invoiceType?: SalesDeskInvoiceType;
   customerId: number;
   customerName: string;
   quoteId?: number | null;
@@ -322,15 +342,19 @@ export const salesDeskApi = {
   quotes: {
     list: (params?: PagedParams) => getPaged<SalesDeskQuoteDto>('quotes', params),
     get: (id: number) => getOne<SalesDeskQuoteDto>('quotes', id),
-    create: (body: Partial<SalesDeskQuoteDto>) => createOne<SalesDeskQuoteDto, Partial<SalesDeskQuoteDto>>('quotes', body),
-    update: (id: number, body: Partial<SalesDeskQuoteDto>) => updateOne<SalesDeskQuoteDto, Partial<SalesDeskQuoteDto>>('quotes', id, body),
+    create: (body: SalesDeskQuoteCreateBody) =>
+      createOne<SalesDeskQuoteDto, SalesDeskQuoteCreateBody>('quotes', body),
+    update: (id: number, body: SalesDeskQuoteCreateBody) =>
+      updateOne<SalesDeskQuoteDto, SalesDeskQuoteCreateBody>('quotes', id, body),
     delete: (id: number) => deleteOne('quotes', id),
   },
   invoices: {
     list: (params?: PagedParams) => getPaged<SalesDeskInvoiceDto>('invoices', params),
     get: (id: number) => getOne<SalesDeskInvoiceDto>('invoices', id),
-    create: (body: Partial<SalesDeskInvoiceDto>) => createOne<SalesDeskInvoiceDto, Partial<SalesDeskInvoiceDto>>('invoices', body),
-    update: (id: number, body: Partial<SalesDeskInvoiceDto>) => updateOne<SalesDeskInvoiceDto, Partial<SalesDeskInvoiceDto>>('invoices', id, body),
+    create: (body: SalesDeskInvoiceCreateBody) =>
+      createOne<SalesDeskInvoiceDto, SalesDeskInvoiceCreateBody>('invoices', body),
+    update: (id: number, body: SalesDeskInvoiceCreateBody) =>
+      updateOne<SalesDeskInvoiceDto, SalesDeskInvoiceCreateBody>('invoices', id, body),
     delete: (id: number) => deleteOne('invoices', id),
   },
   tasks: {

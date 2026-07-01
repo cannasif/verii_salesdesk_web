@@ -14,8 +14,13 @@ export { SalesDeskDashboardPage } from './components/pages/SalesDeskDashboardPag
 export { SalesDeskProductsPage } from './components/pages/SalesDeskProductsPage';
 export { SalesDeskProductCustomersPage } from './components/pages/SalesDeskProductCustomersPage';
 export { SalesDeskQuotesPage } from './components/pages/SalesDeskQuotesPage';
+export { SalesDeskQuoteCreatePage } from './components/pages/SalesDeskQuoteCreatePage';
 export { SalesDeskInvoicesPage } from './components/pages/SalesDeskInvoicesPage';
-export { SalesDeskInvoiceCreatePage } from './components/pages/SalesDeskInvoiceCreatePage';
+export {
+  SalesDeskInvoiceCreatePage,
+  SalesDeskSalesInvoiceCreatePage,
+  SalesDeskPurchaseInvoiceCreatePage,
+} from './components/pages/SalesDeskInvoiceCreatePage';
 export { SalesDeskSalesTrackingPage } from './components/pages/SalesDeskSalesTrackingPage';
 export { SalesDeskVisitsPage } from './components/pages/SalesDeskVisitsPage';
 export { SalesDeskOpenItemsPage } from './components/pages/SalesDeskOpenItemsPage';
@@ -54,8 +59,10 @@ export const salesDeskNavItems = [
     defaultExpanded: true,
     children: [
       { title: 'Teklifler', href: '/salesdesk/quotes' },
+      { title: 'Teklif Ekle', href: '/salesdesk/quotes/new' },
       { title: 'Faturalar', href: '/salesdesk/invoices' },
-      { title: 'Yeni Satis Faturasi', href: '/salesdesk/invoices/new' },
+      { title: 'Satis Faturasi Ekle', href: '/salesdesk/invoices/sales/new' },
+      { title: 'Alis Faturasi Ekle', href: '/salesdesk/invoices/purchase/new' },
       { title: 'Satis Takip', href: '/salesdesk/sales-tracking' },
     ],
   },

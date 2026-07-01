@@ -28,8 +28,11 @@ const SalesDeskPotentialsPage = lazyImport(() => import('@/features/salesdesk'),
 const SalesDeskProductsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskProductsPage');
 const SalesDeskProductCustomersPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskProductCustomersPage');
 const SalesDeskQuotesPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskQuotesPage');
+const SalesDeskQuoteCreatePage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskQuoteCreatePage');
 const SalesDeskInvoicesPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskInvoicesPage');
 const SalesDeskInvoiceCreatePage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskInvoiceCreatePage');
+const SalesDeskSalesInvoiceCreatePage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSalesInvoiceCreatePage');
+const SalesDeskPurchaseInvoiceCreatePage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskPurchaseInvoiceCreatePage');
 const SalesDeskSalesTrackingPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSalesTrackingPage');
 const SalesDeskVisitsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitsPage');
 const SalesDeskOpenItemsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskOpenItemsPage');
@@ -60,7 +63,10 @@ export function createAppRouter() {
         { path: 'salesdesk/products', element: <SalesDeskProductsPage /> },
         { path: 'salesdesk/product-customers', element: <SalesDeskProductCustomersPage /> },
         { path: 'salesdesk/quotes', element: <SalesDeskQuotesPage /> },
+        { path: 'salesdesk/quotes/new', element: <SalesDeskQuoteCreatePage /> },
         { path: 'salesdesk/invoices', element: <SalesDeskInvoicesPage /> },
+        { path: 'salesdesk/invoices/sales/new', element: <SalesDeskSalesInvoiceCreatePage /> },
+        { path: 'salesdesk/invoices/purchase/new', element: <SalesDeskPurchaseInvoiceCreatePage /> },
         { path: 'salesdesk/invoices/new', element: <SalesDeskInvoiceCreatePage /> },
         { path: 'salesdesk/sales-tracking', element: <SalesDeskSalesTrackingPage /> },
         { path: 'salesdesk/weekly-visits', element: <SalesDeskVisitsPage /> },

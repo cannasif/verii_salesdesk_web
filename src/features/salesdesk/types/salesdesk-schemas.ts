@@ -6,10 +6,13 @@ import type {
   SalesDeskFixedAssetStatus,
   SalesDeskGmailMessageDto,
   SalesDeskInvoiceDto,
+  SalesDeskInvoiceCreateBody,
+  SalesDeskInvoiceType,
   SalesDeskPriority,
   SalesDeskProductCustomerDto,
   SalesDeskProductDto,
   SalesDeskQuoteDto,
+  SalesDeskQuoteCreateBody,
   SalesDeskRecurringPaymentDto,
   SalesDeskRecurringPaymentType,
   SalesDeskSoftwareResearchDto,
@@ -127,6 +130,7 @@ export const quoteFormSchema = z.object({
   customerId: customerIdSchema,
   quoteDate: z.string().min(1, 'Tarih zorunludur'),
   status: documentStatusSchema,
+  discountRate: z.number().min(0).max(100).default(0),
   notes: z.string().max(2000).optional(),
 });
 
@@ -138,24 +142,30 @@ export function toQuoteFormValues(quote?: SalesDeskQuoteDto | null): QuoteFormVa
     customerId: String(quote?.customerId ?? ''),
     quoteDate: toDateInputValue(quote?.quoteDate),
     status: String(quote?.status ?? 1),
+    discountRate: quote?.discountRate ?? 0,
     notes: quote?.notes ?? '',
   };
 }
 
-export function toQuotePayload(values: QuoteFormValues): Partial<SalesDeskQuoteDto> & { lines?: z.infer<typeof lineUpsertSchema>[] } {
+export function toQuotePayload(
+  values: QuoteFormValues,
+  lines: z.infer<typeof lineUpsertSchema>[] = []
+): SalesDeskQuoteCreateBody {
   const parsed = quoteFormSchema.parse(values);
   return {
     quoteNumber: parsed.quoteNumber?.trim() || undefined,
     customerId: parsed.customerId,
     quoteDate: parsed.quoteDate,
     status: parsed.status,
+    discountRate: parsed.discountRate,
     notes: parsed.notes?.trim() || undefined,
-    lines: [],
+    lines,
   };
 }
 
 export const invoiceFormSchema = z.object({
   invoiceNumber: z.string().max(32).optional(),
+  invoiceType: z.enum(['1', '2']).default('1'),
   customerId: customerIdSchema,
   quoteId: optionalQuoteIdSchema,
   invoiceDate: z.string().min(1, 'Fatura tarihi zorunludur'),
@@ -167,9 +177,13 @@ export const invoiceFormSchema = z.object({
 
 export type InvoiceFormValues = z.input<typeof invoiceFormSchema>;
 
-export function toInvoiceFormValues(invoice?: SalesDeskInvoiceDto | null): InvoiceFormValues {
+export function toInvoiceFormValues(
+  invoice?: SalesDeskInvoiceDto | null,
+  defaultType: SalesDeskInvoiceType = 1
+): InvoiceFormValues {
   return {
     invoiceNumber: invoice?.invoiceNumber ?? '',
+    invoiceType: String(invoice?.invoiceType ?? defaultType) as InvoiceFormValues['invoiceType'],
     customerId: String(invoice?.customerId ?? ''),
     quoteId: idToSelectValue(invoice?.quoteId),
     invoiceDate: toDateInputValue(invoice?.invoiceDate),
@@ -181,11 +195,13 @@ export function toInvoiceFormValues(invoice?: SalesDeskInvoiceDto | null): Invoi
 }
 
 export function toInvoicePayload(
-  values: InvoiceFormValues
-): Partial<SalesDeskInvoiceDto> & { lines?: z.infer<typeof lineUpsertSchema>[] } {
+  values: InvoiceFormValues,
+  lines: z.infer<typeof lineUpsertSchema>[] = []
+): SalesDeskInvoiceCreateBody {
   const parsed = invoiceFormSchema.parse(values);
   return {
     invoiceNumber: parsed.invoiceNumber?.trim() || undefined,
+    invoiceType: Number(parsed.invoiceType) as SalesDeskInvoiceType,
     customerId: parsed.customerId,
     quoteId: parsed.quoteId,
     invoiceDate: parsed.invoiceDate,
@@ -193,7 +209,7 @@ export function toInvoicePayload(
     status: parsed.status,
     discountRate: parsed.discountRate,
     notes: parsed.notes?.trim() || undefined,
-    lines: [],
+    lines,
   };
 }
 

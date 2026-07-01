@@ -2,6 +2,7 @@ import { type ReactElement } from 'react';
 import type {
   SalesDeskDocumentStatus,
   SalesDeskFixedAssetStatus,
+  SalesDeskInvoiceType,
   SalesDeskPotentialStatus,
   SalesDeskPriority,
   SalesDeskTaskStatus,
@@ -16,6 +17,7 @@ import {
   TASK_STATUS_LABELS,
   VISIT_STATUS_LABELS,
 } from '../../lib/salesdesk-labels';
+import { SALES_DESK_INVOICE_TYPE_LABELS } from '../../types/invoice-types';
 import type { SalesDeskRecurringPaymentType } from '../../api/salesdesk-api';
 
 type BadgeTone = 'green' | 'yellow' | 'red' | 'purple' | 'cyan' | 'pink';
@@ -75,6 +77,12 @@ export function PotentialStatusBadge({ status }: { status: SalesDeskPotentialSta
   const label = POTENTIAL_STATUS_LABELS[status];
   const tone: BadgeTone =
     status === 2 || status === 4 ? 'green' : status === 3 ? 'yellow' : status === 6 ? 'red' : 'purple';
+  return <Badge tone={tone}>{label}</Badge>;
+}
+
+export function InvoiceTypeBadge({ type }: { type: SalesDeskInvoiceType }): ReactElement {
+  const label = SALES_DESK_INVOICE_TYPE_LABELS[type];
+  const tone: BadgeTone = type === 2 ? 'yellow' : 'green';
   return <Badge tone={tone}>{label}</Badge>;
 }
 

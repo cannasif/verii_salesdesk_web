@@ -161,7 +161,19 @@ export const useCreateSalesDeskQuote = () => {
   const mutation = quotes.useCreate();
   return {
     ...mutation,
-    mutateAsync: (values: QuoteFormValues) => mutation.mutateAsync(toQuotePayload(values)),
+    mutateAsync: (
+      valuesOrInput:
+        | QuoteFormValues
+        | {
+            values: QuoteFormValues;
+            lines?: Parameters<typeof toQuotePayload>[1];
+          }
+    ) => {
+      if (typeof valuesOrInput === 'object' && valuesOrInput !== null && 'values' in valuesOrInput) {
+        return mutation.mutateAsync(toQuotePayload(valuesOrInput.values, valuesOrInput.lines ?? []));
+      }
+      return mutation.mutateAsync(toQuotePayload(valuesOrInput));
+    },
   };
 };
 export const useUpdateSalesDeskQuote = () => {
@@ -180,7 +192,21 @@ export const useCreateSalesDeskInvoice = () => {
   const mutation = invoices.useCreate();
   return {
     ...mutation,
-    mutateAsync: (values: InvoiceFormValues) => mutation.mutateAsync(toInvoicePayload(values)),
+    mutateAsync: (
+      valuesOrInput:
+        | InvoiceFormValues
+        | {
+            values: InvoiceFormValues;
+            lines?: Parameters<typeof toInvoicePayload>[1];
+          }
+    ) => {
+      if (typeof valuesOrInput === 'object' && valuesOrInput !== null && 'values' in valuesOrInput) {
+        return mutation.mutateAsync(
+          toInvoicePayload(valuesOrInput.values, valuesOrInput.lines ?? [])
+        );
+      }
+      return mutation.mutateAsync(toInvoicePayload(valuesOrInput));
+    },
   };
 };
 export const useUpdateSalesDeskInvoice = () => {
