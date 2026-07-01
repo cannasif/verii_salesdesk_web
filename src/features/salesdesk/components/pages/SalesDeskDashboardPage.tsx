@@ -1,77 +1,201 @@
-import { type ReactElement } from 'react';
-import { CalendarDays, Loader2, Mail } from 'lucide-react';
-import { useSalesDeskDashboard } from '../../hooks/useSalesDeskModules';
-import { formatMoney, surfaceClass } from '../../lib/salesdesk-shared';
+import { type ReactElement, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import {
+  CalendarDays,
+  CalendarPlus,
+  Eye,
+  FilePlus,
+  Pencil,
+  Receipt,
+  UserPlus,
+  UsersRound,
+  Zap,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { formatSystemDate } from '@/lib/system-settings';
+import { useAuthStore } from '@/stores/auth-store';
+import { useUIStore } from '@/stores/ui-store';
+import { SD_PRIMARY_BUTTON, SD_SECONDARY_BUTTON } from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskDashboardPage(): ReactElement {
-  const { data, isLoading, isError, error } = useSalesDeskDashboard();
-  const today = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'long' }).format(new Date());
+  const { t } = useTranslation('dashboard');
+  const { t: tCommon } = useTranslation('common');
+  const navigate = useNavigate();
+  const { setPageTitle } = useUIStore();
+  const { user } = useAuthStore();
 
-  const metrics = [
-    { label: 'Aylik Satis', value: formatMoney(data?.monthlySalesTotal ?? 0), hint: 'Kesilen faturalar toplami', tone: 'text-slate-100' },
-    { label: 'Acik Gorev', value: data?.openTaskCount ?? 0, hint: 'Takip edilen isler', tone: 'text-amber-400' },
-    { label: 'Bugunku Ziyaret', value: data?.todayVisitCount ?? 0, hint: 'Planlanan gorusmeler', tone: 'text-[var(--crm-brand-text)]' },
-    { label: 'Bekleyen Teklif', value: data?.pendingQuoteCount ?? 0, hint: 'Onay bekleyen teklifler', tone: 'text-emerald-400' },
-  ];
+  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning');
+  const [dashboardMode, setDashboardMode] = useState<'view' | 'edit'>('view');
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setTimeOfDay('morning');
+    else if (hour < 18) setTimeOfDay('afternoon');
+    else setTimeOfDay('evening');
+  }, []);
+
+  useEffect(() => {
+    setPageTitle(t('title'));
+    return () => {
+      setPageTitle(null);
+    };
+  }, [t, setPageTitle]);
+
+  const getUserDisplayName = (): string => {
+    if (!user) return t('user');
+    return user.name || user.email || t('user');
+  };
+
+  const displayName = getUserDisplayName();
+  const firstName = displayName.trim().split(' ')[0];
 
   return (
-    <div className="space-y-6 text-slate-100">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+    <div className="flex w-full flex-col gap-6 overflow-x-hidden p-1 pb-10 md:p-4">
+      <div className="flex-none flex-col justify-between gap-4 px-1 flex md:flex-row md:items-center">
         <div>
-          <h1 className="text-4xl font-semibold">
-            Sales Desk <span className="text-[var(--crm-brand-text)]">Dashboard</span>
+          <h1 className="mb-1 flex flex-wrap items-center gap-2 text-2xl font-bold text-white md:text-3xl">
+            <span>{t(`greeting.${timeOfDay}`)},</span>
+            <span className="text-[var(--crm-brand-text)]">
+              <span className="md:hidden">{firstName}</span>
+              <span className="hidden md:inline">{displayName}</span>
+            </span>
           </h1>
-          <p className="mt-4 flex items-center gap-2 text-slate-400">
-            <CalendarDays size={16} /> {today}
+          <p className="flex items-center gap-2 text-sm font-medium text-[var(--crm-app-text-muted)]">
+            <CalendarDays size={15} />
+            {formatSystemDate(new Date())}
           </p>
         </div>
-      </div>
 
-      {isError && (
-        <div className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-          {(error as Error)?.message || 'Dashboard yuklenemedi.'}
-        </div>
-      )}
-
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {metrics.map((metric) => (
-          <div key={metric.label} className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
-            <p className="text-xs font-semibold uppercase text-slate-500">{metric.label}</p>
-            {isLoading ? (
-              <Loader2 className="mt-3 animate-spin text-[var(--crm-brand-on-soft)]" size={28} />
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setDashboardMode((current) => (current === 'view' ? 'edit' : 'view'))}
+            className={`${SD_SECONDARY_BUTTON} hidden h-10 px-4 md:inline-flex`}
+          >
+            {dashboardMode === 'view' ? (
+              <>
+                <Pencil size={16} className="mr-2" />
+                {tCommon('common.reportBuilder.dashboardTabEdit')}
+              </>
             ) : (
               <>
-                <p className={`mt-3 text-3xl font-semibold ${metric.tone}`}>{metric.value}</p>
-                <p className="mt-2 text-sm text-slate-400">{metric.hint}</p>
+                <Eye size={16} className="mr-2" />
+                {tCommon('common.reportBuilder.dashboardTabView')}
               </>
             )}
-          </div>
-        ))}
-      </div>
+          </Button>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          { label: 'Cari', value: data?.customerCount ?? 0 },
-          { label: 'Potansiyel', value: data?.potentialCount ?? 0 },
-          { label: 'Urun', value: data?.productCount ?? 0 },
-          { label: 'Kesilecek Fatura', value: data?.toBeIssuedInvoiceCount ?? 0 },
-        ].map((item) => (
-          <div key={item.label} className={`rounded-xl p-4 ${surfaceClass}`}>
-            <p className="text-xs uppercase text-slate-500">{item.label}</p>
-            <p className="mt-2 text-2xl font-semibold text-slate-100">{isLoading ? '...' : item.value}</p>
-          </div>
-        ))}
-      </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className={`${SD_PRIMARY_BUTTON} h-10 flex-1 px-6 md:flex-none`}>
+                <Zap size={16} className="mr-2" />
+                {t('quickAction')}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-64 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-popover)] p-1.5 shadow-xl"
+            >
+              <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--crm-app-text-muted)] opacity-80">
+                Cari & Potansiyel
+              </DropdownMenuLabel>
 
-      <div className={`max-w-xl rounded-xl p-5 ${surfaceClass}`}>
-        <div className="flex items-center gap-3">
-          <Mail className="text-[var(--crm-brand-on-soft)]" size={22} />
-          <div>
-            <h2 className="text-lg font-semibold">Yaklasan Toplantilar</h2>
-            <p className="text-sm text-slate-400">Gmail entegrasyonu ile toplanti davetleri burada listelenir.</p>
-          </div>
+              <DropdownMenuItem
+                onClick={() => navigate('/salesdesk/customers')}
+                className="group mb-1 cursor-pointer rounded-lg px-2 py-2.5 outline-none transition-colors duration-150 hover:bg-[var(--crm-brand-soft)] focus:bg-[var(--crm-brand-soft)]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-[var(--crm-app-panel-muted)] p-1.5 text-[var(--crm-app-text-muted)] transition-colors group-hover:text-[var(--crm-brand-text)]">
+                    <UserPlus size={16} />
+                  </div>
+                  <span className="text-sm font-medium text-slate-200">Cari Yonetimi</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => navigate('/salesdesk/potentials')}
+                className="group mb-1 cursor-pointer rounded-lg px-2 py-2.5 outline-none transition-colors duration-150 hover:bg-[var(--crm-brand-soft)] focus:bg-[var(--crm-brand-soft)]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-[var(--crm-app-panel-muted)] p-1.5 text-[var(--crm-app-text-muted)] transition-colors group-hover:text-[var(--crm-brand-text)]">
+                    <UsersRound size={16} />
+                  </div>
+                  <span className="text-sm font-medium text-slate-200">Potansiyel Cariler</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="my-1 bg-[var(--crm-app-border)]" />
+
+              <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--crm-app-text-muted)] opacity-80">
+                Satis & Finans
+              </DropdownMenuLabel>
+
+              <DropdownMenuItem
+                onClick={() => navigate('/salesdesk/quotes')}
+                className="group mb-1 cursor-pointer rounded-lg px-2 py-2.5 outline-none transition-colors duration-150 hover:bg-[var(--crm-brand-soft)] focus:bg-[var(--crm-brand-soft)]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-[var(--crm-app-panel-muted)] p-1.5 text-[var(--crm-app-text-muted)] transition-colors group-hover:text-[var(--crm-brand-text)]">
+                    <FilePlus size={16} />
+                  </div>
+                  <span className="text-sm font-medium text-slate-200">Teklifler</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={() => navigate('/salesdesk/invoices/new')}
+                className="group mb-1 cursor-pointer rounded-lg px-2 py-2.5 outline-none transition-colors duration-150 hover:bg-[var(--crm-brand-soft)] focus:bg-[var(--crm-brand-soft)]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-[var(--crm-app-panel-muted)] p-1.5 text-[var(--crm-app-text-muted)] transition-colors group-hover:text-[var(--crm-brand-text)]">
+                    <Receipt size={16} />
+                  </div>
+                  <span className="text-sm font-medium text-slate-200">Yeni Satis Faturasi</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="my-1 bg-[var(--crm-app-border)]" />
+
+              <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[var(--crm-app-text-muted)] opacity-80">
+                Operasyon
+              </DropdownMenuLabel>
+
+              <DropdownMenuItem
+                onClick={() => navigate('/salesdesk/weekly-plan')}
+                className="group cursor-pointer rounded-lg px-2 py-2.5 outline-none transition-colors duration-150 hover:bg-[var(--crm-brand-soft)] focus:bg-[var(--crm-brand-soft)]"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="rounded-md bg-[var(--crm-app-panel-muted)] p-1.5 text-[var(--crm-app-text-muted)] transition-colors group-hover:text-[var(--crm-brand-text)]">
+                    <CalendarPlus size={16} />
+                  </div>
+                  <span className="text-sm font-medium text-slate-200">Haftalik Plan</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
+
+      {dashboardMode === 'edit' ? (
+        <div
+          className="min-h-[320px] rounded-xl border border-dashed border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_40%,transparent)] px-6 py-10 text-center"
+          aria-hidden
+        >
+          <p className="text-sm text-[var(--crm-app-text-muted)]">
+            Dashboard widget düzenleme yakında eklenecek.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
