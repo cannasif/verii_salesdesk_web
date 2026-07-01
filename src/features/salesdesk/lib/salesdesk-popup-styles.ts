@@ -14,10 +14,105 @@ export const SD_FORM_LABEL =
   'mb-1.5 ml-1 block text-[11px] font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]';
 
 export const SD_FORM_INPUT = [
-  'h-11 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-100',
+  'h-9 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-100',
   'placeholder:text-[var(--crm-app-text-muted)]',
   'focus-visible:border-[var(--crm-brand-primary)] focus-visible:ring-0 focus-visible:ring-offset-0',
   'focus:border-[var(--crm-brand-primary)] focus:shadow-[0_0_0_2px_var(--crm-brand-ring)]',
+  'transition-colors duration-150',
+].join(' ');
+
+export const SD_FORM_SECTION =
+  'col-span-full mb-0.5 mt-2 border-b border-[var(--crm-app-border)] pb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--crm-brand-text)] first:mt-0';
+
+export const SD_FORM_GRID = 'grid grid-cols-1 gap-x-3 gap-y-3 sm:grid-cols-2';
+
+export const SD_DIALOG_CONTENT_COMPACT = [
+  'flex !max-h-[min(88vh,640px)] w-[calc(100%-1.5rem)] max-w-[520px] !flex-col !gap-0 overflow-hidden !p-0',
+  'rounded-xl shadow-2xl shadow-black/30',
+  SD_SURFACE_DIALOG,
+].join(' ');
+
+/** Orta boy form dialog — cari / entity popup'lari. */
+export const SD_DIALOG_CONTENT_FORM = [
+  'flex !max-h-[min(90vh,720px)] w-[calc(100%-1.5rem)] max-w-[640px] !flex-col !gap-0 overflow-hidden !p-0',
+  'rounded-xl shadow-2xl shadow-black/35 sm:max-w-[680px]',
+  SD_SURFACE_DIALOG,
+].join(' ');
+
+export const SD_DIALOG_HEADER_FORM =
+  'flex shrink-0 flex-row items-center justify-between space-y-0 border-b border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] px-5 py-4 sm:px-6';
+
+export const SD_DIALOG_BODY_FORM = 'custom-scrollbar min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6';
+
+export const SD_DELETE_FOOTER = 'border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)]';
+
+export const SD_DIALOG_FOOTER_FORM = [
+  SD_DELETE_FOOTER,
+  'flex shrink-0 flex-row items-center justify-end gap-3 px-5 py-4 sm:px-6',
+].join(' ');
+
+export const SD_DIALOG_ICON_RING_FORM =
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[color-mix(in_srgb,var(--crm-brand-primary)_22%,transparent)] bg-[var(--crm-brand-soft)]';
+
+export const SD_FORM_INPUT_MD = [
+  'h-10 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-100',
+  'placeholder:text-[var(--crm-app-text-muted)]',
+  'focus-visible:border-[var(--crm-brand-primary)] focus-visible:ring-0 focus-visible:ring-offset-0',
+  'focus:border-[var(--crm-brand-primary)] focus:shadow-[0_0_0_2px_var(--crm-brand-ring)]',
+  'transition-colors duration-150',
+].join(' ');
+
+export const SD_FORM_LABEL_ICON =
+  'mb-2 ml-0.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]';
+
+export const SD_FORM_LABEL_ICON_SVG = 'shrink-0 text-[var(--crm-brand-primary)] opacity-90';
+
+export const SD_FORM_GRID_MD = 'grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2';
+
+export const SD_FORM_HINT =
+  'mt-1.5 text-[11px] leading-relaxed text-[var(--crm-app-text-muted)]';
+
+export const SD_PRIMARY_BUTTON_FORM = [
+  SD_BRAND_PRIMARY,
+  'h-10 min-w-[120px] rounded-lg px-6 text-sm font-semibold',
+  'transition-colors duration-150',
+].join(' ');
+
+export const SD_SECONDARY_BUTTON_FORM = [
+  SD_BRAND_SECONDARY,
+  'h-10 rounded-lg px-5 text-sm font-medium text-slate-300',
+  'transition-colors duration-150',
+].join(' ');
+
+export const SD_DIALOG_HEADER_COMPACT =
+  'flex shrink-0 flex-row items-center justify-between space-y-0 border-b border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] px-5 py-3.5';
+
+export const SD_DIALOG_BODY_COMPACT = 'custom-scrollbar min-h-0 flex-1 overflow-y-auto px-5 py-4';
+
+export const SD_DIALOG_FOOTER_COMPACT = [
+  SD_DELETE_FOOTER,
+  'flex shrink-0 flex-row items-center justify-end gap-2 px-5 py-3',
+].join(' ');
+
+export const SD_DIALOG_TITLE = 'text-base font-semibold text-slate-900 dark:text-white';
+
+export const SD_DIALOG_DESC = 'text-xs text-[var(--crm-app-text-muted)]';
+
+export const SD_DIALOG_ICON_RING_COMPACT =
+  'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-brand-soft)]';
+
+export const SD_SELECT_CONTENT =
+  'border border-[var(--crm-app-border)] bg-[var(--crm-app-popover)] text-slate-100';
+
+export const SD_PRIMARY_BUTTON_COMPACT = [
+  SD_BRAND_PRIMARY,
+  'h-9 rounded-lg px-5 text-xs font-semibold',
+  'transition-colors duration-150',
+].join(' ');
+
+export const SD_SECONDARY_BUTTON_COMPACT = [
+  SD_BRAND_SECONDARY,
+  'h-9 rounded-lg px-4 text-xs font-medium text-slate-300',
   'transition-colors duration-150',
 ].join(' ');
 
@@ -84,6 +179,57 @@ export const SD_FILTER_BADGE =
 
 export const SD_METRIC_CARD = `${SD_SURFACE_PANEL} min-h-[108px] rounded-xl p-5`;
 
+/** KPI istatistik kartlari — Navy Gold token'lari. */
+export const SD_KPI_CARD = [
+  'group relative overflow-hidden rounded-xl border border-[var(--crm-app-border)]',
+  'bg-[var(--crm-app-list-card)] shadow-sm ring-1 ring-[var(--crm-app-border)] backdrop-blur-xl',
+  'transition-all duration-300',
+  'hover:border-[color-mix(in_srgb,var(--crm-brand-primary)_32%,transparent)]',
+  'hover:shadow-[0_10px_28px_rgb(0_0_0_/24%)]',
+].join(' ');
+
+export const SD_KPI_CARD_GLOW = [
+  'pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100',
+  'bg-[linear-gradient(135deg,color-mix(in_srgb,var(--crm-brand-primary)_8%,transparent)_0%,transparent_58%)]',
+].join(' ');
+
+export const SD_KPI_ICON_BRAND = [
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
+  'border-[color-mix(in_srgb,var(--crm-brand-primary)_28%,transparent)]',
+  'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)] shadow-sm',
+].join(' ');
+
+export const SD_KPI_ICON_EMERALD = [
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
+  'border-emerald-500/25 bg-emerald-500/10 text-emerald-400 shadow-sm',
+].join(' ');
+
+export const SD_KPI_ICON_AMBER = [
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
+  'border-amber-500/25 bg-amber-500/10 text-amber-400 shadow-sm',
+].join(' ');
+
+export const SD_KPI_ICON_SKY = [
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
+  'border-sky-500/25 bg-sky-500/10 text-sky-400 shadow-sm',
+].join(' ');
+
+export const SD_KPI_ICON_ROSE = [
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border',
+  'border-rose-500/25 bg-rose-500/10 text-rose-400 shadow-sm',
+].join(' ');
+
+export const SD_KPI_ACCENT_BRAND =
+  'absolute inset-y-0 left-0 w-1 bg-[var(--crm-brand-primary)] opacity-80';
+
+export const SD_KPI_ACCENT_EMERALD = 'absolute inset-y-0 left-0 w-1 bg-emerald-500 opacity-80';
+
+export const SD_KPI_ACCENT_AMBER = 'absolute inset-y-0 left-0 w-1 bg-amber-500 opacity-80';
+
+export const SD_KPI_ACCENT_SKY = 'absolute inset-y-0 left-0 w-1 bg-sky-500 opacity-80';
+
+export const SD_KPI_ACCENT_ROSE = 'absolute inset-y-0 left-0 w-1 bg-rose-500 opacity-80';
+
 export const SD_LIST_CARD =
   'gap-0 overflow-hidden rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] p-0 shadow-sm backdrop-blur-xl';
 
@@ -96,7 +242,6 @@ export const SD_LIST_CARD_CONTENT =
 export const SD_TABLE_SHELL =
   'overflow-hidden rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-table-shell)]';
 
-export const SD_DELETE_FOOTER = 'border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)]';
 
 export const SD_METRIC_VALUE_PRIMARY = 'text-slate-100';
 export const SD_METRIC_VALUE_MUTED = 'text-slate-300';
