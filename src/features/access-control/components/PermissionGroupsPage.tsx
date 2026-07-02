@@ -108,7 +108,7 @@ export function PermissionGroupsPage(): ReactElement {
     { enabled: canView }
   );
 
-  const isLoading = canView && (isPending || isFetching) && !isError;
+  const isLoading = canView && isPending && !isError;
 
   const createMutation = useCreatePermissionGroupMutation();
   const updateMutation = useUpdatePermissionGroupMutation();
@@ -403,9 +403,9 @@ export function PermissionGroupsPage(): ReactElement {
                   await handleRefresh();
                   await refetch();
                 }}
-                disabled={isLoading}
+                disabled={isFetching}
                 >
-                  {isLoading ? (
+                  {isFetching ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
                     <RefreshCw className="h-4 w-4 mr-2" />

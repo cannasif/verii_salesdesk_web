@@ -13,6 +13,41 @@ import type { SalesDeskTaskDto } from '../api/salesdesk-api';
 /** Haftalik plan gorevlerini normal gorevlerden ayiran grup etiketi. */
 export const WEEKLY_PLAN_GROUP = 'HaftalikPlan';
 
+/** Grup satirina atanmis haftalik plan gorevleri icin groupName oneki. */
+export const WEEKLY_PLAN_GROUP_ASSIGNEE_PREFIX = `${WEEKLY_PLAN_GROUP}|g|`;
+
+export type WeeklyPlanAssignee =
+  | { kind: 'user'; id: number }
+  | { kind: 'group'; id: number };
+
+export interface WeeklyPlanIndex {
+  users: Map<string, SalesDeskTaskDto>;
+  groups: Map<string, SalesDeskTaskDto>;
+}
+
+export function weeklyPlanGroupAssigneeTag(groupId: number): string {
+  return `${WEEKLY_PLAN_GROUP_ASSIGNEE_PREFIX}${groupId}`;
+}
+
+export function parseWeeklyPlanGroupAssignee(groupName?: string | null): number | null {
+  if (!groupName?.startsWith(WEEKLY_PLAN_GROUP_ASSIGNEE_PREFIX)) return null;
+  const id = Number(groupName.slice(WEEKLY_PLAN_GROUP_ASSIGNEE_PREFIX.length));
+  return Number.isFinite(id) && id > 0 ? Math.trunc(id) : null;
+}
+
+export function isWeeklyPlanTask(task: SalesDeskTaskDto): boolean {
+  if (task.groupName === WEEKLY_PLAN_GROUP) return true;
+  return parseWeeklyPlanGroupAssignee(task.groupName) != null;
+}
+
+export function weeklyPlanAssigneeKey(assignee: WeeklyPlanAssignee): string {
+  return assignee.kind === 'user' ? `u:${assignee.id}` : `g:${assignee.id}`;
+}
+
+export function weeklyPlanGroupCellKey(groupId: number, dateKey: string): string {
+  return `${groupId}|${dateKey}`;
+}
+
 export interface WeeklyActivityType {
   value: string;
   label: string;
@@ -160,15 +195,25 @@ export function formatWeekRange(weekStart: Date): string {
   return `${startLabel} – ${endLabel}`;
 }
 
-/** (userId|dateKey) -> gorev haritasi olusturur. */
-export function buildWeeklyPlanIndex(tasks: SalesDeskTaskDto[]): Map<string, SalesDeskTaskDto> {
-  const index = new Map<string, SalesDeskTaskDto>();
+/** Kullanici ve grup satirlari icin (id|dateKey) -> gorev haritalari olusturur. */
+export function buildWeeklyPlanIndex(tasks: SalesDeskTaskDto[]): WeeklyPlanIndex {
+  const users = new Map<string, SalesDeskTaskDto>();
+  const groups = new Map<string, SalesDeskTaskDto>();
+
   tasks.forEach((task) => {
-    if (!task.assignedUserId || !task.dueDate) return;
+    if (!task.dueDate) return;
     const dateKey = task.dueDate.slice(0, 10);
-    index.set(`${task.assignedUserId}|${dateKey}`, task);
+    const groupId = parseWeeklyPlanGroupAssignee(task.groupName);
+    if (groupId != null) {
+      groups.set(weeklyPlanGroupCellKey(groupId, dateKey), task);
+      return;
+    }
+    if (task.groupName === WEEKLY_PLAN_GROUP && task.assignedUserId) {
+      users.set(weeklyPlanCellKey(task.assignedUserId, dateKey), task);
+    }
   });
-  return index;
+
+  return { users, groups };
 }
 
 export function weeklyPlanCellKey(userId: number, dateKey: string): string {

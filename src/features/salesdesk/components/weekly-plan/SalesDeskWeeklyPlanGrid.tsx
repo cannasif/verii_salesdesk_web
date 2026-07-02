@@ -1,12 +1,16 @@
 import { type ReactElement } from 'react';
-import { Plus, Users } from 'lucide-react';
+import { Plus, Users, UsersRound } from 'lucide-react';
 import {
   resolveActivityType,
   weeklyPlanCellKey,
+  weeklyPlanGroupCellKey,
   type WeeklyDay,
+  type WeeklyPlanAssignee,
+  type WeeklyPlanIndex,
 } from '../../lib/salesdesk-weekly-plan';
 import type { SalesDeskTaskDto } from '../../api/salesdesk-api';
 import type { SalesDeskUserOption } from '../../hooks/useSalesDeskModules';
+import type { SalesDeskGroupDto } from '../../types/salesdesk-group-types';
 import { cn } from '@/lib/utils';
 
 const AVATAR_TONES = [
@@ -19,6 +23,13 @@ const AVATAR_TONES = [
   'bg-sky-500/20 text-sky-300 ring-sky-500/30',
 ];
 
+const GROUP_AVATAR_TONES = [
+  'bg-violet-500/25 text-violet-200 ring-violet-500/35',
+  'bg-teal-500/25 text-teal-200 ring-teal-500/35',
+  'bg-orange-500/25 text-orange-200 ring-orange-500/35',
+  'bg-pink-500/25 text-pink-200 ring-pink-500/35',
+];
+
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';
@@ -28,14 +39,64 @@ function getInitials(name: string): string {
 
 interface SalesDeskWeeklyPlanGridProps {
   users: SalesDeskUserOption[];
+  groups: SalesDeskGroupDto[];
   weekDays: WeeklyDay[];
-  planIndex: Map<string, SalesDeskTaskDto>;
+  planIndex: WeeklyPlanIndex;
   currentUserId?: number | null;
-  onCellClick: (userId: number, dateKey: string, task: SalesDeskTaskDto | null) => void;
+  onCellClick: (assignee: WeeklyPlanAssignee, dateKey: string, task: SalesDeskTaskDto | null) => void;
+}
+
+function PlanCell({
+  task,
+  day,
+  onClick,
+}: {
+  task: SalesDeskTaskDto | null;
+  day: WeeklyDay;
+  onClick: () => void;
+}): ReactElement {
+  const activity = task ? resolveActivityType(task.title) : null;
+
+  return (
+    <td
+      className={cn(
+        'border-b border-r border-[var(--crm-app-border)] p-2 align-middle',
+        day.isWeekend && 'bg-[color-mix(in_srgb,var(--crm-brand-secondary)_5%,transparent)]'
+      )}
+    >
+      {task && activity ? (
+        <button
+          type="button"
+          onClick={onClick}
+          className={cn(
+            'flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold ring-1 transition-transform hover:scale-[1.03]',
+            activity.chipClass
+          )}
+          title={task.description || activity.label}
+        >
+          <activity.icon className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{activity.label}</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={onClick}
+          className={cn(
+            'flex w-full items-center justify-center rounded-lg px-2 py-2 text-[var(--crm-app-text-muted)]',
+            'opacity-0 transition-opacity hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] group-hover/row:opacity-100'
+          )}
+          aria-label="Gorev ekle"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+      )}
+    </td>
+  );
 }
 
 export function SalesDeskWeeklyPlanGrid({
   users,
+  groups,
   weekDays,
   planIndex,
   currentUserId,
@@ -49,7 +110,7 @@ export function SalesDeskWeeklyPlanGrid({
             <th className="sticky left-0 z-30 w-[200px] min-w-[200px] border-b border-r border-[var(--crm-app-border)] bg-[var(--crm-brand-secondary)] px-4 py-3 text-left">
               <span className="flex items-center gap-2 text-sm font-bold text-white">
                 <Users className="h-4 w-4" />
-                Kisiler
+                Kisiler &amp; Gruplar
               </span>
             </th>
             {weekDays.map((day) => (
@@ -77,8 +138,10 @@ export function SalesDeskWeeklyPlanGrid({
         <tbody>
           {users.map((user, rowIndex) => {
             const isCurrent = currentUserId != null && user.id === currentUserId;
+            const assignee: WeeklyPlanAssignee = { kind: 'user', id: user.id };
+
             return (
-              <tr key={user.id} className="group/row">
+              <tr key={`user-${user.id}`} className="group/row">
                 <td
                   className={cn(
                     'sticky left-0 z-20 border-b border-r border-[var(--crm-app-border)] px-4 py-3',
@@ -101,48 +164,78 @@ export function SalesDeskWeeklyPlanGrid({
                         <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--crm-brand-accent)]">
                           Ben
                         </span>
-                      ) : null}
+                      ) : (
+                        <span className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Kisi</span>
+                      )}
                     </div>
                   </div>
                 </td>
                 {weekDays.map((day) => {
-                  const task = planIndex.get(weeklyPlanCellKey(user.id, day.dateKey)) ?? null;
-                  const activity = task ? resolveActivityType(task.title) : null;
+                  const task = planIndex.users.get(weeklyPlanCellKey(user.id, day.dateKey)) ?? null;
                   return (
-                    <td
+                    <PlanCell
                       key={day.dateKey}
+                      task={task}
+                      day={day}
+                      onClick={() => onCellClick(assignee, day.dateKey, task)}
+                    />
+                  );
+                })}
+              </tr>
+            );
+          })}
+
+          {groups.length > 0 ? (
+            <tr>
+              <td
+                colSpan={weekDays.length + 1}
+                className="border-b border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-brand-secondary)_18%,transparent)] px-4 py-2"
+              >
+                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-violet-200">
+                  <UsersRound className="h-3.5 w-3.5" />
+                  Gruplar
+                </span>
+              </td>
+            </tr>
+          ) : null}
+
+          {groups.map((group, rowIndex) => {
+            const assignee: WeeklyPlanAssignee = { kind: 'group', id: group.id };
+
+            return (
+              <tr key={`group-${group.id}`} className="group/row">
+                <td
+                  className={cn(
+                    'sticky left-0 z-20 border-b border-r border-[var(--crm-app-border)] px-4 py-3',
+                    'bg-[color-mix(in_srgb,var(--crm-brand-secondary)_8%,var(--crm-app-list-card))] shadow-[4px_0_12px_-6px_rgba(0,0,0,0.25)]'
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <span
                       className={cn(
-                        'border-b border-r border-[var(--crm-app-border)] p-2 align-middle',
-                        day.isWeekend && 'bg-[color-mix(in_srgb,var(--crm-brand-secondary)_5%,transparent)]'
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ring-1',
+                        GROUP_AVATAR_TONES[rowIndex % GROUP_AVATAR_TONES.length]
                       )}
                     >
-                      {task && activity ? (
-                        <button
-                          type="button"
-                          onClick={() => onCellClick(user.id, day.dateKey, task)}
-                          className={cn(
-                            'flex w-full items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-semibold ring-1 transition-transform hover:scale-[1.03]',
-                            activity.chipClass
-                          )}
-                          title={task.description || activity.label}
-                        >
-                          <activity.icon className="h-3.5 w-3.5 shrink-0" />
-                          <span className="truncate">{activity.label}</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => onCellClick(user.id, day.dateKey, null)}
-                          className={cn(
-                            'flex w-full items-center justify-center rounded-lg px-2 py-2 text-[var(--crm-app-text-muted)]',
-                            'opacity-0 transition-opacity hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] group-hover/row:opacity-100'
-                          )}
-                          aria-label="Gorev ekle"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </button>
-                      )}
-                    </td>
+                      {getInitials(group.name)}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-100">{group.name}</p>
+                      <span className="text-[10px] font-medium text-violet-300/90">
+                        {group.memberCount} uye
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                {weekDays.map((day) => {
+                  const task = planIndex.groups.get(weeklyPlanGroupCellKey(group.id, day.dateKey)) ?? null;
+                  return (
+                    <PlanCell
+                      key={day.dateKey}
+                      task={task}
+                      day={day}
+                      onClick={() => onCellClick(assignee, day.dateKey, task)}
+                    />
                   );
                 })}
               </tr>

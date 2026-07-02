@@ -63,9 +63,27 @@ interface SalesDeskInvoiceCreateFormProps {
 export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCreateFormProps): ReactElement {
   const navigate = useNavigate();
   const createInvoice = useCreateSalesDeskInvoice();
-  const { data: customers, isLoading: customersLoading } = useSalesDeskCustomerOptions();
-  const { data: products, isLoading: productsLoading } = useSalesDeskProductOptions();
+  const {
+    data: customers,
+    isPending: customersPending,
+    isError: customersError,
+    error: customersFetchError,
+  } = useSalesDeskCustomerOptions();
+  const {
+    data: products,
+    isPending: productsPending,
+    isError: productsError,
+    error: productsFetchError,
+  } = useSalesDeskProductOptions();
   const [lines, setLines] = useState<InvoiceLineFormState[]>([]);
+
+  const optionsPending = customersPending || productsPending;
+  const optionsErrorMessage =
+    customersError || productsError
+      ? (customersFetchError as Error | undefined)?.message ||
+        (productsFetchError as Error | undefined)?.message ||
+        'Cari ve urun listesi yuklenemedi.'
+      : null;
 
   const isPurchase = invoiceType === SALES_DESK_INVOICE_TYPE.purchase;
   const title = isPurchase ? 'Yeni Alis Faturasi' : 'Yeni Satis Faturasi';
@@ -116,8 +134,6 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
     toast.info('Onizleme yakinda eklenecek.');
   };
 
-  const isLoading = customersLoading || productsLoading;
-
   return (
     <div className={SD_CREATE_PAGE_CONTAINER_CLASSNAME}>
       <SalesDeskDocumentCreatePageHeader
@@ -133,91 +149,100 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
         ]}
       />
 
-      {isLoading ? (
-        <div className="flex justify-center py-24">
-          <Loader2 className="h-8 w-8 animate-spin text-[var(--crm-brand-primary)]" />
+      {optionsErrorMessage ? (
+        <div className="mb-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          {optionsErrorMessage}
         </div>
-      ) : (
-        <FormProvider {...form}>
-          <form onSubmit={handleSubmit}>
-            <div className={SD_CREATE_MAIN_GRID_CLASSNAME}>
-              <div className="flex min-w-0 flex-col gap-6">
-                <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
-                  <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
-                    <div className={SD_CREATE_SECTION_BADGE_CLASSNAME}>1</div>
-                    <FileText className="h-4 w-4 text-zinc-400" />
-                    <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Bilgileri</h3>
-                  </div>
-                  <div className={cn(SD_CREATE_SECTION_BODY_CLASSNAME, SD_CREATE_HEADER_FORM_SURFACE_CLASSNAME)}>
-                    <SalesDeskInvoiceHeaderForm
-                      partyLabel={partyLabel}
-                      isPurchase={isPurchase}
-                      customerOptions={customerOptions}
-                    />
-                  </div>
-                </section>
+      ) : null}
 
-                <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
-                  <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
-                    <div className={SD_CREATE_SECTION_BADGE_CLASSNAME}>2</div>
-                    <Layers className="h-4 w-4 text-zinc-400" />
-                    <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Kalemleri</h3>
-                  </div>
-                  <div className="overflow-x-auto p-0">
-                    <SalesDeskDocumentLineTable
-                      lines={lines}
-                      onLinesChange={setLines}
-                      products={products ?? []}
-                      title="Fatura Kalemleri"
-                    />
-                  </div>
-                </section>
-              </div>
+      {optionsPending && customerOptions.length === 0 ? (
+        <div className="mb-4 flex items-center gap-2 text-sm text-slate-400">
+          <Loader2 className="h-4 w-4 animate-spin text-[var(--crm-brand-primary)]" />
+          Cari ve urun listesi yukleniyor...
+        </div>
+      ) : null}
 
-              <aside className="w-full xl:sticky xl:top-6">
-                <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
-                  <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
-                    <div className={SD_CREATE_SECTION_BADGE_SUMMARY_CLASSNAME}>3</div>
-                    <Calculator className="h-4 w-4 text-zinc-400" />
-                    <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Ozet</h3>
-                  </div>
-                  <SalesDeskDocumentSummaryCard lines={lines} title="Fatura Ozeti" />
-                </section>
-              </aside>
+      <FormProvider {...form}>
+        <form onSubmit={handleSubmit}>
+          <div className={SD_CREATE_MAIN_GRID_CLASSNAME}>
+            <div className="flex min-w-0 flex-col gap-6">
+              <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
+                <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
+                  <div className={SD_CREATE_SECTION_BADGE_CLASSNAME}>1</div>
+                  <FileText className="h-4 w-4 text-zinc-400" />
+                  <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Bilgileri</h3>
+                </div>
+                <div className={cn(SD_CREATE_SECTION_BODY_CLASSNAME, SD_CREATE_HEADER_FORM_SURFACE_CLASSNAME)}>
+                  <SalesDeskInvoiceHeaderForm
+                    partyLabel={partyLabel}
+                    isPurchase={isPurchase}
+                    customerOptions={customerOptions}
+                    optionsPending={optionsPending}
+                  />
+                </div>
+              </section>
+
+              <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
+                <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
+                  <div className={SD_CREATE_SECTION_BADGE_CLASSNAME}>2</div>
+                  <Layers className="h-4 w-4 text-zinc-400" />
+                  <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Kalemleri</h3>
+                </div>
+                <div className="overflow-x-auto p-0">
+                  <SalesDeskDocumentLineTable
+                    lines={lines}
+                    onLinesChange={setLines}
+                    products={products ?? []}
+                    productsPending={optionsPending}
+                    title="Fatura Kalemleri"
+                  />
+                </div>
+              </section>
             </div>
 
-            <div className={SD_CREATE_ACTION_BAR_CLASSNAME}>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate('/salesdesk/invoices')}
-                className="w-full sm:w-auto"
-              >
-                <X className="mr-2 h-4 w-4" />
-                Iptal
-              </Button>
+            <aside className="w-full xl:sticky xl:top-6">
+              <section className={SD_CREATE_SECTION_CARD_CLASSNAME}>
+                <div className={SD_CREATE_SECTION_HEADER_CLASSNAME}>
+                  <div className={SD_CREATE_SECTION_BADGE_SUMMARY_CLASSNAME}>3</div>
+                  <Calculator className="h-4 w-4 text-zinc-400" />
+                  <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Ozet</h3>
+                </div>
+                <SalesDeskDocumentSummaryCard lines={lines} title="Fatura Ozeti" />
+              </section>
+            </aside>
+          </div>
 
-              <Button
-                type="button"
-                onClick={handlePreview}
-                className={cn(SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_PREVIEW)}
-              >
-                <Eye className="mr-2 h-4 w-4" />
-                Onizle
-              </Button>
+          <div className={SD_CREATE_ACTION_BAR_CLASSNAME}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/salesdesk/invoices')}
+              className="w-full sm:w-auto"
+            >
+              <X className="mr-2 h-4 w-4" />
+              Iptal
+            </Button>
 
-              <Button
-                type="submit"
-                disabled={createInvoice.isPending}
-                className={cn('sm:min-w-[140px]', SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_SAVE)}
-              >
-                <Save className="mr-2 h-4 w-4" />
-                {createInvoice.isPending ? 'Kaydediliyor...' : 'Kaydet'}
-              </Button>
-            </div>
-          </form>
-        </FormProvider>
-      )}
+            <Button
+              type="button"
+              onClick={handlePreview}
+              className={cn(SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_PREVIEW)}
+            >
+              <Eye className="mr-2 h-4 w-4" />
+              Onizle
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={createInvoice.isPending || optionsPending}
+              className={cn('sm:min-w-[140px]', SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_SAVE)}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              {createInvoice.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
     </div>
   );
 }

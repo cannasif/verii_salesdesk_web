@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 
 interface SalesDeskQuoteHeaderFormProps {
   customerOptions: Array<{ value: string; label: string }>;
+  optionsPending?: boolean;
 }
 
 function LabelIconBox({
@@ -55,7 +56,10 @@ function LabelIconBox({
   );
 }
 
-export function SalesDeskQuoteHeaderForm({ customerOptions }: SalesDeskQuoteHeaderFormProps): ReactElement {
+export function SalesDeskQuoteHeaderForm({
+  customerOptions,
+  optionsPending = false,
+}: SalesDeskQuoteHeaderFormProps): ReactElement {
   const form = useFormContext<QuoteFormValues>();
   const statusOptions = enumToSelectOptions(DOCUMENT_STATUS_LABELS);
   const hasCustomer = Boolean(form.watch('customerId'));
@@ -83,10 +87,13 @@ export function SalesDeskQuoteHeaderForm({ customerOptions }: SalesDeskQuoteHead
                   onValueChange={(value) =>
                     field.onChange(value === NONE_SELECT_VALUE ? NONE_SELECT_VALUE : value)
                   }
+                  disabled={optionsPending && customerOptions.length === 0}
                 >
                   <FormControl>
                     <SelectTrigger className={cn(SD_CREATE_FORM_INPUT_CLASSNAME, 'pl-3')}>
-                      <SelectValue placeholder="Cari secin" />
+                      <SelectValue
+                        placeholder={optionsPending && customerOptions.length === 0 ? 'Cariler yukleniyor...' : 'Cari secin'}
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className={SD_SELECT_CONTENT}>

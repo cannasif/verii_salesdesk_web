@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
-const SHOW_DELAY_MS = 180;
+const SHOW_DELAY_MS = 600;
 const HIDE_DELAY_MS = 220;
 
 export function GlobalNetworkIndicator(): ReactElement | null {

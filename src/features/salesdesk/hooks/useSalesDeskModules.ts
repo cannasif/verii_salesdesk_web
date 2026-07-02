@@ -426,6 +426,9 @@ export function useSalesDeskDashboard(): UseQueryResult<SalesDeskDashboardDto> {
   });
 }
 
+const SALESDESK_OPTIONS_STALE_TIME_MS = 5 * 60 * 1000;
+const SALESDESK_OPTIONS_GC_TIME_MS = 30 * 60 * 1000;
+
 export function useSalesDeskCustomerOptions(): UseQueryResult<SalesDeskCustomerDto[]> {
   return useQuery({
     queryKey: ['salesdesk', 'customers', 'options'],
@@ -433,7 +436,9 @@ export function useSalesDeskCustomerOptions(): UseQueryResult<SalesDeskCustomerD
       const response = await salesDeskApi.customers.list({ pageNumber: 1, pageSize: 200, sortBy: 'Name', sortDirection: 'asc' });
       return response.data;
     },
-    staleTime: 60000,
+    staleTime: SALESDESK_OPTIONS_STALE_TIME_MS,
+    gcTime: SALESDESK_OPTIONS_GC_TIME_MS,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -444,7 +449,9 @@ export function useSalesDeskProductOptions(): UseQueryResult<SalesDeskProductDto
       const response = await salesDeskApi.products.list({ pageNumber: 1, pageSize: 200, sortBy: 'Name', sortDirection: 'asc' });
       return response.data;
     },
-    staleTime: 60000,
+    staleTime: SALESDESK_OPTIONS_STALE_TIME_MS,
+    gcTime: SALESDESK_OPTIONS_GC_TIME_MS,
+    placeholderData: (previousData) => previousData,
   });
 }
 
@@ -480,6 +487,8 @@ export function useSalesDeskUserOptions(): UseQueryResult<SalesDeskUserOption[]>
         } satisfies SalesDeskUserOption;
       });
     },
-    staleTime: 60000,
+    staleTime: SALESDESK_OPTIONS_STALE_TIME_MS,
+    gcTime: SALESDESK_OPTIONS_GC_TIME_MS,
+    placeholderData: (previousData) => previousData,
   });
 }

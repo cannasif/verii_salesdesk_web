@@ -8,6 +8,12 @@ interface RouteNamespaceLoaderProps {
   children: ReactNode;
 }
 
+const loadedRouteKeys = new Set<string>();
+
+function buildRouteKey(pathname: string, namespaces: readonly string[]): string {
+  return `${pathname}::${namespaces.join('|')}`;
+}
+
 export function RouteNamespaceLoader({ children }: RouteNamespaceLoaderProps): ReactElement {
   const location = useLocation();
   const [ready, setReady] = useState(false);
@@ -18,13 +24,28 @@ export function RouteNamespaceLoader({ children }: RouteNamespaceLoaderProps): R
     [location.pathname]
   );
 
+  const routeKey = useMemo(
+    () => buildRouteKey(location.pathname, namespaces),
+    [location.pathname, namespaces]
+  );
+
   useEffect(() => {
     let cancelled = false;
+
+    if (loadedRouteKeys.has(routeKey)) {
+      setLoadedPath(location.pathname);
+      setReady(true);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     setReady(false);
 
     async function load(): Promise<void> {
       await ensureNamespacesReady(namespaces);
       if (cancelled) return;
+      loadedRouteKeys.add(routeKey);
       setLoadedPath(location.pathname);
       setReady(true);
     }
@@ -34,7 +55,7 @@ export function RouteNamespaceLoader({ children }: RouteNamespaceLoaderProps): R
     return () => {
       cancelled = true;
     };
-  }, [location.pathname, namespaces]);
+  }, [location.pathname, namespaces, routeKey]);
 
   if (!ready || loadedPath !== location.pathname) {
     return <PageLoader />;

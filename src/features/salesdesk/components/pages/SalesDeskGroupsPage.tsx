@@ -80,7 +80,7 @@ export function SalesDeskGroupsPage(): ReactElement {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const isLoading = (isPending || isFetching) && !isError;
+  const isLoading = isPending && !isError;
   const queryErrorMessage = error instanceof Error ? error.message : 'Gruplar yuklenemedi.';
 
   useEffect(() => {
@@ -267,9 +267,9 @@ export function SalesDeskGroupsPage(): ReactElement {
                 size="sm"
                 className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
                 onClick={() => void refetch()}
-                disabled={isLoading}
+                disabled={isFetching}
               >
-                {isLoading ? (
+                {isFetching ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
                   <RefreshCw className="mr-2 h-4 w-4" />

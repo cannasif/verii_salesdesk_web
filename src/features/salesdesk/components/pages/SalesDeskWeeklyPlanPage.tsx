@@ -17,9 +17,11 @@ import {
   buildWeeklyPlanIndex,
   formatWeekRange,
   getWeekStart,
+  isWeeklyPlanTask,
   WEEKLY_ACTIVITY_TYPES,
-  WEEKLY_PLAN_GROUP,
+  type WeeklyPlanAssignee,
 } from '../../lib/salesdesk-weekly-plan';
+import { useSalesDeskGroupList } from '../../hooks/useSalesDeskGroups';
 import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
 import type { TaskFormValues } from '../../types/salesdesk-schemas';
 import { SalesDeskWeeklyPlanGrid } from '../weekly-plan/SalesDeskWeeklyPlanGrid';
@@ -37,14 +39,19 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
 
   const {
     data: users,
-    isLoading: usersLoading,
+    isPending: usersPending,
     isError: usersError,
     error: usersFetchError,
   } = useSalesDeskUserOptions();
+  const {
+    data: groups,
+    isError: groupsError,
+    error: groupsFetchError,
+  } = useSalesDeskGroupList();
   const { data: customers } = useSalesDeskCustomerOptions();
   const {
     data: taskData,
-    isLoading: tasksLoading,
+    isPending: tasksPending,
     isError: tasksError,
     error: tasksFetchError,
   } = useSalesDeskTaskList({ pageNumber: 1, pageSize: 500, sortBy: 'DueDate', sortDirection: 'asc' });
@@ -56,11 +63,12 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
   const weekDays = useMemo(() => buildWeekDays(weekStart), [weekStart]);
 
   const planIndex = useMemo(() => {
-    const planTasks = (taskData?.data ?? []).filter((task) => task.groupName === WEEKLY_PLAN_GROUP);
+    const planTasks = (taskData?.data ?? []).filter(isWeeklyPlanTask);
     return buildWeeklyPlanIndex(planTasks);
   }, [taskData?.data]);
 
   const userOptions = users ?? [];
+  const groupOptions = groups ?? [];
   const customerOptions = useMemo(
     () => withNoneOption((customers ?? []).map((item) => ({ value: String(item.id), label: item.name }))),
     [customers]
@@ -69,15 +77,22 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
   const planCount = useMemo(() => {
     const weekKeys = new Set(weekDays.map((day) => day.dateKey));
     let count = 0;
-    planIndex.forEach((task) => {
+    planIndex.users.forEach((task) => {
+      if (task.dueDate && weekKeys.has(task.dueDate.slice(0, 10))) count += 1;
+    });
+    planIndex.groups.forEach((task) => {
       if (task.dueDate && weekKeys.has(task.dueDate.slice(0, 10))) count += 1;
     });
     return count;
   }, [planIndex, weekDays]);
 
-  const openDialog = (userId: number, dateKey: string, task: SalesDeskTaskDto | null): void => {
+  const openDialog = (assignee: WeeklyPlanAssignee, dateKey: string, task: SalesDeskTaskDto | null): void => {
     setEditingTask(task);
-    setDialogInitial({ userId, dateKey });
+    setDialogInitial(
+      assignee.kind === 'group'
+        ? { groupId: assignee.id, dateKey }
+        : { userId: assignee.id, dateKey }
+    );
     setDialogOpen(true);
   };
 
@@ -101,12 +116,15 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
     setDialogOpen(false);
   };
 
-  const isLoading = usersLoading || tasksLoading;
+  const isLoading = usersPending || tasksPending;
   const loadErrorMessage = tasksError
     ? (tasksFetchError as Error)?.message || 'Gorevler yuklenemedi.'
     : usersError
       ? (usersFetchError as Error)?.message || 'Kullanicilar yuklenemedi.'
       : null;
+  const groupsWarningMessage = groupsError
+    ? (groupsFetchError as Error)?.message || 'Gruplar yuklenemedi.'
+    : null;
 
   return (
     <div className="space-y-5 text-slate-100">
@@ -158,7 +176,9 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-          <span>{userOptions.length} kisi · {planCount} planli aktivite</span>
+          <span>
+            {userOptions.length} kisi · {groupOptions.length} grup · {planCount} planli aktivite
+          </span>
         </div>
       </div>
 
@@ -173,6 +193,15 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
           </span>
         ))}
       </div>
+
+      {groupsWarningMessage && (
+        <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          <p>Gruplar yuklenemedi: {groupsWarningMessage}</p>
+          <p className="mt-2 text-xs text-amber-100/80">
+            Grup satirlari icin yerel sunucunun calistigindan emin olun (`npm run server` veya `npm run dev:all`).
+          </p>
+        </div>
+      )}
 
       {loadErrorMessage && (
         <div className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
@@ -198,6 +227,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
       ) : (
         <SalesDeskWeeklyPlanGrid
           users={userOptions}
+          groups={groupOptions}
           weekDays={weekDays}
           planIndex={planIndex}
           currentUserId={authUser?.id}
@@ -209,6 +239,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         userOptions={userOptions}
+        groupOptions={groupOptions}
         customerOptions={customerOptions}
         editingTask={editingTask}
         initial={dialogInitial}

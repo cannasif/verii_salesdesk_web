@@ -1,5 +1,5 @@
 import { type ReactElement, useEffect, useState } from 'react';
-import { CalendarClock, CalendarPlus, Loader2, Trash2, User } from 'lucide-react';
+import { CalendarClock, CalendarPlus, Loader2, Trash2, User, UsersRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -28,14 +30,22 @@ import {
 } from '../../lib/salesdesk-document-button-styles';
 import { enumToSelectOptions } from '../../lib/salesdesk-shared';
 import { TASK_STATUS_LABELS } from '../../lib/salesdesk-labels';
-import { WEEKLY_ACTIVITY_TYPES, WEEKLY_PLAN_GROUP } from '../../lib/salesdesk-weekly-plan';
+import {
+  WEEKLY_ACTIVITY_TYPES,
+  WEEKLY_PLAN_GROUP,
+  parseWeeklyPlanGroupAssignee,
+  weeklyPlanGroupAssigneeTag,
+  type WeeklyPlanAssignee,
+} from '../../lib/salesdesk-weekly-plan';
 import type { SalesDeskTaskDto } from '../../api/salesdesk-api';
 import type { SalesDeskUserOption } from '../../hooks/useSalesDeskModules';
+import type { SalesDeskGroupDto } from '../../types/salesdesk-group-types';
 import type { TaskFormValues } from '../../types/salesdesk-schemas';
 import { cn } from '@/lib/utils';
 
 export interface WeeklyPlanDialogInitial {
   userId?: number;
+  groupId?: number;
   dateKey?: string;
 }
 
@@ -43,6 +53,7 @@ interface SalesDeskWeeklyPlanEntryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userOptions: SalesDeskUserOption[];
+  groupOptions: SalesDeskGroupDto[];
   customerOptions?: Array<{ value: string; label: string }>;
   editingTask?: SalesDeskTaskDto | null;
   initial?: WeeklyPlanDialogInitial;
@@ -53,7 +64,7 @@ interface SalesDeskWeeklyPlanEntryDialogProps {
 }
 
 interface DraftState {
-  assignedUserId: string;
+  assignee: string;
   dueDate: string;
   activity: string;
   status: string;
@@ -62,7 +73,7 @@ interface DraftState {
 }
 
 const EMPTY_DRAFT: DraftState = {
-  assignedUserId: '',
+  assignee: '',
   dueDate: '',
   activity: '',
   status: '1',
@@ -70,10 +81,33 @@ const EMPTY_DRAFT: DraftState = {
   description: '',
 };
 
+function assigneeFromTask(task: SalesDeskTaskDto): string {
+  const groupId = parseWeeklyPlanGroupAssignee(task.groupName);
+  if (groupId != null) return `group:${groupId}`;
+  if (task.assignedUserId) return `user:${task.assignedUserId}`;
+  return '';
+}
+
+function assigneeFromInitial(initial?: WeeklyPlanDialogInitial): string {
+  if (initial?.groupId) return `group:${initial.groupId}`;
+  if (initial?.userId) return `user:${initial.userId}`;
+  return '';
+}
+
+function parseAssignee(value: string): WeeklyPlanAssignee | null {
+  const [kind, idPart] = value.split(':');
+  const id = Number(idPart);
+  if (!Number.isFinite(id) || id <= 0) return null;
+  if (kind === 'group') return { kind: 'group', id };
+  if (kind === 'user') return { kind: 'user', id };
+  return null;
+}
+
 export function SalesDeskWeeklyPlanEntryDialog({
   open,
   onOpenChange,
   userOptions,
+  groupOptions,
   customerOptions = [],
   editingTask,
   initial,
@@ -89,7 +123,7 @@ export function SalesDeskWeeklyPlanEntryDialog({
     if (!open) return;
     if (editingTask) {
       setDraft({
-        assignedUserId: editingTask.assignedUserId ? String(editingTask.assignedUserId) : '',
+        assignee: assigneeFromTask(editingTask),
         dueDate: editingTask.dueDate ? editingTask.dueDate.slice(0, 10) : initial?.dateKey ?? '',
         activity: editingTask.title ?? '',
         status: String(editingTask.status ?? 1),
@@ -100,25 +134,41 @@ export function SalesDeskWeeklyPlanEntryDialog({
     }
     setDraft({
       ...EMPTY_DRAFT,
-      assignedUserId: initial?.userId ? String(initial.userId) : '',
+      assignee: assigneeFromInitial(initial),
       dueDate: initial?.dateKey ?? '',
     });
-  }, [open, editingTask, initial?.userId, initial?.dateKey]);
+  }, [open, editingTask, initial?.userId, initial?.groupId, initial?.dateKey]);
 
-  const isValid = Boolean(draft.assignedUserId) && Boolean(draft.dueDate) && Boolean(draft.activity);
+  const isValid = Boolean(draft.assignee) && Boolean(draft.dueDate) && Boolean(draft.activity);
 
   const handleSave = async (): Promise<void> => {
     if (!isValid) return;
-    const values: TaskFormValues = {
-      title: draft.activity,
-      description: draft.description.trim() || undefined,
-      groupName: WEEKLY_PLAN_GROUP,
-      customerId: draft.customerId || undefined,
-      assignedUserId: draft.assignedUserId || undefined,
-      priority: '2',
-      status: draft.status,
-      dueDate: draft.dueDate || undefined,
-    };
+    const assignee = parseAssignee(draft.assignee);
+    if (!assignee) return;
+
+    const values: TaskFormValues =
+      assignee.kind === 'group'
+        ? {
+            title: draft.activity,
+            description: draft.description.trim() || undefined,
+            groupName: weeklyPlanGroupAssigneeTag(assignee.id),
+            customerId: draft.customerId || undefined,
+            assignedUserId: undefined,
+            priority: '2',
+            status: draft.status,
+            dueDate: draft.dueDate || undefined,
+          }
+        : {
+            title: draft.activity,
+            description: draft.description.trim() || undefined,
+            groupName: WEEKLY_PLAN_GROUP,
+            customerId: draft.customerId || undefined,
+            assignedUserId: String(assignee.id),
+            priority: '2',
+            status: draft.status,
+            dueDate: draft.dueDate || undefined,
+          };
+
     await onSubmit(values, editingTask?.id ?? null);
   };
 
@@ -140,7 +190,7 @@ export function SalesDeskWeeklyPlanEntryDialog({
               {editingTask ? 'Plan Gorevini Duzenle' : 'Haftalik Plana Gorev Ekle'}
             </DialogTitle>
             <DialogDescription className="mt-0.5 text-xs text-[var(--crm-app-text-muted)]">
-              Kullanici, gun ve aktivite secerek haftalik plana ekleyin.
+              Kisi veya grup, gun ve aktivite secerek haftalik plana ekleyin.
             </DialogDescription>
           </div>
         </div>
@@ -152,21 +202,37 @@ export function SalesDeskWeeklyPlanEntryDialog({
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)] text-[var(--crm-brand-accent)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)]">
                   <User className="h-3.5 w-3.5" />
                 </span>
-                Kullanici
+                Atanan
               </Label>
               <Select
-                value={draft.assignedUserId || undefined}
-                onValueChange={(value) => setDraft((current) => ({ ...current, assignedUserId: value }))}
+                value={draft.assignee || undefined}
+                onValueChange={(value) => setDraft((current) => ({ ...current, assignee: value }))}
               >
                 <SelectTrigger className={cn(SD_CREATE_FORM_INPUT_CLASSNAME, 'w-full')}>
-                  <SelectValue placeholder="Kullanici secin" />
+                  <SelectValue placeholder="Kisi veya grup secin" />
                 </SelectTrigger>
                 <SelectContent className={SD_SELECT_CONTENT}>
-                  {userOptions.map((option) => (
-                    <SelectItem key={option.id} value={String(option.id)}>
-                      {option.name}
-                    </SelectItem>
-                  ))}
+                  <SelectGroup>
+                    <SelectLabel>Kisiler</SelectLabel>
+                    {userOptions.map((option) => (
+                      <SelectItem key={`user-${option.id}`} value={`user:${option.id}`}>
+                        {option.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                  {groupOptions.length > 0 ? (
+                    <SelectGroup>
+                      <SelectLabel>Gruplar</SelectLabel>
+                      {groupOptions.map((option) => (
+                        <SelectItem key={`group-${option.id}`} value={`group:${option.id}`}>
+                          <span className="inline-flex items-center gap-2">
+                            <UsersRound className="h-3.5 w-3.5 text-violet-300" />
+                            {option.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ) : null}
                 </SelectContent>
               </Select>
             </div>

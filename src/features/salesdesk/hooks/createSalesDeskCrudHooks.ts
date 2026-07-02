@@ -32,6 +32,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
       queryKey: listKey(params),
       queryFn: () => api.list(params),
       staleTime: 15000,
+      placeholderData: (previousData) => previousData,
     });
 
   const useStats = (): UseQueryResult<PagedResponse<TDto>> =>

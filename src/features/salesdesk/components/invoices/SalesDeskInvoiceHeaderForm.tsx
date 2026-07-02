@@ -32,6 +32,7 @@ interface SalesDeskInvoiceHeaderFormProps {
   partyLabel: string;
   isPurchase: boolean;
   customerOptions: Array<{ value: string; label: string }>;
+  optionsPending?: boolean;
 }
 
 function LabelIconBox({
@@ -61,6 +62,7 @@ export function SalesDeskInvoiceHeaderForm({
   partyLabel,
   isPurchase,
   customerOptions,
+  optionsPending = false,
 }: SalesDeskInvoiceHeaderFormProps): ReactElement {
   const form = useFormContext<InvoiceFormValues>();
   const statusOptions = enumToSelectOptions(DOCUMENT_STATUS_LABELS);
@@ -89,10 +91,13 @@ export function SalesDeskInvoiceHeaderForm({
                   onValueChange={(value) =>
                     field.onChange(value === NONE_SELECT_VALUE ? NONE_SELECT_VALUE : value)
                   }
+                  disabled={optionsPending && customerOptions.length === 0}
                 >
                   <FormControl>
                     <SelectTrigger className={cn(SD_CREATE_FORM_INPUT_CLASSNAME, 'pl-3')}>
-                      <SelectValue placeholder="Cari secin" />
+                      <SelectValue
+                        placeholder={optionsPending && customerOptions.length === 0 ? 'Cariler yukleniyor...' : 'Cari secin'}
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className={SD_SELECT_CONTENT}>

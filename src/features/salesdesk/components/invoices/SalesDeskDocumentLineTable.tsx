@@ -52,6 +52,7 @@ interface SalesDeskDocumentLineTableProps {
   lines: InvoiceLineFormState[];
   onLinesChange: (lines: InvoiceLineFormState[]) => void;
   products: SalesDeskProductDto[];
+  productsPending?: boolean;
   title?: string;
   subtitle?: string;
 }
@@ -78,6 +79,7 @@ export function SalesDeskDocumentLineTable({
   lines,
   onLinesChange,
   products,
+  productsPending = false,
   title = 'Kalemler',
   subtitle = 'Urun, miktar ve fiyat bilgilerini girin.',
 }: SalesDeskDocumentLineTableProps): ReactElement {
@@ -276,9 +278,12 @@ export function SalesDeskDocumentLineTable({
               <Select
                 value={dialog.draft.productId > 0 ? String(dialog.draft.productId) : undefined}
                 onValueChange={handleProductChange}
+                disabled={productsPending && productOptions.length === 0}
               >
                 <SelectTrigger className={cn(SD_CREATE_FORM_INPUT_CLASSNAME, 'w-full')}>
-                  <SelectValue placeholder="Urun secin" />
+                  <SelectValue
+                    placeholder={productsPending && productOptions.length === 0 ? 'Urunler yukleniyor...' : 'Urun secin'}
+                  />
                 </SelectTrigger>
                 <SelectContent className={SD_SELECT_CONTENT}>
                   {productOptions.map((option) => (

@@ -20,8 +20,12 @@ export async function ensureApiReady(): Promise<void> {
   api.defaults.baseURL = base;
 }
 
+/** Sonsuz beklemeyi onlemek icin tum API isteklerine ust sinir. */
+export const API_REQUEST_TIMEOUT_MS = 15_000;
+
 export const api = axios.create({
   baseURL: getApiBaseUrl(),
+  timeout: API_REQUEST_TIMEOUT_MS,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -606,6 +610,12 @@ api.interceptors.response.use(
     const apiError = normalizeApiEnvelope(error.response?.data);
     if (error.response) {
       error.response.data = apiError;
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      error.message = 'Sunucu yanit vermedi. Baglantinizi kontrol edip tekrar deneyin.';
+    } else if (!error.response && !error.message) {
+      error.message = 'Ag hatasi. API sunucusuna ulasilamiyor.';
     }
 
     const apiMessage = extractApiErrorMessage(apiError);
