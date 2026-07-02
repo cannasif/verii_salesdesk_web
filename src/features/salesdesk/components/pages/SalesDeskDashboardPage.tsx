@@ -25,6 +25,7 @@ import { formatSystemDate } from '@/lib/system-settings';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
 import { SD_PRIMARY_BUTTON, SD_SECONDARY_BUTTON } from '../../lib/salesdesk-popup-styles';
+import { SalesDeskMeetingsCard } from '../dashboard/SalesDeskMeetingsCard';
 
 export function SalesDeskDashboardPage(): ReactElement {
   const { t } = useTranslation('dashboard');
@@ -195,7 +196,13 @@ export function SalesDeskDashboardPage(): ReactElement {
             Dashboard widget düzenleme yakında eklenecek.
           </p>
         </div>
-      ) : null}
+      ) : (
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          <div className="xl:col-span-1">
+            <SalesDeskMeetingsCard />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

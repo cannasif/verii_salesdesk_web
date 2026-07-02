@@ -1,12 +1,14 @@
 import { type ReactElement, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, Receipt, Package, Headphones, Info } from 'lucide-react';
+import { FileText, Receipt, Package, Headphones, Info, CalendarClock } from 'lucide-react';
 import type { NotificationDto } from '../types/notification';
 import { formatNotificationTime } from '../utils/date-utils';
 import { notificationApi } from '../api/notification-api';
+import { useNotificationStore } from '../stores/notification-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppShellStore } from '@/stores/app-shell-store';
+import { useSalesDeskMeetingStore } from '@/features/salesdesk/stores/salesdesk-meeting-store';
 
 interface NotificationItemProps {
   notification: NotificationDto;
@@ -18,6 +20,11 @@ export function NotificationItem({ notification, onNavigate }: NotificationItemP
   const queryClient = useQueryClient();
   const userId = useAuthStore((state) => state.user?.id ?? null);
   const decrementUnreadCount = useAppShellStore((state) => state.decrementUnreadCount);
+  const markRealTimeRead = useNotificationStore((state) => state.markRealTimeNotificationRead);
+  const markMeetingAlertRead = useSalesDeskMeetingStore((state) => state.markAlertRead);
+
+  // Client tarafi (backend'siz) bildirimler negatif id ile isaretlenir; API cagrisi yapilmaz.
+  const isClientNotification = notification.id < 0;
 
   const markAsReadMutation = useMutation({
     mutationFn: (id: number) => notificationApi.markAsRead(id),
@@ -73,12 +80,23 @@ export function NotificationItem({ notification, onNavigate }: NotificationItemP
     return routeMap[entityName] || null;
   }, []);
 
+  const markClientRead = useCallback((): void => {
+    markRealTimeRead(notification.id);
+    if (notification.relatedEntityType) {
+      markMeetingAlertRead(notification.relatedEntityType);
+    }
+  }, [markRealTimeRead, markMeetingAlertRead, notification.id, notification.relatedEntityType]);
+
   const handleClick = useCallback((e: React.MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!notification.isRead) {
-      markAsReadMutation.mutate(notification.id);
+      if (isClientNotification) {
+        markClientRead();
+      } else {
+        markAsReadMutation.mutate(notification.id);
+      }
     }
 
     let route: string | null = null;
@@ -94,20 +112,27 @@ export function NotificationItem({ notification, onNavigate }: NotificationItemP
     if (route && onNavigate) {
       onNavigate(route);
     }
-  }, [notification, markAsReadMutation, getRouteForNotification, getRouteForEntity, onNavigate]);
+  }, [notification, isClientNotification, markClientRead, markAsReadMutation, getRouteForNotification, getRouteForEntity, onNavigate]);
 
   const handleMarkAsRead = useCallback((e: React.MouseEvent): void => {
     e.preventDefault();
     e.stopPropagation();
     
     if (notification.isRead) return;
+    if (isClientNotification) {
+      markClientRead();
+      return;
+    }
     markAsReadMutation.mutate(notification.id);
-  }, [notification, markAsReadMutation]);
+  }, [notification, isClientNotification, markClientRead, markAsReadMutation]);
 
   const icon = useMemo(() => {
     const notificationType = notification.notificationType;
     const entityName = notification.relatedEntityName || '';
 
+    if (notificationType === 'Meeting' || entityName === 'Meeting' || entityName.includes('Toplant')) {
+      return <CalendarClock size={16} className="text-emerald-400" />;
+    }
     if (notificationType === 'QuotationDetail' || notificationType === 'QuotationApproval' || entityName.includes('Quotation') || entityName.includes('Teklif')) {
       return <FileText size={16} className="text-pink-400" />;
     }

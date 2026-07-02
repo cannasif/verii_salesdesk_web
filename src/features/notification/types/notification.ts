@@ -7,6 +7,7 @@ export const NotificationType = {
   QuotationApproval: 'QuotationApproval',
   OrderDetail: 'OrderDetail',
   OrderApproval: 'OrderApproval',
+  Meeting: 'Meeting',
 } as const;
 
 export type NotificationChannel = 'Terminal' | 'Web';

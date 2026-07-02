@@ -14,6 +14,7 @@ import { NotificationItem } from './NotificationItem';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppShellStore } from '@/stores/app-shell-store';
+import { useSalesDeskMeetingStore } from '@/features/salesdesk/stores/salesdesk-meeting-store';
 
 interface NotificationDropdownProps {
   children: ReactElement;
@@ -30,6 +31,10 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
   );
   const refreshUnreadCount = useAppShellStore((state) => state.refreshUnreadCount);
   const setUnreadCount = useAppShellStore((state) => state.setUnreadCount);
+  const markAllRealTimeNotificationsRead = useNotificationStore(
+    (state) => state.markAllRealTimeNotificationsRead
+  );
+  const markAllMeetingAlertsRead = useSalesDeskMeetingStore((state) => state.markAllAlertsRead);
 
   const {
     data,
@@ -108,17 +113,23 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
   }, [isOpen, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleMarkAllAsRead = useCallback(async (): Promise<void> => {
-    if (unreadCount === 0) return;
-    markAllAsReadMutation.mutate();
-  }, [unreadCount, markAllAsReadMutation]);
+    markAllRealTimeNotificationsRead();
+    markAllMeetingAlertsRead();
+    if (unreadCount > 0) {
+      markAllAsReadMutation.mutate();
+    }
+  }, [unreadCount, markAllAsReadMutation, markAllRealTimeNotificationsRead, markAllMeetingAlertsRead]);
 
   const handleClose = useCallback((e?: React.MouseEvent): void => {
     e?.stopPropagation();
     setIsOpen(false);
   }, []);
 
-  const { realTimeNotifications } = useNotificationStore();
-  
+  const realTimeNotifications = useNotificationStore((state) => state.realTimeNotifications);
+
+  const clientUnreadCount = realTimeNotifications.filter((n) => n.id < 0 && !n.isRead).length;
+  const combinedUnreadCount = unreadCount + clientUnreadCount;
+
   const apiNotifications = data?.pages.flatMap((page) => page.data) ?? [];
   
   const mergedNotifications = [
@@ -153,9 +164,9 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
             <span className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">
               {t('title')}
             </span>
-            {unreadCount > 0 && (
+            {combinedUnreadCount > 0 && (
               <span className="text-[10px] font-bold bg-pink-500 text-white px-1.5 py-0.5 rounded-md leading-none">
-                {unreadCount}
+                {combinedUnreadCount}
               </span>
             )}
           </div>
@@ -209,7 +220,7 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
               "text-slate-500 hover:text-pink-500 dark:text-slate-400 dark:hover:text-pink-400",
               "disabled:opacity-30 disabled:cursor-not-allowed"
             )}
-            disabled={unreadCount === 0 || markAllAsReadMutation.isPending}
+            disabled={combinedUnreadCount === 0 || markAllAsReadMutation.isPending}
           >
             {t('markAllAsRead')}
           </button>

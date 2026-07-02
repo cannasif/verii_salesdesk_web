@@ -4,6 +4,7 @@ import { createAppRouter } from './routes';
 import { Toaster } from './components/ui/sonner';
 import { SystemSettingsBootstrap } from './components/shared/SystemSettingsBootstrap';
 import { useNotificationConnection } from './features/notification/hooks/useNotificationConnection';
+import { SalesDeskMeetingWatcher } from './features/salesdesk/components/SalesDeskMeetingWatcher';
 import './App.css';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   return (
     <>
       <SystemSettingsBootstrap />
+      <SalesDeskMeetingWatcher />
       <RouterProvider router={router} />
       <Toaster />
     </>

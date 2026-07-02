@@ -5,6 +5,7 @@ import { NotificationDropdown } from './NotificationDropdown';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppShellStore } from '@/stores/app-shell-store';
+import { useSalesDeskMeetingStore } from '@/features/salesdesk/stores/salesdesk-meeting-store';
 
 export function NotificationIcon(): ReactElement {
   const { t } = useTranslation(['notification', 'common']);
@@ -14,7 +15,9 @@ export function NotificationIcon(): ReactElement {
     userId ? state.unreadCounts[String(userId)]?.data ?? 0 : 0
   );
   const refreshUnreadCount = useAppShellStore((state) => state.refreshUnreadCount);
-  const hasUnread = unreadCount > 0;
+  const meetingUnseen = useSalesDeskMeetingStore((state) => state.unseenCount);
+  const totalUnread = unreadCount + meetingUnseen;
+  const hasUnread = totalUnread > 0;
 
   useEffect(() => {
     const timer = window.setTimeout(() => setShouldFetchUnread(true), 1500);
@@ -34,7 +37,7 @@ export function NotificationIcon(): ReactElement {
           "hover:bg-slate-100 dark:hover:bg-white/10",
           "active:scale-95"
         )}
-        aria-label={`${t('notifications')}${hasUnread ? ` (${unreadCount} ${t('new')})` : ''}`}
+        aria-label={`${t('notifications')}${hasUnread ? ` (${totalUnread} ${t('new')})` : ''}`}
       >
         <Notification01Icon 
           size={20} // 22'den 20'ye düşürüldü, daha zarif

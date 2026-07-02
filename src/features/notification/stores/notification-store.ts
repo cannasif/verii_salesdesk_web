@@ -9,6 +9,8 @@ interface NotificationState {
   setConnectionState: (state: ConnectionState) => void;
   addRealTimeNotification: (notification: NotificationDto) => void;
   clearRealTimeNotifications: () => void;
+  markRealTimeNotificationRead: (id: number) => void;
+  markAllRealTimeNotificationsRead: () => void;
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -35,6 +37,20 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
   clearRealTimeNotifications: (): void => {
     set({ realTimeNotifications: [] });
+  },
+
+  markRealTimeNotificationRead: (id: number): void => {
+    set({
+      realTimeNotifications: get().realTimeNotifications.map((n) =>
+        n.id === id ? { ...n, isRead: true } : n
+      ),
+    });
+  },
+
+  markAllRealTimeNotificationsRead: (): void => {
+    set({
+      realTimeNotifications: get().realTimeNotifications.map((n) => ({ ...n, isRead: true })),
+    });
   },
 }));
 
