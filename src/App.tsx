@@ -5,17 +5,21 @@ import { Toaster } from './components/ui/sonner';
 import { SystemSettingsBootstrap } from './components/shared/SystemSettingsBootstrap';
 import { useNotificationConnection } from './features/notification/hooks/useNotificationConnection';
 import { SalesDeskMeetingWatcher } from './features/salesdesk/components/SalesDeskMeetingWatcher';
+import { useSalesDeskChatConnection } from './features/salesdesk/hooks/useSalesDeskChatConnection';
+import { SalesDeskChatWidget } from './features/salesdesk/components/chat/SalesDeskChatWidget';
 import './App.css';
 
 function App() {
   const router = useMemo(() => createAppRouter(), []);
   useNotificationConnection();
+  useSalesDeskChatConnection();
 
   return (
     <>
       <SystemSettingsBootstrap />
       <SalesDeskMeetingWatcher />
       <RouterProvider router={router} />
+      <SalesDeskChatWidget />
       <Toaster />
     </>
   );
