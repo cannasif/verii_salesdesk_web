@@ -82,12 +82,12 @@ const optionalVisitIdSchema = z
   .optional()
   .transform((value) => optionalIdFromSelect(value));
 
-const lineUpsertSchema = z.object({
-  productId: z.number().int().positive(),
-  quantity: z.number().min(0),
-  unitPrice: z.number().min(0),
-  vatRate: z.number().min(0).max(100),
-});
+export type LineUpsertInput = {
+  productId: number;
+  quantity: number;
+  unitPrice: number;
+  vatRate: number;
+};
 
 export const productFormSchema = z.object({
   code: z.string().max(32).optional(),
@@ -149,7 +149,7 @@ export function toQuoteFormValues(quote?: SalesDeskQuoteDto | null): QuoteFormVa
 
 export function toQuotePayload(
   values: QuoteFormValues,
-  lines: z.infer<typeof lineUpsertSchema>[] = []
+  lines: LineUpsertInput[] = []
 ): SalesDeskQuoteCreateBody {
   const parsed = quoteFormSchema.parse(values);
   return {
@@ -196,7 +196,7 @@ export function toInvoiceFormValues(
 
 export function toInvoicePayload(
   values: InvoiceFormValues,
-  lines: z.infer<typeof lineUpsertSchema>[] = []
+  lines: LineUpsertInput[] = []
 ): SalesDeskInvoiceCreateBody {
   const parsed = invoiceFormSchema.parse(values);
   return {

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "node scripts/dev-all.mjs",
     "server": "node server/index.mjs",
     "gmail:bridge": "node server/index.mjs",
     "build": "tsc -b && node scripts/check-i18n-explicit-namespaces.mjs && vite build",

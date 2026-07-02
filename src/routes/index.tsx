@@ -21,6 +21,7 @@ const ResetPasswordPage = lazyImport(() => import('@/features/auth'), 'ResetPass
 const ForgotPasswordPage = lazyImport(() => import('@/features/auth'), 'ForgotPasswordPage');
 const ProfilePage = lazyImport(() => import('@/features/user-detail-management'), 'ProfilePage');
 const UserManagementPage = lazyImport(() => import('@/features/user-management'), 'UserManagementPage');
+const PermissionGroupsPage = lazyImport(() => import('@/features/access-control'), 'PermissionGroupsPage');
 
 const SalesDeskDashboardPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskDashboardPage');
 const SalesDeskCustomersPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskCustomersPage');
@@ -44,6 +45,7 @@ const SalesDeskSoftwareResearchPage = lazyImport(() => import('@/features/salesd
 const SalesDeskErpNewsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskErpNewsPage');
 const SalesDeskGmailPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGmailPage');
 const SalesDeskSettingsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSettingsPage');
+const SalesDeskGroupsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGroupsPage');
 
 export function createAppRouter() {
   return createBrowserRouter([
@@ -80,6 +82,8 @@ export function createAppRouter() {
         { path: 'salesdesk/gmail', element: <SalesDeskGmailPage /> },
         { path: 'salesdesk/settings', element: <SalesDeskSettingsPage /> },
         { path: 'user-management', element: <UserManagementPage /> },
+        { path: 'salesdesk/groups', element: <SalesDeskGroupsPage /> },
+        { path: 'access-control/permission-groups', element: <PermissionGroupsPage /> },
         { path: 'profile', element: <ProfilePage /> },
         { path: '*', element: <Navigate to="/" replace /> },
       ],

@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useMemo } from 'react';
+import { type ReactElement, type ReactNode, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -6,6 +6,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -39,11 +40,30 @@ import type { RoleOption } from '../hooks/useUserAuthorityOptionsQuery';
 import { useUserManagerOptionsQuery } from '../hooks/useUserManagerOptionsQuery';
 import { useUserPermissionGroupsForForm } from '../hooks/useUserPermissionGroupsForForm';
 import { UserFormPermissionGroupSelect } from './UserFormPermissionGroupSelect';
-import { User, Mail, Lock, Phone, Shield, Activity, X, Users } from 'lucide-react';
+import { User, Mail, Lock, Phone, Shield, Activity, X, Users, Loader2 } from 'lucide-react';
 import { FormSubmitTooltipWrap } from '@/components/shared/FormSubmitTooltipWrap';
 import { isZodFieldRequired } from '@/lib/zod-required';
 import { getZodValidationMessages } from '@/lib/zod-validation-hint';
 import { cn } from '@/lib/utils';
+import {
+  SD_DIALOG_BODY_FORM,
+  SD_DIALOG_CLOSE,
+  SD_DIALOG_CONTENT_FORM,
+  SD_DIALOG_DESC,
+  SD_DIALOG_FOOTER_FORM,
+  SD_DIALOG_HEADER_FORM,
+  SD_DIALOG_ICON,
+  SD_DIALOG_ICON_RING_FORM,
+  SD_DIALOG_TITLE,
+  SD_FORM_GRID_MD,
+  SD_FORM_INPUT_MD,
+  SD_FORM_LABEL_ICON,
+  SD_FORM_LABEL_ICON_SVG,
+  SD_FORM_MESSAGE,
+  SD_PRIMARY_BUTTON_FORM,
+  SD_SECONDARY_BUTTON_FORM,
+  SD_SELECT_CONTENT,
+} from '@/features/salesdesk/lib/salesdesk-popup-styles';
 
 interface UserFormProps {
   open: boolean;
@@ -54,27 +74,34 @@ interface UserFormProps {
   canManagePermissionGroups?: boolean;
 }
 
-const INPUT_FIELD_CLASSNAME = cn(
-  'h-11 w-full rounded-lg text-sm transition-all duration-200',
-  'bg-slate-50 dark:bg-white/5',
-  'border border-slate-200 dark:border-white/10',
-  'text-slate-900 dark:text-white',
-  'placeholder:text-slate-400 dark:placeholder:text-slate-500',
-  'focus-visible:bg-white dark:focus-visible:bg-white/5',
-  'focus-visible:border-rose-500/70 focus-visible:ring-2 focus-visible:ring-rose-500/10 focus-visible:ring-offset-0',
-  'aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20',
-  'dark:aria-invalid:border-destructive dark:aria-invalid:ring-destructive/30'
-);
+const INPUT_FIELD_CLASSNAME = SD_FORM_INPUT_MD;
 
-const LABEL_STYLE = 'text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-2';
+const LABEL_STYLE = SD_FORM_LABEL_ICON;
 
 const FORM_MESSAGE_SLOT_CLASSNAME = 'min-h-5';
 
 function FormMessageSlot(): ReactElement {
   return (
     <div className={FORM_MESSAGE_SLOT_CLASSNAME}>
-      <FormMessage className="text-xs leading-snug" />
+      <FormMessage className={SD_FORM_MESSAGE} />
     </div>
+  );
+}
+
+function FieldLabel({
+  icon: Icon,
+  required,
+  children,
+}: {
+  icon: typeof User;
+  required?: boolean;
+  children: ReactNode;
+}): ReactElement {
+  return (
+    <FormLabel className={LABEL_STYLE} required={required}>
+      <Icon size={14} className={SD_FORM_LABEL_ICON_SVG} />
+      {children}
+    </FormLabel>
   );
 }
 
@@ -247,44 +274,47 @@ export function UserForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="bg-white dark:bg-[#130822] border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white w-[calc(100vw-1rem)] sm:w-[calc(100vw-2rem)] max-w-[96vw] xl:max-w-[800px] max-h-[92vh] flex flex-col p-0 overflow-hidden rounded-2xl shadow-2xl transition-all duration-300">
-        <DialogHeader className="px-6 py-4 border-b border-slate-100 dark:border-white/5 flex flex-row items-center justify-between shrink-0">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="h-10 w-10 rounded-xl bg-[image:var(--crm-brand-gradient)] flex items-center justify-center shrink-0">
-              <User size={20} className="text-white" />
+      {open ? (
+        <DialogContent className={SD_DIALOG_CONTENT_FORM} showCloseButton={false}>
+          <DialogHeader className={SD_DIALOG_HEADER_FORM}>
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className={SD_DIALOG_ICON_RING_FORM}>
+                <User className={`h-5 w-5 ${SD_DIALOG_ICON}`} aria-hidden />
+              </div>
+              <div className="min-w-0 space-y-0.5">
+                <DialogTitle className={SD_DIALOG_TITLE}>
+                  {user ? t('form.editUser') : t('form.addUser')}
+                </DialogTitle>
+                <DialogDescription className={SD_DIALOG_DESC}>
+                  {user ? t('form.editDescription') : t('form.addDescription')}
+                </DialogDescription>
+              </div>
             </div>
-            <div className="min-w-0 text-left">
-              <DialogTitle className="text-lg font-semibold text-slate-900 dark:text-white truncate">
-                {user ? t('form.editUser') : t('form.addUser')}
-              </DialogTitle>
-              <DialogDescription className="text-slate-500 dark:text-slate-400 text-sm truncate">
-                {user ? t('form.editDescription') : t('form.addDescription')}
-              </DialogDescription>
-            </div>
-          </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 transition-colors"
-          >
-            <X size={20} />
-          </button>
-        </DialogHeader>
+            <button
+              type="button"
+              className={SD_DIALOG_CLOSE}
+              onClick={() => onOpenChange(false)}
+              aria-label="Kapat"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit, handleInvalidSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <form
+              id="user-management-form"
+              onSubmit={form.handleSubmit(handleSubmit, handleInvalidSubmit)}
+              className={SD_DIALOG_BODY_FORM}
+            >
+              <div className={cn(SD_FORM_GRID_MD, 'space-y-0')}>
                 <FormField
                   control={form.control}
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel
-                        className={LABEL_STYLE}
-                        required={isZodFieldRequired(activeSchema, 'username')}
-                      >
-                        <User size={16} className="text-rose-500" /> {t('form.username')}
-                      </FormLabel>
+                      <FieldLabel icon={User} required={isZodFieldRequired(activeSchema, 'username')}>
+                        {t('form.username')}
+                      </FieldLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -304,12 +334,9 @@ export function UserForm({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel
-                        className={LABEL_STYLE}
-                        required={isZodFieldRequired(activeSchema, 'email')}
-                      >
-                        <Mail size={16} className="text-rose-500" /> {t('form.email')}
-                      </FormLabel>
+                      <FieldLabel icon={Mail} required={isZodFieldRequired(activeSchema, 'email')}>
+                        {t('form.email')}
+                      </FieldLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -322,40 +349,34 @@ export function UserForm({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {!isEditMode && (
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className={LABEL_STYLE}>
-                        <Lock size={16} className="text-rose-500" /> {t('form.password')}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder={t('form.passwordPlaceholder')}
-                          className={INPUT_FIELD_CLASSNAME}
-                        />
-                      </FormControl>
-                      <FormMessageSlot />
-                    </FormItem>
-                  )}
-                />
-              )}
+                {!isEditMode && (
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem className="sm:col-span-2">
+                        <FieldLabel icon={Lock}>{t('form.password')}</FieldLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder={t('form.passwordPlaceholder')}
+                            className={INPUT_FIELD_CLASSNAME}
+                          />
+                        </FormControl>
+                        <FormMessageSlot />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="firstName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={LABEL_STYLE}>
-                        <User size={16} className="text-rose-500" /> {t('form.firstName')}
-                      </FormLabel>
+                      <FieldLabel icon={User}>{t('form.firstName')}</FieldLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -374,9 +395,7 @@ export function UserForm({
                   name="lastName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={LABEL_STYLE}>
-                        <User size={16} className="text-rose-500" /> {t('form.lastName')}
-                      </FormLabel>
+                      <FieldLabel icon={User}>{t('form.lastName')}</FieldLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -389,17 +408,13 @@ export function UserForm({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={LABEL_STYLE}>
-                        <Phone size={16} className="text-rose-500" /> {t('form.phoneNumber')}
-                      </FormLabel>
+                      <FieldLabel icon={Phone}>{t('form.phoneNumber')}</FieldLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -418,12 +433,9 @@ export function UserForm({
                   name="roleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel
-                        className={LABEL_STYLE}
-                        required={isZodFieldRequired(activeSchema, 'roleId')}
-                      >
-                        <Shield size={16} className="text-rose-500" /> {t('form.role')}
-                      </FormLabel>
+                      <FieldLabel icon={Shield} required={isZodFieldRequired(activeSchema, 'roleId')}>
+                        {t('form.role')}
+                      </FieldLabel>
                       <Select
                         value={field.value ? String(field.value) : ''}
                         onValueChange={(v) => field.onChange(v ? parseInt(v, 10) : 0)}
@@ -431,14 +443,12 @@ export function UserForm({
                       >
                         <FormControl>
                           <SelectTrigger className={INPUT_FIELD_CLASSNAME}>
-                            <SelectValue
-                              placeholder={t('form.rolePlaceholder')}
-                            />
+                            <SelectValue placeholder={t('form.rolePlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-white dark:bg-[#130822] border-slate-200 dark:border-white/10">
+                        <SelectContent className={SD_SELECT_CONTENT}>
                           {roleOptions.map((opt) => (
-                            <SelectItem key={opt.value} value={String(opt.value)} className="focus:bg-rose-500 focus:text-white">
+                            <SelectItem key={opt.value} value={String(opt.value)}>
                               {opt.label}
                             </SelectItem>
                           ))}
@@ -448,112 +458,117 @@ export function UserForm({
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <FormField
-                control={form.control}
-                name="managerUserId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={LABEL_STYLE}>
-                      <Users size={16} className="text-rose-500" /> {t('form.manager')}
-                    </FormLabel>
-                    <Select
-                      value={field.value ? String(field.value) : 'none'}
-                      onValueChange={(value) => field.onChange(value === 'none' ? null : parseInt(value, 10))}
-                      disabled={isLoading}
-                    >
-                      <FormControl>
-                        <SelectTrigger className={INPUT_FIELD_CLASSNAME}>
-                          <SelectValue placeholder={t('form.managerPlaceholder')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-white dark:bg-[#130822] border-slate-200 dark:border-white/10">
-                        <SelectItem value="none">{t('form.noManager')}</SelectItem>
-                        {managerOptions.map((option) => (
-                          <SelectItem key={option.value} value={String(option.value)} className="focus:bg-rose-500 focus:text-white">
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessageSlot />
-                  </FormItem>
-                )}
-              />
-
-              {canManagePermissionGroups && (
                 <FormField
                   control={form.control}
-                  name="permissionGroupIds"
+                  name="managerUserId"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className={LABEL_STYLE}>
-                        <Shield size={16} className="text-rose-500" /> {t('form.permissionGroups')}
-                      </FormLabel>
-                      <FormControl>
-                        <UserFormPermissionGroupSelect
-                          value={field.value ?? []}
-                          onChange={field.onChange}
-                          disabled={isLoading}
-                        />
-                      </FormControl>
+                    <FormItem className="sm:col-span-2">
+                      <FieldLabel icon={Users}>{t('form.manager')}</FieldLabel>
+                      <Select
+                        value={field.value ? String(field.value) : 'none'}
+                        onValueChange={(value) =>
+                          field.onChange(value === 'none' ? null : parseInt(value, 10))
+                        }
+                        disabled={isLoading}
+                      >
+                        <FormControl>
+                          <SelectTrigger className={INPUT_FIELD_CLASSNAME}>
+                            <SelectValue placeholder={t('form.managerPlaceholder')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent className={SD_SELECT_CONTENT}>
+                          <SelectItem value="none">{t('form.noManager')}</SelectItem>
+                          {managerOptions.map((option) => (
+                            <SelectItem key={option.value} value={String(option.value)}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessageSlot />
                     </FormItem>
                   )}
                 />
-              )}
 
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-xl border border-slate-200 dark:border-white/10 p-4 bg-slate-50/50 dark:bg-white/5">
-                    <FormLabel className="text-sm font-medium flex items-center gap-2 m-0">
-                      <Activity size={16} className="text-rose-500" /> {t('form.isActive')}
-                    </FormLabel>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="data-[state=checked]:bg-rose-500"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                {canManagePermissionGroups && (
+                  <FormField
+                    control={form.control}
+                    name="permissionGroupIds"
+                    render={({ field }) => (
+                      <FormItem className="sm:col-span-2">
+                        <FieldLabel icon={Shield}>{t('form.permissionGroups')}</FieldLabel>
+                        <FormControl>
+                          <UserFormPermissionGroupSelect
+                            value={field.value ?? []}
+                            onChange={field.onChange}
+                            disabled={isLoading}
+                          />
+                        </FormControl>
+                        <FormMessageSlot />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
 
-              <div className="flex flex-col-reverse flex-row justify-end gap-3 pt-6 border-t border-slate-100 dark:border-white/5">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  disabled={isLoading}
-                  className="h-11 px-5 rounded-lg font-medium"
-                >
-                  {t('form.cancel')}
-                </Button>
-                <FormSubmitTooltipWrap
-                  schema={activeSchema}
-                  value={watchedValues}
-                  isValid={isFormValid}
-                  isPending={isLoading}
-                  manualHintLines={saveManualHintLines}
-                >
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="h-11 px-8 rounded-lg bg-[image:var(--crm-brand-gradient)] hover:scale-[1.02] active:scale-[0.98] border-0 text-white font-semibold shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] transition-all duration-200"
-                  >
-                    {isLoading ? t('form.saving') : t('form.save')}
-                  </Button>
-                </FormSubmitTooltipWrap>
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="sm:col-span-2 flex flex-row items-center justify-between rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)]/50 px-4 py-3">
+                      <FieldLabel icon={Activity}>{t('form.isActive')}</FieldLabel>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="data-[state=checked]:bg-[var(--crm-brand-primary)]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </form>
           </Form>
-        </div>
-      </DialogContent>
+
+          <DialogFooter className={SD_DIALOG_FOOTER_FORM}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+              className={SD_SECONDARY_BUTTON_FORM}
+            >
+              {t('form.cancel')}
+            </Button>
+            <FormSubmitTooltipWrap
+              schema={activeSchema}
+              value={watchedValues}
+              isValid={isFormValid}
+              isPending={isLoading}
+              manualHintLines={saveManualHintLines}
+            >
+              <Button
+                type="submit"
+                form="user-management-form"
+                variant="ghost"
+                disabled={isLoading}
+                className={SD_PRIMARY_BUTTON_FORM}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('form.saving')}
+                  </>
+                ) : (
+                  t('form.save')
+                )}
+              </Button>
+            </FormSubmitTooltipWrap>
+          </DialogFooter>
+        </DialogContent>
+      ) : null}
     </Dialog>
   );
 }

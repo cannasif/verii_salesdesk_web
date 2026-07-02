@@ -34,6 +34,9 @@ const pageTitles: Record<string, string> = {
   '/salesdesk/erp-news': 'ERP Haber Takibi',
   '/salesdesk/gmail': 'Gmail',
   '/salesdesk/settings': 'Ayarlar',
+  '/user-management': 'Kullanici Yonetimi',
+  '/salesdesk/groups': 'Grup Yonetimi',
+  '/access-control/permission-groups': 'Izin Gruplari',
 };
 
 export function Navbar(): ReactElement {

@@ -93,20 +93,26 @@ export function PermissionGroupsPage(): ReactElement {
 
   const backendFilters = useMemo(() => rowsToBackendFilters(appliedFilterRows), [appliedFilterRows]);
 
-  const { data, isLoading } = usePermissionGroupsQuery({
-    pageNumber,
-    pageSize,
-    search: searchTerm || undefined,
-    sortBy: 'updatedDate',
-    sortDirection: 'desc',
-    filters: backendFilters.length > 0 ? backendFilters : undefined,
-  });
+  const { data: permissions } = useMyPermissionsQuery();
+  const { canView, canCreate, canUpdate, canDelete } = useCrudPermissions('access-control.permission-groups.view');
+
+  const { data, isPending, isFetching, isError, error, refetch } = usePermissionGroupsQuery(
+    {
+      pageNumber,
+      pageSize,
+      search: searchTerm || undefined,
+      sortBy: 'name',
+      sortDirection: 'asc',
+      filters: backendFilters.length > 0 ? backendFilters : undefined,
+    },
+    { enabled: canView }
+  );
+
+  const isLoading = canView && (isPending || isFetching) && !isError;
 
   const createMutation = useCreatePermissionGroupMutation();
   const updateMutation = useUpdatePermissionGroupMutation();
   const deleteMutation = useDeletePermissionGroupMutation();
-  const { data: permissions } = useMyPermissionsQuery();
-  const { canCreate, canUpdate, canDelete } = useCrudPermissions('access-control.permission-groups.view');
 
   const items = data?.data ?? EMPTY_ITEMS;
   const totalCount = data?.totalCount ?? 0;
@@ -275,6 +281,8 @@ export function PermissionGroupsPage(): ReactElement {
 
   const headerCardStyle = ACCESS_CONTROL_HEADER_CARD_CLASSNAME;
   const statCardStyle = ACCESS_CONTROL_STAT_CARD_CLASSNAME;
+  const queryErrorMessage =
+    error instanceof Error ? error.message : t('common.error');
 
   return (
     <div className="w-full space-y-6">
@@ -391,8 +399,11 @@ export function PermissionGroupsPage(): ReactElement {
                   variant="outline"
                   size="sm"
                   className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
-                  onClick={handleRefresh}
-                  disabled={isLoading}
+                onClick={async () => {
+                  await handleRefresh();
+                  await refetch();
+                }}
+                disabled={isLoading}
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -452,9 +463,9 @@ export function PermissionGroupsPage(): ReactElement {
                   return '-';
                 }}
                 isLoading={isLoading}
-                isError={false}
+                isError={isError}
                 loadingText={t('common.loading')}
-                errorText={t('common.error')}
+                errorText={queryErrorMessage}
                 emptyText={t('common.noData')}
                 minTableWidthClassName="min-w-[700px]"
                 showActionsColumn={canUpdate || canDelete}

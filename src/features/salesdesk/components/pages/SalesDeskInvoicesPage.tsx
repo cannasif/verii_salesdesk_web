@@ -59,7 +59,7 @@ export function SalesDeskInvoicesPage(): ReactElement {
   const updateInvoice = useUpdateSalesDeskInvoice();
   const deleteInvoice = useDeleteSalesDeskInvoice();
 
-  const allRows = data?.data ?? [];
+  const allRows = useMemo(() => data?.data ?? [], [data?.data]);
   const rows = useMemo(() => filterInvoicesByType(allRows, typeFilter), [allRows, typeFilter]);
   const statsRows = statsData?.data ?? [];
   const salesCount = statsRows.filter((item) => resolveInvoiceType(item) === SALES_DESK_INVOICE_TYPE.sales).length;

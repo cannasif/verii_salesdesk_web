@@ -8,8 +8,8 @@ export function SalesDeskSalesTrackingPage(): ReactElement {
   const { data: invoiceStats } = useSalesDeskInvoiceStats();
   const { data: quoteStats } = useSalesDeskQuoteStats();
 
-  const invoiceRows = invoiceStats?.data ?? [];
-  const quoteRows = quoteStats?.data ?? [];
+  const invoiceRows = useMemo(() => invoiceStats?.data ?? [], [invoiceStats?.data]);
+  const quoteRows = useMemo(() => quoteStats?.data ?? [], [quoteStats?.data]);
 
   const issuedTotal = useMemo(
     () => invoiceRows.filter((item) => item.status === 6).reduce((sum, item) => sum + item.grandTotal, 0),

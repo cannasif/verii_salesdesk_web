@@ -18,18 +18,22 @@ export const permissionGroupApi = {
         pageNumber: params.pageNumber ?? 1,
         pageSize: params.pageSize ?? 10,
         search: params.search ?? '',
-        sortBy: params.sortBy ?? 'id',
+        sortBy: params.sortBy ?? 'name',
         sortDirection: params.sortDirection ?? 'asc',
         filterLogic: params.filterLogic ?? 'and',
         filters: params.filters ?? [],
       }
     );
-    const data = extractData(response as ApiResponse<PagedResponse<PermissionGroupDto>>);
-    const rawData = data as unknown as { items?: PermissionGroupDto[]; data?: PermissionGroupDto[] };
-    if (rawData.items && !rawData.data) {
-      return { ...data, data: rawData.items };
+
+    if (response.success && response.data) {
+      const rawData = response.data as unknown as { items?: PermissionGroupDto[]; data?: PermissionGroupDto[] };
+      if (rawData.items && !rawData.data) {
+        return { ...response.data, data: rawData.items };
+      }
+      return response.data;
     }
-    return data;
+
+    throw new Error(response.message || response.exceptionMessage || 'İzin grupları yüklenemedi');
   },
 
   getById: async (id: number): Promise<PermissionGroupDto> => {

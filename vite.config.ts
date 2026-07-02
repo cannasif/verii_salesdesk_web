@@ -26,8 +26,16 @@ function resolveDevApiProxyTarget(mode: string): string {
   return "https://salesdeskapi.v3rii.com"
 }
 
+function resolveDevLocalServerTarget(mode: string): string {
+  const env = loadEnv(mode, process.cwd(), "")
+  const fromEnv = env.VITE_CHAT_SERVER_URL?.trim() || env.VITE_GMAIL_BRIDGE_URL?.trim()
+  if (fromEnv) return fromEnv.replace(/\/$/, "")
+  return "http://localhost:8787"
+}
+
 export default defineConfig(({ mode }) => {
   const devApiProxyTarget = resolveDevApiProxyTarget(mode)
+  const devLocalServerTarget = resolveDevLocalServerTarget(mode)
 
   return {
   base: "/",
@@ -81,6 +89,12 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         secure: false,
         ws: true,
+      },
+      // Grup API'si /salesdesk/groups rotasi React sayfasi ile cakisir; proxy kullanma.
+      "/gmail": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
       },
     },
   },

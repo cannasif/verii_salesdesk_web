@@ -5,6 +5,7 @@ import {
   Search,
   Settings,
   ShoppingCart,
+  UserCog,
   UsersRound,
 } from 'lucide-react';
 
@@ -32,6 +33,7 @@ export { SalesDeskSoftwareResearchPage } from './components/pages/SalesDeskSoftw
 export { SalesDeskErpNewsPage } from './components/pages/SalesDeskErpNewsPage';
 export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
+export { SalesDeskGroupsPage } from './components/pages/SalesDeskGroupsPage';
 
 export const salesDeskNavItems = [
   { title: 'Ana Sayfa', href: '/', icon: <Home size={22} className="text-slate-400" /> },
@@ -87,6 +89,16 @@ export const salesDeskNavItems = [
       { title: 'Yazilim Arastirma', href: '/salesdesk/software-research' },
       { title: 'ERP Haber Takibi', href: '/salesdesk/erp-news' },
       { title: 'Gmail', href: '/salesdesk/gmail' },
+    ],
+  },
+  {
+    title: 'Kullanici & Ekip',
+    icon: <UserCog size={22} className="text-violet-300" />,
+    defaultExpanded: true,
+    children: [
+      { title: 'Kullanici Yonetimi', href: '/user-management' },
+      { title: 'Grup Yonetimi', href: '/salesdesk/groups' },
+      { title: 'Izin Gruplari', href: '/access-control/permission-groups' },
     ],
   },
   { title: 'Sistem Ayarlari', href: '/salesdesk/settings', icon: <Settings size={22} className="text-slate-300" /> },

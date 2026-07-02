@@ -100,6 +100,7 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/definitions/category-definitions': 'definitions.category-definitions.view',
 
   '/user-management': 'users.user-management.view',
+  '/salesdesk/groups': 'users.user-management.view',
   '/user-discount-limit-management': 'users.discount-limits.view',
   '/users/mail-settings': 'users.mail-settings.view',
   '/profile': 'users.profile.view',
@@ -212,6 +213,7 @@ export const PATH_TO_PERMISSION_PATTERNS: Array<{ pattern: RegExp; permission: s
   { pattern: /^\/definitions\/category-definitions(\/|$)/, permission: 'definitions.category-definitions.view' },
 
   { pattern: /^\/user-management(\/|$)/, permission: 'users.user-management.view' },
+  { pattern: /^\/salesdesk\/groups(\/|$)/, permission: 'users.user-management.view' },
   { pattern: /^\/user-discount-limit-management(\/|$)/, permission: 'users.discount-limits.view' },
   { pattern: /^\/users\/mail-settings(\/|$)/, permission: 'users.mail-settings.view' },
   { pattern: /^\/profile(\/|$)/, permission: 'users.profile.view' },

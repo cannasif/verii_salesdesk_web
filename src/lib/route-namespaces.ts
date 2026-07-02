@@ -21,6 +21,7 @@ const ROUTE_NAMESPACE_ENTRIES: Array<{ match: (pathname: string) => boolean; nam
   { match: (pathname) => pathname.startsWith('/erp-customers'), namespaces: ['erp-customer-management'] },
   { match: (pathname) => pathname.startsWith('/title-management'), namespaces: ['title-management'] },
   { match: (pathname) => pathname.startsWith('/user-management'), namespaces: ['user-management'] },
+  { match: (pathname) => pathname.startsWith('/salesdesk/groups'), namespaces: ['user-management', 'common'] },
   { match: (pathname) => pathname.startsWith('/users/mail-settings'), namespaces: ['mail-settings'] },
   { match: (pathname) => pathname.startsWith('/product-pricing-management'), namespaces: ['product-pricing-management'] },
   {
