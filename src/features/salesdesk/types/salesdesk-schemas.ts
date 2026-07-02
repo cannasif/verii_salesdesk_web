@@ -23,7 +23,7 @@ import type {
   SalesDeskVisitStatus,
 } from '../api/salesdesk-api';
 import type { SalesDeskPotentialStatus } from '../api/salesdesk-api';
-import { idToSelectValue, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue } from '../lib/salesdesk-shared';
+import { idToSelectValue, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
 
 const documentStatusSchema = z
   .string()
@@ -286,7 +286,7 @@ export function toVisitPayload(values: VisitFormValues): Partial<SalesDeskVisitD
   const parsed = visitFormSchema.parse(values);
   return {
     visitDate: parsed.visitDate,
-    visitTime: parsed.visitTime || undefined,
+    visitTime: toTimePayloadValue(parsed.visitTime),
     title: parsed.title.trim(),
     customerId: parsed.customerId,
     visitType: parsed.visitType.trim(),

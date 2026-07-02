@@ -38,6 +38,18 @@ export function toTimeInputValue(value?: string | null): string {
   return match?.[1] ?? '';
 }
 
+/**
+ * `<input type="time">` degeri "HH:mm" formatinda gelir. Backend TimeSpan alanlari
+ * "HH:mm:ss" bekledigi icin saniye eklenerek normalize edilir.
+ */
+export function toTimePayloadValue(value?: string | null): string | undefined {
+  if (!value) return undefined;
+  const match = value.match(/^(\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!match) return undefined;
+  const [, hours, minutes, seconds] = match;
+  return `${hours}:${minutes}:${seconds ?? '00'}`;
+}
+
 export interface SalesDeskSelectOption {
   value: string;
   label: string;

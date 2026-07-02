@@ -27,6 +27,7 @@ import {
 import { type DefaultValues, type FieldValues, type Path, useForm, type Resolver, type UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ZodTypeAny } from 'zod';
+import { toast } from 'sonner';
 import { FilePenLine, Loader2, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { NONE_SELECT_VALUE, normalizeSelectValue, sanitizeSelectOptions } from '../lib/salesdesk-shared';
@@ -252,10 +253,18 @@ export function SalesDeskEntityForm<T extends FieldValues>({
     }
   }, [open, entity, form, defaultValues, mapEntityToForm]);
 
-  const handleSubmit = form.handleSubmit(async (values) => {
-    await onSubmit(values);
-    onOpenChange(false);
-  });
+  const handleSubmit = form.handleSubmit(
+    async (values) => {
+      await onSubmit(values);
+      onOpenChange(false);
+    },
+    (errors) => {
+      const firstError = Object.values(errors).find(
+        (fieldError) => fieldError && typeof (fieldError as { message?: unknown }).message === 'string'
+      ) as { message?: string } | undefined;
+      toast.error(firstError?.message || 'Lutfen zorunlu alanlari kontrol edin.');
+    }
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -298,11 +307,13 @@ export function SalesDeskEntityForm<T extends FieldValues>({
               Iptal
             </Button>
             <Button
-              type="submit"
-              form={formId}
+              type="button"
               variant="ghost"
               className={SD_PRIMARY_BUTTON_FORM}
               disabled={isLoading}
+              onClick={() => {
+                void handleSubmit();
+              }}
             >
               {isLoading ? (
                 <>
