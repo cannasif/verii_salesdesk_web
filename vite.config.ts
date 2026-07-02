@@ -1,11 +1,35 @@
-import path from "path"
+import fs from "node:fs"
+import path from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import { defineConfig, loadEnv } from "vite"
 
 const allowedHosts = ["https://salesdesk.v3rii.com"]
 
-export default defineConfig({
+function resolveDevApiProxyTarget(mode: string): string {
+  const env = loadEnv(mode, process.cwd(), "")
+  const fromEnv = env.VITE_API_URL?.trim() || env.VITE_DEV_API_PROXY_TARGET?.trim()
+  if (fromEnv) {
+    return fromEnv.replace(/\/$/, "")
+  }
+
+  try {
+    const runtimePath = path.resolve(__dirname, "public/runtime-settings.json")
+    const runtime = JSON.parse(fs.readFileSync(runtimePath, "utf8")) as { apiUrl?: string }
+    if (runtime.apiUrl?.trim()) {
+      return runtime.apiUrl.trim().replace(/\/$/, "")
+    }
+  } catch {
+    // runtime-settings.json is optional during local setup
+  }
+
+  return "https://salesdeskapi.v3rii.com"
+}
+
+export default defineConfig(({ mode }) => {
+  const devApiProxyTarget = resolveDevApiProxyTarget(mode)
+
+  return {
   base: "/",
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -46,5 +70,19 @@ export default defineConfig({
     allowedHosts,
     host: "0.0.0.0",
     port: 5174,
+    proxy: {
+      "/api": {
+        target: devApiProxyTarget,
+        changeOrigin: true,
+        secure: false,
+      },
+      "/notificationHub": {
+        target: devApiProxyTarget,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+    },
   },
+  }
 })

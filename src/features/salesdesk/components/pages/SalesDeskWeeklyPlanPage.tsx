@@ -35,13 +35,18 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
   const [editingTask, setEditingTask] = useState<SalesDeskTaskDto | null>(null);
   const [dialogInitial, setDialogInitial] = useState<WeeklyPlanDialogInitial>({});
 
-  const { data: users, isLoading: usersLoading } = useSalesDeskUserOptions();
+  const {
+    data: users,
+    isLoading: usersLoading,
+    isError: usersError,
+    error: usersFetchError,
+  } = useSalesDeskUserOptions();
   const { data: customers } = useSalesDeskCustomerOptions();
   const {
     data: taskData,
     isLoading: tasksLoading,
-    isError,
-    error,
+    isError: tasksError,
+    error: tasksFetchError,
   } = useSalesDeskTaskList({ pageNumber: 1, pageSize: 500, sortBy: 'DueDate', sortDirection: 'asc' });
 
   const createTask = useCreateSalesDeskTask();
@@ -97,6 +102,11 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
   };
 
   const isLoading = usersLoading || tasksLoading;
+  const loadErrorMessage = tasksError
+    ? (tasksFetchError as Error)?.message || 'Gorevler yuklenemedi.'
+    : usersError
+      ? (usersFetchError as Error)?.message || 'Kullanicilar yuklenemedi.'
+      : null;
 
   return (
     <div className="space-y-5 text-slate-100">
@@ -164,9 +174,16 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         ))}
       </div>
 
-      {isError && (
+      {loadErrorMessage && (
         <div className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-          {(error as Error)?.message || 'Plan yuklenemedi.'}
+          <p>{loadErrorMessage}</p>
+          {loadErrorMessage === 'Network Error' && (
+            <p className="mt-2 text-xs text-rose-100/80">
+              API sunucusuna ulasilamiyor. Yerel gelistirmede dev sunucusunu yeniden baslatin; yerel
+              backend kullaniyorsaniz proje kokunde `.env` icinde `VITE_API_URL=http://localhost:5000`
+              tanimlayin.
+            </p>
+          )}
         </div>
       )}
 
@@ -174,7 +191,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         <div className="flex justify-center py-16">
           <Loader2 className="animate-spin text-[var(--crm-brand-accent)]" size={32} />
         </div>
-      ) : userOptions.length === 0 ? (
+      ) : !loadErrorMessage && userOptions.length === 0 ? (
         <div className="rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] px-4 py-12 text-center text-sm text-slate-400">
           Gosterilecek kullanici bulunamadi.
         </div>

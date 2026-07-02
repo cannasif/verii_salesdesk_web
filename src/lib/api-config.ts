@@ -77,6 +77,18 @@ function toBaseRelativePath(fileName: string): string {
   return `${normalizedBase}${fileName}`;
 }
 
+function resolveDevProxyApiUrl(): string | null {
+  if (!import.meta.env.DEV || isValidApiUrl(import.meta.env.VITE_API_URL)) {
+    return null;
+  }
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return normalizeBaseUrl(window.location.origin);
+}
+
 function resolveRuntimeConfig(config: RuntimeConfig | undefined | null, fallbackConfig: ResolvedRuntimeConfig): ResolvedRuntimeConfig {
   const configuredApiUrl = config?.apiUrl ?? config?.apiBaseUrl ?? config?.apiBaseURL;
 
@@ -96,6 +108,14 @@ async function fetchRuntimeConfig(): Promise<ResolvedRuntimeConfig> {
 
   if (import.meta.env.DEV && isValidApiUrl(import.meta.env.VITE_API_URL)) {
     return fallbackConfig;
+  }
+
+  const devProxyApiUrl = resolveDevProxyApiUrl();
+  if (devProxyApiUrl) {
+    return {
+      apiUrl: devProxyApiUrl,
+      baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
+    };
   }
 
   try {
@@ -176,10 +196,21 @@ export function loadConfig(): Promise<string> {
   if (!configPromise) {
     configPromise = fetchRuntimeConfig()
       .catch((error) => {
+        const devProxyApiUrl = resolveDevProxyApiUrl();
+        if (devProxyApiUrl) {
+          if (import.meta.env.DEV) {
+            console.warn(`[api-config] ${RUNTIME_CONFIG_FILE_NAME} okunamadi, dev proxy kullaniliyor:`, error);
+          }
+          return {
+            apiUrl: devProxyApiUrl,
+            baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
+          };
+        }
+
         const persisted = readPersistedRuntimeConfig();
         if (persisted) {
           if (import.meta.env.DEV) {
-            console.warn(`[api-config] ${RUNTIME_CONFIG_FILE_NAME} okunamadı, persisted fallback kullanılıyor:`, error);
+            console.warn(`[api-config] ${RUNTIME_CONFIG_FILE_NAME} okunamadi, persisted fallback kullaniliyor:`, error);
           }
           return {
             apiUrl: persisted.apiUrl,
