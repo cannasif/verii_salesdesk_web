@@ -93,6 +93,8 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   filterColumns?: readonly FilterColumnConfig[];
   defaultFilterColumn?: string;
   hideToolbar?: boolean;
+  contentAboveTable?: ReactNode;
+  customTable?: ReactNode;
 }
 
 function loadSalesDeskColumnPrefs(pageKey: string, userId: number | undefined, defaultOrder: string[]) {
@@ -140,6 +142,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
   filterColumns,
   defaultFilterColumn,
   hideToolbar = false,
+  contentAboveTable,
+  customTable,
 }: SalesDeskListLayoutProps<T>): ReactElement {
   const user = useAuthStore((state) => state.user);
   const showTableLoading = Boolean(isLoading && !isError);
@@ -215,14 +219,15 @@ export function SalesDeskListLayout<T extends { id: number }>({
             {subtitle}
           </p>
         </div>
-        {headerActions ?? (
-          !hideAddButton ? (
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {headerActions}
+          {!hideAddButton ? (
             <Button onClick={onAdd} variant="ghost" className={ADD_BUTTON_CLASS}>
               <Plus size={20} className="mr-2 stroke-[3px]" />
               {actionLabel}
             </Button>
-          ) : null
-        )}
+          ) : null}
+        </div>
       </div>
 
       {metrics.length > 0 ? (
@@ -269,37 +274,41 @@ export function SalesDeskListLayout<T extends { id: number }>({
         </CardHeader>
 
         <CardContent className={MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME}>
+          {contentAboveTable}
+
           {isError ? (
             <div className="mb-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
               {error?.message || 'Liste yuklenemedi. API baglantisini kontrol edin.'}
             </div>
           ) : null}
 
-          <div className={MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME}>
-            <ManagementDataTableChrome>
-              <SalesDeskManagementTable
-                columns={visibleTableColumns}
-                rows={filteredRows}
-                isLoading={showTableLoading}
-                isError={isError}
-                errorText={error?.message || 'Liste yuklenemedi.'}
-                emptyText={emptyMessage}
-                minTableWidthClassName={minTableWidthClassName}
-                onEdit={onEdit}
-                onDelete={onDeleteRequest}
-                pageSize={pageSize}
-                pageSizeOptions={PAGE_SIZE_OPTIONS}
-                onPageSizeChange={onPageSizeChange}
-                pageNumber={pageNumber}
-                totalPages={totalPages}
-                hasPreviousPage={hasPreviousPage}
-                hasNextPage={hasNextPage}
-                onPageChange={onPageChange}
-                totalCount={totalCount}
-                onColumnOrderChange={handleColumnOrderChange}
-              />
-            </ManagementDataTableChrome>
-          </div>
+          {customTable ?? (
+            <div className={MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME}>
+              <ManagementDataTableChrome>
+                <SalesDeskManagementTable
+                  columns={visibleTableColumns}
+                  rows={filteredRows}
+                  isLoading={showTableLoading}
+                  isError={isError}
+                  errorText={error?.message || 'Liste yuklenemedi.'}
+                  emptyText={emptyMessage}
+                  minTableWidthClassName={minTableWidthClassName}
+                  onEdit={onEdit}
+                  onDelete={onDeleteRequest}
+                  pageSize={pageSize}
+                  pageSizeOptions={PAGE_SIZE_OPTIONS}
+                  onPageSizeChange={onPageSizeChange}
+                  pageNumber={pageNumber}
+                  totalPages={totalPages}
+                  hasPreviousPage={hasPreviousPage}
+                  hasNextPage={hasNextPage}
+                  onPageChange={onPageChange}
+                  totalCount={totalCount}
+                  onColumnOrderChange={handleColumnOrderChange}
+                />
+              </ManagementDataTableChrome>
+            </div>
+          )}
         </CardContent>
       </Card>
 

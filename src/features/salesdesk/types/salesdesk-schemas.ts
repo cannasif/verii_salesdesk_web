@@ -24,6 +24,7 @@ import type {
 } from '../api/salesdesk-api';
 import type { SalesDeskPotentialStatus } from '../api/salesdesk-api';
 import { buildSalesDeskActivityGroupName, parseSalesDeskActivityType } from '../lib/salesdesk-activities';
+import { buildSalesDeskProjectGroupName, parseSalesDeskProjectPhase } from '../lib/salesdesk-project-tracking';
 import { idToSelectValue, NONE_SELECT_VALUE, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
 
 const documentStatusSchema = z
@@ -353,6 +354,64 @@ export function toSalesDeskActivityPayload(values: SalesDeskActivityFormValues):
     title: parsed.title.trim(),
     description: parsed.description?.trim() || undefined,
     groupName: buildSalesDeskActivityGroupName(parsed.activityType),
+    customerId: parsed.customerId,
+    assignedUserId: parsed.assignedUserId,
+    priority: parsed.priority,
+    status: parsed.status,
+    dueDate: parsed.dueDate || undefined,
+  };
+}
+
+export const salesDeskProjectFormSchema = z.object({
+  title: z.string().trim().min(1, 'Proje adi zorunludur').max(220),
+  description: z.string().max(2000).optional(),
+  projectPhase: z.string().optional(),
+  customerId: optionalCustomerIdSchema,
+  assignedUserId: optionalUserIdSchema,
+  priority: prioritySchema,
+  status: taskStatusSchema,
+  dueDate: z.string().optional(),
+});
+
+export type SalesDeskProjectFormValues = z.input<typeof salesDeskProjectFormSchema>;
+
+function normalizeProjectFormInput(values: SalesDeskProjectFormValues): SalesDeskProjectFormValues {
+  const projectPhase =
+    values.projectPhase != null && values.projectPhase !== NONE_SELECT_VALUE
+      ? String(values.projectPhase)
+      : '';
+  return {
+    ...values,
+    projectPhase,
+    customerId: values.customerId != null ? String(values.customerId) : undefined,
+    assignedUserId: values.assignedUserId != null ? String(values.assignedUserId) : undefined,
+    priority: String(values.priority ?? ''),
+    status: String(values.status ?? ''),
+    dueDate: values.dueDate ?? '',
+  };
+}
+
+export function toSalesDeskProjectFormValues(task?: SalesDeskTaskDto | null): SalesDeskProjectFormValues {
+  return {
+    title: task?.title ?? '',
+    description: task?.description ?? '',
+    projectPhase: parseSalesDeskProjectPhase(task?.groupName) || '',
+    customerId: idToSelectValue(task?.customerId),
+    assignedUserId: idToSelectValue(task?.assignedUserId),
+    priority: String(task?.priority ?? 2),
+    status: String(task?.status ?? 1),
+    dueDate: task?.dueDate ? toDateInputValue(task.dueDate) : '',
+  };
+}
+
+export function toSalesDeskProjectPayload(values: SalesDeskProjectFormValues): Partial<SalesDeskTaskDto> {
+  const parsed = salesDeskProjectFormSchema.parse(normalizeProjectFormInput(values));
+  const phase =
+    parsed.projectPhase && parsed.projectPhase !== NONE_SELECT_VALUE ? parsed.projectPhase.trim() : '';
+  return {
+    title: parsed.title.trim(),
+    description: parsed.description?.trim() || undefined,
+    groupName: buildSalesDeskProjectGroupName(phase || undefined),
     customerId: parsed.customerId,
     assignedUserId: parsed.assignedUserId,
     priority: parsed.priority,

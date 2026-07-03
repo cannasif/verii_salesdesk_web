@@ -26,6 +26,7 @@ export { SalesDeskSalesTrackingPage } from './components/pages/SalesDeskSalesTra
 export { SalesDeskVisitsPage } from './components/pages/SalesDeskVisitsPage';
 export { SalesDeskOpenItemsPage } from './components/pages/SalesDeskOpenItemsPage';
 export { SalesDeskActivitiesPage } from './components/pages/SalesDeskActivitiesPage';
+export { SalesDeskProjeTakibiPage } from './components/pages/SalesDeskProjeTakibiPage';
 export { SalesDeskWeeklyPlanPage } from './components/pages/SalesDeskWeeklyPlanPage';
 export { SalesDeskVisitFormsPage } from './components/pages/SalesDeskVisitFormsPage';
 export { SalesDeskAssetsPage } from './components/pages/SalesDeskAssetsPage';
@@ -76,6 +77,7 @@ export const salesDeskNavItems = [
     children: [
       { title: 'Haftalik Ziyaretler', href: '/salesdesk/weekly-visits' },
       { title: 'Aktiviteler', href: '/salesdesk/activities' },
+      { title: 'Proje Takibi', href: '/salesdesk/proje-takibi' },
       { title: 'Acik Maddeler', href: '/salesdesk/open-items' },
       { title: 'Haftalik Plan', href: '/salesdesk/weekly-plan' },
       { title: 'Ziyaret Formu', href: '/salesdesk/visit-forms' },

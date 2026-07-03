@@ -4,6 +4,7 @@ import { normalizePagedResponse } from '@/lib/paged-response';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import { isWeeklyPlanTask } from '../lib/salesdesk-weekly-plan';
 import { isSalesDeskActivityTask } from '../lib/salesdesk-activities';
+import { isSalesDeskProjectTask } from '../lib/salesdesk-project-tracking';
 
 export type SalesDeskCustomerKind = 1 | 2 | 3;
 export type SalesDeskPotentialStatus = 1 | 2 | 3 | 4 | 5 | 6;
@@ -287,6 +288,7 @@ export function isOpenSalesDeskTask(task: SalesDeskTaskDto): boolean {
 
 const OPEN_ITEMS_FETCH_SIZE = 50;
 const ACTIVITIES_FETCH_SIZE = 30;
+const PROJECT_FETCH_SIZE = 50;
 const SALESDESK_READ_TIMEOUT_MS = 30_000;
 const SALESDESK_TASKS_WRITE_TIMEOUT_MS = 45_000;
 
@@ -301,6 +303,53 @@ export interface SalesDeskActivityStats {
 export type SalesDeskActivitiesListResult = PagedResponse<SalesDeskTaskDto> & {
   activityStats: SalesDeskActivityStats;
 };
+
+export interface SalesDeskProjectStats {
+  active: number;
+  completed: number;
+  overdue: number;
+  inProgress: number;
+}
+
+export type SalesDeskProjectsListResult = PagedResponse<SalesDeskTaskDto> & {
+  projectStats: SalesDeskProjectStats;
+};
+
+function computeProjectStats(rows: SalesDeskTaskDto[]): SalesDeskProjectStats {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  return {
+    active: rows.filter((item) => item.status === 1 || item.status === 2).length,
+    inProgress: rows.filter((item) => item.status === 2).length,
+    completed: rows.filter((item) => item.status === 3).length,
+    overdue: rows.filter(
+      (item) =>
+        item.dueDate &&
+        item.dueDate.slice(0, 10) < todayKey &&
+        item.status !== 3 &&
+        item.status !== 4
+    ).length,
+  };
+}
+
+function emptyProjectsPage(params?: PagedParams): SalesDeskProjectsListResult {
+  const pageNumber = params?.pageNumber ?? 1;
+  const pageSize = params?.pageSize ?? 10;
+  return {
+    ...normalizePagedResponse<SalesDeskTaskDto>(
+      {
+        data: [],
+        totalCount: 0,
+        pageNumber,
+        pageSize,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      },
+      { pageNumber, pageSize }
+    ),
+    projectStats: { active: 0, completed: 0, overdue: 0, inProgress: 0 },
+  };
+}
 
 function computeActivityStats(rows: SalesDeskTaskDto[]): SalesDeskActivityStats {
   const todayKey = new Date().toISOString().slice(0, 10);
@@ -361,6 +410,25 @@ async function fetchActivitySourceRows(params?: PagedParams): Promise<SalesDeskT
   } catch {
     return [];
   }
+}
+
+async function fetchProjectSourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
+  try {
+    const result = await getPaged<SalesDeskTaskDto>('tasks', {
+      pageNumber: 1,
+      pageSize: PROJECT_FETCH_SIZE,
+      sortBy: params?.sortBy ?? 'DueDate',
+      sortDirection: params?.sortDirection ?? 'asc',
+      search: params?.search?.trim() || 'Proje',
+    });
+    return filterProjectTasks(result.data);
+  } catch {
+    return [];
+  }
+}
+
+function filterProjectTasks(tasks: SalesDeskTaskDto[]): SalesDeskTaskDto[] {
+  return tasks.filter((task) => isSalesDeskProjectTask(task));
 }
 
 async function fetchOpenItemSourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
@@ -441,6 +509,19 @@ async function listOpenItems(params?: PagedParams): Promise<PagedResponse<SalesD
     return paginateTaskRows(sourceRows, params);
   } catch {
     return emptyOpenItemsPage(params);
+  }
+}
+
+/** SalesDesk proje takibi kayitlari (groupName: Proje veya Proje|asama). */
+async function listProjectTasks(params?: PagedParams): Promise<SalesDeskProjectsListResult> {
+  try {
+    const sourceRows = await fetchProjectSourceRows(params);
+    return {
+      ...paginateTaskRows(sourceRows, params),
+      projectStats: computeProjectStats(sourceRows),
+    };
+  } catch {
+    return emptyProjectsPage(params);
   }
 }
 
@@ -565,6 +646,7 @@ export const salesDeskApi = {
     list: (params?: PagedParams) => getPaged<SalesDeskTaskDto>('tasks', params),
     openItems: (params?: PagedParams) => listOpenItems(params),
     activities: (params?: PagedParams) => listActivities(params),
+    projects: (params?: PagedParams) => listProjectTasks(params),
     create: (body: Partial<SalesDeskTaskDto>) =>
       createOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', body, {
         timeout: SALESDESK_TASKS_WRITE_TIMEOUT_MS,

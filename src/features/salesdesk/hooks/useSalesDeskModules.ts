@@ -15,9 +15,11 @@ import {
   type SalesDeskProductCustomerDto,
   type SalesDeskProductDto,
   type SalesDeskActivitiesListResult,
+  type SalesDeskProjectsListResult,
   type SalesDeskTaskDto,
 } from '../api/salesdesk-api';
 import { isSalesDeskActivityTask } from '../lib/salesdesk-activities';
+import { isSalesDeskProjectTask } from '../lib/salesdesk-project-tracking';
 import { createSalesDeskCrudHooks } from './createSalesDeskCrudHooks';
 import { userApi } from '@/features/user-management/api/user-api';
 import type {
@@ -29,6 +31,7 @@ import type {
   QuoteFormValues,
   RecurringPaymentFormValues,
   SalesDeskActivityFormValues,
+  SalesDeskProjectFormValues,
   SoftwareResearchFormValues,
   TaskFormValues,
   VisitFormRecordValues,
@@ -46,11 +49,13 @@ import {
   toTaskPayload,
   toOpenItemTaskPayload,
   toSalesDeskActivityPayload,
+  toSalesDeskProjectPayload,
   toVisitFormRecordPayload,
   toVisitPayload,
 } from '../types/salesdesk-schemas';
 
 const ACTIVITIES_LIST_KEY = ['salesdesk', 'tasks', 'activities'] as const;
+const PROJECTS_LIST_KEY = ['salesdesk', 'tasks', 'projects'] as const;
 
 function mergeActivityTask(
   saved: SalesDeskTaskDto,
@@ -134,6 +139,123 @@ function upsertActivityTaskInCache(queryClient: QueryClient, task: SalesDeskTask
     };
   });
   clearActivitiesQueryErrors(queryClient);
+}
+
+function clearProjectsQueryErrors(queryClient: QueryClient): void {
+  queryClient.getQueryCache().findAll({ queryKey: PROJECTS_LIST_KEY }).forEach((query) => {
+    if (!query.state.error) return;
+    query.setState({ error: null, status: 'success', fetchStatus: 'idle' });
+  });
+}
+
+function mergeProjectTask(saved: SalesDeskTaskDto, payload: Partial<SalesDeskTaskDto>): SalesDeskTaskDto {
+  return {
+    ...saved,
+    ...payload,
+    id: saved.id,
+    groupName: payload.groupName ?? saved.groupName,
+    title: payload.title ?? saved.title,
+    customerId: payload.customerId ?? saved.customerId,
+    assignedUserId: payload.assignedUserId ?? saved.assignedUserId,
+    priority: payload.priority ?? saved.priority,
+    status: payload.status ?? saved.status,
+    dueDate: payload.dueDate ?? saved.dueDate,
+    description: payload.description ?? saved.description,
+  };
+}
+
+function upsertProjectTaskInCache(queryClient: QueryClient, task: SalesDeskTaskDto): void {
+  if (!isSalesDeskProjectTask(task)) return;
+
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const isActive = task.status === 1 || task.status === 2;
+  const isInProgress = task.status === 2;
+  const isCompleted = task.status === 3;
+  const isOverdue =
+    Boolean(task.dueDate && task.dueDate.slice(0, 10) < todayKey && task.status !== 3 && task.status !== 4);
+
+  queryClient.setQueriesData<SalesDeskProjectsListResult>({ queryKey: PROJECTS_LIST_KEY }, (old) => {
+    if (!old) {
+      return {
+        data: [task],
+        totalCount: 1,
+        pageNumber: 1,
+        pageSize: 10,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+        projectStats: {
+          active: isActive ? 1 : 0,
+          inProgress: isInProgress ? 1 : 0,
+          completed: isCompleted ? 1 : 0,
+          overdue: isOverdue ? 1 : 0,
+        },
+      };
+    }
+
+    const exists = old.data.some((item) => item.id === task.id);
+    const previous = exists ? old.data.find((item) => item.id === task.id) : undefined;
+    const nextData = exists
+      ? old.data.map((item) => (item.id === task.id ? { ...item, ...task } : item))
+      : [task, ...old.data];
+    const totalCount = exists ? old.totalCount : old.totalCount + 1;
+    const stats = { ...old.projectStats };
+
+    const adjustStats = (row: SalesDeskTaskDto, delta: number): void => {
+      if (row.status === 1 || row.status === 2) stats.active = Math.max(0, stats.active + delta);
+      if (row.status === 2) stats.inProgress = Math.max(0, stats.inProgress + delta);
+      if (row.status === 3) stats.completed = Math.max(0, stats.completed + delta);
+      const rowOverdue =
+        Boolean(row.dueDate && row.dueDate.slice(0, 10) < todayKey && row.status !== 3 && row.status !== 4);
+      if (rowOverdue) stats.overdue = Math.max(0, stats.overdue + delta);
+    };
+
+    if (previous) adjustStats(previous, -1);
+    adjustStats(task, 1);
+
+    return {
+      ...old,
+      data: nextData.slice(0, old.pageSize),
+      totalCount,
+      totalPages: Math.max(1, Math.ceil(totalCount / old.pageSize)),
+      projectStats: stats,
+    };
+  });
+  clearProjectsQueryErrors(queryClient);
+}
+
+function removeProjectTaskFromCache(queryClient: QueryClient, id: number): void {
+  queryClient.setQueriesData<SalesDeskProjectsListResult>({ queryKey: PROJECTS_LIST_KEY }, (old) => {
+    if (!old) return old;
+
+    const removed = old.data.find((item) => item.id === id);
+    const data = old.data.filter((item) => item.id !== id);
+    const stats = { ...old.projectStats };
+    const todayKey = new Date().toISOString().slice(0, 10);
+
+    if (removed) {
+      if (removed.status === 1 || removed.status === 2) stats.active = Math.max(0, stats.active - 1);
+      if (removed.status === 2) stats.inProgress = Math.max(0, stats.inProgress - 1);
+      if (removed.status === 3) stats.completed = Math.max(0, stats.completed - 1);
+      const wasOverdue =
+        Boolean(
+          removed.dueDate &&
+            removed.dueDate.slice(0, 10) < todayKey &&
+            removed.status !== 3 &&
+            removed.status !== 4
+        );
+      if (wasOverdue) stats.overdue = Math.max(0, stats.overdue - 1);
+    }
+
+    return {
+      ...old,
+      data,
+      totalCount: Math.max(0, old.totalCount - (old.data.length - data.length)),
+      totalPages: Math.max(1, Math.ceil(Math.max(0, old.totalCount - 1) / old.pageSize)),
+      projectStats: stats,
+    };
+  });
+  clearProjectsQueryErrors(queryClient);
 }
 
 function removeActivityTaskFromCache(queryClient: QueryClient, id: number): void {
@@ -426,6 +548,64 @@ export function useDeleteSalesDeskActivity(): UseMutationResult<void, Error, num
   });
 }
 
+export function useCreateSalesDeskProject(): UseMutationResult<
+  SalesDeskTaskDto,
+  Error,
+  SalesDeskProjectFormValues
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (values: SalesDeskProjectFormValues) => {
+      const payload = toSalesDeskProjectPayload(values);
+      const created = await salesDeskApi.tasks.create(payload);
+      return mergeProjectTask(created, payload);
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: PROJECTS_LIST_KEY });
+    },
+    onSuccess: (task) => {
+      upsertProjectTaskInCache(queryClient, task);
+      toast.success('Proje olusturuldu');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Proje olusturulamadi'),
+  });
+}
+
+export function useUpdateSalesDeskProject(): UseMutationResult<
+  SalesDeskTaskDto,
+  Error,
+  { id: number; values: SalesDeskProjectFormValues }
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, values }: { id: number; values: SalesDeskProjectFormValues }) => {
+      const payload = toSalesDeskProjectPayload(values);
+      const updated = await salesDeskApi.tasks.update(id, payload);
+      return mergeProjectTask(updated, payload);
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: PROJECTS_LIST_KEY });
+    },
+    onSuccess: (task) => {
+      upsertProjectTaskInCache(queryClient, task);
+      toast.success('Proje guncellendi');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Proje guncellenemedi'),
+  });
+}
+
+export function useDeleteSalesDeskProject(): UseMutationResult<void, Error, number> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => salesDeskApi.tasks.delete(id),
+    onSuccess: (_, id) => {
+      removeProjectTaskFromCache(queryClient, id);
+      toast.success('Proje silindi');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Proje silinemedi'),
+  });
+}
+
 export const useDeleteSalesDeskTask = tasks.useDelete;
 
 export const useSalesDeskVisitList = visits.useList;
@@ -618,6 +798,21 @@ export function useSalesDeskActivitiesList(
   return useQuery({
     queryKey: [...ACTIVITIES_LIST_KEY, params],
     queryFn: () => salesDeskApi.tasks.activities(params),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    retry: false,
+    placeholderData: (previousData) => previousData,
+  });
+}
+
+export function useSalesDeskProjectsList(
+  params: PagedParams
+): UseQueryResult<SalesDeskProjectsListResult> {
+  return useQuery({
+    queryKey: [...PROJECTS_LIST_KEY, params],
+    queryFn: () => salesDeskApi.tasks.projects(params),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     refetchOnMount: false,

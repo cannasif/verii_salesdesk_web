@@ -10,6 +10,7 @@ import {
 import type { SalesDeskTaskDto } from '../api/salesdesk-api';
 import { isWeeklyPlanTask } from './salesdesk-weekly-plan';
 import { isSalesDeskActivityTask } from './salesdesk-activities';
+import { isSalesDeskProjectTask } from './salesdesk-project-tracking';
 
 export interface OpenItemCategoryDef {
   id: string;
@@ -32,7 +33,7 @@ export const OPEN_ITEM_CATEGORY_DEFS: OpenItemCategoryDef[] = [
     id: 'proje',
     title: 'Proje Maddeleri',
     subtitle: 'Acik proje gorevleri',
-    href: '/salesdesk/open-items?group=Proje',
+    href: '/salesdesk/proje-takibi',
     formGroupName: 'Proje',
     groupKeys: ['proje'],
     icon: FolderKanban,
@@ -120,6 +121,8 @@ export function isSalesDeskActivityTaskItem(task: SalesDeskTaskDto): boolean {
 }
 
 export function resolveOpenItemCategoryId(task: SalesDeskTaskDto): string {
+  if (isSalesDeskProjectTask(task)) return 'proje';
+
   const key = normalizeOpenItemGroupKey(task.groupName);
   for (const category of CATEGORY_KEY_SETS) {
     if (category.id === 'genel') continue;

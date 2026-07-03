@@ -38,6 +38,7 @@ const SalesDeskSalesTrackingPage = lazyImport(() => import('@/features/salesdesk
 const SalesDeskVisitsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitsPage');
 const SalesDeskOpenItemsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskOpenItemsPage');
 const SalesDeskActivitiesPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskActivitiesPage');
+const SalesDeskProjeTakibiPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskProjeTakibiPage');
 const SalesDeskWeeklyPlanPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskWeeklyPlanPage');
 const SalesDeskVisitFormsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitFormsPage');
 const SalesDeskAssetsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskAssetsPage');
@@ -74,6 +75,7 @@ export function createAppRouter() {
         { path: 'salesdesk/sales-tracking', element: <SalesDeskSalesTrackingPage /> },
         { path: 'salesdesk/weekly-visits', element: <SalesDeskVisitsPage /> },
         { path: 'salesdesk/activities', element: <SalesDeskActivitiesPage /> },
+        { path: 'salesdesk/proje-takibi', element: <SalesDeskProjeTakibiPage /> },
         { path: 'salesdesk/open-items', element: <SalesDeskOpenItemsPage /> },
         { path: 'salesdesk/weekly-plan', element: <SalesDeskWeeklyPlanPage /> },
         { path: 'salesdesk/visit-forms', element: <SalesDeskVisitFormsPage /> },
