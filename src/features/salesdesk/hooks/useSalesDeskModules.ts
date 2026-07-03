@@ -34,6 +34,7 @@ import {
   toRecurringPaymentPayload,
   toSoftwareResearchPayload,
   toTaskPayload,
+  toOpenItemTaskPayload,
   toVisitFormRecordPayload,
   toVisitPayload,
 } from '../types/salesdesk-schemas';
@@ -229,6 +230,13 @@ export const useCreateSalesDeskTask = () => {
     mutateAsync: (values: TaskFormValues) => mutation.mutateAsync(toTaskPayload(values)),
   };
 };
+export const useCreateSalesDeskOpenItem = () => {
+  const mutation = tasks.useCreate();
+  return {
+    ...mutation,
+    mutateAsync: (values: TaskFormValues) => mutation.mutateAsync(toOpenItemTaskPayload(values)),
+  };
+};
 export const useUpdateSalesDeskTask = () => {
   const mutation = tasks.useUpdate();
   return {
@@ -415,6 +423,7 @@ export function useSalesDeskOpenItemsList(params: PagedParams): UseQueryResult<P
     queryKey: ['salesdesk', 'tasks', 'open-items', params],
     queryFn: () => salesDeskApi.tasks.openItems(params),
     staleTime: 15000,
+    placeholderData: (previousData) => previousData,
   });
 }
 

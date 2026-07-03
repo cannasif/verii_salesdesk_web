@@ -23,7 +23,7 @@ import type {
   SalesDeskVisitStatus,
 } from '../api/salesdesk-api';
 import type { SalesDeskPotentialStatus } from '../api/salesdesk-api';
-import { idToSelectValue, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
+import { idToSelectValue, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
 
 const documentStatusSchema = z
   .string()
@@ -218,10 +218,15 @@ const optionalUserIdSchema = z
   .optional()
   .transform((value) => optionalIdFromSelect(value));
 
+const optionalGroupNameSchema = z
+  .string()
+  .optional()
+  .transform((value) => optionalGroupNameFromSelect(value));
+
 export const taskFormSchema = z.object({
   title: z.string().trim().min(1, 'Baslik zorunludur').max(220),
   description: z.string().max(2000).optional(),
-  groupName: z.string().max(80).optional(),
+  groupName: optionalGroupNameSchema,
   customerId: optionalCustomerIdSchema,
   assignedUserId: optionalUserIdSchema,
   priority: prioritySchema,
@@ -229,7 +234,30 @@ export const taskFormSchema = z.object({
   dueDate: z.string().optional(),
 });
 
+/** Acik maddeler formu: dashboard kartina yonlendirmek icin grup zorunlu. */
+export const openItemTaskFormSchema = taskFormSchema.superRefine((data, ctx) => {
+  if (!data.groupName) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Grup secimi zorunludur',
+      path: ['groupName'],
+    });
+  }
+});
+
 export type TaskFormValues = z.input<typeof taskFormSchema>;
+
+function normalizeTaskFormInput(values: TaskFormValues): TaskFormValues {
+  return {
+    ...values,
+    groupName: values.groupName != null ? String(values.groupName) : undefined,
+    customerId: values.customerId != null ? String(values.customerId) : undefined,
+    assignedUserId: values.assignedUserId != null ? String(values.assignedUserId) : undefined,
+    priority: String(values.priority ?? ''),
+    status: String(values.status ?? ''),
+    dueDate: values.dueDate ?? '',
+  };
+}
 
 export function toTaskFormValues(task?: SalesDeskTaskDto | null): TaskFormValues {
   return {
@@ -245,11 +273,25 @@ export function toTaskFormValues(task?: SalesDeskTaskDto | null): TaskFormValues
 }
 
 export function toTaskPayload(values: TaskFormValues): Partial<SalesDeskTaskDto> {
-  const parsed = taskFormSchema.parse(values);
+  const parsed = taskFormSchema.parse(normalizeTaskFormInput(values));
   return {
     title: parsed.title.trim(),
     description: parsed.description?.trim() || undefined,
-    groupName: parsed.groupName?.trim() || undefined,
+    groupName: parsed.groupName,
+    customerId: parsed.customerId,
+    assignedUserId: parsed.assignedUserId,
+    priority: parsed.priority,
+    status: parsed.status,
+    dueDate: parsed.dueDate || undefined,
+  };
+}
+
+export function toOpenItemTaskPayload(values: TaskFormValues): Partial<SalesDeskTaskDto> {
+  const parsed = openItemTaskFormSchema.parse(normalizeTaskFormInput(values));
+  return {
+    title: parsed.title.trim(),
+    description: parsed.description?.trim() || undefined,
+    groupName: parsed.groupName,
     customerId: parsed.customerId,
     assignedUserId: parsed.assignedUserId,
     priority: parsed.priority,

@@ -26,6 +26,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
 import { SD_PRIMARY_BUTTON, SD_SECONDARY_BUTTON } from '../../lib/salesdesk-popup-styles';
 import { SalesDeskMeetingsCard } from '../dashboard/SalesDeskMeetingsCard';
+import { SalesDeskOpenItemsDashboardSection } from '../dashboard/SalesDeskOpenItemsDashboardSection';
 
 export function SalesDeskDashboardPage(): ReactElement {
   const { t } = useTranslation('dashboard');
@@ -197,10 +198,9 @@ export function SalesDeskDashboardPage(): ReactElement {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <div className="xl:col-span-1">
-            <SalesDeskMeetingsCard />
-          </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <SalesDeskMeetingsCard />
+          <SalesDeskOpenItemsDashboardSection />
         </div>
       )}
     </div>

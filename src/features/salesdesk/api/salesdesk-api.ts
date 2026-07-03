@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios';
 import { normalizePagedResponse } from '@/lib/paged-response';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
+import { isWeeklyPlanTask } from '../lib/salesdesk-weekly-plan';
 
 export type SalesDeskCustomerKind = 1 | 2 | 3;
 export type SalesDeskPotentialStatus = 1 | 2 | 3 | 4 | 5 | 6;
@@ -269,6 +270,76 @@ async function getPaged<T>(path: string, params?: PagedParams): Promise<PagedRes
   });
 }
 
+const OPEN_TASK_STATUSES = new Set<SalesDeskTaskStatus>([1, 2]);
+
+export function isOpenSalesDeskTask(task: SalesDeskTaskDto): boolean {
+  return OPEN_TASK_STATUSES.has(task.status);
+}
+
+const OPEN_ITEMS_FETCH_SIZE = 200;
+
+function filterOpenItemTasks(tasks: SalesDeskTaskDto[]): SalesDeskTaskDto[] {
+  return tasks.filter((task) => isOpenSalesDeskTask(task) && !isWeeklyPlanTask(task));
+}
+
+function matchesOpenItemSearch(task: SalesDeskTaskDto, search?: string): boolean {
+  if (!search?.trim()) return true;
+  const query = search.trim().toLocaleLowerCase('tr-TR');
+  const haystack = [task.title, task.description, task.groupName, task.customerName]
+    .filter(Boolean)
+    .join(' ')
+    .toLocaleLowerCase('tr-TR');
+  return haystack.includes(query);
+}
+
+function paginateOpenItemTasks(
+  allRows: SalesDeskTaskDto[],
+  params?: PagedParams
+): PagedResponse<SalesDeskTaskDto> {
+  const pageNumber = params?.pageNumber ?? 1;
+  const pageSize = params?.pageSize ?? 10;
+  const filteredRows = allRows.filter((task) => matchesOpenItemSearch(task, params?.search));
+  const totalCount = filteredRows.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const start = (pageNumber - 1) * pageSize;
+  const pageRows = filteredRows.slice(start, start + pageSize);
+
+  return normalizePagedResponse<SalesDeskTaskDto>(
+    {
+      data: pageRows,
+      totalCount,
+      pageNumber,
+      pageSize,
+      totalPages,
+      hasPreviousPage: pageNumber > 1,
+      hasNextPage: pageNumber < totalPages,
+    },
+    { pageNumber, pageSize }
+  );
+}
+
+/** open-items endpoint yoksa veya hata verirse tasks listesinden acik kayitlari filtreler. */
+async function listOpenItems(params?: PagedParams): Promise<PagedResponse<SalesDeskTaskDto>> {
+  const fetchParams = {
+    pageNumber: 1,
+    pageSize: OPEN_ITEMS_FETCH_SIZE,
+    sortBy: params?.sortBy ?? 'DueDate',
+    sortDirection: params?.sortDirection ?? 'asc',
+  };
+
+  let sourceRows: SalesDeskTaskDto[];
+
+  try {
+    const result = await getPaged<SalesDeskTaskDto>('tasks/open-items', fetchParams);
+    sourceRows = filterOpenItemTasks(result.data);
+  } catch {
+    const fallback = await getPaged<SalesDeskTaskDto>('tasks', fetchParams);
+    sourceRows = filterOpenItemTasks(fallback.data);
+  }
+
+  return paginateOpenItemTasks(sourceRows, params);
+}
+
 async function postPaged<T>(path: string, params?: PagedParams): Promise<PagedResponse<T>> {
   const response = await api.post<ApiResponse<PagedResponse<T>>>(`${BASE}/${path}/query`, params ?? {});
   const paged = unwrapApiData(response, 'Liste yuklenemedi');
@@ -359,7 +430,7 @@ export const salesDeskApi = {
   },
   tasks: {
     list: (params?: PagedParams) => getPaged<SalesDeskTaskDto>('tasks', params),
-    openItems: (params?: PagedParams) => getPaged<SalesDeskTaskDto>('tasks/open-items', params),
+    openItems: (params?: PagedParams) => listOpenItems(params),
     create: (body: Partial<SalesDeskTaskDto>) => createOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', body),
     update: (id: number, body: Partial<SalesDeskTaskDto>) => updateOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', id, body),
     delete: (id: number) => deleteOne('tasks', id),

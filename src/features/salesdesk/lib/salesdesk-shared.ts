@@ -100,6 +100,12 @@ export function optionalIdFromSelect(value?: string): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
+export function optionalGroupNameFromSelect(value?: string): string | undefined {
+  if (!value || value === NONE_SELECT_VALUE) return undefined;
+  const trimmed = value.trim();
+  return trimmed || undefined;
+}
+
 export function requiredIdFromSelect(value: string, field = 'Secim'): number {
   if (!value || value === NONE_SELECT_VALUE) {
     throw new Error(`${field} zorunludur`);
