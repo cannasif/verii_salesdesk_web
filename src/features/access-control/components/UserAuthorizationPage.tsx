@@ -86,6 +86,14 @@ export function UserAuthorizationPage(): ReactElement {
     return null;
   }, [userGroupsQuery.data, selectedUserId]);
 
+  const otherAssignedGroups = useMemo(() => {
+    const ids = userGroupsQuery.data?.permissionGroupIds ?? [];
+    const names = userGroupsQuery.data?.permissionGroupNames ?? [];
+    return ids
+      .map((id, index) => ({ id, name: names[index] ?? `#${id}` }))
+      .filter((g) => !isPersonalGroupName(g.name));
+  }, [userGroupsQuery.data]);
+
   const personalGroupQuery = usePermissionGroupQuery(personalGroupId);
   const savedIds = useMemo(
     () => personalGroupQuery.data?.permissionDefinitionIds ?? [],
@@ -125,8 +133,9 @@ export function UserAuthorizationPage(): ReactElement {
     if (selectedUserId == null || readOnly) return;
     setIsSaving(true);
     try {
-      if (personalGroupId != null) {
-        await setPermissions.mutateAsync({ id: personalGroupId, dto: { permissionDefinitionIds: selectedIds } });
+      let groupId = personalGroupId;
+      if (groupId != null) {
+        await setPermissions.mutateAsync({ id: groupId, dto: { permissionDefinitionIds: selectedIds } });
       } else {
         const created = await createGroup.mutateAsync({
           name: buildPersonalGroupName(selectedUserId),
@@ -135,11 +144,10 @@ export function UserAuthorizationPage(): ReactElement {
           isActive: true,
           permissionDefinitionIds: selectedIds,
         });
-        const existing = userGroupsQuery.data?.permissionGroupIds ?? [];
-        await setUserGroups.mutateAsync({
-          permissionGroupIds: Array.from(new Set([...existing, created.id])),
-        });
+        groupId = created.id;
       }
+      // Only the personal group applies — remove legacy group assignments (e.g. System Admin).
+      await setUserGroups.mutateAsync({ permissionGroupIds: [groupId] });
       await queryClient.invalidateQueries({ queryKey: ['users', selectedUserId, 'permission-groups'] });
       await queryClient.invalidateQueries({ queryKey: ['permissions', 'groups'] });
       toast.success('Kullanici yetkileri kaydedildi');
@@ -276,6 +284,18 @@ export function UserAuthorizationPage(): ReactElement {
                 <div className="mx-4 mt-4 flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-300">
                   <ShieldCheck className="size-4 shrink-0" />
                   Bu alanda degisiklik yetkin yok.
+                </div>
+              )}
+
+              {otherAssignedGroups.length > 0 && (
+                <div className="mx-4 mt-4 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-200">
+                  <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                  <span>
+                    Bu kullanicinin matriste gorunmeyen eski izin gruplari var:{' '}
+                    <strong>{otherAssignedGroups.map((g) => g.name).join(', ')}</strong>. Bu gruplar
+                    yuzunden tiksiz olsa bile tum sayfalara erisebilir. Kaydet dediginizde yalnizca bu
+                    matristeki yetkiler gecerli olur, eski gruplar kaldirilir.
+                  </span>
                 </div>
               )}
 

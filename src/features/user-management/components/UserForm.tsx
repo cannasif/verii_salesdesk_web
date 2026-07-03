@@ -1,4 +1,5 @@
 import { type ReactElement, type ReactNode, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -38,9 +39,7 @@ import type { UserDto } from '../types/user-types';
 import { useUserAuthorityOptionsQuery } from '../hooks/useUserAuthorityOptionsQuery';
 import type { RoleOption } from '../hooks/useUserAuthorityOptionsQuery';
 import { useUserManagerOptionsQuery } from '../hooks/useUserManagerOptionsQuery';
-import { useUserPermissionGroupsForForm } from '../hooks/useUserPermissionGroupsForForm';
-import { UserFormPermissionGroupSelect } from './UserFormPermissionGroupSelect';
-import { User, Mail, Lock, Phone, Shield, Activity, X, Users, Loader2 } from 'lucide-react';
+import { User, Mail, Lock, Phone, Shield, Activity, X, Users, Loader2, ExternalLink } from 'lucide-react';
 import { FormSubmitTooltipWrap } from '@/components/shared/FormSubmitTooltipWrap';
 import { isZodFieldRequired } from '@/lib/zod-required';
 import { getZodValidationMessages } from '@/lib/zod-validation-hint';
@@ -71,7 +70,6 @@ interface UserFormProps {
   onSubmit: (data: UserFormSchema | UserUpdateFormSchema) => void | Promise<void>;
   user?: UserDto | null;
   isLoading?: boolean;
-  canManagePermissionGroups?: boolean;
 }
 
 const INPUT_FIELD_CLASSNAME = SD_FORM_INPUT_MD;
@@ -113,7 +111,6 @@ export function UserForm({
   onSubmit,
   user,
   isLoading = false,
-  canManagePermissionGroups = false,
 }: UserFormProps): ReactElement {
   const { t } = useTranslation('user-management');
   const userId = user?.id ?? null;
@@ -131,10 +128,6 @@ export function UserForm({
   const roleOptions = roleOptionsQuery.data ?? EMPTY_ROLE_OPTIONS;
   const managerOptionsQuery = useUserManagerOptionsQuery();
   const managerOptions = (managerOptionsQuery.data ?? []).filter((option) => option.value !== userId);
-  const userPermissionGroupsQuery = useUserPermissionGroupsForForm(
-    userId,
-    canManagePermissionGroups
-  );
 
   const form = useForm<UserFormSchema | UserUpdateFormSchema>({
     resolver: zodResolver(isEditMode ? userUpdateFormSchema : userFormSchema),
@@ -150,7 +143,6 @@ export function UserForm({
       roleId: 0,
       managerUserId: null,
       isActive: true,
-      permissionGroupIds: [],
     },
   });
   const isFormValid = form.formState.isValid;
@@ -186,7 +178,6 @@ export function UserForm({
         roleId: userRoleId,
         managerUserId: userManagerUserId,
         isActive: userIsActive,
-        permissionGroupIds: [],
       });
       return;
     }
@@ -201,7 +192,6 @@ export function UserForm({
       roleId: 0,
       managerUserId: null,
       isActive: true,
-      permissionGroupIds: [],
     });
   }, [
     open,
@@ -216,26 +206,6 @@ export function UserForm({
     userRoleId,
     form,
   ]);
-
-  useEffect(() => {
-    if (!open || userId == null || !canManagePermissionGroups) {
-      return;
-    }
-
-    if (userPermissionGroupsQuery.isLoading || userPermissionGroupsQuery.data == null) {
-      return;
-    }
-
-    const current = form.getValues('permissionGroupIds') ?? [];
-    const next = userPermissionGroupsQuery.data;
-    const same =
-      current.length === next.length &&
-      current.every((value, index) => value === next[index]);
-
-    if (!same) {
-      form.setValue('permissionGroupIds', next, { shouldDirty: false, shouldTouch: false });
-    }
-  }, [open, userId, canManagePermissionGroups, userPermissionGroupsQuery.isLoading, userPermissionGroupsQuery.data, form]);
 
   useEffect(() => {
     if (!open || userId == null || roleOptions.length === 0) {
@@ -266,7 +236,6 @@ export function UserForm({
         roleId: 0,
         managerUserId: null,
         isActive: true,
-        permissionGroupIds: [],
       });
       onOpenChange(false);
     }
@@ -491,25 +460,26 @@ export function UserForm({
                   )}
                 />
 
-                {canManagePermissionGroups && (
-                  <FormField
-                    control={form.control}
-                    name="permissionGroupIds"
-                    render={({ field }) => (
-                      <FormItem className="sm:col-span-2">
-                        <FieldLabel icon={Shield}>{t('form.permissionGroups')}</FieldLabel>
-                        <FormControl>
-                          <UserFormPermissionGroupSelect
-                            value={field.value ?? []}
-                            onChange={field.onChange}
-                            disabled={isLoading}
-                          />
-                        </FormControl>
-                        <FormMessageSlot />
-                      </FormItem>
-                    )}
-                  />
-                )}
+                <div className="sm:col-span-2 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-brand-primary)]/5 px-4 py-3">
+                  <div className="flex items-start gap-2.5">
+                    <Shield className="mt-0.5 size-4 shrink-0 text-[var(--crm-brand-primary)]" />
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-sm font-semibold text-slate-200">Sayfa yetkileri</p>
+                      <p className="text-xs leading-relaxed text-slate-400">
+                        Kullanicinin hangi sayfalara girebilecegi ve hangi islemleri yapabilecegi
+                        Kullanici Yetkileri sayfasindan ayarlanir.
+                      </p>
+                      <Link
+                        to="/access-control/user-authorization"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--crm-brand-accent)] transition-colors hover:text-[var(--crm-brand-on-soft)]"
+                        onClick={() => onOpenChange(false)}
+                      >
+                        Kullanici Yetkileri sayfasina git
+                        <ExternalLink size={12} />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
 
                 <FormField
                   control={form.control}

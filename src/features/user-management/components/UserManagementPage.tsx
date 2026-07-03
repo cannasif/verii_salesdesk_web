@@ -3,7 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
-import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Plus, RefreshCw } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { DataTableActionBar, ManagementListPageHeader, type DataTableGridColumn } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +44,7 @@ import type { UserFormSchema, UserUpdateFormSchema } from '../types/user-types';
 import type { CreateUserDto, UpdateUserDto } from '../types/user-types';
 import { useCreateUser } from '../hooks/useCreateUser';
 import { useUpdateUser as useUpdateUserMutation } from '../hooks/useUpdateUser';
+import { useDeleteUser } from '../hooks/useDeleteUser';
 import { userRowsToBackendFilters, USER_FILTER_COLUMNS } from '../types/user-filter.types';
 import type { FilterRow } from '@/lib/advanced-filter-types';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
@@ -57,6 +66,8 @@ export function UserManagementPage(): ReactElement {
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserDto | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingUser, setDeletingUser] = useState<UserDto | null>(null);
   const [showStats, setShowStats] = useManagementShowStats(PAGE_KEY, user?.id);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,11 +80,9 @@ export function UserManagementPage(): ReactElement {
 
   const createUser = useCreateUser();
   const updateUser = useUpdateUserMutation();
+  const deleteUser = useDeleteUser();
   const queryClient = useQueryClient();
-  const { canCreate, canUpdate } = useCrudPermissions('users.user-management.view');
-  const permissionGroupCrud = useCrudPermissions('access-control.permission-groups.view');
-  const assignmentCrud = useCrudPermissions('access-control.user-group-assignments.view');
-  const canManagePermissionGroups = permissionGroupCrud.canView && assignmentCrud.canUpdate;
+  const { canCreate, canUpdate, canDelete } = useCrudPermissions('users.user-management.view');
 
   const tableColumns = useMemo(() => getColumnsConfig(t), [t]);
   const baseColumns = useMemo(
@@ -217,6 +226,24 @@ export function UserManagementPage(): ReactElement {
     setFormOpen(true);
   };
 
+  const handleDeleteClick = (u: UserDto): void => {
+    if (!canDelete) return;
+    if (user?.id === u.id) return;
+    setDeletingUser(u);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async (): Promise<void> => {
+    if (!deletingUser || !canDelete) return;
+    try {
+      await deleteUser.mutateAsync(deletingUser.id);
+      setDeleteDialogOpen(false);
+      setDeletingUser(null);
+    } catch {
+      // Toast handled in mutation hook
+    }
+  };
+
   const handleFormSubmit = async (data: UserFormSchema | UserUpdateFormSchema): Promise<void> => {
     if (editingUser) {
       if (!canUpdate) return;
@@ -228,7 +255,6 @@ export function UserManagementPage(): ReactElement {
         roleId: data.roleId && data.roleId > 0 ? data.roleId : undefined,
         managerUserId: data.managerUserId ?? null,
         isActive: data.isActive,
-        permissionGroupIds: canManagePermissionGroups ? data.permissionGroupIds : undefined,
       };
       await updateUser.mutateAsync({
         id: editingUser.id,
@@ -247,7 +273,6 @@ export function UserManagementPage(): ReactElement {
         roleId: createFormData.roleId!,
         managerUserId: createFormData.managerUserId ?? null,
         isActive: createFormData.isActive,
-        permissionGroupIds: canManagePermissionGroups ? createFormData.permissionGroupIds : undefined,
       };
       await createUser.mutateAsync(createData);
     }
@@ -353,6 +378,7 @@ export function UserManagementPage(): ReactElement {
           <div className={MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME}>
             <UserTable
               onEdit={canUpdate ? handleEdit : undefined}
+              onDelete={canDelete ? handleDeleteClick : undefined}
               columns={columns}
               visibleColumnKeys={orderedVisibleColumns}
               rows={users}
@@ -438,7 +464,7 @@ export function UserManagementPage(): ReactElement {
               errorText={t('messages.error', { defaultValue: 'Hata oluştu' })}
               emptyText={t('table.noData')}
               minTableWidthClassName="min-w-[900px] lg:min-w-[1100px]"
-              showActionsColumn={canUpdate}
+              showActionsColumn={canUpdate || canDelete}
               actionsHeaderLabel={t('common.actions')}
               rowClassName="group"
               pageSize={pageSize}
@@ -480,8 +506,49 @@ export function UserManagementPage(): ReactElement {
         onSubmit={handleFormSubmit}
         user={editingUser}
         isLoading={createUser.isPending || updateUser.isPending}
-        canManagePermissionGroups={canManagePermissionGroups}
       />
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="overflow-hidden border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] p-0 shadow-2xl sm:max-w-md">
+          <DialogHeader className="flex flex-col items-center gap-3 px-6 pb-2 pt-8 text-center">
+            <div className="flex size-16 items-center justify-center rounded-full bg-red-500/10">
+              <Trash2 className="size-7 text-red-400" />
+            </div>
+            <DialogTitle className="text-xl font-black text-white">{t('delete.confirmTitle')}</DialogTitle>
+            <DialogDescription className="text-sm text-slate-400">
+              {t('delete.confirmMessage', {
+                username: deletingUser?.fullName?.trim() || deletingUser?.username || '',
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] px-6 py-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteUser.isPending}
+              className="flex-1 rounded-xl border-[var(--crm-app-border)]"
+            >
+              {t('form.cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => void handleDeleteConfirm()}
+              disabled={deleteUser.isPending}
+              className="flex-1 rounded-xl bg-red-600 text-white hover:bg-red-700"
+            >
+              {deleteUser.isPending ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  {t('form.saving')}
+                </>
+              ) : (
+                t('table.delete')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

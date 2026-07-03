@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import type { UserDto } from '../types/user-types';
-import { Edit2 } from 'lucide-react';
+import { Edit2, Trash2 } from 'lucide-react';
 import { MANAGEMENT_LIST_ID_COLUMN_DEF } from '@/lib/management-list-layout';
 
 type UserColumnKey = keyof UserDto | 'status';
@@ -43,6 +43,7 @@ export const getColumnsConfig = (t: TFunction): ColumnDef<UserDto>[] => [
 
 interface UserTableProps {
   onEdit?: (user: UserDto) => void;
+  onDelete?: (user: UserDto) => void;
   toolbar?: React.ReactNode;
   columns: DataTableGridColumn<UserColumnKey>[];
   visibleColumnKeys: UserColumnKey[];
@@ -79,6 +80,7 @@ interface UserTableProps {
 
 export function UserTable({
   onEdit,
+  onDelete,
   toolbar,
   columns,
   visibleColumnKeys,
@@ -121,14 +123,26 @@ export function UserTable({
 
   const renderActionsCell = (user: UserDto): ReactElement => (
     <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onEdit?.(user)}
-        className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-      >
-        <Edit2 size={16} />
-      </Button>
+      {onEdit ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onEdit(user)}
+          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
+        >
+          <Edit2 size={16} />
+        </Button>
+      ) : null}
+      {onDelete ? (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDelete(user)}
+          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
+        >
+          <Trash2 size={16} />
+        </Button>
+      ) : null}
     </div>
   );
 
