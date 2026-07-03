@@ -1,9 +1,9 @@
 import { QueryClient } from '@tanstack/react-query';
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 
 function shouldRetryQuery(failureCount: number, error: unknown): boolean {
   if (failureCount >= 1) return false;
-  if (axios.isAxiosError(error)) {
+  if (isAxiosError(error)) {
     if (error.code === 'ECONNABORTED') return false;
     if (!error.response) return false;
   }

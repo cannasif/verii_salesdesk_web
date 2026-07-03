@@ -1,3 +1,6 @@
+import { isAxiosError } from 'axios';
+import { api } from '@/lib/axios';
+import type { ApiResponse } from '@/types/api';
 import { getLocalServerUrl } from '../lib/local-server-url';
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../types/salesdesk-group-types';
 
@@ -5,9 +8,54 @@ interface ApiEnvelope<T> {
   success?: boolean;
   data?: T;
   error?: string;
+  message?: string;
 }
 
-async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+const GROUPS_BASE = '/groups';
+const BACKEND_GROUPS_BASE = '/api/salesdesk/groups';
+
+type GroupsSource = 'backend' | 'local';
+
+let resolvedSource: GroupsSource | null = null;
+
+function unwrapBackendGroups(response: ApiResponse<SalesDeskGroupDto[]>): SalesDeskGroupDto[] {
+  if (response.success && Array.isArray(response.data)) {
+    return response.data;
+  }
+  throw new Error(response.message || 'Gruplar yuklenemedi.');
+}
+
+function unwrapBackendGroup(response: ApiResponse<SalesDeskGroupDto>, fallbackMessage: string): SalesDeskGroupDto {
+  if (response.success && response.data) {
+    return response.data;
+  }
+  throw new Error(response.message || fallbackMessage);
+}
+
+function isBackendGroupsUnavailable(error: unknown): boolean {
+  return isAxiosError(error) && [404, 405, 501].includes(error.response?.status ?? 0);
+}
+
+async function detectGroupsSource(): Promise<GroupsSource> {
+  if (resolvedSource) return resolvedSource;
+
+  try {
+    const response = await api.get<ApiResponse<SalesDeskGroupDto[]>>(BACKEND_GROUPS_BASE, {
+      timeout: 10_000,
+    });
+    unwrapBackendGroups(response);
+    resolvedSource = 'backend';
+    return 'backend';
+  } catch (error) {
+    if (isBackendGroupsUnavailable(error)) {
+      resolvedSource = 'local';
+      return 'local';
+    }
+    throw error;
+  }
+}
+
+async function requestLocalJson<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${getLocalServerUrl()}${path}`, {
@@ -16,16 +64,17 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
         'Content-Type': 'application/json',
         ...(init?.headers ?? {}),
       },
+      signal: init?.signal ?? AbortSignal.timeout(15_000),
     });
   } catch {
     throw new Error(
-      'Yerel sunucuya ulasilamadi. Uygulamayi "npm run dev" ile baslatin; yerel sunucu otomatik acilir.'
+      'Yerel sunucuya ulasilamadi. Uygulamayi "npm run dev" ile baslatin veya production icin yardimci sunucuyu deploy edin.'
     );
   }
 
   const payload = (await response.json().catch(() => ({}))) as ApiEnvelope<T>;
   if (!response.ok || payload.success === false) {
-    throw new Error(payload.error || `Sunucu hatasi (${response.status}).`);
+    throw new Error(payload.error || payload.message || `Sunucu hatasi (${response.status}).`);
   }
 
   if (payload.data === undefined) {
@@ -35,37 +84,87 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   return payload.data;
 }
 
-/** Vite SPA rotasi ile cakismamasi icin /groups kullanilir (proxy destekli). */
-const GROUPS_BASE = '/groups';
+async function listFromBackend(): Promise<SalesDeskGroupDto[]> {
+  const response = await api.get<ApiResponse<SalesDeskGroupDto[]>>(BACKEND_GROUPS_BASE, {
+    timeout: 15_000,
+  });
+  return unwrapBackendGroups(response);
+}
+
+async function withSource<T>(fn: (source: GroupsSource) => Promise<T>): Promise<T> {
+  const source = await detectGroupsSource();
+  return fn(source);
+}
 
 export const salesDeskGroupsApi = {
-  list: async (): Promise<SalesDeskGroupDto[]> => requestJson<SalesDeskGroupDto[]>(GROUPS_BASE),
+  getSource: detectGroupsSource,
+
+  list: async (): Promise<SalesDeskGroupDto[]> =>
+    withSource(async (source) =>
+      source === 'backend' ? listFromBackend() : requestLocalJson<SalesDeskGroupDto[]>(GROUPS_BASE)
+    ),
 
   getById: async (id: number): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}`),
+    withSource(async (source) => {
+      if (source === 'backend') {
+        const response = await api.get<ApiResponse<SalesDeskGroupDto>>(`${BACKEND_GROUPS_BASE}/${id}`);
+        return unwrapBackendGroup(response, 'Grup bulunamadi.');
+      }
+      return requestLocalJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}`);
+    }),
 
   create: async (dto: SalesDeskGroupFormSchema): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(GROUPS_BASE, {
-      method: 'POST',
-      body: JSON.stringify(dto),
+    withSource(async (source) => {
+      if (source === 'backend') {
+        const response = await api.post<ApiResponse<SalesDeskGroupDto>>(BACKEND_GROUPS_BASE, dto);
+        return unwrapBackendGroup(response, 'Grup olusturulamadi.');
+      }
+      return requestLocalJson<SalesDeskGroupDto>(GROUPS_BASE, {
+        method: 'POST',
+        body: JSON.stringify(dto),
+      });
     }),
 
   update: async (
     id: number,
     dto: Pick<SalesDeskGroupFormSchema, 'name' | 'description'>
   ): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(dto),
+    withSource(async (source) => {
+      if (source === 'backend') {
+        const response = await api.put<ApiResponse<SalesDeskGroupDto>>(`${BACKEND_GROUPS_BASE}/${id}`, dto);
+        return unwrapBackendGroup(response, 'Grup guncellenemedi.');
+      }
+      return requestLocalJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(dto),
+      });
     }),
 
   setMembers: async (id: number, memberUserIds: number[]): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}/members`, {
-      method: 'PUT',
-      body: JSON.stringify({ memberUserIds }),
+    withSource(async (source) => {
+      if (source === 'backend') {
+        const response = await api.put<ApiResponse<SalesDeskGroupDto>>(
+          `${BACKEND_GROUPS_BASE}/${id}/members`,
+          { memberUserIds }
+        );
+        return unwrapBackendGroup(response, 'Grup uyeleri guncellenemedi.');
+      }
+      return requestLocalJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}/members`, {
+        method: 'PUT',
+        body: JSON.stringify({ memberUserIds }),
+      });
     }),
 
   delete: async (id: number): Promise<void> => {
-    await requestJson<unknown>(`${GROUPS_BASE}/${id}`, { method: 'DELETE' });
+    await withSource(async (source) => {
+      if (source === 'backend') {
+        const response = await api.delete<ApiResponse<unknown>>(`${BACKEND_GROUPS_BASE}/${id}`);
+        if (!response.success) {
+          throw new Error(response.message || 'Grup silinemedi.');
+        }
+        return;
+      }
+      await requestLocalJson<unknown>(`${GROUPS_BASE}/${id}`, { method: 'DELETE' });
+    });
   },
 };

@@ -71,8 +71,7 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
   const rows = useMemo(() => data?.data ?? [], [data?.data]);
   const projectStats = data?.projectStats;
   const statusCounts = useMemo(() => computeProjectStatusCounts(rows), [rows]);
-  const showListError = isError && rows.length === 0;
-  const listError = showListError ? (error as Error | null) : null;
+  const listError = isError ? (error as Error | null) : null;
   const todayKey = new Date().toISOString().slice(0, 10);
 
   const customerOptions = withNoneOption(
@@ -200,7 +199,7 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
       rows={rows}
       isLoading={isPending && !isError}
       isFetching={isFetching}
-      isError={showListError}
+      isError={isError}
       error={listError}
       searchTerm={listPage.searchTerm}
       onSearchChange={listPage.setSearchTerm}

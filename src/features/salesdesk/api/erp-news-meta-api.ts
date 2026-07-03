@@ -13,6 +13,8 @@ import {
 export interface ErpNewsMetaBundle {
   overlays: Record<string, ErpNewsMetaOverlay>;
   triggerKeys: string[];
+  /** Sunucu erisilemezse yalnizca tarayici deposu kullanilir. */
+  source?: 'server' | 'local';
 }
 
 interface ApiEnvelope<T> {
@@ -22,13 +24,21 @@ interface ApiEnvelope<T> {
 }
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${getLocalServerUrl()}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers ?? {}),
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${getLocalServerUrl()}${path}`, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init?.headers ?? {}),
+      },
+      signal: init?.signal ?? AbortSignal.timeout(15_000),
+    });
+  } catch {
+    throw new Error(
+      'ERP haber meta sunucusuna ulasilamadi. Yerel yardimci sunucunun calistigindan emin olun.'
+    );
+  }
 
   const payload = (await response.json().catch(() => ({}))) as ApiEnvelope<T>;
   if (!response.ok || payload.success === false) {
@@ -52,13 +62,14 @@ function localBundle(): ErpNewsMetaBundle {
 export const erpNewsMetaApi = {
   async getBundle(): Promise<ErpNewsMetaBundle> {
     try {
-      const server = await requestJson<ErpNewsMetaBundle>('/erp-news-meta');
+      const server = await requestJson<Omit<ErpNewsMetaBundle, 'source'>>('/erp-news-meta');
       return {
         overlays: mergeOverlayBundles(server.overlays, getLocalOverlays()),
         triggerKeys: mergeTriggerKeys(server.triggerKeys, getLocalTriggerKeys()),
+        source: 'server',
       };
     } catch {
-      return localBundle();
+      return { ...localBundle(), source: 'local' };
     }
   },
 

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { erpNewsMetaApi } from '../api/erp-news-meta-api';
@@ -7,12 +8,23 @@ import type { SalesDeskGroupDto } from '../types/salesdesk-group-types';
 export const ERP_NEWS_META_QUERY_KEY = ['salesdesk', 'erp-news', 'meta'] as const;
 
 export function useErpNewsMetaBundle() {
-  return useQuery({
+  const warnedRef = useRef(false);
+  const query = useQuery({
     queryKey: ERP_NEWS_META_QUERY_KEY,
     queryFn: () => erpNewsMetaApi.getBundle(),
     staleTime: 15_000,
     retry: false,
   });
+
+  useEffect(() => {
+    if (query.data?.source !== 'local' || warnedRef.current) return;
+    warnedRef.current = true;
+    toast.warning('ERP haber meta sunucusuna ulasilamadi; yalnizca bu tarayicidaki yerel ayarlar kullaniliyor.', {
+      duration: 7000,
+    });
+  }, [query.data?.source]);
+
+  return query;
 }
 
 export function useSaveErpNewsMetaOverlay() {

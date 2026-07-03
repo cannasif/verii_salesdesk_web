@@ -43,6 +43,7 @@ export function SalesDeskChatWidget(): ReactElement | null {
   const messagesByUser = useSalesDeskChatStore((state) => state.messagesByUser);
   const unreadByUser = useSalesDeskChatStore((state) => state.unreadByUser);
   const typingByUser = useSalesDeskChatStore((state) => state.typingByUser);
+  const connectionStatus = useSalesDeskChatStore((state) => state.connectionStatus);
 
   const authUser = useAuthStore((state) => state.user);
   const { data: users } = useSalesDeskUserOptions();
@@ -128,10 +129,17 @@ export function SalesDeskChatWidget(): ReactElement | null {
               <div className="flex items-center gap-2">
                 <Users size={16} className="text-[var(--crm-brand-accent)]" />
                 <span className="text-[15px] font-bold tracking-tight text-slate-50">Sohbet</span>
-                <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_1px_rgba(52,211,153,0.7)]" />
-                  {onlineCount} çevrimiçi
-                </span>
+                {connectionStatus === 'connected' ? (
+                  <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_1px_rgba(52,211,153,0.7)]" />
+                    {onlineCount} çevrimiçi
+                  </span>
+                ) : (
+                  <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-200">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                    {connectionStatus === 'connecting' ? 'Bağlanıyor…' : 'Sunucu yok'}
+                  </span>
+                )}
               </div>
               <div className="relative mt-3">
                 <Search
@@ -391,6 +399,12 @@ export function SalesDeskChatWidget(): ReactElement | null {
           <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[11px] font-bold text-white ring-2 ring-[var(--crm-app-bg,#0c0516)]">
             {totalUnread}
           </span>
+        )}
+        {!isOpen && connectionStatus === 'disconnected' && (
+          <span
+            className="absolute -left-1 -top-1 h-3.5 w-3.5 rounded-full bg-amber-500 ring-2 ring-[var(--crm-app-bg,#0c0516)]"
+            title="Sohbet sunucusuna bağlanılamadı"
+          />
         )}
       </button>
     </div>

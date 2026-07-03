@@ -54,8 +54,7 @@ export function SalesDeskActivitiesPage(): ReactElement {
   const todayCount = activityStats?.today ?? 0;
   const plannedCount = activityStats?.planned ?? 0;
   const completedCount = activityStats?.completed ?? 0;
-  const showListError = isError && rows.length === 0;
-  const listError = showListError ? (error as Error | null) : null;
+  const listError = isError ? (error as Error | null) : null;
 
   const customerOptions = withNoneOption(
     (customers ?? []).map((item) => ({ value: String(item.id), label: item.name }))
@@ -131,7 +130,7 @@ export function SalesDeskActivitiesPage(): ReactElement {
       rows={rows}
       isLoading={isPending && !isError}
       isFetching={isFetching}
-      isError={showListError}
+      isError={isError}
       error={listError}
       searchTerm={listPage.searchTerm}
       onSearchChange={listPage.setSearchTerm}

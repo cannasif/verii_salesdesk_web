@@ -10,6 +10,7 @@ export function useSalesDeskGroupList(): UseQueryResult<SalesDeskGroupDto[]> {
     queryKey: SALESDESK_GROUPS_QUERY_KEY,
     queryFn: () => salesDeskGroupsApi.list(),
     staleTime: 30_000,
+    retry: false,
   });
 }
 

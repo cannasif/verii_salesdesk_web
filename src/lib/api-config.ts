@@ -1,3 +1,5 @@
+import { setLocalServerUrl } from '@/features/salesdesk/lib/local-server-url';
+
 export const DEFAULT_API_BASE_URL = 'https://salesdeskapi.v3rii.com';
 const RUNTIME_CONFIG_FILE_NAME = 'runtime-settings.json';
 const RUNTIME_CONFIG_CACHE_KEY = 'runtime-config-cache';
@@ -7,6 +9,9 @@ interface RuntimeConfig {
   apiBaseUrl?: string;
   apiBaseURL?: string;
   baseUrl?: string;
+  localServerUrl?: string;
+  chatServerUrl?: string;
+  gmailBridgeUrl?: string;
 }
 
 interface ResolvedRuntimeConfig {
@@ -106,6 +111,9 @@ function resolveDevProxyApiUrl(): string | null {
 
 function resolveRuntimeConfig(config: RuntimeConfig | undefined | null, fallbackConfig: ResolvedRuntimeConfig): ResolvedRuntimeConfig {
   const configuredApiUrl = config?.apiUrl ?? config?.apiBaseUrl ?? config?.apiBaseURL;
+  const localServerUrl =
+    config?.localServerUrl ?? config?.chatServerUrl ?? config?.gmailBridgeUrl ?? null;
+  setLocalServerUrl(localServerUrl);
 
   return {
     apiUrl: isValidApiUrl(configuredApiUrl) ? normalizeBaseUrl(configuredApiUrl!) : fallbackConfig.apiUrl,

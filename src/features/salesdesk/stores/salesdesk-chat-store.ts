@@ -9,6 +9,8 @@ export interface ChatMessage {
   pending?: boolean;
 }
 
+export type ChatConnectionStatus = 'connecting' | 'connected' | 'disconnected';
+
 interface SalesDeskChatState {
   currentUserId: number | null;
   isOpen: boolean;
@@ -17,6 +19,7 @@ interface SalesDeskChatState {
   messagesByUser: Record<number, ChatMessage[]>;
   unreadByUser: Record<number, number>;
   typingByUser: Record<number, boolean>;
+  connectionStatus: ChatConnectionStatus;
 
   setCurrentUserId: (id: number | null) => void;
   setOpen: (open: boolean) => void;
@@ -28,6 +31,7 @@ interface SalesDeskChatState {
   reconcileAck: (tempId: string | undefined, message: ChatMessage) => void;
   ingestMessage: (message: ChatMessage) => void;
   setTyping: (fromUserId: number, typing: boolean) => void;
+  setConnectionStatus: (status: ChatConnectionStatus) => void;
   reset: () => void;
 }
 
@@ -43,6 +47,7 @@ export const useSalesDeskChatStore = create<SalesDeskChatState>((set) => ({
   messagesByUser: {},
   unreadByUser: {},
   typingByUser: {},
+  connectionStatus: 'disconnected',
 
   setCurrentUserId: (id) => set({ currentUserId: id }),
 
@@ -119,6 +124,8 @@ export const useSalesDeskChatStore = create<SalesDeskChatState>((set) => ({
   setTyping: (fromUserId, typing) =>
     set((state) => ({ typingByUser: { ...state.typingByUser, [fromUserId]: typing } })),
 
+  setConnectionStatus: (status) => set({ connectionStatus: status }),
+
   reset: () =>
     set({
       selectedUserId: null,
@@ -126,5 +133,6 @@ export const useSalesDeskChatStore = create<SalesDeskChatState>((set) => ({
       messagesByUser: {},
       unreadByUser: {},
       typingByUser: {},
+      connectionStatus: 'disconnected',
     }),
 }));

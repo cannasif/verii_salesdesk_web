@@ -12,11 +12,36 @@ export function isChatConnected(): boolean {
   return Boolean(socket?.connected);
 }
 
+function bindConnectionHandlers(instance: Socket): void {
+  const store = useSalesDeskChatStore;
+
+  instance.on('connect', () => {
+    store.getState().setConnectionStatus('connected');
+  });
+
+  instance.on('disconnect', () => {
+    store.getState().setConnectionStatus('disconnected');
+  });
+
+  instance.on('connect_error', () => {
+    store.getState().setConnectionStatus('disconnected');
+  });
+
+  instance.io.on('reconnect_attempt', () => {
+    store.getState().setConnectionStatus('connecting');
+  });
+}
+
 export function connectChat(user: { id: number; name: string }): void {
   if (socket) {
-    if (socket.connected) socket.emit('identify', user);
+    if (socket.connected) {
+      useSalesDeskChatStore.getState().setConnectionStatus('connected');
+      socket.emit('identify', user);
+    }
     return;
   }
+
+  useSalesDeskChatStore.getState().setConnectionStatus('connecting');
 
   const instance = io(getChatServerUrl(), {
     transports: ['websocket', 'polling'],
@@ -26,6 +51,8 @@ export function connectChat(user: { id: number; name: string }): void {
   socket = instance;
 
   const store = useSalesDeskChatStore;
+
+  bindConnectionHandlers(instance);
 
   instance.on('connect', () => {
     instance.emit('identify', user);
@@ -55,6 +82,7 @@ export function disconnectChat(): void {
   socket.removeAllListeners();
   socket.disconnect();
   socket = null;
+  useSalesDeskChatStore.getState().setConnectionStatus('disconnected');
 }
 
 export function sendDm(toUserId: number, text: string): void {

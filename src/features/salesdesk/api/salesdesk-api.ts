@@ -1,5 +1,5 @@
 import { api } from '@/lib/axios';
-import axios, { type AxiosRequestConfig } from 'axios';
+import { isAxiosError, type AxiosRequestConfig } from 'axios';
 import { normalizePagedResponse } from '@/lib/paged-response';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import { isWeeklyPlanTask } from '../lib/salesdesk-weekly-plan';
@@ -331,26 +331,6 @@ function computeProjectStats(rows: SalesDeskTaskDto[]): SalesDeskProjectStats {
   };
 }
 
-function emptyProjectsPage(params?: PagedParams): SalesDeskProjectsListResult {
-  const pageNumber = params?.pageNumber ?? 1;
-  const pageSize = params?.pageSize ?? 10;
-  return {
-    ...normalizePagedResponse<SalesDeskTaskDto>(
-      {
-        data: [],
-        totalCount: 0,
-        pageNumber,
-        pageSize,
-        totalPages: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
-      },
-      { pageNumber, pageSize }
-    ),
-    projectStats: { active: 0, completed: 0, overdue: 0, inProgress: 0 },
-  };
-}
-
 function computeActivityStats(rows: SalesDeskTaskDto[]): SalesDeskActivityStats {
   const todayKey = new Date().toISOString().slice(0, 10);
   return {
@@ -360,75 +340,34 @@ function computeActivityStats(rows: SalesDeskTaskDto[]): SalesDeskActivityStats 
   };
 }
 
-function emptyTaskPage(params?: PagedParams): SalesDeskActivitiesListResult {
-  const pageNumber = params?.pageNumber ?? 1;
-  const pageSize = params?.pageSize ?? 10;
-  return {
-    ...normalizePagedResponse<SalesDeskTaskDto>(
-      {
-        data: [],
-        totalCount: 0,
-        pageNumber,
-        pageSize,
-        totalPages: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
-      },
-      { pageNumber, pageSize }
-    ),
-    activityStats: { today: 0, planned: 0, completed: 0 },
-  };
-}
-
-function emptyOpenItemsPage(params?: PagedParams): PagedResponse<SalesDeskTaskDto> {
-  const pageNumber = params?.pageNumber ?? 1;
-  const pageSize = params?.pageSize ?? 10;
-  return normalizePagedResponse<SalesDeskTaskDto>(
-    {
-      data: [],
-      totalCount: 0,
-      pageNumber,
-      pageSize,
-      totalPages: 1,
-      hasPreviousPage: false,
-      hasNextPage: false,
-    },
-    { pageNumber, pageSize }
-  );
-}
-
 async function fetchActivitySourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
-  try {
-    const result = await getPaged<SalesDeskTaskDto>('tasks', {
-      pageNumber: 1,
-      pageSize: ACTIVITIES_FETCH_SIZE,
-      sortBy: params?.sortBy ?? 'DueDate',
-      sortDirection: params?.sortDirection ?? 'desc',
-      search: params?.search?.trim() || 'Aktivite',
-    });
-    return filterActivityTasks(result.data);
-  } catch {
-    return [];
-  }
+  const result = await getPaged<SalesDeskTaskDto>('tasks', {
+    pageNumber: 1,
+    pageSize: ACTIVITIES_FETCH_SIZE,
+    sortBy: params?.sortBy ?? 'DueDate',
+    sortDirection: params?.sortDirection ?? 'desc',
+    search: params?.search?.trim() || 'Aktivite',
+  });
+  return filterActivityTasks(result.data);
 }
 
 async function fetchProjectSourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
-  try {
-    const result = await getPaged<SalesDeskTaskDto>('tasks', {
-      pageNumber: 1,
-      pageSize: PROJECT_FETCH_SIZE,
-      sortBy: params?.sortBy ?? 'DueDate',
-      sortDirection: params?.sortDirection ?? 'asc',
-      search: params?.search?.trim() || 'Proje',
-    });
-    return filterProjectTasks(result.data);
-  } catch {
-    return [];
-  }
+  const result = await getPaged<SalesDeskTaskDto>('tasks', {
+    pageNumber: 1,
+    pageSize: PROJECT_FETCH_SIZE,
+    sortBy: params?.sortBy ?? 'DueDate',
+    sortDirection: params?.sortDirection ?? 'asc',
+    search: params?.search?.trim() || 'Proje',
+  });
+  return filterProjectTasks(result.data);
 }
 
 function filterProjectTasks(tasks: SalesDeskTaskDto[]): SalesDeskTaskDto[] {
   return tasks.filter((task) => isSalesDeskProjectTask(task));
+}
+
+function isOpenItemsEndpointMissing(error: unknown): boolean {
+  return isAxiosError(error) && error.response?.status === 404;
 }
 
 async function fetchOpenItemSourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
@@ -443,16 +382,12 @@ async function fetchOpenItemSourceRows(params?: PagedParams): Promise<SalesDeskT
     const result = await getPaged<SalesDeskTaskDto>('tasks/open-items', fetchParams);
     return filterOpenItemTasks(result.data);
   } catch (error) {
-    if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
-      return [];
+    if (!isOpenItemsEndpointMissing(error)) {
+      throw error;
     }
 
-    try {
-      const result = await getPaged<SalesDeskTaskDto>('tasks', fetchParams);
-      return filterOpenItemTasks(result.data);
-    } catch {
-      return [];
-    }
+    const result = await getPaged<SalesDeskTaskDto>('tasks', fetchParams);
+    return filterOpenItemTasks(result.data);
   }
 }
 
@@ -502,40 +437,28 @@ function paginateTaskRows(
   );
 }
 
-/** open-items endpoint yoksa veya hata verirse tasks listesinden acik kayitlari filtreler. */
+/** open-items endpoint yoksa (404) tasks listesinden acik kayitlari filtreler. */
 async function listOpenItems(params?: PagedParams): Promise<PagedResponse<SalesDeskTaskDto>> {
-  try {
-    const sourceRows = await fetchOpenItemSourceRows(params);
-    return paginateTaskRows(sourceRows, params);
-  } catch {
-    return emptyOpenItemsPage(params);
-  }
+  const sourceRows = await fetchOpenItemSourceRows(params);
+  return paginateTaskRows(sourceRows, params);
 }
 
 /** SalesDesk proje takibi kayitlari (groupName: Proje veya Proje|asama). */
 async function listProjectTasks(params?: PagedParams): Promise<SalesDeskProjectsListResult> {
-  try {
-    const sourceRows = await fetchProjectSourceRows(params);
-    return {
-      ...paginateTaskRows(sourceRows, params),
-      projectStats: computeProjectStats(sourceRows),
-    };
-  } catch {
-    return emptyProjectsPage(params);
-  }
+  const sourceRows = await fetchProjectSourceRows(params);
+  return {
+    ...paginateTaskRows(sourceRows, params),
+    projectStats: computeProjectStats(sourceRows),
+  };
 }
 
 /** SalesDesk aktivite kayitlari (groupName: Aktivite|...). */
 async function listActivities(params?: PagedParams): Promise<SalesDeskActivitiesListResult> {
-  try {
-    const sourceRows = await fetchActivitySourceRows(params);
-    return {
-      ...paginateTaskRows(sourceRows, params),
-      activityStats: computeActivityStats(sourceRows),
-    };
-  } catch {
-    return emptyTaskPage(params);
-  }
+  const sourceRows = await fetchActivitySourceRows(params);
+  return {
+    ...paginateTaskRows(sourceRows, params),
+    activityStats: computeActivityStats(sourceRows),
+  };
 }
 
 async function postPaged<T>(path: string, params?: PagedParams): Promise<PagedResponse<T>> {

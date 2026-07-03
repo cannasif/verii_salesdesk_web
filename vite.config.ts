@@ -96,6 +96,11 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         secure: false,
       },
+      "/health": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+      },
       "/erp-news-meta": {
         target: devLocalServerTarget,
         changeOrigin: true,
