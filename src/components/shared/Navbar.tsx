@@ -25,6 +25,7 @@ const pageTitles: Record<string, string> = {
   '/salesdesk/invoices/new': 'Satis Faturasi Ekle',
   '/salesdesk/sales-tracking': 'Satis Takip',
   '/salesdesk/weekly-visits': 'Haftalik Ziyaretler',
+  '/salesdesk/activities': 'Aktiviteler',
   '/salesdesk/open-items': 'Acik Maddeler',
   '/salesdesk/weekly-plan': 'Haftalik Plan',
   '/salesdesk/visit-forms': 'Ziyaret Formu',

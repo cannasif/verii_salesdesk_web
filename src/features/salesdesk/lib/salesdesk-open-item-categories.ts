@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { SalesDeskTaskDto } from '../api/salesdesk-api';
 import { isWeeklyPlanTask } from './salesdesk-weekly-plan';
+import { isSalesDeskActivityTask } from './salesdesk-activities';
 
 export interface OpenItemCategoryDef {
   id: string;
@@ -114,6 +115,10 @@ export function isWeeklyPlanTaskItem(task: SalesDeskTaskDto): boolean {
   return isWeeklyPlanTask(task);
 }
 
+export function isSalesDeskActivityTaskItem(task: SalesDeskTaskDto): boolean {
+  return isSalesDeskActivityTask(task);
+}
+
 export function resolveOpenItemCategoryId(task: SalesDeskTaskDto): string {
   const key = normalizeOpenItemGroupKey(task.groupName);
   for (const category of CATEGORY_KEY_SETS) {
@@ -134,7 +139,7 @@ export function groupOpenItemsByCategory(tasks: SalesDeskTaskDto[]): Record<stri
   );
 
   tasks.forEach((task) => {
-    if (isWeeklyPlanTaskItem(task)) return;
+    if (isWeeklyPlanTaskItem(task) || isSalesDeskActivityTaskItem(task)) return;
     const categoryId = resolveOpenItemCategoryId(task);
     grouped[categoryId]?.push(task);
   });

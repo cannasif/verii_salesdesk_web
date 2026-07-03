@@ -31,15 +31,17 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
     useQuery({
       queryKey: listKey(params),
       queryFn: () => api.list(params),
-      staleTime: 15000,
+      staleTime: 60_000,
+      retry: false,
       placeholderData: (previousData) => previousData,
     });
 
   const useStats = (): UseQueryResult<PagedResponse<TDto>> =>
     useQuery({
       queryKey: statsKey,
-      queryFn: () => api.list({ pageNumber: 1, pageSize: 200 }),
-      staleTime: 30000,
+      queryFn: () => api.list({ pageNumber: 1, pageSize: 50 }),
+      staleTime: 60_000,
+      retry: false,
     });
 
   const useCreate = (): UseMutationResult<TDto, Error, TPayload> => {

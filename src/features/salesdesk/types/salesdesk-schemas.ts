@@ -23,7 +23,8 @@ import type {
   SalesDeskVisitStatus,
 } from '../api/salesdesk-api';
 import type { SalesDeskPotentialStatus } from '../api/salesdesk-api';
-import { idToSelectValue, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
+import { buildSalesDeskActivityGroupName, parseSalesDeskActivityType } from '../lib/salesdesk-activities';
+import { idToSelectValue, NONE_SELECT_VALUE, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
 
 const documentStatusSchema = z
   .string()
@@ -292,6 +293,66 @@ export function toOpenItemTaskPayload(values: TaskFormValues): Partial<SalesDesk
     title: parsed.title.trim(),
     description: parsed.description?.trim() || undefined,
     groupName: parsed.groupName,
+    customerId: parsed.customerId,
+    assignedUserId: parsed.assignedUserId,
+    priority: parsed.priority,
+    status: parsed.status,
+    dueDate: parsed.dueDate || undefined,
+  };
+}
+
+export const salesDeskActivityFormSchema = z.object({
+  title: z.string().trim().min(1, 'Baslik zorunludur').max(220),
+  description: z.string().max(2000).optional(),
+  activityType: z
+    .string()
+    .refine((value) => value !== NONE_SELECT_VALUE && value.trim().length > 0, {
+      message: 'Tip secin',
+    }),
+  customerId: optionalCustomerIdSchema,
+  assignedUserId: optionalUserIdSchema,
+  priority: prioritySchema,
+  status: taskStatusSchema,
+  dueDate: z.string().optional(),
+});
+
+export type SalesDeskActivityFormValues = z.input<typeof salesDeskActivityFormSchema>;
+
+function normalizeActivityFormInput(values: SalesDeskActivityFormValues): SalesDeskActivityFormValues {
+  const activityType =
+    values.activityType != null && values.activityType !== NONE_SELECT_VALUE
+      ? String(values.activityType)
+      : '';
+  return {
+    ...values,
+    activityType,
+    customerId: values.customerId != null ? String(values.customerId) : undefined,
+    assignedUserId: values.assignedUserId != null ? String(values.assignedUserId) : undefined,
+    priority: String(values.priority ?? ''),
+    status: String(values.status ?? ''),
+    dueDate: values.dueDate ?? '',
+  };
+}
+
+export function toSalesDeskActivityFormValues(task?: SalesDeskTaskDto | null): SalesDeskActivityFormValues {
+  return {
+    title: task?.title ?? '',
+    description: task?.description ?? '',
+    activityType: parseSalesDeskActivityType(task?.groupName) || '',
+    customerId: idToSelectValue(task?.customerId),
+    assignedUserId: idToSelectValue(task?.assignedUserId),
+    priority: String(task?.priority ?? 2),
+    status: String(task?.status ?? 1),
+    dueDate: task?.dueDate ? toDateInputValue(task.dueDate) : '',
+  };
+}
+
+export function toSalesDeskActivityPayload(values: SalesDeskActivityFormValues): Partial<SalesDeskTaskDto> {
+  const parsed = salesDeskActivityFormSchema.parse(normalizeActivityFormInput(values));
+  return {
+    title: parsed.title.trim(),
+    description: parsed.description?.trim() || undefined,
+    groupName: buildSalesDeskActivityGroupName(parsed.activityType),
     customerId: parsed.customerId,
     assignedUserId: parsed.assignedUserId,
     priority: parsed.priority,

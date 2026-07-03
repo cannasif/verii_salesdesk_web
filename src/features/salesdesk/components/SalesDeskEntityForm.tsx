@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { type DefaultValues, type FieldValues, type Path, useForm, type Resolver, type UseFormReturn } from 'react-hook-form';
+import { type DefaultValues, type FieldValues, type Path, useForm, type Resolver, type UseFormReturn, type Mode } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ZodTypeAny } from 'zod';
 import { toast } from 'sonner';
@@ -85,6 +85,7 @@ interface SalesDeskEntityFormProps<T extends FieldValues> {
   isLoading?: boolean;
   submitLabel?: string;
   icon?: LucideIcon;
+  validateMode?: Mode;
 }
 
 function colSpanClass(colSpan?: 1 | 2 | 3): string {
@@ -238,14 +239,18 @@ export function SalesDeskEntityForm<T extends FieldValues>({
   isLoading = false,
   submitLabel,
   icon: Icon = FilePenLine,
+  validateMode = 'onChange',
 }: SalesDeskEntityFormProps<T>): ReactElement {
   const isEditMode = entity != null;
   const formId = 'salesdesk-entity-form';
   const form = useForm<T>({
     resolver: zodResolver(schema as never) as Resolver<T>,
-    mode: 'onChange',
+    mode: validateMode,
     defaultValues,
   });
+
+  const isSubmitting = form.formState.isSubmitting;
+  const isSaving = isLoading || isSubmitting;
 
   useEffect(() => {
     if (open) {
@@ -255,8 +260,12 @@ export function SalesDeskEntityForm<T extends FieldValues>({
 
   const handleSubmit = form.handleSubmit(
     async (values) => {
-      await onSubmit(values);
-      onOpenChange(false);
+      try {
+        await onSubmit(values);
+        onOpenChange(false);
+      } catch {
+        // Hata durumunda form acik kalsin; toast mutation veya sayfa tarafinda gosterilir.
+      }
     },
     (errors) => {
       const firstError = Object.values(errors).find(
@@ -302,7 +311,7 @@ export function SalesDeskEntityForm<T extends FieldValues>({
               variant="ghost"
               className={SD_SECONDARY_BUTTON_FORM}
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isSaving}
             >
               Iptal
             </Button>
@@ -310,12 +319,12 @@ export function SalesDeskEntityForm<T extends FieldValues>({
               type="button"
               variant="ghost"
               className={SD_PRIMARY_BUTTON_FORM}
-              disabled={isLoading}
+              disabled={isSaving}
               onClick={() => {
                 void handleSubmit();
               }}
             >
-              {isLoading ? (
+              {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Kaydediliyor...

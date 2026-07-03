@@ -1,7 +1,9 @@
 import { api } from '@/lib/axios';
+import axios, { type AxiosRequestConfig } from 'axios';
 import { normalizePagedResponse } from '@/lib/paged-response';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import { isWeeklyPlanTask } from '../lib/salesdesk-weekly-plan';
+import { isSalesDeskActivityTask } from '../lib/salesdesk-activities';
 
 export type SalesDeskCustomerKind = 1 | 2 | 3;
 export type SalesDeskPotentialStatus = 1 | 2 | 3 | 4 | 5 | 6;
@@ -261,8 +263,15 @@ function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T 
   throw new Error(response.message || fallbackMessage);
 }
 
-async function getPaged<T>(path: string, params?: PagedParams): Promise<PagedResponse<T>> {
-  const response = await api.get<ApiResponse<PagedResponse<T>>>(`${BASE}/${path}${buildQuery(params)}`);
+async function getPaged<T>(
+  path: string,
+  params?: PagedParams,
+  requestConfig?: AxiosRequestConfig
+): Promise<PagedResponse<T>> {
+  const response = await api.get<ApiResponse<PagedResponse<T>>>(
+    `${BASE}/${path}${buildQuery(params)}`,
+    { ...salesDeskReadConfig, ...requestConfig }
+  );
   const paged = unwrapApiData(response, 'Liste yuklenemedi');
   return normalizePagedResponse<T>(paged, {
     pageNumber: params?.pageNumber,
@@ -276,13 +285,120 @@ export function isOpenSalesDeskTask(task: SalesDeskTaskDto): boolean {
   return OPEN_TASK_STATUSES.has(task.status);
 }
 
-const OPEN_ITEMS_FETCH_SIZE = 200;
+const OPEN_ITEMS_FETCH_SIZE = 50;
+const ACTIVITIES_FETCH_SIZE = 30;
+const SALESDESK_READ_TIMEOUT_MS = 30_000;
+const SALESDESK_TASKS_WRITE_TIMEOUT_MS = 45_000;
 
-function filterOpenItemTasks(tasks: SalesDeskTaskDto[]): SalesDeskTaskDto[] {
-  return tasks.filter((task) => isOpenSalesDeskTask(task) && !isWeeklyPlanTask(task));
+const salesDeskReadConfig: AxiosRequestConfig = { timeout: SALESDESK_READ_TIMEOUT_MS };
+
+export interface SalesDeskActivityStats {
+  today: number;
+  planned: number;
+  completed: number;
 }
 
-function matchesOpenItemSearch(task: SalesDeskTaskDto, search?: string): boolean {
+export type SalesDeskActivitiesListResult = PagedResponse<SalesDeskTaskDto> & {
+  activityStats: SalesDeskActivityStats;
+};
+
+function computeActivityStats(rows: SalesDeskTaskDto[]): SalesDeskActivityStats {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  return {
+    today: rows.filter((item) => item.dueDate?.slice(0, 10) === todayKey).length,
+    planned: rows.filter((item) => item.status === 1 || item.status === 2).length,
+    completed: rows.filter((item) => item.status === 3).length,
+  };
+}
+
+function emptyTaskPage(params?: PagedParams): SalesDeskActivitiesListResult {
+  const pageNumber = params?.pageNumber ?? 1;
+  const pageSize = params?.pageSize ?? 10;
+  return {
+    ...normalizePagedResponse<SalesDeskTaskDto>(
+      {
+        data: [],
+        totalCount: 0,
+        pageNumber,
+        pageSize,
+        totalPages: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      },
+      { pageNumber, pageSize }
+    ),
+    activityStats: { today: 0, planned: 0, completed: 0 },
+  };
+}
+
+function emptyOpenItemsPage(params?: PagedParams): PagedResponse<SalesDeskTaskDto> {
+  const pageNumber = params?.pageNumber ?? 1;
+  const pageSize = params?.pageSize ?? 10;
+  return normalizePagedResponse<SalesDeskTaskDto>(
+    {
+      data: [],
+      totalCount: 0,
+      pageNumber,
+      pageSize,
+      totalPages: 1,
+      hasPreviousPage: false,
+      hasNextPage: false,
+    },
+    { pageNumber, pageSize }
+  );
+}
+
+async function fetchActivitySourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
+  try {
+    const result = await getPaged<SalesDeskTaskDto>('tasks', {
+      pageNumber: 1,
+      pageSize: ACTIVITIES_FETCH_SIZE,
+      sortBy: params?.sortBy ?? 'DueDate',
+      sortDirection: params?.sortDirection ?? 'desc',
+      search: params?.search?.trim() || 'Aktivite',
+    });
+    return filterActivityTasks(result.data);
+  } catch {
+    return [];
+  }
+}
+
+async function fetchOpenItemSourceRows(params?: PagedParams): Promise<SalesDeskTaskDto[]> {
+  const fetchParams = {
+    pageNumber: 1,
+    pageSize: OPEN_ITEMS_FETCH_SIZE,
+    sortBy: params?.sortBy ?? 'DueDate',
+    sortDirection: params?.sortDirection ?? 'asc',
+  };
+
+  try {
+    const result = await getPaged<SalesDeskTaskDto>('tasks/open-items', fetchParams);
+    return filterOpenItemTasks(result.data);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.code === 'ECONNABORTED') {
+      return [];
+    }
+
+    try {
+      const result = await getPaged<SalesDeskTaskDto>('tasks', fetchParams);
+      return filterOpenItemTasks(result.data);
+    } catch {
+      return [];
+    }
+  }
+}
+
+function filterOpenItemTasks(tasks: SalesDeskTaskDto[]): SalesDeskTaskDto[] {
+  return tasks.filter(
+    (task) => isOpenSalesDeskTask(task) && !isWeeklyPlanTask(task) && !isSalesDeskActivityTask(task)
+  );
+}
+
+function filterActivityTasks(tasks: SalesDeskTaskDto[]): SalesDeskTaskDto[] {
+  return tasks.filter((task) => isSalesDeskActivityTask(task));
+}
+
+function matchesTaskSearch(task: SalesDeskTaskDto, search?: string): boolean {
   if (!search?.trim()) return true;
   const query = search.trim().toLocaleLowerCase('tr-TR');
   const haystack = [task.title, task.description, task.groupName, task.customerName]
@@ -292,13 +408,13 @@ function matchesOpenItemSearch(task: SalesDeskTaskDto, search?: string): boolean
   return haystack.includes(query);
 }
 
-function paginateOpenItemTasks(
+function paginateTaskRows(
   allRows: SalesDeskTaskDto[],
   params?: PagedParams
 ): PagedResponse<SalesDeskTaskDto> {
   const pageNumber = params?.pageNumber ?? 1;
   const pageSize = params?.pageSize ?? 10;
-  const filteredRows = allRows.filter((task) => matchesOpenItemSearch(task, params?.search));
+  const filteredRows = allRows.filter((task) => matchesTaskSearch(task, params?.search));
   const totalCount = filteredRows.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const start = (pageNumber - 1) * pageSize;
@@ -320,28 +436,33 @@ function paginateOpenItemTasks(
 
 /** open-items endpoint yoksa veya hata verirse tasks listesinden acik kayitlari filtreler. */
 async function listOpenItems(params?: PagedParams): Promise<PagedResponse<SalesDeskTaskDto>> {
-  const fetchParams = {
-    pageNumber: 1,
-    pageSize: OPEN_ITEMS_FETCH_SIZE,
-    sortBy: params?.sortBy ?? 'DueDate',
-    sortDirection: params?.sortDirection ?? 'asc',
-  };
-
-  let sourceRows: SalesDeskTaskDto[];
-
   try {
-    const result = await getPaged<SalesDeskTaskDto>('tasks/open-items', fetchParams);
-    sourceRows = filterOpenItemTasks(result.data);
+    const sourceRows = await fetchOpenItemSourceRows(params);
+    return paginateTaskRows(sourceRows, params);
   } catch {
-    const fallback = await getPaged<SalesDeskTaskDto>('tasks', fetchParams);
-    sourceRows = filterOpenItemTasks(fallback.data);
+    return emptyOpenItemsPage(params);
   }
+}
 
-  return paginateOpenItemTasks(sourceRows, params);
+/** SalesDesk aktivite kayitlari (groupName: Aktivite|...). */
+async function listActivities(params?: PagedParams): Promise<SalesDeskActivitiesListResult> {
+  try {
+    const sourceRows = await fetchActivitySourceRows(params);
+    return {
+      ...paginateTaskRows(sourceRows, params),
+      activityStats: computeActivityStats(sourceRows),
+    };
+  } catch {
+    return emptyTaskPage(params);
+  }
 }
 
 async function postPaged<T>(path: string, params?: PagedParams): Promise<PagedResponse<T>> {
-  const response = await api.post<ApiResponse<PagedResponse<T>>>(`${BASE}/${path}/query`, params ?? {});
+  const response = await api.post<ApiResponse<PagedResponse<T>>>(
+    `${BASE}/${path}/query`,
+    params ?? {},
+    salesDeskReadConfig
+  );
   const paged = unwrapApiData(response, 'Liste yuklenemedi');
   return normalizePagedResponse<T>(paged, {
     pageNumber: params?.pageNumber,
@@ -350,17 +471,29 @@ async function postPaged<T>(path: string, params?: PagedParams): Promise<PagedRe
 }
 
 async function getOne<T>(path: string, id: number): Promise<T> {
-  const response = await api.get<ApiResponse<T>>(`${BASE}/${path}/${id}`);
+  const response = await api.get<ApiResponse<T>>(`${BASE}/${path}/${id}`, salesDeskReadConfig);
   return unwrapApiData(response, 'Kayit bulunamadi');
 }
 
-async function createOne<T, TBody>(path: string, body: TBody): Promise<T> {
-  const response = await api.post<ApiResponse<T>>(`${BASE}/${path}`, body);
+async function createOne<T, TBody>(
+  path: string,
+  body: TBody,
+  requestConfig?: AxiosRequestConfig
+): Promise<T> {
+  const response = await api.post<ApiResponse<T>>(`${BASE}/${path}`, body, requestConfig);
   return unwrapApiData(response, 'Kayit olusturulamadi');
 }
 
-async function updateOne<T, TBody>(path: string, id: number, body: TBody): Promise<T> {
-  const response = await api.put<ApiResponse<T>>(`${BASE}/${path}/${id}`, body, { useNativeHttpMethod: true });
+async function updateOne<T, TBody>(
+  path: string,
+  id: number,
+  body: TBody,
+  requestConfig?: AxiosRequestConfig
+): Promise<T> {
+  const response = await api.put<ApiResponse<T>>(`${BASE}/${path}/${id}`, body, {
+    useNativeHttpMethod: true,
+    ...requestConfig,
+  });
   return unwrapApiData(response, 'Kayit guncellenemedi');
 }
 
@@ -373,7 +506,7 @@ async function deleteOne(path: string, id: number): Promise<void> {
 
 export const salesDeskApi = {
   async dashboard(): Promise<SalesDeskDashboardDto> {
-    const response = await api.get<ApiResponse<SalesDeskDashboardDto>>(`${BASE}/dashboard`);
+    const response = await api.get<ApiResponse<SalesDeskDashboardDto>>(`${BASE}/dashboard`, salesDeskReadConfig);
     return unwrapApiData(response, 'Dashboard yuklenemedi');
   },
   async search(q: string, take = 12): Promise<SalesDeskSearchResultDto[]> {
@@ -431,8 +564,15 @@ export const salesDeskApi = {
   tasks: {
     list: (params?: PagedParams) => getPaged<SalesDeskTaskDto>('tasks', params),
     openItems: (params?: PagedParams) => listOpenItems(params),
-    create: (body: Partial<SalesDeskTaskDto>) => createOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', body),
-    update: (id: number, body: Partial<SalesDeskTaskDto>) => updateOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', id, body),
+    activities: (params?: PagedParams) => listActivities(params),
+    create: (body: Partial<SalesDeskTaskDto>) =>
+      createOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', body, {
+        timeout: SALESDESK_TASKS_WRITE_TIMEOUT_MS,
+      }),
+    update: (id: number, body: Partial<SalesDeskTaskDto>) =>
+      updateOne<SalesDeskTaskDto, Partial<SalesDeskTaskDto>>('tasks', id, body, {
+        timeout: SALESDESK_TASKS_WRITE_TIMEOUT_MS,
+      }),
     delete: (id: number) => deleteOne('tasks', id),
   },
   visits: {

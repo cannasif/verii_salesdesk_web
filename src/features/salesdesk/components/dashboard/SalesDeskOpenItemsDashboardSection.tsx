@@ -9,7 +9,7 @@ import { SalesDeskOpenItemsCategoryCard } from './SalesDeskOpenItemsCategoryCard
 export function SalesDeskOpenItemsDashboardSection(): ReactElement {
   const { data, isPending, isError, error } = useSalesDeskOpenItemsList({
     pageNumber: 1,
-    pageSize: 200,
+    pageSize: 50,
     sortBy: 'DueDate',
     sortDirection: 'asc',
   });

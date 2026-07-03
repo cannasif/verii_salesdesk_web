@@ -142,6 +142,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
   hideToolbar = false,
 }: SalesDeskListLayoutProps<T>): ReactElement {
   const user = useAuthStore((state) => state.user);
+  const showTableLoading = Boolean(isLoading && !isError);
   const defaultColumnKeys = useMemo(() => columns.map((column) => column.key), [columns]);
   const columnDefs = useMemo(() => salesDeskColumnsToColumnDefs(columns), [columns]);
   const resolvedFilterColumns = useMemo(
@@ -225,7 +226,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
       </div>
 
       {metrics.length > 0 ? (
-        <SalesDeskKpiCards isLoading={isLoading} items={salesDeskMetricsToKpiItems(metrics)} />
+        <SalesDeskKpiCards isLoading={showTableLoading} items={salesDeskMetricsToKpiItems(metrics)} />
       ) : null}
 
       <Card className={MANAGEMENT_LIST_CARD_CLASSNAME}>
@@ -279,7 +280,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
               <SalesDeskManagementTable
                 columns={visibleTableColumns}
                 rows={filteredRows}
-                isLoading={isLoading}
+                isLoading={showTableLoading}
                 isError={isError}
                 errorText={error?.message || 'Liste yuklenemedi.'}
                 emptyText={emptyMessage}
