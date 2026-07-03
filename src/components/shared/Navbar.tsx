@@ -36,6 +36,7 @@ const pageTitles: Record<string, string> = {
   '/salesdesk/software-research': 'Yazilim Arastirma',
   '/salesdesk/software-research/new': 'Yeni Yazilim Arastirmasi',
   '/salesdesk/erp-news': 'ERP Haber Takibi',
+  '/salesdesk/erp-news/new': 'Yeni ERP Haberi',
   '/salesdesk/gmail': 'Gmail',
   '/salesdesk/settings': 'Ayarlar',
   '/user-management': 'Kullanici Yonetimi',
@@ -78,7 +79,9 @@ export function Navbar(): ReactElement {
       ? 'Ziyaret Formu Duzenle'
       : location.pathname.match(/^\/salesdesk\/software-research\/\d+\/edit$/)
         ? 'Yazilim Arastirmasi Duzenle'
-        : 'Sales Desk');
+        : location.pathname.match(/^\/salesdesk\/erp-news\/\d+\/edit$/)
+          ? 'ERP Haberi Duzenle'
+          : 'Sales Desk');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

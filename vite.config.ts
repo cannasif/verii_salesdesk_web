@@ -96,6 +96,16 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         secure: false,
       },
+      "/erp-news-meta": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+      },
+      "/erp-news-meta-triggers": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+      },
       "/gmail": {
         target: devLocalServerTarget,
         changeOrigin: true,

@@ -683,7 +683,7 @@ export function toSoftwareResearchPayload(
 }
 
 export const erpNewsFormSchema = z.object({
-  topic: z.string().trim().min(1, 'Konu zorunludur').max(80),
+  module: z.enum(['DEPO', 'CRM', 'URETIM', 'IK', 'GIB', 'NETSIS', 'ERP', 'OTHER']),
   title: z.string().trim().min(1, 'Baslik zorunludur').max(220),
   source: z.string().max(120).optional(),
   sourceUrl: z.string().max(500).optional(),
@@ -691,13 +691,47 @@ export const erpNewsFormSchema = z.object({
   isCritical: z.boolean(),
   isRead: z.boolean(),
   publishedAt: z.string().min(1, 'Yayin tarihi zorunludur'),
+  targetGroupIds: z.array(z.number().int().positive()),
+  sourceType: z.enum(['manual', 'external']),
 });
 
 export type ErpNewsFormValues = z.infer<typeof erpNewsFormSchema>;
 
-export function toErpNewsFormValues(item?: SalesDeskErpNewsItemDto | null): ErpNewsFormValues {
+export function createDefaultErpNewsFormValues(): ErpNewsFormValues {
   return {
-    topic: item?.topic ?? '',
+    module: 'ERP',
+    title: '',
+    source: '',
+    sourceUrl: '',
+    score: 0,
+    isCritical: false,
+    isRead: false,
+    publishedAt: toDateInputValue(new Date().toISOString()),
+    targetGroupIds: [],
+    sourceType: 'manual',
+  };
+}
+
+export function toErpNewsFormValues(
+  item?: SalesDeskErpNewsItemDto | null,
+  overlay?: { module?: string; targetGroupIds?: number[]; sourceType?: string } | null
+): ErpNewsFormValues {
+  const moduleValue = overlay?.module ?? item?.topic ?? 'ERP';
+  const normalizedModule = [
+    'DEPO',
+    'CRM',
+    'URETIM',
+    'IK',
+    'GIB',
+    'NETSIS',
+    'ERP',
+    'OTHER',
+  ].includes(moduleValue.toUpperCase())
+    ? (moduleValue.toUpperCase() as ErpNewsFormValues['module'])
+    : 'OTHER';
+
+  return {
+    module: normalizedModule,
     title: item?.title ?? '',
     source: item?.source ?? '',
     sourceUrl: item?.sourceUrl ?? '',
@@ -705,12 +739,14 @@ export function toErpNewsFormValues(item?: SalesDeskErpNewsItemDto | null): ErpN
     isCritical: item?.isCritical ?? false,
     isRead: item?.isRead ?? false,
     publishedAt: item?.publishedAt ? toDateInputValue(item.publishedAt) : toDateInputValue(new Date().toISOString()),
+    targetGroupIds: overlay?.targetGroupIds ?? [],
+    sourceType: overlay?.sourceType === 'external' ? 'external' : 'manual',
   };
 }
 
 export function toErpNewsPayload(values: ErpNewsFormValues): Partial<SalesDeskErpNewsItemDto> {
   return {
-    topic: values.topic.trim(),
+    topic: values.module,
     title: values.title.trim(),
     source: values.source?.trim() || undefined,
     sourceUrl: values.sourceUrl?.trim() || undefined,

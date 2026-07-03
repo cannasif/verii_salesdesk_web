@@ -691,6 +691,7 @@ export const salesDeskApi = {
   },
   erpNews: {
     list: (params?: PagedParams) => getPaged<SalesDeskErpNewsItemDto>('erp-news', params),
+    get: (id: number) => getOne<SalesDeskErpNewsItemDto>('erp-news', id),
     create: (body: Partial<SalesDeskErpNewsItemDto>) => createOne<SalesDeskErpNewsItemDto, Partial<SalesDeskErpNewsItemDto>>('erp-news', body),
     update: (id: number, body: Partial<SalesDeskErpNewsItemDto>) => updateOne<SalesDeskErpNewsItemDto, Partial<SalesDeskErpNewsItemDto>>('erp-news', id, body),
     delete: (id: number) => deleteOne('erp-news', id),

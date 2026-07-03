@@ -41,6 +41,10 @@ export {
   SalesDeskSoftwareResearchEditPage,
 } from './components/pages/SalesDeskSoftwareResearchEditorPage';
 export { SalesDeskErpNewsPage } from './components/pages/SalesDeskErpNewsPage';
+export {
+  SalesDeskErpNewsCreatePage,
+  SalesDeskErpNewsEditPage,
+} from './components/pages/SalesDeskErpNewsEditorPage';
 export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
 export { SalesDeskGroupsPage } from './components/pages/SalesDeskGroupsPage';

@@ -56,6 +56,8 @@ const SalesDeskSoftwareResearchEditPage = lazyImport(
   'SalesDeskSoftwareResearchEditPage'
 );
 const SalesDeskErpNewsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskErpNewsPage');
+const SalesDeskErpNewsCreatePage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskErpNewsCreatePage');
+const SalesDeskErpNewsEditPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskErpNewsEditPage');
 const SalesDeskGmailPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGmailPage');
 const SalesDeskSettingsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSettingsPage');
 const SalesDeskGroupsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGroupsPage');
@@ -98,6 +100,8 @@ export function createAppRouter() {
         { path: 'salesdesk/software-research/new', element: <SalesDeskSoftwareResearchCreatePage /> },
         { path: 'salesdesk/software-research/:id/edit', element: <SalesDeskSoftwareResearchEditPage /> },
         { path: 'salesdesk/erp-news', element: <SalesDeskErpNewsPage /> },
+        { path: 'salesdesk/erp-news/new', element: <SalesDeskErpNewsCreatePage /> },
+        { path: 'salesdesk/erp-news/:id/edit', element: <SalesDeskErpNewsEditPage /> },
         { path: 'salesdesk/gmail', element: <SalesDeskGmailPage /> },
         { path: 'salesdesk/settings', element: <SalesDeskSettingsPage /> },
         { path: 'user-management', element: <UserManagementPage /> },

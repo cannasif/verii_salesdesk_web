@@ -5,6 +5,7 @@ import { Toaster } from './components/ui/sonner';
 import { SystemSettingsBootstrap } from './components/shared/SystemSettingsBootstrap';
 import { useNotificationConnection } from './features/notification/hooks/useNotificationConnection';
 import { SalesDeskMeetingWatcher } from './features/salesdesk/components/SalesDeskMeetingWatcher';
+import { SalesDeskErpNewsWatcher } from './features/salesdesk/components/SalesDeskErpNewsWatcher';
 import { useSalesDeskChatConnection } from './features/salesdesk/hooks/useSalesDeskChatConnection';
 import { SalesDeskChatWidget } from './features/salesdesk/components/chat/SalesDeskChatWidget';
 import './App.css';
@@ -18,6 +19,7 @@ function App() {
     <>
       <SystemSettingsBootstrap />
       <SalesDeskMeetingWatcher />
+      <SalesDeskErpNewsWatcher />
       <RouterProvider router={router} />
       <SalesDeskChatWidget />
       <Toaster />

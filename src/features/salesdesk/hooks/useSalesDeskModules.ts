@@ -723,6 +723,15 @@ export const useDeleteSalesDeskSoftwareResearch = softwareResearch.useDelete;
 
 export const useSalesDeskErpNewsList = erpNews.useList;
 export const useSalesDeskErpNewsStats = erpNews.useStats;
+export function useSalesDeskErpNews(id: number | null) {
+  return useQuery({
+    queryKey: [...erpNews.allKey, 'detail', id],
+    queryFn: () => salesDeskApi.erpNews.get(id!),
+    enabled: id != null && id > 0,
+    staleTime: 30_000,
+    retry: false,
+  });
+}
 export const useCreateSalesDeskErpNews = () => {
   const mutation = erpNews.useCreate();
   return {
