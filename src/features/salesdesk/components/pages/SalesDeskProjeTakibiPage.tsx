@@ -68,7 +68,7 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
     return map;
   }, [users]);
 
-  const rows = data?.data ?? [];
+  const rows = useMemo(() => data?.data ?? [], [data?.data]);
   const projectStats = data?.projectStats;
   const statusCounts = useMemo(() => computeProjectStatusCounts(rows), [rows]);
   const showListError = isError && rows.length === 0;

@@ -141,7 +141,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
           </div>
         </div>
         <button type="button" onClick={openNewDialog} className={SD_ADD_BUTTON}>
-          <Plus size={16} />
+          <Plus size={18} className="stroke-[3px]" />
           Yeni Gorev
         </button>
       </div>

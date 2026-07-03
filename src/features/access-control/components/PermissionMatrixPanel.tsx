@@ -114,7 +114,7 @@ export function PermissionMatrixPanel({
     [canSync, myPermissions, queryClient]
   );
 
-  const definitions = definitionsQuery.data ?? [];
+  const definitions = useMemo(() => definitionsQuery.data ?? [], [definitionsQuery.data]);
   const salesdeskDefinitionCount = useMemo(
     () =>
       definitions.filter(

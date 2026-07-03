@@ -102,16 +102,12 @@ export function SalesDeskOpenItemsPage(): ReactElement {
       assignedUserId,
     };
 
-    try {
-      if (editing) {
-        await updateTask.mutateAsync({ id: editing.id, values: payload });
-      } else {
-        await createTask.mutateAsync(payload);
-      }
-      await refetch();
-    } catch (error) {
-      throw error;
+    if (editing) {
+      await updateTask.mutateAsync({ id: editing.id, values: payload });
+    } else {
+      await createTask.mutateAsync(payload);
     }
+    await refetch();
   };
 
   return (

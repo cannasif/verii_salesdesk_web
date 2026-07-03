@@ -51,7 +51,6 @@ import {
   SD_DIALOG_DESC,
   SD_DIALOG_FOOTER_FORM,
   SD_DIALOG_HEADER_FORM,
-  SD_DIALOG_ICON,
   SD_DIALOG_ICON_RING_FORM,
   SD_DIALOG_TITLE,
   SD_FORM_GRID_MD,
@@ -246,11 +245,11 @@ export function UserForm({
       {open ? (
         <DialogContent className={SD_DIALOG_CONTENT_FORM} showCloseButton={false}>
           <DialogHeader className={SD_DIALOG_HEADER_FORM}>
-            <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="flex min-w-0 flex-1 items-center gap-4">
               <div className={SD_DIALOG_ICON_RING_FORM}>
-                <User className={`h-5 w-5 ${SD_DIALOG_ICON}`} aria-hidden />
+                <User className="h-6 w-6 text-white" aria-hidden />
               </div>
-              <div className="min-w-0 space-y-0.5">
+              <div className="min-w-0 space-y-1">
                 <DialogTitle className={SD_DIALOG_TITLE}>
                   {user ? t('form.editUser') : t('form.addUser')}
                 </DialogTitle>
@@ -265,7 +264,7 @@ export function UserForm({
               onClick={() => onOpenChange(false)}
               aria-label="Kapat"
             >
-              <X className="h-4 w-4" />
+              <X size={20} strokeWidth={2.5} />
             </button>
           </DialogHeader>
 

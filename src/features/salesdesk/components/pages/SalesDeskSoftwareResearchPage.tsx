@@ -41,12 +41,12 @@ export function SalesDeskSoftwareResearchPage(): ReactElement {
   const { data: statsData } = useSalesDeskSoftwareResearchStats();
   const deleteResearch = useDeleteSalesDeskSoftwareResearch();
 
-  const rows = data?.data ?? [];
   const statsRows = statsData?.data ?? [];
   const filteredRows = useMemo(() => {
+    const rows = data?.data ?? [];
     if (statusFilter === 'all') return rows;
     return rows.filter((item) => String(item.status) === statusFilter);
-  }, [rows, statusFilter]);
+  }, [data?.data, statusFilter]);
 
   return (
     <div className={salesDeskPageShellClass}>

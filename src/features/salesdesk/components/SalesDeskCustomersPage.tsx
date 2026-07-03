@@ -341,7 +341,7 @@ export function SalesDeskCustomersPage(): ReactElement {
             Gelismis filtre, sutun tercihi ve sayfalama ile cari listesi
           </p>
         </div>
-        <Button onClick={handleCreateClick} variant="ghost" className={ADD_BUTTON_CLASS}>
+        <Button onClick={handleCreateClick} className={ADD_BUTTON_CLASS}>
           <Plus size={20} className="mr-2 stroke-[3px]" />
           Yeni Cari Ekle
         </Button>

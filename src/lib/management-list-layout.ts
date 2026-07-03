@@ -37,8 +37,9 @@ export const MANAGEMENT_LIST_ID_COLUMN_DEF = {
 
 export const ADD_BUTTON_CLASS = [
   'sd-brand-primary',
-  'h-10 px-5 rounded-lg text-sm font-semibold',
-  'transition-colors duration-150',
+  'inline-flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-bold',
+  'shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)]',
+  'transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
 ].join(' ');
 
 /** DataTableGrid sarmalayici — thead / hucre border ve hover. */

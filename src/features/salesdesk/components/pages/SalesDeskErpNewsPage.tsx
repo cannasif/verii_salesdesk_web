@@ -65,12 +65,15 @@ export function SalesDeskErpNewsPage(): ReactElement {
   const updateNews = useUpdateSalesDeskErpNews();
   const triggerAutomation = useTriggerErpNewsAutomation();
 
-  const rows = data?.data ?? [];
+  const enrichedRows = useMemo(() => {
+    const rows = data?.data ?? [];
+    const overlays = metaBundle?.overlays ?? {};
+    return enrichErpNewsItems(rows, overlays);
+  }, [data?.data, metaBundle?.overlays]);
+
+  const overlays = useMemo(() => metaBundle?.overlays ?? {}, [metaBundle?.overlays]);
   const statsRows = statsData?.data ?? [];
   const todayKey = new Date().toISOString().slice(0, 10);
-  const overlays = metaBundle?.overlays ?? {};
-
-  const enrichedRows = useMemo(() => enrichErpNewsItems(rows, overlays), [rows, overlays]);
 
   const filteredRows = useMemo(() => {
     return enrichedRows.filter((item) => {

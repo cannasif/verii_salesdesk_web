@@ -38,55 +38,67 @@ export const SD_DIALOG_CONTENT_COMPACT = [
   SD_SURFACE_DIALOG,
 ].join(' ');
 
-/** Orta boy form dialog — cari / entity popup'lari. */
+/** Form dialog — CRM duzeni, SalesDesk renk token'lari. */
 export const SD_DIALOG_CONTENT_FORM = [
-  'flex !max-h-[min(90vh,720px)] w-[calc(100%-1.5rem)] max-w-[640px] !flex-col !gap-0 overflow-hidden !p-0',
-  'rounded-xl shadow-2xl shadow-black/35 sm:max-w-[680px]',
-  SD_SURFACE_DIALOG,
+  'flex !max-h-[90vh] w-[95%] !max-w-[900px] !flex-col !gap-0 overflow-hidden !p-0',
+  'rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] text-slate-900 shadow-2xl dark:text-white',
+  'sm:w-full',
 ].join(' ');
 
-export const SD_DIALOG_HEADER_FORM =
-  'flex shrink-0 flex-row items-center justify-between space-y-0 border-b border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] px-5 py-4 sm:px-6';
+export const SD_DIALOG_HEADER_FORM = [
+  'sticky top-0 z-10 flex shrink-0 flex-col gap-5 border-b border-[var(--crm-app-border)]',
+  'bg-[color-mix(in_srgb,var(--crm-app-dialog)_95%,transparent)] px-6 py-5 backdrop-blur-md',
+].join(' ');
 
-export const SD_DIALOG_BODY_FORM = 'custom-scrollbar min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6';
+export const SD_DIALOG_HEADER_ROW =
+  'flex w-full flex-row items-center justify-between gap-4';
+
+export const SD_DIALOG_BODY_FORM =
+  'custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 sm:p-8';
 
 export const SD_DELETE_FOOTER = 'border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)]';
 
 export const SD_DIALOG_FOOTER_FORM = [
   SD_DELETE_FOOTER,
-  'flex shrink-0 flex-row items-center justify-end gap-3 px-5 py-4 sm:px-6',
+  'flex shrink-0 flex-row items-center justify-end gap-3 px-6 py-4 sm:px-8',
 ].join(' ');
 
-export const SD_DIALOG_ICON_RING_FORM =
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[color-mix(in_srgb,var(--crm-brand-primary)_22%,transparent)] bg-[var(--crm-brand-soft)]';
+/** Gradient ikon kutusu — CRM basligi, marka gradyani. */
+export const SD_DIALOG_ICON_GRADIENT = [
+  'flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl',
+  'bg-[image:var(--crm-brand-gradient)] shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)]',
+].join(' ');
+
+export const SD_DIALOG_ICON_RING_FORM = SD_DIALOG_ICON_GRADIENT;
 
 export const SD_FORM_INPUT_MD = [
-  'h-10 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-100',
+  'h-12 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-900 dark:text-slate-100',
   'placeholder:text-[var(--crm-app-text-muted)]',
   SD_FORM_FOCUS_GLOW,
-  'transition-[color,box-shadow,border-color] duration-150',
+  'transition-[color,box-shadow,border-color] duration-200',
 ].join(' ');
 
 export const SD_FORM_LABEL_ICON =
-  'mb-2 ml-0.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]';
+  'mb-2 ml-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[var(--crm-app-text-muted)]';
 
-export const SD_FORM_LABEL_ICON_SVG = 'shrink-0 text-[var(--crm-brand-primary)] opacity-90';
+export const SD_FORM_LABEL_ICON_SVG = 'shrink-0 text-[var(--crm-brand-primary)]';
 
-export const SD_FORM_GRID_MD = 'grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2';
+export const SD_FORM_GRID_MD = 'grid grid-cols-1 items-start gap-x-5 gap-y-5 sm:grid-cols-2';
 
 export const SD_FORM_HINT =
   'mt-1.5 text-[11px] leading-relaxed text-[var(--crm-app-text-muted)]';
 
 export const SD_PRIMARY_BUTTON_FORM = [
   SD_BRAND_PRIMARY,
-  'h-10 min-w-[120px] rounded-lg px-6 text-sm font-semibold',
-  'transition-colors duration-150',
+  'h-12 min-w-[140px] rounded-xl px-10 text-sm font-bold',
+  'shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
+  'transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
 ].join(' ');
 
 export const SD_SECONDARY_BUTTON_FORM = [
   SD_BRAND_SECONDARY,
-  'h-10 rounded-lg px-5 text-sm font-medium text-slate-300',
-  'transition-colors duration-150',
+  'h-12 rounded-xl px-6 text-sm font-medium text-slate-600 dark:text-slate-300',
+  'transition-all duration-200 hover:scale-[1.01]',
 ].join(' ');
 
 export const SD_DIALOG_HEADER_COMPACT =
@@ -99,9 +111,9 @@ export const SD_DIALOG_FOOTER_COMPACT = [
   'flex shrink-0 flex-row items-center justify-end gap-2 px-5 py-3',
 ].join(' ');
 
-export const SD_DIALOG_TITLE = 'text-base font-semibold text-slate-900 dark:text-white';
+export const SD_DIALOG_TITLE = 'text-xl font-bold tracking-tight text-slate-900 dark:text-white';
 
-export const SD_DIALOG_DESC = 'text-xs text-[var(--crm-app-text-muted)]';
+export const SD_DIALOG_DESC = 'text-sm text-[var(--crm-app-text-muted)]';
 
 export const SD_DIALOG_ICON_RING_COMPACT =
   'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-brand-soft)]';
@@ -131,9 +143,9 @@ export const SD_DIALOG_ICON_INNER = 'flex items-center justify-center';
 export const SD_DIALOG_ICON = 'text-[var(--crm-brand-primary)]';
 
 export const SD_DIALOG_CLOSE = [
-  'flex h-9 w-9 items-center justify-center rounded-lg',
-  'border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] text-[var(--crm-app-text-muted)]',
-  'transition-colors duration-150 hover:border-[var(--crm-brand-primary)] hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-text)]',
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+  'bg-[var(--crm-app-panel-muted)] text-[var(--crm-app-text-muted)] shadow-sm',
+  'transition-all duration-300 hover:scale-110 hover:bg-[var(--crm-brand-primary)] hover:text-[var(--crm-brand-on-primary)]',
 ].join(' ');
 
 export const SD_PRIMARY_BUTTON = [
@@ -149,11 +161,10 @@ export const SD_SECONDARY_BUTTON = [
 ].join(' ');
 
 export const SD_ADD_BUTTON = [
-  'h-10 inline-flex items-center gap-2 rounded-lg px-4 text-sm font-medium',
-  'border border-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
-  'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-text)]',
-  'hover:border-[var(--crm-brand-primary)] hover:bg-[color-mix(in_srgb,var(--crm-brand-primary)_16%,transparent)] hover:text-[var(--crm-brand-on-soft)]',
-  'transition-colors duration-150',
+  SD_BRAND_PRIMARY,
+  'inline-flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-bold',
+  'shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
+  'transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
 ].join(' ');
 
 export const SD_PAGE_PULSE = 'bg-[var(--crm-brand-primary)]';
