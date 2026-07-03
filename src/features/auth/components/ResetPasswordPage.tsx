@@ -25,8 +25,7 @@ import {
   AUTH_PRIMARY_BUTTON,
   AUTH_SHELL,
 } from '../lib/auth-page-styles';
-
-const loginImage = '/veriicrmlogo-sm.png';
+import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
 
 export function ResetPasswordPage(): React.JSX.Element {
   const { t } = useTranslation('auth');
@@ -89,9 +88,9 @@ export function ResetPasswordPage(): React.JSX.Element {
         <div className={`${AUTH_CARD} ${AUTH_CARD_ANIMATE} my-auto`}>
           <div className="mb-8 text-center">
             <img
-              src={loginImage}
-              alt="Logo"
-              className="inline-flex h-50 w-80 items-center justify-center object-contain p-2"
+              src={SALESDESK_LOGO_URL}
+              alt={SALESDESK_LOGO_ALT}
+              className="inline-flex h-auto w-full max-w-[320px] object-contain p-2"
             />
             <p className="mt-2 text-xs font-medium uppercase tracking-[0.15em] text-[var(--crm-app-text-muted)]">
               {t('auth.resetPassword.title')}

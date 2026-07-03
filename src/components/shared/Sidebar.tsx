@@ -4,6 +4,7 @@ import { useUIStore } from '@/stores/ui-store';
 import { cn } from '@/lib/utils';
 import { CRM_APP_PANEL_GLASS } from '@/lib/management-list-layout';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
+import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
 
 const SIDEBAR_EASE = 'ease-[cubic-bezier(0.4,0,0.2,1)]';
 const SIDEBAR_TRANSITION = `duration-[260ms] ${SIDEBAR_EASE}`;
@@ -11,8 +12,6 @@ const SIDEBAR_LABEL_TRANSITION = cn(
   'min-w-0 overflow-hidden transition-[opacity,max-width,width] duration-[200ms] ease-[cubic-bezier(0.4,0,0.2,1)]',
   'motion-reduce:transition-none'
 );
-const LOGO_URL = '/v3logo-sm.png';
-const VERII_LOGO_URL = '/veriicrmlogo-sm.png';
 
 const areSetsEqual = (left: Set<string>, right: Set<string>): boolean => {
   if (left.size !== right.size) return false;
@@ -456,7 +455,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
               onDoubleClick={handleLogoDoubleClick}
               className="flex justify-center flex-1 cursor-pointer select-none rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--crm-brand-ring)]"
             >
-              <img src={VERII_LOGO_URL} alt="V3RII Sales Desk" className="h-24 object-contain pointer-events-none" />
+              <img src={SALESDESK_LOGO_URL} alt={SALESDESK_LOGO_ALT} className="h-20 max-w-[220px] object-contain pointer-events-none" />
             </button>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:text-red-400 rounded-lg">
               <X size={24} />
@@ -472,7 +471,11 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
               isSidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100 pointer-events-auto"
             )}
           >
-            <img src={LOGO_URL} alt="V3" className="w-full h-full object-contain scale-125 pointer-events-none" />
+            <img
+              src={SALESDESK_LOGO_URL}
+              alt={SALESDESK_LOGO_ALT}
+              className="h-full w-full max-h-[72px] object-contain object-left scale-110 pointer-events-none"
+            />
           </button>
         </div>
 

@@ -47,7 +47,7 @@ import {
   AUTH_TOGGLE_ACTIVE,
   AUTH_TOGGLE_IDLE,
 } from '../lib/auth-page-styles';
-const loginImage = '/veriicrmlogo-sm.png';
+import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
 const AuthBackground = lazy(async () => import('./AuthBackground').then((mod) => ({ default: mod.AuthBackground })));
 
 import { 
@@ -177,9 +177,9 @@ export function LoginPage(): React.JSX.Element {
         <div className={`${AUTH_CARD} ${AUTH_CARD_ANIMATE} mb-auto mt-10 md:mt-auto`}>
           <div className="text-center mb-8">
             <img
-              src={loginImage}
-              alt="Logo"
-              className="inline-flex items-center justify-center w-80 h-50 object-contain p-2"
+              src={SALESDESK_LOGO_URL}
+              alt={SALESDESK_LOGO_ALT}
+              className="inline-flex h-auto w-full max-w-[320px] object-contain p-2"
             />
             <p className="text-slate-400 text-xs uppercase tracking-[0.15em] mt-2 font-medium">
               {t('auth.login.title')}
