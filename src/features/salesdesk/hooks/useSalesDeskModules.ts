@@ -629,6 +629,15 @@ export const useDeleteSalesDeskVisit = visits.useDelete;
 
 export const useSalesDeskVisitFormList = visitForms.useList;
 export const useSalesDeskVisitFormStats = visitForms.useStats;
+export function useSalesDeskVisitForm(id: number | null) {
+  return useQuery({
+    queryKey: [...visitForms.allKey, 'detail', id],
+    queryFn: () => salesDeskApi.visitForms.get(id!),
+    enabled: id != null && id > 0,
+    staleTime: 30_000,
+    retry: false,
+  });
+}
 export const useCreateSalesDeskVisitForm = () => {
   const mutation = visitForms.useCreate();
   return {

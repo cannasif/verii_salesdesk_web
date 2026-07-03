@@ -665,6 +665,7 @@ export const salesDeskApi = {
   },
   visitForms: {
     list: (params?: PagedParams) => getPaged<SalesDeskVisitFormDto>('visit-forms', params),
+    get: (id: number) => getOne<SalesDeskVisitFormDto>('visit-forms', id),
     create: (body: Partial<SalesDeskVisitFormDto>) => createOne<SalesDeskVisitFormDto, Partial<SalesDeskVisitFormDto>>('visit-forms', body),
     update: (id: number, body: Partial<SalesDeskVisitFormDto>) => updateOne<SalesDeskVisitFormDto, Partial<SalesDeskVisitFormDto>>('visit-forms', id, body),
     delete: (id: number) => deleteOne('visit-forms', id),

@@ -29,6 +29,10 @@ export { SalesDeskActivitiesPage } from './components/pages/SalesDeskActivitiesP
 export { SalesDeskProjeTakibiPage } from './components/pages/SalesDeskProjeTakibiPage';
 export { SalesDeskWeeklyPlanPage } from './components/pages/SalesDeskWeeklyPlanPage';
 export { SalesDeskVisitFormsPage } from './components/pages/SalesDeskVisitFormsPage';
+export {
+  SalesDeskVisitFormCreatePage,
+  SalesDeskVisitFormEditPage,
+} from './components/pages/SalesDeskVisitFormEditorPage';
 export { SalesDeskAssetsPage } from './components/pages/SalesDeskAssetsPage';
 export { SalesDeskPaymentsPage } from './components/pages/SalesDeskPaymentsPage';
 export { SalesDeskSoftwareResearchPage } from './components/pages/SalesDeskSoftwareResearchPage';

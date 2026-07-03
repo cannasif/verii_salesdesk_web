@@ -26,6 +26,7 @@ import type { SalesDeskPotentialStatus } from '../api/salesdesk-api';
 import { buildSalesDeskActivityGroupName, parseSalesDeskActivityType } from '../lib/salesdesk-activities';
 import { buildSalesDeskProjectGroupName, parseSalesDeskProjectPhase } from '../lib/salesdesk-project-tracking';
 import { idToSelectValue, NONE_SELECT_VALUE, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
+import { buildDefaultVisitFormTitle, parseVisitFormContent, serializeVisitFormContent } from '../lib/visit-form-content';
 
 const documentStatusSchema = z
   .string()
@@ -75,11 +76,6 @@ const optionalPotentialIdSchema = z
   .transform((value) => optionalIdFromSelect(value));
 
 const optionalQuoteIdSchema = z
-  .string()
-  .optional()
-  .transform((value) => optionalIdFromSelect(value));
-
-const optionalVisitIdSchema = z
   .string()
   .optional()
   .transform((value) => optionalIdFromSelect(value));
@@ -457,34 +453,101 @@ export function toVisitPayload(values: VisitFormValues): Partial<SalesDeskVisitD
   };
 }
 
-export const visitFormRecordSchema = z.object({
-  visitId: optionalVisitIdSchema,
-  customerId: optionalCustomerIdSchema,
+export const visitFormRecordFormSchema = z.object({
+  visitId: z.string().optional(),
+  customerId: z.string().min(1, 'Cari secin'),
   title: z.string().trim().min(1, 'Baslik zorunludur').max(220),
   formDate: z.string().min(1, 'Tarih zorunludur'),
-  content: z.string().max(8000).optional(),
+  visitorName: z.string().max(120).optional(),
+  contactedPerson: z.string().max(120).optional(),
+  recipientEmail: z.string().max(200).optional(),
+  recipientPhone: z.string().max(40).optional(),
+  notes: z.string().max(6000).optional(),
+  nextSteps: z.string().max(2000).optional(),
 });
 
-export type VisitFormRecordValues = z.input<typeof visitFormRecordSchema>;
+/** @deprecated Use visitFormRecordFormSchema in forms; payload uses toVisitFormRecordPayload. */
+export const visitFormRecordSchema = visitFormRecordFormSchema;
+
+export type VisitFormRecordValues = z.infer<typeof visitFormRecordFormSchema>;
+
+function normalizeVisitFormDate(value: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return `${value}T12:00:00`;
+  }
+  return value;
+}
+
+function normalizeVisitFormRecordInput(values: VisitFormRecordValues): VisitFormRecordValues {
+  return {
+    ...values,
+    visitId:
+      values.visitId == null || values.visitId === ''
+        ? NONE_SELECT_VALUE
+        : String(values.visitId),
+    customerId:
+      typeof values.customerId === 'number'
+        ? String(values.customerId)
+        : values.customerId ?? '',
+    title: values.title ?? '',
+    formDate: values.formDate ?? '',
+    visitorName: values.visitorName ?? '',
+    contactedPerson: values.contactedPerson ?? '',
+    recipientEmail: values.recipientEmail ?? '',
+    recipientPhone: values.recipientPhone ?? '',
+    notes: values.notes ?? '',
+    nextSteps: values.nextSteps ?? '',
+  };
+}
+
+export function createDefaultVisitFormRecordValues(visitorName?: string): VisitFormRecordValues {
+  const formDate = new Date().toISOString().slice(0, 10);
+  return {
+    visitId: NONE_SELECT_VALUE,
+    customerId: '',
+    title: buildDefaultVisitFormTitle(formDate),
+    formDate,
+    visitorName: visitorName ?? '',
+    contactedPerson: '',
+    recipientEmail: '',
+    recipientPhone: '',
+    notes: '',
+    nextSteps: '',
+  };
+}
 
 export function toVisitFormRecordValues(form?: SalesDeskVisitFormDto | null): VisitFormRecordValues {
+  const content = parseVisitFormContent(form?.content);
   return {
     visitId: idToSelectValue(form?.visitId),
-    customerId: idToSelectValue(form?.customerId),
+    customerId: form?.customerId ? String(form.customerId) : '',
     title: form?.title ?? '',
     formDate: toDateInputValue(form?.formDate),
-    content: form?.content ?? '',
+    visitorName: content.visitorName ?? '',
+    contactedPerson: content.contactedPerson ?? '',
+    recipientEmail: content.recipientEmail ?? '',
+    recipientPhone: content.recipientPhone ?? '',
+    notes: content.notes ?? '',
+    nextSteps: content.nextSteps ?? '',
   };
 }
 
 export function toVisitFormRecordPayload(values: VisitFormRecordValues): Partial<SalesDeskVisitFormDto> {
-  const parsed = visitFormRecordSchema.parse(values);
+  const parsed = visitFormRecordFormSchema.parse(normalizeVisitFormRecordInput(values));
+  const visitId = optionalIdFromSelect(parsed.visitId);
   return {
-    visitId: parsed.visitId,
-    customerId: parsed.customerId,
+    visitId,
+    customerId: requiredIdFromSelect(parsed.customerId, 'Cari'),
     title: parsed.title.trim(),
-    formDate: parsed.formDate,
-    content: parsed.content?.trim() || undefined,
+    formDate: normalizeVisitFormDate(parsed.formDate),
+    content: serializeVisitFormContent({
+      visitorName: parsed.visitorName,
+      contactedPerson: parsed.contactedPerson,
+      recipientEmail: parsed.recipientEmail,
+      recipientPhone: parsed.recipientPhone,
+      notes: parsed.notes,
+      nextSteps: parsed.nextSteps,
+    }),
   };
 }
 

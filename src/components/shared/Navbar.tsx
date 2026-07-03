@@ -30,6 +30,7 @@ const pageTitles: Record<string, string> = {
   '/salesdesk/open-items': 'Acik Maddeler',
   '/salesdesk/weekly-plan': 'Haftalik Plan',
   '/salesdesk/visit-forms': 'Ziyaret Formu',
+  '/salesdesk/visit-forms/new': 'Yeni Ziyaret Formu',
   '/salesdesk/assets': 'Demirbaslar',
   '/salesdesk/recurring-payments': 'Standart Odemeler',
   '/salesdesk/software-research': 'Yazilim Arastirma',
@@ -70,7 +71,9 @@ export function Navbar(): ReactElement {
 
   const displayName = user?.name || user?.email || 'Kullanıcı';
   const displayInitials = user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'MK';
-  const pageTitle = pageTitles[location.pathname] ?? 'Sales Desk';
+  const pageTitle =
+    pageTitles[location.pathname] ??
+    (location.pathname.match(/^\/salesdesk\/visit-forms\/\d+\/edit$/) ? 'Ziyaret Formu Duzenle' : 'Sales Desk');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
