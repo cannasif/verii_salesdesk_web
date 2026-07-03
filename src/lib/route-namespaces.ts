@@ -55,6 +55,7 @@ const ROUTE_NAMESPACE_ENTRIES: Array<{ match: (pathname: string) => boolean; nam
   { match: (pathname) => pathname.startsWith('/hangfire-monitoring'), namespaces: ['hangfire-monitoring'] },
   { match: (pathname) => pathname.startsWith('/powerbi/reports'), namespaces: ['powerbi-viewer'] },
   { match: (pathname) => pathname.startsWith('/profile'), namespaces: ['user-detail-management'] },
+  { match: (pathname) => pathname.startsWith('/salesdesk/settings'), namespaces: ['user-detail-management', 'mail-settings'] },
 ];
 
 export const GLOBAL_ROUTE_NAMESPACES = ['common', 'notification', 'activity-image', 'ai-assistant'] as const;

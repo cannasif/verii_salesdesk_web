@@ -227,7 +227,7 @@ export function Navbar(): ReactElement {
         onOpenChange={setUserProfileModalOpen}
         onOpenProfileDetails={() => {
           setUserProfileModalOpen(false);
-          navigate('/profile');
+          navigate('/salesdesk/settings?tab=profile');
         }}
       />
     </>
