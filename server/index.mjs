@@ -5,7 +5,7 @@
  *   1) Gmail IMAP koprusu  (POST /gmail/test, /gmail/messages)
  *   2) Gercek zamanli sohbet + presence (socket.io)
  *
- * Calistirma:  npm run server   (veya npm run gmail:bridge)
+ * Calistirma:  npm run dev  (otomatik) veya npm run server
  * Varsayilan port: 8787  (SERVER_PORT ile degistirilebilir)
  */
 

@@ -19,7 +19,7 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
     });
   } catch {
     throw new Error(
-      'Yerel sunucuya ulasilamadi. "npm run dev:all" veya "npm run server" ile sunucunun calistigindan emin olun.'
+      'Yerel sunucuya ulasilamadi. Uygulamayi "npm run dev" ile baslatin; yerel sunucu otomatik acilir.'
     );
   }
 

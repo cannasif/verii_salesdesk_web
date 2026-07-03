@@ -1,13 +1,11 @@
 import { io, type Socket } from 'socket.io-client';
 import { useSalesDeskChatStore, type ChatMessage } from '../stores/salesdesk-chat-store';
+import { getLocalServerUrl } from './local-server-url';
 
 let socket: Socket | null = null;
 
 export function getChatServerUrl(): string {
-  const raw =
-    (import.meta.env.VITE_CHAT_SERVER_URL as string | undefined) ||
-    (import.meta.env.VITE_GMAIL_BRIDGE_URL as string | undefined);
-  return (raw?.trim() || 'http://localhost:8787').replace(/\/$/, '');
+  return getLocalServerUrl();
 }
 
 export function isChatConnected(): boolean {

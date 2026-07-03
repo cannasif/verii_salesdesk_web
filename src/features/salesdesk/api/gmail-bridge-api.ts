@@ -3,6 +3,8 @@
  * Yerel Node koprusune (server/gmail-bridge.mjs) baglanir.
  */
 
+import { getLocalServerUrl } from '../lib/local-server-url';
+
 export interface GmailMessage {
   id: string;
   threadId: string;
@@ -20,8 +22,7 @@ export interface GmailCredentials {
 }
 
 export function getGmailBridgeUrl(): string {
-  const raw = import.meta.env.VITE_GMAIL_BRIDGE_URL as string | undefined;
-  return (raw?.trim() || 'http://localhost:8787').replace(/\/$/, '');
+  return getLocalServerUrl();
 }
 
 async function postJson<T>(path: string, body: unknown): Promise<T> {
@@ -34,7 +35,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
     });
   } catch {
     throw new Error(
-      'Gmail koprusune ulasilamadi. "npm run gmail:bridge" ile koprunun calistigindan emin olun.'
+      'Gmail koprusune ulasilamadi. Uygulamayi "npm run dev" ile baslatin; yerel sunucu otomatik acilir.'
     );
   }
 

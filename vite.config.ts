@@ -96,6 +96,12 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         secure: false,
       },
+      "/socket.io": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
     },
   },
   }

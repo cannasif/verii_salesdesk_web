@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/dev-all.mjs",
+    "dev:web": "vite",
     "dev:all": "node scripts/dev-all.mjs",
     "server": "node server/index.mjs",
     "gmail:bridge": "node server/index.mjs",

@@ -239,9 +239,9 @@ export function SalesDeskGmailConnectPanel({
                 sayfasindan olusturulur (16 haneli).
               </p>
               <p>Gmail &rarr; Ayarlar &rarr; "Yonlendirme ve POP/IMAP" bolumunden IMAP acik olmali.</p>
-              <p className="text-amber-300/80">
-                Baglantinin calismasi icin yerel kopru gerekir: terminalde{' '}
-                <code className="rounded bg-black/30 px-1">npm run gmail:bridge</code>.
+              <p className="text-slate-500">
+                Gmail koprusu <code className="rounded bg-black/30 px-1">npm run dev</code> ile otomatik
+                baslar; ayri terminal acmaniza gerek yoktur.
               </p>
             </div>
           </div>
