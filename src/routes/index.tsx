@@ -22,6 +22,7 @@ const ForgotPasswordPage = lazyImport(() => import('@/features/auth'), 'ForgotPa
 const ProfilePage = lazyImport(() => import('@/features/user-detail-management'), 'ProfilePage');
 const UserManagementPage = lazyImport(() => import('@/features/user-management'), 'UserManagementPage');
 const PermissionGroupsPage = lazyImport(() => import('@/features/access-control'), 'PermissionGroupsPage');
+const UserAuthorizationPage = lazyImport(() => import('@/features/access-control'), 'UserAuthorizationPage');
 
 const SalesDeskDashboardPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskDashboardPage');
 const SalesDeskCustomersPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskCustomersPage');
@@ -88,6 +89,7 @@ export function createAppRouter() {
         { path: 'user-management', element: <UserManagementPage /> },
         { path: 'salesdesk/groups', element: <SalesDeskGroupsPage /> },
         { path: 'access-control/permission-groups', element: <PermissionGroupsPage /> },
+        { path: 'access-control/user-authorization', element: <UserAuthorizationPage /> },
         { path: 'profile', element: <ProfilePage /> },
         { path: '*', element: <Navigate to="/" replace /> },
       ],

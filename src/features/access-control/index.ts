@@ -9,6 +9,7 @@ export { userVisibilityPolicyApi } from './api/userVisibilityPolicyApi';
 export { extractData } from './utils/extract-api-data';
 export { PermissionDefinitionsPage } from './components/PermissionDefinitionsPage';
 export { PermissionGroupsPage } from './components/PermissionGroupsPage';
+export { UserAuthorizationPage } from './components/UserAuthorizationPage';
 export { AccessControlGuidePage } from './components/AccessControlGuidePage';
 export { AuditLogsPage } from './components/AuditLogsPage';
 export { UserGroupAssignmentsPage } from './components/UserGroupAssignmentsPage';

@@ -15,6 +15,30 @@ export function translatePermissionLabel(t: TFunction, key: string, fallback: st
 export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/': 'dashboard.view',
 
+  '/salesdesk/customers': 'salesdesk.customers.view',
+  '/salesdesk/potentials': 'salesdesk.potentials.view',
+  '/salesdesk/products': 'salesdesk.products.view',
+  '/salesdesk/product-customers': 'salesdesk.product-customers.view',
+  '/salesdesk/quotes': 'salesdesk.quotes.view',
+  '/salesdesk/quotes/new': 'salesdesk.quotes.create',
+  '/salesdesk/invoices': 'salesdesk.invoices.view',
+  '/salesdesk/invoices/sales/new': 'salesdesk.invoices.create',
+  '/salesdesk/invoices/purchase/new': 'salesdesk.invoices.create',
+  '/salesdesk/invoices/new': 'salesdesk.invoices.create',
+  '/salesdesk/sales-tracking': 'salesdesk.sales-tracking.view',
+  '/salesdesk/weekly-visits': 'salesdesk.weekly-visits.view',
+  '/salesdesk/activities': 'salesdesk.activities.view',
+  '/salesdesk/proje-takibi': 'salesdesk.projects.view',
+  '/salesdesk/open-items': 'salesdesk.open-items.view',
+  '/salesdesk/weekly-plan': 'salesdesk.weekly-plan.view',
+  '/salesdesk/visit-forms': 'salesdesk.visit-forms.view',
+  '/salesdesk/assets': 'salesdesk.assets.view',
+  '/salesdesk/recurring-payments': 'salesdesk.recurring-payments.view',
+  '/salesdesk/software-research': 'salesdesk.software-research.view',
+  '/salesdesk/erp-news': 'salesdesk.erp-news.view',
+  '/salesdesk/gmail': 'salesdesk.gmail.view',
+  '/salesdesk/settings': 'salesdesk.settings.view',
+
   '/demands': 'sales.demands.view',
   '/demands/create': 'sales.demands.create',
   '/demands/waiting-approvals': 'sales.demands.view',
@@ -100,7 +124,7 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/definitions/category-definitions': 'definitions.category-definitions.view',
 
   '/user-management': 'users.user-management.view',
-  '/salesdesk/groups': 'users.user-management.view',
+  '/salesdesk/groups': 'salesdesk.groups.view',
   '/user-discount-limit-management': 'users.discount-limits.view',
   '/users/mail-settings': 'users.mail-settings.view',
   '/profile': 'users.profile.view',
@@ -126,10 +150,36 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/access-control/visibility-policies': 'access-control.visibility-policies.view',
   '/access-control/user-visibility-assignments': 'access-control.user-visibility-assignments.view',
   '/access-control/visibility-simulator': 'access-control.visibility-simulator.view',
+  '/access-control/user-authorization': 'access-control.permission-groups.view',
 };
 
 export const PATH_TO_PERMISSION_PATTERNS: Array<{ pattern: RegExp; permission: string }> = [
   { pattern: /^\/$/, permission: 'dashboard.view' },
+
+  { pattern: /^\/salesdesk\/customers(\/|$)/, permission: 'salesdesk.customers.view' },
+  { pattern: /^\/salesdesk\/potentials(\/|$)/, permission: 'salesdesk.potentials.view' },
+  { pattern: /^\/salesdesk\/product-customers(\/|$)/, permission: 'salesdesk.product-customers.view' },
+  { pattern: /^\/salesdesk\/products(\/|$)/, permission: 'salesdesk.products.view' },
+  { pattern: /^\/salesdesk\/quotes\/new(\/|$)/, permission: 'salesdesk.quotes.create' },
+  { pattern: /^\/salesdesk\/quotes(\/|$)/, permission: 'salesdesk.quotes.view' },
+  { pattern: /^\/salesdesk\/invoices\/sales\/new(\/|$)/, permission: 'salesdesk.invoices.create' },
+  { pattern: /^\/salesdesk\/invoices\/purchase\/new(\/|$)/, permission: 'salesdesk.invoices.create' },
+  { pattern: /^\/salesdesk\/invoices\/new(\/|$)/, permission: 'salesdesk.invoices.create' },
+  { pattern: /^\/salesdesk\/invoices(\/|$)/, permission: 'salesdesk.invoices.view' },
+  { pattern: /^\/salesdesk\/sales-tracking(\/|$)/, permission: 'salesdesk.sales-tracking.view' },
+  { pattern: /^\/salesdesk\/weekly-visits(\/|$)/, permission: 'salesdesk.weekly-visits.view' },
+  { pattern: /^\/salesdesk\/activities(\/|$)/, permission: 'salesdesk.activities.view' },
+  { pattern: /^\/salesdesk\/proje-takibi(\/|$)/, permission: 'salesdesk.projects.view' },
+  { pattern: /^\/salesdesk\/open-items(\/|$)/, permission: 'salesdesk.open-items.view' },
+  { pattern: /^\/salesdesk\/weekly-plan(\/|$)/, permission: 'salesdesk.weekly-plan.view' },
+  { pattern: /^\/salesdesk\/visit-forms(\/|$)/, permission: 'salesdesk.visit-forms.view' },
+  { pattern: /^\/salesdesk\/assets(\/|$)/, permission: 'salesdesk.assets.view' },
+  { pattern: /^\/salesdesk\/recurring-payments(\/|$)/, permission: 'salesdesk.recurring-payments.view' },
+  { pattern: /^\/salesdesk\/software-research(\/|$)/, permission: 'salesdesk.software-research.view' },
+  { pattern: /^\/salesdesk\/erp-news(\/|$)/, permission: 'salesdesk.erp-news.view' },
+  { pattern: /^\/salesdesk\/gmail(\/|$)/, permission: 'salesdesk.gmail.view' },
+  { pattern: /^\/salesdesk\/settings(\/|$)/, permission: 'salesdesk.settings.view' },
+  { pattern: /^\/salesdesk\/groups(\/|$)/, permission: 'salesdesk.groups.view' },
 
   { pattern: /^\/demands\/create(\/|$)/, permission: 'sales.demands.create' },
   { pattern: /^\/demands\/waiting-approvals(\/|$)/, permission: 'sales.demands.view' },
@@ -213,7 +263,6 @@ export const PATH_TO_PERMISSION_PATTERNS: Array<{ pattern: RegExp; permission: s
   { pattern: /^\/definitions\/category-definitions(\/|$)/, permission: 'definitions.category-definitions.view' },
 
   { pattern: /^\/user-management(\/|$)/, permission: 'users.user-management.view' },
-  { pattern: /^\/salesdesk\/groups(\/|$)/, permission: 'users.user-management.view' },
   { pattern: /^\/user-discount-limit-management(\/|$)/, permission: 'users.discount-limits.view' },
   { pattern: /^\/users\/mail-settings(\/|$)/, permission: 'users.mail-settings.view' },
   { pattern: /^\/profile(\/|$)/, permission: 'users.profile.view' },
@@ -230,6 +279,7 @@ export const PATH_TO_PERMISSION_PATTERNS: Array<{ pattern: RegExp; permission: s
   { pattern: /^\/access-control\/visibility-policies(\/|$)/, permission: 'access-control.visibility-policies.view' },
   { pattern: /^\/access-control\/user-visibility-assignments(\/|$)/, permission: 'access-control.user-visibility-assignments.view' },
   { pattern: /^\/access-control\/visibility-simulator(\/|$)/, permission: 'access-control.visibility-simulator.view' },
+  { pattern: /^\/access-control\/user-authorization(\/|$)/, permission: 'access-control.permission-groups.view' },
 ];
 
 export function isLeafPermissionCode(code: string): boolean {
@@ -247,6 +297,12 @@ type CrudAction = (typeof CRUD_ACTIONS)[number];
 // Some access-control pages are operations, not CRUD resources.
 // Keep their selectable permissions aligned with the API endpoints they expose.
 const PERMISSION_ACTION_OVERRIDES: Record<string, readonly CrudAction[]> = {
+  'salesdesk.product-customers': ['view'],
+  'salesdesk.sales-tracking': ['view'],
+  'salesdesk.software-research': ['view'],
+  'salesdesk.erp-news': ['view'],
+  'salesdesk.gmail': ['view'],
+  'salesdesk.settings': ['view'],
   'sales.erp-orders': ['view'],
   'sales-documents.erp-cleanup': ['delete'],
   'access-control.user-group-assignments': ['view', 'update'],
@@ -300,6 +356,27 @@ export const ACCESS_CONTROL_ADMIN_ONLY_PATTERNS: RegExp[] = [];
 
 export const PERMISSION_CODE_DISPLAY: Record<string, { key?: string; fallback: string }> = {
   'dashboard.view': { key: 'sidebar.dashboard', fallback: 'Dashboard' },
+
+  'salesdesk.customers.view': { fallback: 'Cari Yonetimi' },
+  'salesdesk.potentials.view': { fallback: 'Potansiyel Cariler' },
+  'salesdesk.products.view': { fallback: 'Stok / Urunler' },
+  'salesdesk.product-customers.view': { fallback: 'Urun Bazli Musteriler' },
+  'salesdesk.quotes.view': { fallback: 'Teklifler' },
+  'salesdesk.invoices.view': { fallback: 'Faturalar' },
+  'salesdesk.sales-tracking.view': { fallback: 'Satis Takip' },
+  'salesdesk.weekly-visits.view': { fallback: 'Haftalik Ziyaretler' },
+  'salesdesk.activities.view': { fallback: 'Aktiviteler' },
+  'salesdesk.projects.view': { fallback: 'Proje Takibi' },
+  'salesdesk.open-items.view': { fallback: 'Acik Maddeler' },
+  'salesdesk.weekly-plan.view': { fallback: 'Haftalik Plan' },
+  'salesdesk.visit-forms.view': { fallback: 'Ziyaret Formu' },
+  'salesdesk.assets.view': { fallback: 'Demirbaslar' },
+  'salesdesk.recurring-payments.view': { fallback: 'Standart Odemeler' },
+  'salesdesk.software-research.view': { fallback: 'Yazilim Arastirma' },
+  'salesdesk.erp-news.view': { fallback: 'ERP Haber Takibi' },
+  'salesdesk.gmail.view': { fallback: 'Gmail' },
+  'salesdesk.settings.view': { fallback: 'Sistem Ayarlari' },
+  'salesdesk.groups.view': { fallback: 'Grup Yonetimi' },
 
   'sales.demands.view': { key: 'sidebar.demands', fallback: 'Talepler' },
   'sales.demands.select-representative': { fallback: 'Taleplerde Temsilci Seçme' },
@@ -490,6 +567,7 @@ export function getPermissionDisplayLabel(
 
 export const PERMISSION_MODULE_DISPLAY: Record<string, { key: string; fallback: string }> = {
   dashboard: { key: 'sidebar.home', fallback: 'Home' },
+  salesdesk: { key: 'sidebar.salesDesk', fallback: 'SalesDesk' },
   sales: { key: 'sidebar.salesManagement', fallback: 'Sales' },
   'sales-documents': { key: 'sidebar.salesManagement', fallback: 'Sales' },
   customers: { key: 'sidebar.customers', fallback: 'Customers' },
@@ -597,3 +675,49 @@ export function getRoutesForPermissionCode(code: string): string[] {
     .map(([route]) => route);
   return routes.sort((a, b) => a.localeCompare(b));
 }
+
+// Pages that actually exist in the SalesDesk app. The authorization matrix
+// only lists these (not the full inherited CRM catalog).
+export const SALESDESK_MATRIX_BASE_CODES: ReadonlySet<string> = new Set<string>([
+  'dashboard',
+  'salesdesk.customers',
+  'salesdesk.potentials',
+  'salesdesk.products',
+  'salesdesk.product-customers',
+  'salesdesk.quotes',
+  'salesdesk.invoices',
+  'salesdesk.sales-tracking',
+  'salesdesk.weekly-visits',
+  'salesdesk.activities',
+  'salesdesk.projects',
+  'salesdesk.open-items',
+  'salesdesk.weekly-plan',
+  'salesdesk.visit-forms',
+  'salesdesk.assets',
+  'salesdesk.recurring-payments',
+  'salesdesk.software-research',
+  'salesdesk.erp-news',
+  'salesdesk.gmail',
+  'salesdesk.settings',
+  'salesdesk.groups',
+  'users.user-management',
+  'access-control.permission-groups',
+  'access-control.user-group-assignments',
+]);
+
+export function getPermissionBaseCode(code: string): string {
+  const parts = code.split('.').filter(Boolean);
+  if (parts.length === 0) return code;
+  const last = (parts[parts.length - 1] ?? '').toLowerCase();
+  return isCrudAction(last) ? parts.slice(0, -1).join('.') : code;
+}
+
+export function isSalesDeskAppPermissionCode(code: string): boolean {
+  return SALESDESK_MATRIX_BASE_CODES.has(getPermissionBaseCode(code));
+}
+
+// Only the leaf permission codes shown in the authorization matrix. Kept small so
+// the sync payload stays fast (the full inherited catalog times out the backend).
+export const SALESDESK_MATRIX_PERMISSION_CODES: string[] = PERMISSION_CODE_CATALOG.filter(
+  isSalesDeskAppPermissionCode
+);

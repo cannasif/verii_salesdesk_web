@@ -102,7 +102,7 @@ export const salesDeskNavItems = [
     children: [
       { title: 'Kullanici Yonetimi', href: '/user-management' },
       { title: 'Grup Yonetimi', href: '/salesdesk/groups' },
-      { title: 'Izin Gruplari', href: '/access-control/permission-groups' },
+      { title: 'Kullanici Yetkileri', href: '/access-control/user-authorization' },
     ],
   },
   { title: 'Sistem Ayarlari', href: '/salesdesk/settings', icon: <Settings size={22} className="text-slate-300" /> },

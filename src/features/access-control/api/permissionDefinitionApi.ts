@@ -1,3 +1,4 @@
+import type { AxiosRequestConfig } from 'axios';
 import { api } from '@/lib/axios';
 import { extractData } from '../utils/extract-api-data';
 import type {
@@ -33,6 +34,28 @@ export const permissionDefinitionApi = {
     return data;
   },
 
+  // The API clamps server-side page size (max 200), and definitions are sorted by
+  // code so salesdesk.* entries fall late. Loop every page to get the full set.
+  getAll: async (): Promise<PermissionDefinitionDto[]> => {
+    const all: PermissionDefinitionDto[] = [];
+    let pageNumber = 1;
+    const pageSize = 200;
+    // Hard cap to avoid an accidental infinite loop if the API misreports paging.
+    const maxPages = 50;
+    for (let i = 0; i < maxPages; i += 1) {
+      const page = await permissionDefinitionApi.getList({
+        pageNumber,
+        pageSize,
+        sortBy: 'code',
+        sortDirection: 'asc',
+      });
+      all.push(...page.data);
+      if (!page.hasNextPage || page.data.length === 0) break;
+      pageNumber += 1;
+    }
+    return all;
+  },
+
   getById: async (id: number): Promise<PermissionDefinitionDto> => {
     const response = await api.get<ApiResponse<PermissionDefinitionDto>>(
       `/api/permission-definitions/${id}`
@@ -61,10 +84,14 @@ export const permissionDefinitionApi = {
 
 
 
-  sync: async (dto: SyncPermissionDefinitionsDto): Promise<PermissionDefinitionSyncResultDto> => {
+  sync: async (
+    dto: SyncPermissionDefinitionsDto,
+    config?: AxiosRequestConfig
+  ): Promise<PermissionDefinitionSyncResultDto> => {
     const response = await api.post<ApiResponse<PermissionDefinitionSyncResultDto>>(
       '/api/permission-definitions/sync',
-      dto
+      dto,
+      config
     );
     return extractData(response as ApiResponse<PermissionDefinitionSyncResultDto>);
   },

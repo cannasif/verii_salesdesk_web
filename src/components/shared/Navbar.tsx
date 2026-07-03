@@ -39,6 +39,7 @@ const pageTitles: Record<string, string> = {
   '/user-management': 'Kullanici Yonetimi',
   '/salesdesk/groups': 'Grup Yonetimi',
   '/access-control/permission-groups': 'Izin Gruplari',
+  '/access-control/user-authorization': 'Kullanici Yetkileri',
 };
 
 export function Navbar(): ReactElement {

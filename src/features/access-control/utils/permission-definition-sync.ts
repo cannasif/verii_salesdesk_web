@@ -4,6 +4,7 @@ import type { MyPermissionsDto, SyncPermissionDefinitionItemDto } from '../types
 import {
   DEPRECATED_AUTO_PERMISSION_CODES,
   PERMISSION_CODE_CATALOG,
+  SALESDESK_MATRIX_PERMISSION_CODES,
   getPermissionDisplayLabel,
   getPermissionDisplayMeta,
   inferPermissionPlatforms,
@@ -87,15 +88,56 @@ async function buildSyncItems(): Promise<SyncPermissionDefinitionItemDto[]> {
   return [...activeItems, ...deprecatedItems];
 }
 
+export function canSyncPermissionDefinitions(permissions: MyPermissionsDto | null | undefined): boolean {
+  return canManagePermissionDefinitions(permissions);
+}
+
+const FOCUSED_SYNC_TIMEOUT_MS = 60_000;
+
+/**
+ * Upserts only the permission definitions shown in the authorization matrix.
+ * The payload is small so it never hits the request timeout that the full
+ * inherited catalog sync does. Sync never deletes definitions that are absent
+ * from the payload, so existing definitions stay intact.
+ */
+export async function syncSalesDeskMatrixDefinitions(
+  permissions: MyPermissionsDto | null | undefined
+): Promise<void> {
+  if (!canManagePermissionDefinitions(permissions)) return;
+
+  await ensureNamespacesReady(getRequiredNamespaces(), CANONICAL_PERMISSION_LANGUAGE);
+
+  const items = SALESDESK_MATRIX_PERMISSION_CODES.map((code) => ({
+    code,
+    name: getPermissionDisplayLabel(code, translateInCanonicalLanguage),
+    description: null,
+    isActive: true,
+    ...inferPermissionPlatforms(code),
+  }));
+
+  if (items.length === 0) return;
+
+  await permissionDefinitionApi.sync(
+    {
+      items,
+      reactivateSoftDeleted: true,
+      updateExistingNames: true,
+      updateExistingIsActive: true,
+    },
+    { timeout: FOCUSED_SYNC_TIMEOUT_MS }
+  );
+}
+
 export async function ensurePermissionDefinitionsSynced(args: {
   userId: number | null;
   permissions: MyPermissionsDto | null | undefined;
+  force?: boolean;
 }): Promise<void> {
-  const { userId, permissions } = args;
+  const { userId, permissions, force = false } = args;
   if (!userId || !canManagePermissionDefinitions(permissions)) return;
 
   const signature = getCatalogSignature();
-  if (getStoredSignature(userId) === signature) return;
+  if (!force && getStoredSignature(userId) === signature) return;
 
   if (!autoSyncPromise) {
     autoSyncPromise = (async () => {
