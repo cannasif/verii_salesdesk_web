@@ -28,17 +28,24 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(payload.error || `Sunucu hatasi (${response.status}).`);
   }
 
-  return payload.data as T;
+  if (payload.data === undefined) {
+    throw new Error('Yerel sunucudan gecersiz yanit alindi.');
+  }
+
+  return payload.data;
 }
 
+/** Vite SPA rotasi ile cakismamasi icin /groups kullanilir (proxy destekli). */
+const GROUPS_BASE = '/groups';
+
 export const salesDeskGroupsApi = {
-  list: async (): Promise<SalesDeskGroupDto[]> => requestJson<SalesDeskGroupDto[]>('/salesdesk/groups'),
+  list: async (): Promise<SalesDeskGroupDto[]> => requestJson<SalesDeskGroupDto[]>(GROUPS_BASE),
 
   getById: async (id: number): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(`/salesdesk/groups/${id}`),
+    requestJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}`),
 
   create: async (dto: SalesDeskGroupFormSchema): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>('/salesdesk/groups', {
+    requestJson<SalesDeskGroupDto>(GROUPS_BASE, {
       method: 'POST',
       body: JSON.stringify(dto),
     }),
@@ -47,18 +54,18 @@ export const salesDeskGroupsApi = {
     id: number,
     dto: Pick<SalesDeskGroupFormSchema, 'name' | 'description'>
   ): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(`/salesdesk/groups/${id}`, {
+    requestJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}`, {
       method: 'PUT',
       body: JSON.stringify(dto),
     }),
 
   setMembers: async (id: number, memberUserIds: number[]): Promise<SalesDeskGroupDto> =>
-    requestJson<SalesDeskGroupDto>(`/salesdesk/groups/${id}/members`, {
+    requestJson<SalesDeskGroupDto>(`${GROUPS_BASE}/${id}/members`, {
       method: 'PUT',
       body: JSON.stringify({ memberUserIds }),
     }),
 
   delete: async (id: number): Promise<void> => {
-    await requestJson<unknown>(`/salesdesk/groups/${id}`, { method: 'DELETE' });
+    await requestJson<unknown>(`${GROUPS_BASE}/${id}`, { method: 'DELETE' });
   },
 };

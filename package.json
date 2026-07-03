@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-all.mjs",
-    "dev:web": "vite",
+    "dev:web": "vite --port 5174 --strictPort",
     "dev:all": "node scripts/dev-all.mjs",
     "server": "node server/index.mjs",
     "gmail:bridge": "node server/index.mjs",

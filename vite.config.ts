@@ -90,7 +90,12 @@ export default defineConfig(({ mode }) => {
         secure: false,
         ws: true,
       },
-      // Grup API'si /salesdesk/groups rotasi React sayfasi ile cakisir; proxy kullanma.
+      // /salesdesk/groups React sayfasi ile cakisir; grup API'si /groups uzerinden proxy'lenir.
+      "/groups": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+      },
       "/gmail": {
         target: devLocalServerTarget,
         changeOrigin: true,

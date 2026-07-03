@@ -77,12 +77,27 @@ function toBaseRelativePath(fileName: string): string {
   return `${normalizedBase}${fileName}`;
 }
 
-function resolveDevProxyApiUrl(): string | null {
-  if (!import.meta.env.DEV || isValidApiUrl(import.meta.env.VITE_API_URL)) {
-    return null;
+function isLocalhostApiUrl(value: string | undefined | null): boolean {
+  if (!isValidApiUrl(value)) return false;
+  try {
+    const host = new URL(normalizeBaseUrl(value!)).hostname.toLowerCase();
+    return host === 'localhost' || host === '127.0.0.1' || host === '[::1]';
+  } catch {
+    return false;
+  }
+}
+
+function shouldUseDevBrowserProxy(): boolean {
+  if (!import.meta.env.DEV || typeof window === 'undefined') {
+    return false;
   }
 
-  if (typeof window === 'undefined') {
+  // Yerel backend (localhost:5000 vb.) icin dogrudan baglanti; uzak API icin Vite proxy kullan.
+  return !isLocalhostApiUrl(import.meta.env.VITE_API_URL);
+}
+
+function resolveDevProxyApiUrl(): string | null {
+  if (!shouldUseDevBrowserProxy()) {
     return null;
   }
 
@@ -106,16 +121,16 @@ async function fetchRuntimeConfig(): Promise<ResolvedRuntimeConfig> {
     baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
   };
 
-  if (import.meta.env.DEV && isValidApiUrl(import.meta.env.VITE_API_URL)) {
-    return fallbackConfig;
-  }
-
   const devProxyApiUrl = resolveDevProxyApiUrl();
   if (devProxyApiUrl) {
     return {
       apiUrl: devProxyApiUrl,
       baseUrl: normalizeAppBasePath(import.meta.env.BASE_URL || '/'),
     };
+  }
+
+  if (import.meta.env.DEV && isLocalhostApiUrl(import.meta.env.VITE_API_URL)) {
+    return fallbackConfig;
   }
 
   try {
@@ -208,7 +223,7 @@ export function loadConfig(): Promise<string> {
         }
 
         const persisted = readPersistedRuntimeConfig();
-        if (persisted) {
+        if (persisted && !(import.meta.env.DEV && !isLocalhostApiUrl(persisted.apiUrl))) {
           if (import.meta.env.DEV) {
             console.warn(`[api-config] ${RUNTIME_CONFIG_FILE_NAME} okunamadi, persisted fallback kullaniliyor:`, error);
           }

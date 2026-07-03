@@ -1,6 +1,6 @@
 /**
  * Yerel yardimci sunucu (Gmail koprusu, sohbet, gruplar) taban URL'si.
- * Gelistirmede bos string doner; Vite /gmail ve /socket.io isteklerini proxy'ler.
+ * Gelistirmede bos string doner; Vite /gmail, /groups ve /socket.io isteklerini proxy'ler.
  */
 export function getLocalServerUrl(): string {
   const fromEnv =

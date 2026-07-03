@@ -198,7 +198,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         <div className="rounded-lg border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
           <p>Gruplar yuklenemedi: {groupsWarningMessage}</p>
           <p className="mt-2 text-xs text-amber-100/80">
-            Grup satirlari icin yerel sunucunun calistigindan emin olun (`npm run server` veya `npm run dev:all`).
+            Grup satirlari icin uygulamayi `npm run dev` ile baslatin; yerel sunucu otomatik acilir.
           </p>
         </div>
       )}

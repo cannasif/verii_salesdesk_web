@@ -614,8 +614,12 @@ api.interceptors.response.use(
 
     if (error.code === 'ECONNABORTED') {
       error.message = 'Sunucu yanit vermedi. Baglantinizi kontrol edip tekrar deneyin.';
-    } else if (!error.response && !error.message) {
-      error.message = 'Ag hatasi. API sunucusuna ulasilamiyor.';
+    } else if (
+      !error.response &&
+      (!error.message || error.message === 'Network Error')
+    ) {
+      error.message =
+        'API sunucusuna ulasilamadi. npm run dev ile baslatin ve adres cubugundaki portu (or. localhost:5174) kullanin.';
     }
 
     const apiMessage = extractApiErrorMessage(apiError);
