@@ -695,6 +695,15 @@ export const useDeleteSalesDeskRecurringPayment = recurringPayments.useDelete;
 
 export const useSalesDeskSoftwareResearchList = softwareResearch.useList;
 export const useSalesDeskSoftwareResearchStats = softwareResearch.useStats;
+export function useSalesDeskSoftwareResearch(id: number | null) {
+  return useQuery({
+    queryKey: [...softwareResearch.allKey, 'detail', id],
+    queryFn: () => salesDeskApi.softwareResearch.get(id!),
+    enabled: id != null && id > 0,
+    staleTime: 30_000,
+    retry: false,
+  });
+}
 export const useCreateSalesDeskSoftwareResearch = () => {
   const mutation = softwareResearch.useCreate();
   return {

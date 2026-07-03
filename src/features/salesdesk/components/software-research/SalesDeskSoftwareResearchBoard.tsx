@@ -1,0 +1,231 @@
+import { type ReactElement } from 'react';
+import { ChevronLeft, ChevronRight, Loader2, RefreshCw, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import type { SalesDeskPotentialStatus, SalesDeskSoftwareResearchDto } from '../../api/salesdesk-api';
+import { PAGE_SIZE_OPTIONS } from '../../lib/salesdesk-shared';
+import { POTENTIAL_STATUS_LABELS } from '../../lib/salesdesk-labels';
+import { SD_SEARCH_FOCUS, SD_SELECT_CONTENT } from '../../lib/salesdesk-popup-styles';
+import { SalesDeskSoftwareResearchCard } from './SalesDeskSoftwareResearchCard';
+
+type StatusFilter = 'all' | `${SalesDeskPotentialStatus}`;
+
+const POTENTIAL_STATUS_IDS: SalesDeskPotentialStatus[] = [1, 2, 3, 4, 5, 6];
+
+const STATUS_FILTERS: Array<{ id: StatusFilter; label: string }> = [
+  { id: 'all', label: 'Tumu' },
+  ...POTENTIAL_STATUS_IDS.map((id) => ({
+    id: String(id) as StatusFilter,
+    label: POTENTIAL_STATUS_LABELS[id],
+  })),
+];
+
+interface SalesDeskSoftwareResearchBoardProps {
+  items: SalesDeskSoftwareResearchDto[];
+  totalCount: number;
+  statusFilter: StatusFilter;
+  onStatusFilterChange: (value: StatusFilter) => void;
+  isLoading?: boolean;
+  isFetching?: boolean;
+  isError?: boolean;
+  errorMessage?: string | null;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onRefresh: () => void;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  onEdit: (item: SalesDeskSoftwareResearchDto) => void;
+  onDelete: (item: SalesDeskSoftwareResearchDto) => void;
+  onAdd: () => void;
+}
+
+function BoardSkeleton(): ReactElement {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {[0, 1, 2, 3, 4, 5].map((item) => (
+        <div key={item} className="h-64 animate-pulse rounded-2xl bg-[var(--crm-app-panel-muted)]" />
+      ))}
+    </div>
+  );
+}
+
+export function SalesDeskSoftwareResearchBoard({
+  items,
+  totalCount,
+  statusFilter,
+  onStatusFilterChange,
+  isLoading = false,
+  isFetching = false,
+  isError = false,
+  errorMessage,
+  searchTerm,
+  onSearchChange,
+  onRefresh,
+  pageNumber,
+  pageSize,
+  totalPages,
+  onPageChange,
+  onPageSizeChange,
+  onEdit,
+  onDelete,
+  onAdd,
+}: SalesDeskSoftwareResearchBoardProps): ReactElement {
+  const hasPreviousPage = pageNumber > 1;
+  const hasNextPage = pageNumber < totalPages;
+  const rangeStart = totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
+  const rangeEnd = Math.min(pageNumber * pageSize, totalCount);
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] p-4 sm:p-5">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="group/search relative min-w-0 flex-1">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)]"
+            />
+            <Input
+              value={searchTerm}
+              onChange={(event) => onSearchChange(event.target.value)}
+              placeholder="Saglayici, firma, host veya anahtar kelimede ara..."
+              className={cn(
+                'h-11 rounded-xl border-[var(--crm-app-border)] bg-[var(--crm-app-input)] pl-10 text-sm text-slate-900 dark:text-slate-100',
+                SD_SEARCH_FOCUS
+              )}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={isFetching}
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300"
+          >
+            <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
+            Yenile
+          </button>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {STATUS_FILTERS.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              onClick={() => onStatusFilterChange(filter.id)}
+              className={cn(
+                'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                statusFilter === filter.id
+                  ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-accent)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)]'
+                  : 'border border-[var(--crm-app-border)] text-[var(--crm-app-text-muted)] hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-700 dark:hover:text-slate-200'
+              )}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)]/50 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300">
+        <span className="font-semibold text-slate-900 dark:text-slate-100">{totalCount}</span> arastirma kaydi
+      </div>
+
+      {isError ? (
+        <div className="rounded-xl border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 dark:text-rose-200">
+          {errorMessage || 'Arastirma kayitlari yuklenemedi.'}
+        </div>
+      ) : null}
+
+      {isLoading ? (
+        <BoardSkeleton />
+      ) : items.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[var(--crm-app-border)] px-6 py-16 text-center">
+          <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+            {searchTerm.trim() || statusFilter !== 'all' ? 'Sonuc bulunamadi' : 'Henuz arastirma kaydi yok'}
+          </p>
+          <p className="mt-1 text-sm text-[var(--crm-app-text-muted)]">
+            {searchTerm.trim() || statusFilter !== 'all'
+              ? 'Filtreleri degistirmeyi deneyin.'
+              : 'Potansiyel cariler icin ilk yazilim arastirmanizi olusturun.'}
+          </p>
+          {!searchTerm.trim() && statusFilter === 'all' ? (
+            <button
+              type="button"
+              onClick={onAdd}
+              className="mt-4 rounded-lg bg-[var(--crm-brand-primary)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[color-mix(in_srgb,var(--crm-brand-primary)_88%,black)]"
+            >
+              Ilk arastirmayi olustur
+            </button>
+          ) : null}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {items.map((item) => (
+            <SalesDeskSoftwareResearchCard key={item.id} item={item} onEdit={onEdit} onDelete={onDelete} />
+          ))}
+        </div>
+      )}
+
+      {isFetching && !isLoading ? (
+        <div className="flex items-center justify-center gap-2 text-xs text-[var(--crm-app-text-muted)]">
+          <Loader2 size={14} className="animate-spin" />
+          Guncelleniyor...
+        </div>
+      ) : null}
+
+      {totalCount > 0 ? (
+        <div className="flex flex-col gap-3 rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-[var(--crm-app-text-muted)]">
+            <span className="font-medium text-slate-700 dark:text-slate-200">
+              {rangeStart}–{rangeEnd}
+            </span>{' '}
+            / {totalCount}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={String(pageSize)} onValueChange={(value) => onPageSizeChange(Number(value))}>
+              <SelectTrigger className="h-9 w-[72px] rounded-lg border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className={SD_SELECT_CONTENT}>
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <SelectItem key={size} value={String(size)}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <button
+              type="button"
+              onClick={() => onPageChange(pageNumber - 1)}
+              disabled={!hasPreviousPage}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="min-w-[72px] text-center text-xs font-semibold">
+              {pageNumber} / {Math.max(1, totalPages)}
+            </span>
+            <button
+              type="button"
+              onClick={() => onPageChange(pageNumber + 1)}
+              disabled={!hasNextPage}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export type { StatusFilter as SoftwareResearchStatusFilter };

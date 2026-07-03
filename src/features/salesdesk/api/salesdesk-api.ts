@@ -684,6 +684,7 @@ export const salesDeskApi = {
   },
   softwareResearch: {
     list: (params?: PagedParams) => getPaged<SalesDeskSoftwareResearchDto>('software-research', params),
+    get: (id: number) => getOne<SalesDeskSoftwareResearchDto>('software-research', id),
     create: (body: Partial<SalesDeskSoftwareResearchDto>) => createOne<SalesDeskSoftwareResearchDto, Partial<SalesDeskSoftwareResearchDto>>('software-research', body),
     update: (id: number, body: Partial<SalesDeskSoftwareResearchDto>) => updateOne<SalesDeskSoftwareResearchDto, Partial<SalesDeskSoftwareResearchDto>>('software-research', id, body),
     delete: (id: number) => deleteOne('software-research', id),

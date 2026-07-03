@@ -47,6 +47,14 @@ const SalesDeskVisitFormEditPage = lazyImport(() => import('@/features/salesdesk
 const SalesDeskAssetsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskAssetsPage');
 const SalesDeskPaymentsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskPaymentsPage');
 const SalesDeskSoftwareResearchPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSoftwareResearchPage');
+const SalesDeskSoftwareResearchCreatePage = lazyImport(
+  () => import('@/features/salesdesk'),
+  'SalesDeskSoftwareResearchCreatePage'
+);
+const SalesDeskSoftwareResearchEditPage = lazyImport(
+  () => import('@/features/salesdesk'),
+  'SalesDeskSoftwareResearchEditPage'
+);
 const SalesDeskErpNewsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskErpNewsPage');
 const SalesDeskGmailPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGmailPage');
 const SalesDeskSettingsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSettingsPage');
@@ -87,6 +95,8 @@ export function createAppRouter() {
         { path: 'salesdesk/assets', element: <SalesDeskAssetsPage /> },
         { path: 'salesdesk/recurring-payments', element: <SalesDeskPaymentsPage /> },
         { path: 'salesdesk/software-research', element: <SalesDeskSoftwareResearchPage /> },
+        { path: 'salesdesk/software-research/new', element: <SalesDeskSoftwareResearchCreatePage /> },
+        { path: 'salesdesk/software-research/:id/edit', element: <SalesDeskSoftwareResearchEditPage /> },
         { path: 'salesdesk/erp-news', element: <SalesDeskErpNewsPage /> },
         { path: 'salesdesk/gmail', element: <SalesDeskGmailPage /> },
         { path: 'salesdesk/settings', element: <SalesDeskSettingsPage /> },

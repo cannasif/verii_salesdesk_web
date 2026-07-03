@@ -58,11 +58,6 @@ const paymentTypeSchema = z
   .min(1, 'Tip secin')
   .transform((value) => Number(value) as SalesDeskRecurringPaymentType);
 
-const potentialStatusSchema = z
-  .string()
-  .min(1, 'Durum secin')
-  .transform((value) => Number(value) as SalesDeskPotentialStatus);
-
 const customerIdSchema = z.string().min(1, 'Cari secin').transform((value) => requiredIdFromSelect(value, 'Cari'));
 
 const optionalCustomerIdSchema = z
@@ -627,16 +622,28 @@ export function toRecurringPaymentPayload(
 }
 
 export const softwareResearchFormSchema = z.object({
-  potentialCustomerId: optionalPotentialIdSchema,
+  potentialCustomerId: z.string().optional(),
   provider: z.string().trim().min(1, 'Saglayici zorunludur').max(80),
   keywords: z.string().max(500).optional(),
   host: z.string().max(220).optional(),
   sourceUrl: z.string().max(500).optional(),
-  score: z.number().min(0).max(100),
-  status: potentialStatusSchema,
+  score: z.number().min(0, 'Skor 0-100 arasi olmali').max(100, 'Skor 0-100 arasi olmali'),
+  status: z.string().min(1, 'Durum secin'),
 });
 
-export type SoftwareResearchFormValues = z.input<typeof softwareResearchFormSchema>;
+export type SoftwareResearchFormValues = z.infer<typeof softwareResearchFormSchema>;
+
+export function createDefaultSoftwareResearchFormValues(): SoftwareResearchFormValues {
+  return {
+    potentialCustomerId: NONE_SELECT_VALUE,
+    provider: '',
+    keywords: '',
+    host: '',
+    sourceUrl: '',
+    score: 0,
+    status: '1',
+  };
+}
 
 export function toSoftwareResearchFormValues(
   item?: SalesDeskSoftwareResearchDto | null
@@ -655,15 +662,23 @@ export function toSoftwareResearchFormValues(
 export function toSoftwareResearchPayload(
   values: SoftwareResearchFormValues
 ): Partial<SalesDeskSoftwareResearchDto> {
-  const parsed = softwareResearchFormSchema.parse(values);
+  const parsed = softwareResearchFormSchema.parse({
+    ...values,
+    potentialCustomerId:
+      values.potentialCustomerId == null || values.potentialCustomerId === ''
+        ? NONE_SELECT_VALUE
+        : String(values.potentialCustomerId),
+    score: Number(values.score),
+  });
+
   return {
-    potentialCustomerId: parsed.potentialCustomerId,
+    potentialCustomerId: optionalIdFromSelect(parsed.potentialCustomerId),
     provider: parsed.provider.trim(),
     keywords: parsed.keywords?.trim() || undefined,
     host: parsed.host?.trim() || undefined,
     sourceUrl: parsed.sourceUrl?.trim() || undefined,
     score: parsed.score,
-    status: parsed.status,
+    status: Number(parsed.status) as SalesDeskPotentialStatus,
   };
 }
 

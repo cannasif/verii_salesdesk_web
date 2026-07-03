@@ -36,6 +36,10 @@ export {
 export { SalesDeskAssetsPage } from './components/pages/SalesDeskAssetsPage';
 export { SalesDeskPaymentsPage } from './components/pages/SalesDeskPaymentsPage';
 export { SalesDeskSoftwareResearchPage } from './components/pages/SalesDeskSoftwareResearchPage';
+export {
+  SalesDeskSoftwareResearchCreatePage,
+  SalesDeskSoftwareResearchEditPage,
+} from './components/pages/SalesDeskSoftwareResearchEditorPage';
 export { SalesDeskErpNewsPage } from './components/pages/SalesDeskErpNewsPage';
 export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
