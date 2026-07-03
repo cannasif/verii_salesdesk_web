@@ -80,8 +80,8 @@ function SubMenuComponent({ item, pathname, searchQuery }: { item: NavItem; path
         className={cn(
           "flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors text-sm group select-none relative",
           isOpen || hasActiveChild
-            ? "text-white font-medium"
-            : "text-slate-400 hover:bg-white/[.04] hover:text-white"
+            ? "text-slate-900 font-medium dark:text-white"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/[.04] dark:hover:text-white"
         )}
       >
         <span className="whitespace-normal leading-tight crm-text-start wrap-break-word crm-pe-2">{item.title}</span>
@@ -91,7 +91,7 @@ function SubMenuComponent({ item, pathname, searchQuery }: { item: NavItem; path
       </button>
 
       {isOpen && (
-        <div className="crm-ms-2 mt-1 space-y-1 crm-border-start border-white/10 crm-ps-2">
+        <div className="crm-ms-2 mt-1 space-y-1 crm-border-start border-slate-200 crm-ps-2 dark:border-white/10">
           {item.children?.map((child) => {
              const isSubLinkActive = pathname === child.href;
              return (
@@ -102,7 +102,7 @@ function SubMenuComponent({ item, pathname, searchQuery }: { item: NavItem; path
                    "flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-xs w-full relative",
                    isSubLinkActive
                      ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)] font-medium'
-                     : 'text-slate-400 hover:bg-white/[.04] hover:text-white'
+                     : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/[.04] dark:hover:text-white'
                  )}
                  onClick={() => {
                    
@@ -210,7 +210,7 @@ function NavItemComponent({
             type="button"
             className={cn(
                 "relative flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-colors cursor-pointer select-none crm-text-start group",
-                visualActive ? 'bg-[var(--crm-brand-soft)]' : 'hover:bg-white/[.04]',
+                visualActive ? 'bg-[var(--crm-brand-soft)]' : 'hover:bg-slate-100 dark:hover:bg-white/[.04]',
                 !isSidebarOpen && "justify-center px-0 gap-0",
                 SIDEBAR_TRANSITION
             )}
@@ -225,7 +225,7 @@ function NavItemComponent({
           {item.icon && (
             <div className={cn(
                 "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200",
-                visualActive ? 'bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)] text-[var(--crm-brand-on-soft)]' : 'bg-slate-800/80 border border-white/8 text-slate-400'
+                visualActive ? 'bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)] text-[var(--crm-brand-on-soft)]' : 'bg-slate-100 border border-slate-200 text-slate-500 dark:bg-slate-800/80 dark:border-white/8 dark:text-slate-400'
             )}>
               {item.icon}
             </div>
@@ -235,7 +235,7 @@ function NavItemComponent({
             className={cn(
               SIDEBAR_LABEL_TRANSITION,
               "flex-1 min-w-0 text-sm font-medium leading-tight crm-text-start crm-pe-2 whitespace-nowrap text-ellipsis",
-              visualActive ? 'text-[var(--crm-brand-on-soft)] font-semibold' : 'text-slate-300',
+              visualActive ? 'text-[var(--crm-brand-on-soft)] font-semibold' : 'text-slate-700 dark:text-slate-300',
               isSidebarOpen ? 'opacity-100 max-w-[12rem]' : 'opacity-0 max-w-0 w-0 pointer-events-none'
             )}
           >
@@ -254,7 +254,7 @@ function NavItemComponent({
         </button>
 
         {isExpanded && isSidebarOpen && (
-          <div className="crm-ms-12 mt-2 space-y-1 crm-border-start border-white/10 crm-ps-2">
+          <div className="crm-ms-12 mt-2 space-y-1 crm-border-start border-slate-200 crm-ps-2 dark:border-white/10">
             {item.children?.map((child) => (
               child.children && child.children.length > 0 
                 ? <SubMenuComponent key={child.title} item={child} pathname={location.pathname} searchQuery={searchQuery} />
@@ -263,7 +263,7 @@ function NavItemComponent({
                     to={child.href || '#'}
                     className={cn(
                       "flex items-center justify-between px-3 py-2 rounded-lg transition-colors text-sm w-full relative",
-                      location.pathname === child.href ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)] font-semibold' : 'text-slate-400 hover:bg-white/[.04] hover:text-white'
+                      location.pathname === child.href ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)] font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/[.04] dark:hover:text-white'
                     )}
                     onClick={() => { 
                  
@@ -289,7 +289,7 @@ function NavItemComponent({
           to={item.href || '#'} 
           className={cn(
             "relative flex items-center gap-3 rounded-xl px-3 py-2 transition-all group",
-            isActive ? 'bg-[var(--crm-brand-soft)]' : 'hover:bg-white/[.04]',
+            isActive ? 'bg-[var(--crm-brand-soft)]' : 'hover:bg-slate-100 dark:hover:bg-white/[.04]',
             !isSidebarOpen && "justify-center px-0 gap-0",
             SIDEBAR_TRANSITION
           )}
@@ -303,7 +303,7 @@ function NavItemComponent({
           }}
         >
             {item.icon && (
-                <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200", isActive ? 'bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)] text-[var(--crm-brand-on-soft)]' : 'bg-slate-800/80 border border-white/8 text-slate-400')}>
+                <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200", isActive ? 'bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)] text-[var(--crm-brand-on-soft)]' : 'bg-slate-100 border border-slate-200 text-slate-500 dark:bg-slate-800/80 dark:border-white/8 dark:text-slate-400')}>
                     {item.icon}
                 </div>
             )}
@@ -312,7 +312,7 @@ function NavItemComponent({
               className={cn(
                 SIDEBAR_LABEL_TRANSITION,
                 "flex-1 min-w-0 text-sm font-medium leading-tight crm-text-start crm-pe-2 whitespace-nowrap text-ellipsis",
-                isActive ? 'text-[var(--crm-brand-on-soft)] font-semibold' : 'text-slate-300',
+                isActive ? 'text-[var(--crm-brand-on-soft)] font-semibold' : 'text-slate-700 dark:text-slate-300',
                 isSidebarOpen ? 'opacity-100 max-w-[12rem]' : 'opacity-0 max-w-0 w-0 pointer-events-none'
               )}
             >
@@ -438,7 +438,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
       >
         
         <div className={cn(
-          "h-[104px] flex items-center justify-center border-b border-white/10 shrink-0 relative overflow-hidden",
+          "h-[104px] flex items-center justify-center border-b border-slate-200 shrink-0 relative overflow-hidden dark:border-white/10",
           "pt-[env(safe-area-inset-top)] transition-[padding] duration-[260ms]",
           SIDEBAR_EASE,
           isSidebarOpen ? "px-4" : "px-0"

@@ -1,12 +1,5 @@
 import { type ReactElement, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { loadLanguage } from '@/lib/i18n';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from '@/components/ui/select';
 import {
   Mail02Icon,
   Moon02Icon,
@@ -20,12 +13,10 @@ import {
 } from 'hugeicons-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Check, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/components/theme-provider';
-import { brandThemes, type BrandTheme } from '@/lib/brand-themes';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserDetailByUserId } from '@/features/user-detail-management/hooks/useUserDetailByUserId';
 import { getImageUrl } from '@/features/user-detail-management/utils/image-url';
@@ -38,23 +29,15 @@ interface UserProfileModalProps {
   onOpenProfileDetails: () => void;
 }
 
-const languages = [
-  { code: 'tr', name: 'Türkçe', flag: '🇹🇷', short: 'TR' },
-  { code: 'en', name: 'English', flag: '🇬🇧', short: 'EN' },
-  { code: 'de', name: 'Deutsch', flag: '🇩🇪', short: 'DE' },
-  { code: 'fr', name: 'Français', flag: '🇫🇷', short: 'FR' },
-  { code: 'it', name: 'Italiano', flag: '🇮🇹', short: 'IT' },
-  { code: 'es', name: 'Español', flag: '🇪🇸', short: 'ES' },
-  { code: 'ar', name: 'العربية', flag: '🇸🇦', short: 'AR' },
-];
+const APP_LANGUAGE = { code: 'tr', name: 'Türkçe', flag: '🇹🇷' } as const;
 
 export function UserProfileModal({
   open,
   onOpenChange,
   onOpenProfileDetails
 }: UserProfileModalProps): ReactElement {
-  const { t, i18n } = useTranslation();
-  const { theme, brandTheme, setTheme, setBrandTheme } = useTheme();
+  const { t } = useTranslation();
+  const { theme, setTheme } = useTheme();
   const { user, logout, branch } = useAuthStore();
   const navigate = useNavigate();
   const { data: userDetail } = useUserDetailByUserId(user?.id || 0, open);
@@ -69,10 +52,6 @@ export function UserProfileModal({
     checkIsDark();
   }, [theme, open]);
 
-  const normalizedLang = i18n.language?.toLowerCase() === 'sa' ? 'ar' : i18n.language?.toLowerCase().split('-')[0] ?? 'tr';
-  const currentLanguage = languages.find((lang) => lang.code === normalizedLang) || languages[0];
-  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
-
   const displayName = user?.name || user?.email || t('dashboard.user');
   const displayInitials = user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || 'U';
 
@@ -80,19 +59,6 @@ export function UserProfileModal({
     logout();
     onOpenChange(false);
     navigate('/auth/login', { replace: true });
-  };
-
-  const handleLanguageChange = async (value: string): Promise<void> => {
-    const target = value.toLowerCase() === 'sa' ? 'ar' : value.toLowerCase();
-    if (target === normalizedLang) return;
-    setIsChangingLanguage(true);
-    try {
-      await loadLanguage(target);
-      await i18n.changeLanguage(target);
-      if (typeof window !== 'undefined') window.localStorage.setItem('i18nextLng', target);
-    } finally {
-      setIsChangingLanguage(false);
-    }
   };
 
   return (
@@ -203,115 +169,32 @@ export function UserProfileModal({
                     <p className="font-bold text-sm md:text-base lg:text-lg">{t('language_choice')}</p>
                   </div>
                 </div>
-                <Select value={currentLanguage.code} onValueChange={handleLanguageChange} disabled={isChangingLanguage}>
-                  <SelectTrigger className={cn(
-                    "w-16 md:w-24 lg:w-28 h-9 md:h-10 shadow-none focus:ring-0 font-black text-xs md:text-sm transition-all",
-                    "bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:border-none dark:hover:bg-white/20 dark:text-white"
-                  )}>
-                    <span>{currentLanguage.short}</span>
-                  </SelectTrigger>
-                  <SelectContent className={cn(
-                    "rounded-2xl border shadow-2xl",
-                    "bg-white border-slate-200 text-slate-900 dark:bg-[#1a1025] dark:border-white/10 dark:text-white"
-                  )}>
-                    {languages.map((l) => (
-                      <SelectItem
-                        key={l.code}
-                        value={l.code}
-                        className={cn(
-                          "my-1 cursor-pointer rounded-xl transition-all duration-200",
-                          currentLanguage.code === l.code
-                            ? "bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)] font-bold"
-                            : "hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-white/5 dark:focus:bg-white/5"
-                        )}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span>{l.flag}</span>
-                          <span className="font-medium">{l.name}</span>
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <span className={cn(
+                  "inline-flex h-9 md:h-10 items-center gap-2 rounded-xl px-3 md:px-4 text-xs md:text-sm font-black",
+                  "bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-white"
+                )}>
+                  <span>{APP_LANGUAGE.flag}</span>
+                  <span>{APP_LANGUAGE.name}</span>
+                </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-                <div className={cn(
-                  "group w-full p-2 md:p-3 lg:p-4 flex items-center justify-between border rounded-[1.5rem] md:rounded-[2rem] transition-all",
-                  "border-slate-100 bg-slate-50/50 dark:border-white/5 dark:bg-white/5"
-                )}>
-                  <div className="flex items-center gap-3 md:gap-4">
-                    <div className={cn("p-2.5 md:p-4 rounded-2xl shadow-lg", "bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400")}>
-                      {isDark ? <Moon02Icon size={18} className="md:w-6 md:h-6" /> : <Sun01Icon size={18} className="md:w-6 md:h-6" />}
-                    </div>
-                    <div className="text-left">
-                      <p className="font-bold text-sm md:text-base lg:text-lg">{t('appearance')}</p>
-                    </div>
+              <div className={cn(
+                "group w-full p-2 md:p-3 lg:p-4 flex items-center justify-between border rounded-[1.5rem] md:rounded-[2rem] transition-all",
+                "border-slate-100 bg-slate-50/50 dark:border-white/5 dark:bg-white/5"
+              )}>
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className={cn("p-2.5 md:p-4 rounded-2xl shadow-lg", "bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400")}>
+                    {isDark ? <Moon02Icon size={18} className="md:w-6 md:h-6" /> : <Sun01Icon size={18} className="md:w-6 md:h-6" />}
                   </div>
-                  <Switch
-                    checked={isDark}
-                    onCheckedChange={() => setTheme(isDark ? 'light' : 'dark')}
-                    className="scale-75 data-[state=checked]:bg-[var(--crm-brand-primary)] md:scale-100"
-                  />
-                </div>
-
-                <div className={cn(
-                  "group w-full p-2 md:p-3 lg:p-4 flex items-center justify-between border rounded-[1.5rem] md:rounded-[2rem] transition-all",
-                  "border-slate-100 bg-slate-50/50 dark:border-white/5 dark:bg-white/5"
-                )}>
-                  <div className="flex items-center gap-3 md:gap-4 flex-1">
-                    <div className={cn("p-2.5 md:p-4 rounded-2xl shadow-lg", "bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)]")}>
-                      <Palette size={18} className="md:h-6 md:w-6" />
-                    </div>
-                    <div className="text-left min-w-0">
-                      <p className="font-bold text-sm md:text-base lg:text-lg">Tema</p>
-                    </div>
+                  <div className="text-left">
+                    <p className="font-bold text-sm md:text-base lg:text-lg">{t('appearance')}</p>
                   </div>
-                  <Select value={brandTheme} onValueChange={(val) => setBrandTheme(val as BrandTheme)}>
-                    <SelectTrigger className={cn(
-                      "w-24 md:w-28 lg:w-32 h-9 md:h-10 shadow-none focus:ring-0 font-black text-xs md:text-sm transition-all",
-                      "bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 dark:bg-white/10 dark:border-none dark:hover:bg-white/20 dark:text-white"
-                    )}>
-                      <span className="truncate">{brandThemes.find(t => t.id === brandTheme)?.label || 'Tema'}</span>
-                    </SelectTrigger>
-                    <SelectContent align="end" className={cn(
-                      "rounded-2xl border shadow-2xl p-2 w-[300px] sm:w-[500px]",
-                      "bg-white border-slate-200 text-slate-900 dark:bg-[#1a1025] dark:border-white/10 dark:text-white"
-                    )}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {brandThemes.map((item) => (
-                          <SelectItem
-                            key={item.id}
-                            value={item.id}
-                            className={cn(
-                              "flex min-h-16 items-center gap-3 cursor-pointer rounded-xl border p-3 px-3 transition-colors",
-                              "hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-white/5 dark:focus:bg-white/5",
-                              "border-slate-100 dark:border-white/5 data-[state=checked]:border-[var(--crm-brand-primary)] data-[state=checked]:bg-[var(--crm-brand-soft)]",
-                              "focus:text-inherit [&>span.absolute]:hidden"
-                            )}
-                          >
-                            <div className="flex items-center gap-3 w-full">
-                              <span className="flex h-9 w-12 shrink-0 overflow-hidden rounded-xl border border-white/40 shadow-sm">
-                                {item.swatches.map((color) => (
-                                  <span key={color} className="h-full flex-1" style={{ backgroundColor: color }} />
-                                ))}
-                              </span>
-                              <span className="min-w-0 flex-1 flex flex-col items-start text-left">
-                                <span className="block truncate text-xs font-black md:text-sm">{item.label}</span>
-                                <span className="mt-0.5 line-clamp-1 text-[10px] font-medium text-[var(--crm-app-text-muted)] md:text-[11px] whitespace-normal">
-                                  {item.description}
-                                </span>
-                              </span>
-                              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--crm-brand-primary)] bg-[var(--crm-brand-primary)] text-white opacity-0 transition-opacity [[data-state=checked]_&]:opacity-100">
-                                <Check size={14} strokeWidth={3} />
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </div>
-                    </SelectContent>
-                  </Select>
                 </div>
+                <Switch
+                  checked={isDark}
+                  onCheckedChange={() => setTheme(isDark ? 'light' : 'dark')}
+                  className="scale-75 data-[state=checked]:bg-[var(--crm-brand-primary)] md:scale-100"
+                />
               </div>
             </div>
 

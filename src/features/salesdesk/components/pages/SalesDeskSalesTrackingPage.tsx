@@ -1,7 +1,7 @@
 import { type ReactElement, useMemo } from 'react';
 import { Columns3, Loader2 } from 'lucide-react';
 import { useSalesDeskDashboard, useSalesDeskInvoiceStats, useSalesDeskQuoteStats } from '../../hooks/useSalesDeskModules';
-import { formatMoney, surfaceClass } from '../../lib/salesdesk-shared';
+import { formatMoney, surfaceClass, salesDeskPageShellClass, salesDeskPageTitleClass, salesDeskPageSubtitleClass, salesDeskSectionTitleClass, salesDeskStatValueClass } from '../../lib/salesdesk-shared';
 
 export function SalesDeskSalesTrackingPage(): ReactElement {
   const { data: dashboard, isLoading: dashboardLoading, isError, error } = useSalesDeskDashboard();
@@ -20,14 +20,14 @@ export function SalesDeskSalesTrackingPage(): ReactElement {
   const uniqueCustomers = new Set(invoiceRows.map((item) => item.customerId)).size;
 
   return (
-    <div className="space-y-5 text-slate-100">
+    <div className={salesDeskPageShellClass}>
       <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/15 text-emerald-300">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
           <Columns3 size={22} />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold text-slate-50">Satis Takip</h1>
-          <p className="mt-1 text-sm text-slate-400">Aylik performans ve fatura ozetleri</p>
+          <h1 className={salesDeskPageTitleClass}>Satis Takip</h1>
+          <p className={salesDeskPageSubtitleClass}>Aylik performans ve fatura ozetleri</p>
         </div>
       </div>
 
@@ -43,19 +43,19 @@ export function SalesDeskSalesTrackingPage(): ReactElement {
             label: 'Aylik Satis',
             value: dashboardLoading ? '...' : formatMoney(dashboard?.monthlySalesTotal ?? 0),
             hint: 'Dashboard metrigi',
-            tone: 'text-blue-300',
+            tone: 'text-blue-600 dark:text-blue-300',
           },
           {
             label: 'Kesilen Fatura Toplami',
             value: formatMoney(issuedTotal),
             hint: `${uniqueCustomers} cari`,
-            tone: 'text-emerald-300',
+            tone: 'text-emerald-600 dark:text-emerald-300',
           },
           {
             label: 'Onayli Teklif',
             value: approvedQuotes,
             hint: 'Faturaya donusturulebilir',
-            tone: 'text-green-300',
+            tone: 'text-green-600 dark:text-green-300',
           },
           {
             label: 'Siparise Donen',
@@ -71,24 +71,24 @@ export function SalesDeskSalesTrackingPage(): ReactElement {
             ) : (
               <>
                 <p className={`mt-3 text-3xl font-semibold ${metric.tone}`}>{metric.value}</p>
-                <p className="mt-2 text-sm text-slate-400">{metric.hint}</p>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{metric.hint}</p>
               </>
             )}
           </div>
         ))}
       </div>
 
-      <section className="rounded-xl border border-white/8 bg-slate-900/35 p-5">
-        <h2 className="text-lg font-semibold">Fatura Durum Ozeti</h2>
+      <section className={`rounded-xl p-5 ${surfaceClass}`}>
+        <h2 className={salesDeskSectionTitleClass}>Fatura Durum Ozeti</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {[
             { label: 'Toplam Fatura', value: invoiceStats?.totalCount ?? 0 },
             { label: 'Kesilecek', value: invoiceRows.filter((item) => item.status === 5).length },
             { label: 'Kesildi', value: invoiceRows.filter((item) => item.status === 6).length },
           ].map((item) => (
-            <div key={item.label} className={`rounded-lg p-4 ${surfaceClass}`}>
+            <div key={item.label} className="rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] p-4">
               <p className="text-xs uppercase text-slate-500">{item.label}</p>
-              <p className="mt-2 text-2xl font-semibold text-slate-100">{item.value}</p>
+              <p className={`mt-2 text-2xl ${salesDeskStatValueClass}`}>{item.value}</p>
             </div>
           ))}
         </div>

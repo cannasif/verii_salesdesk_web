@@ -56,7 +56,7 @@ export const MANAGEMENT_DATA_GRID_CLASSNAME = cn(
 
 /** Sidebar / navbar cam panel formulü. */
 export const CRM_APP_PANEL_GLASS =
-  'border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_82%,transparent)] backdrop-blur-xl';
+  'border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] shadow-sm dark:bg-[color-mix(in_srgb,var(--crm-app-panel)_82%,transparent)] dark:backdrop-blur-xl';
 
 /** Popover / sutun secici arka plani. */
 export const CRM_APP_POPOVER_SURFACE =

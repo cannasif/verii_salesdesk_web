@@ -11,7 +11,7 @@ export function Footer(): ReactElement {
         </div>
         <div className="flex items-center gap-4">
           <span>V3RII Sales Desk v1.0</span>
-          <span className="rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 font-semibold text-emerald-200">
+          <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 font-semibold text-emerald-700 dark:text-emerald-200">
             SQL Server bagli
           </span>
         </div>

@@ -55,6 +55,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -93,31 +94,31 @@
   --crm-brand-on-primary: #0a0e17;
   --crm-brand-text: #92650a;
   --crm-brand-on-soft: #64748b;
-  --crm-brand-muted: #faf8f3;
-  --crm-brand-soft: rgb(201 162 39 / 9%);
-  --crm-brand-ring: rgb(234 179 8 / 32%);
-  --crm-brand-focus-glow: rgb(234 179 8 / 38%);
-  --crm-brand-shadow: rgb(10 14 23 / 20%);
+  --crm-brand-muted: #ffffff;
+  --crm-brand-soft: rgb(201 162 39 / 8%);
+  --crm-brand-ring: rgb(234 179 8 / 24%);
+  --crm-brand-focus-glow: rgb(234 179 8 / 28%);
+  --crm-brand-shadow: rgb(15 23 42 / 8%);
   --crm-brand-gradient: linear-gradient(180deg, #d4af37 0%, #a67c00 100%);
-  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(30 58 95 / 6%) 0%, rgb(201 162 39 / 7%) 100%);
-  --crm-app-background: #f7f6f2;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(248 250 252 / 96%) 0%, rgb(255 255 255 / 96%) 100%);
+  --crm-app-background: #ffffff;
   --crm-app-panel: #ffffff;
-  --crm-app-panel-muted: #faf9f6;
-  --crm-app-panel-strong: #f1efe8;
-  --crm-app-border: rgb(212 175 55 / 14%);
+  --crm-app-panel-muted: #f8fafc;
+  --crm-app-panel-strong: #f1f5f9;
+  --crm-app-border: rgb(226 232 240 / 95%);
   --crm-app-text-muted: #64748b;
-  --crm-app-aura-start: rgb(30 58 95 / 5%);
-  --crm-app-aura-end: rgb(201 162 39 / 5%);
-  --crm-app-dialog: rgb(255 255 255 / 90%);
-  --crm-app-dialog-footer: rgb(248 250 252 / 50%);
-  --crm-app-input: #f8fafc;
-  --crm-app-popover: rgb(255 255 255 / 95%);
-  --crm-app-list-card: rgb(250 250 249 / 95%);
-  --crm-app-list-card-header: rgb(241 245 249 / 90%);
-  --crm-app-list-card-content: rgb(250 250 249 / 80%);
-  --crm-app-table-shell: rgb(245 245 244 / 80%);
-  --crm-app-table-head: rgb(241 245 249 / 90%);
-  --crm-app-table-row-hover: rgb(248 250 252 / 70%);
+  --crm-app-aura-start: rgb(248 250 252 / 80%);
+  --crm-app-aura-end: rgb(241 245 249 / 80%);
+  --crm-app-dialog: rgb(255 255 255 / 98%);
+  --crm-app-dialog-footer: rgb(248 250 252 / 90%);
+  --crm-app-input: #ffffff;
+  --crm-app-popover: #ffffff;
+  --crm-app-list-card: #ffffff;
+  --crm-app-list-card-header: #f8fafc;
+  --crm-app-list-card-content: #ffffff;
+  --crm-app-table-shell: #f8fafc;
+  --crm-app-table-head: #f1f5f9;
+  --crm-app-table-row-hover: #f8fafc;
   --primary: var(--crm-brand-primary);
   --primary-foreground: var(--crm-brand-on-primary);
   --accent: var(--crm-brand-soft);
@@ -209,15 +210,19 @@
   --crm-brand-on-primary: #0a0e17;
   --crm-brand-text: #92650a;
   --crm-brand-on-soft: #64748b;
-  --crm-brand-muted: #faf8f3;
-  --crm-brand-soft: rgb(201 162 39 / 9%);
-  --crm-brand-ring: rgb(234 179 8 / 32%);
-  --crm-brand-focus-glow: rgb(234 179 8 / 38%);
-  --crm-brand-shadow: rgb(10 14 23 / 20%);
+  --crm-brand-muted: #ffffff;
+  --crm-brand-soft: rgb(201 162 39 / 8%);
+  --crm-brand-ring: rgb(234 179 8 / 24%);
+  --crm-brand-focus-glow: rgb(234 179 8 / 28%);
+  --crm-brand-shadow: rgb(15 23 42 / 8%);
   --crm-brand-gradient: linear-gradient(180deg, #d4af37 0%, #a67c00 100%);
-  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(30 58 95 / 6%) 0%, rgb(201 162 39 / 7%) 100%);
-  --crm-app-aura-start: rgb(30 58 95 / 5%);
-  --crm-app-aura-end: rgb(201 162 39 / 5%);
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(248 250 252 / 96%) 0%, rgb(255 255 255 / 96%) 100%);
+}
+
+html.light .theme-v3rii,
+html:not(.dark) .theme-v3rii {
+  --crm-app-aura-start: rgb(248 250 252 / 80%);
+  --crm-app-aura-end: rgb(241 245 249 / 80%);
 }
 
 .theme-corporate-blue {
@@ -738,6 +743,28 @@
   :where([class*='shadow-pink'], [class*='shadow-purple'], [class*='shadow-orange']) {
     --tw-shadow-color: var(--crm-brand-shadow) !important;
     --tw-shadow: var(--tw-shadow-colored) !important;
+  }
+
+  /* Light mode — koyu metin siniflarini okunur hale getir */
+  html.light .salesdesk-shell :where(.text-slate-50, .text-slate-100) {
+    color: rgb(15 23 42);
+  }
+
+  html.light .salesdesk-shell :where(.text-slate-200, .text-slate-300) {
+    color: rgb(51 65 85);
+  }
+
+  html.light .salesdesk-shell :where(.text-slate-400) {
+    color: rgb(100 116 139);
+  }
+
+  html.light .salesdesk-shell :where([class*='bg-slate-900']) {
+    background-color: var(--crm-app-panel) !important;
+    border-color: var(--crm-app-border) !important;
+  }
+
+  html.light .salesdesk-shell :where([class*='bg-black/']) {
+    background-color: var(--crm-app-panel-muted) !important;
   }
 
   /* SalesDesk / Auth — popup & marka butonlari */

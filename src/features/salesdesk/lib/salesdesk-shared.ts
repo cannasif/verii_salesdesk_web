@@ -1,8 +1,14 @@
 export const surfaceClass =
-  'border border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_72%,transparent)] shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] backdrop-blur-xl';
+  'border border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] shadow-sm dark:bg-[color-mix(in_srgb,var(--crm-app-panel)_72%,transparent)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,.04),0_18px_48px_rgba(0,0,0,.18)] dark:backdrop-blur-xl';
+
+export const salesDeskPageShellClass = 'space-y-5 text-slate-900 dark:text-slate-100';
+export const salesDeskPageTitleClass = 'text-2xl font-semibold text-slate-900 dark:text-slate-50';
+export const salesDeskPageSubtitleClass = 'mt-1 text-sm text-slate-600 dark:text-slate-400';
+export const salesDeskSectionTitleClass = 'text-lg font-semibold text-slate-900 dark:text-slate-50';
+export const salesDeskStatValueClass = 'font-semibold text-slate-900 dark:text-slate-100';
 
 export const fieldClass = [
-  'h-11 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 text-sm text-slate-200 outline-none',
+  'h-11 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] px-4 text-sm text-slate-900 dark:text-slate-200 outline-none',
   'focus-visible:!border-[var(--crm-brand-accent)] focus-visible:!ring-0 focus-visible:!shadow-[0_0_0_3px_var(--crm-brand-focus-glow)]',
   'focus:!border-[var(--crm-brand-accent)] focus:!shadow-[0_0_0_3px_var(--crm-brand-focus-glow)]',
   'transition-[color,box-shadow,border-color] duration-150',

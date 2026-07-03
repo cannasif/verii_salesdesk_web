@@ -103,14 +103,14 @@ export function Navbar(): ReactElement {
             type="button"
             onClick={toggleSidebar}
             aria-pressed={isSidebarOpen}
-            className="shrink-0 rounded-xl border border-white/8 bg-white/[.03] p-2 text-slate-400 transition-all duration-300 hover:bg-violet-500/10 hover:text-violet-300 focus:outline-none"
+            className="shrink-0 rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-500 transition-all duration-300 hover:bg-violet-500/10 hover:text-violet-600 focus:outline-none dark:border-white/8 dark:bg-white/[.03] dark:text-slate-400 dark:hover:text-violet-300"
           >
             <SidebarLeft01Icon size={21} />
           </button>
 
-          <div className="hidden min-w-[140px] border-l border-white/10 pl-5 md:block">
+          <div className="hidden min-w-[140px] border-l border-slate-200 pl-5 dark:border-white/10 md:block">
             <p className="text-[11px] text-slate-500">Sales Desk</p>
-            <p className="mt-1 truncate text-base font-semibold text-slate-100">{pageTitle}</p>
+            <p className="mt-1 truncate text-base font-semibold text-slate-900 dark:text-slate-100">{pageTitle}</p>
           </div>
 
           <div className="group relative mx-auto hidden w-full max-w-[760px] md:block">
@@ -124,8 +124,10 @@ export function Navbar(): ReactElement {
                 placeholder={t('navbar.search_placeholder')}
                 className={cn(
                   "h-12 w-full rounded-2xl border py-0 pl-12 pr-24 text-sm font-medium outline-none transition-all duration-300",
-                  "border-white/10 bg-[#0b0d19]/90 text-white placeholder:text-slate-500",
-                  "focus:border-violet-400/60 focus:bg-[#0f1222] focus:ring-4 focus:ring-violet-500/10"
+                  "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400",
+                  "focus:border-violet-400/60 focus:bg-white focus:ring-4 focus:ring-violet-500/10",
+                  "dark:border-white/10 dark:bg-[#0b0d19]/90 dark:text-white dark:placeholder:text-slate-500",
+                  "dark:focus:border-violet-400/60 dark:focus:bg-[#0f1222]"
                 )}
               />
               <div className="absolute right-3 flex items-center gap-2">
@@ -181,12 +183,12 @@ export function Navbar(): ReactElement {
             </div>
           </div>
 
-          {user && <div className="hidden h-8 w-px shrink-0 bg-white/10 xs:block" />}
+          {user && <div className="hidden h-8 w-px shrink-0 bg-slate-200 dark:bg-white/10 xs:block" />}
 
           {user && (
             <div onClick={() => setUserProfileModalOpen(true)} className="group flex shrink-0 cursor-pointer items-center gap-2 sm:gap-3">
               <div className="text-right hidden lg:block">
-                <p className="max-w-[160px] truncate text-sm font-semibold text-slate-100 transition-colors group-hover:text-violet-300">
+                <p className="max-w-[160px] truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-violet-600 dark:text-slate-100 dark:group-hover:text-violet-300">
                   {displayName}
                 </p>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
@@ -195,7 +197,7 @@ export function Navbar(): ReactElement {
               </div>
               <div className="relative shrink-0">
                 <div className="h-11 w-11 rounded-full bg-[image:var(--crm-brand-gradient)] p-[2px] transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(115,103,255,.45)]">
-                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-[#080915] bg-[#090b16]">
+                  <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-slate-200 bg-slate-100 dark:border-[#080915] dark:bg-[#090b16]">
                     {userDetail?.profilePictureUrl ? (
                       <img src={getImageUrl(userDetail.profilePictureUrl) || ''} alt={displayName} className="w-full h-full object-cover" />
                     ) : (

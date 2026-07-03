@@ -38,10 +38,10 @@ export function MainLayout({ navItems }: MainLayoutProps): ReactElement {
   }, [navItems, defaultNavItems, permissions, isLoading, isError]);
 
   return (
-    <div className="salesdesk-shell theme-v3rii dark relative flex min-h-dvh h-[100dvh] w-full overflow-hidden bg-[var(--crm-app-background)] font-['Outfit'] text-slate-100 transition-colors duration-300">
+    <div className="salesdesk-shell theme-v3rii relative flex min-h-dvh h-[100dvh] w-full overflow-hidden bg-[var(--crm-app-background)] font-['Outfit'] text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <div className="pointer-events-none absolute inset-0 z-0 w-full overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] aspect-square w-[80vw] max-w-[800px] rounded-full bg-[var(--crm-app-aura-start)] blur-[80px] mix-blend-multiply transition-colors duration-500 dark:mix-blend-normal md:blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] aspect-square w-[60vw] max-w-[600px] rounded-full bg-[var(--crm-app-aura-end)] blur-[60px] mix-blend-multiply transition-colors duration-500 dark:mix-blend-normal md:blur-[100px]" />
+        <div className="absolute top-[-10%] left-[-10%] aspect-square w-[80vw] max-w-[800px] rounded-full bg-[var(--crm-app-aura-start)] blur-[80px] opacity-0 mix-blend-normal transition-colors duration-500 dark:opacity-70 md:blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] aspect-square w-[60vw] max-w-[600px] rounded-full bg-[var(--crm-app-aura-end)] blur-[60px] opacity-0 mix-blend-normal transition-colors duration-500 dark:opacity-70 md:blur-[100px]" />
       </div>
 
       {/* Sidebar - Mobile handles itself with fixed position, Desktop uses sticky/relative */}
