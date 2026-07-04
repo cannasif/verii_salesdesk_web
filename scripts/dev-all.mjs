@@ -45,7 +45,17 @@ function shutdown(code = 0) {
 async function isLocalServerHealthy() {
   try {
     const response = await fetch(`${LOCAL_SERVER_URL}/health`, { signal: AbortSignal.timeout(1500) });
-    return response.ok;
+    if (!response.ok) return false;
+
+    const notesProbe = await fetch(`${LOCAL_SERVER_URL}/notes?userId=1`, {
+      signal: AbortSignal.timeout(1500),
+    });
+    if (notesProbe.status === 404) {
+      console.warn('[dev] Yerel sunucu eski surum; /notes bulunamadi, yeniden baslatilacak.');
+      return false;
+    }
+
+    return true;
   } catch {
     return false;
   }
@@ -107,11 +117,6 @@ async function ensureLocalServer() {
     console.warn(`[dev] Port ${LOCAL_SERVER_PORT} dolu; eski surec temizleniyor...`);
     killProcessesOnPort(LOCAL_SERVER_PORT);
     await new Promise((resolve) => setTimeout(resolve, 500));
-
-    if (await isLocalServerHealthy()) {
-      console.log(`[dev] Yerel sunucu hazir: ${LOCAL_SERVER_URL}`);
-      return;
-    }
   }
 
   run('node', ['server/index.mjs'], 'yerel-sunucu');

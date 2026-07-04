@@ -16,6 +16,7 @@ import { attachGmailBridge } from './gmail-bridge.mjs';
 import { attachChatServer } from './chat-server.mjs';
 import { attachGroupsApi } from './groups-api.mjs';
 import { attachCompaniesApi } from './companies-api.mjs';
+import { attachNotesApi } from './notes-api.mjs';
 import { attachErpNewsMetaApi } from './erp-news-meta-api.mjs';
 
 const PORT = Number(process.env.SERVER_PORT || process.env.GMAIL_BRIDGE_PORT || 8787);
@@ -29,6 +30,7 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 attachGmailBridge(app);
 attachGroupsApi(app);
 attachCompaniesApi(app);
+attachNotesApi(app);
 attachErpNewsMetaApi(app);
 
 const httpServer = http.createServer(app);
@@ -39,6 +41,7 @@ httpServer.listen(PORT, () => {
   console.log('  - Gmail koprusu: POST /gmail/test, /gmail/messages');
   console.log('  - Gruplar: GET/POST/PUT/DELETE /salesdesk/groups');
   console.log('  - Sirketler: GET/POST/PUT/DELETE /salesdesk/companies');
+  console.log('  - Notlar: GET/POST/PUT/DELETE /notes');
   console.log('  - ERP haber meta: GET/PUT /erp-news-meta');
   console.log('  - Sohbet (socket.io): /socket.io');
 });

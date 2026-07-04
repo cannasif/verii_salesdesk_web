@@ -105,6 +105,11 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         secure: false,
       },
+      "/notes": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+      },
       "/health": {
         target: devLocalServerTarget,
         changeOrigin: true,

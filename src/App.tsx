@@ -6,6 +6,7 @@ import { SystemSettingsBootstrap } from './components/shared/SystemSettingsBoots
 import { useNotificationConnection } from './features/notification/hooks/useNotificationConnection';
 import { SalesDeskMeetingWatcher } from './features/salesdesk/components/SalesDeskMeetingWatcher';
 import { SalesDeskErpNewsWatcher } from './features/salesdesk/components/SalesDeskErpNewsWatcher';
+import { SalesDeskNotesNotificationBootstrap } from './features/salesdesk/components/SalesDeskNotesNotificationBootstrap';
 import { SalesDeskLocalServicesBootstrap } from './features/salesdesk/components/SalesDeskLocalServicesBootstrap';
 import { useSalesDeskChatConnection } from './features/salesdesk/hooks/useSalesDeskChatConnection';
 import { SalesDeskChatWidget } from './features/salesdesk/components/chat/SalesDeskChatWidget';
@@ -22,6 +23,7 @@ function App() {
       <SalesDeskLocalServicesBootstrap />
       <SalesDeskMeetingWatcher />
       <SalesDeskErpNewsWatcher />
+      <SalesDeskNotesNotificationBootstrap />
       <RouterProvider router={router} />
       <SalesDeskChatWidget />
       <Toaster />

@@ -49,6 +49,7 @@ export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
 export { SalesDeskGroupsPage } from './components/pages/SalesDeskGroupsPage';
 export { SalesDeskCompaniesPage } from './components/pages/SalesDeskCompaniesPage';
+export { SalesDeskNotesPage } from './components/pages/SalesDeskNotesPage';
 
 export const salesDeskNavItems = [
   { title: 'Ana Sayfa', href: '/', icon: <Home size={22} className="text-slate-400" /> },
@@ -91,6 +92,7 @@ export const salesDeskNavItems = [
     children: [
       { title: 'Haftalik Ziyaretler', href: '/salesdesk/weekly-visits' },
       { title: 'Aktiviteler', href: '/salesdesk/activities' },
+      { title: 'Notlar', href: '/salesdesk/notes' },
       { title: 'Proje Takibi', href: '/salesdesk/proje-takibi' },
       { title: 'Acik Maddeler', href: '/salesdesk/open-items' },
       { title: 'Haftalik Plan', href: '/salesdesk/weekly-plan' },
