@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { shouldRetryQuery } from '@/lib/query-client';
 import { salesDeskGroupsApi } from '../api/salesdesk-groups-api';
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../types/salesdesk-group-types';
 
@@ -10,7 +11,7 @@ export function useSalesDeskGroupList(): UseQueryResult<SalesDeskGroupDto[]> {
     queryKey: SALESDESK_GROUPS_QUERY_KEY,
     queryFn: () => salesDeskGroupsApi.list(),
     staleTime: 30_000,
-    retry: false,
+    retry: shouldRetryQuery,
   });
 }
 

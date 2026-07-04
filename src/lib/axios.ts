@@ -21,7 +21,7 @@ export async function ensureApiReady(): Promise<void> {
 }
 
 /** Sonsuz beklemeyi onlemek icin tum API isteklerine ust sinir. */
-export const API_REQUEST_TIMEOUT_MS = 15_000;
+export const API_REQUEST_TIMEOUT_MS = 30_000;
 
 export const api = axios.create({
   baseURL: getApiBaseUrl(),
@@ -484,6 +484,7 @@ async function refreshAccessToken(): Promise<string | null> {
         `${getApiBaseUrl()}/api/auth/refresh-token`,
         { refreshToken: storedRefreshToken },
         {
+          timeout: API_REQUEST_TIMEOUT_MS,
           headers: {
             'Content-Type': 'application/json',
             'X-Language': i18n.language || 'tr',
@@ -573,6 +574,9 @@ api.interceptors.request.use((config) => {
   }
 
   return config;
+}, (error) => {
+  trackApiRequestEnd();
+  return Promise.reject(error);
 });
 
 api.interceptors.response.use(

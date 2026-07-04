@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { shouldRetryQuery } from '@/lib/query-client';
 import type { PagedParams, PagedResponse } from '@/types/api';
 
 interface SalesDeskCrudApi<TDto, TPayload> {
@@ -32,7 +33,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
       queryKey: listKey(params),
       queryFn: () => api.list(params),
       staleTime: 60_000,
-      retry: false,
+      retry: shouldRetryQuery,
       placeholderData: (previousData) => previousData,
     });
 
@@ -41,7 +42,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
       queryKey: statsKey,
       queryFn: () => api.list({ pageNumber: 1, pageSize: 50 }),
       staleTime: 60_000,
-      retry: false,
+      retry: shouldRetryQuery,
     });
 
   const useCreate = (): UseMutationResult<TDto, Error, TPayload> => {

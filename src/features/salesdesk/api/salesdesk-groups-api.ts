@@ -33,7 +33,9 @@ function unwrapBackendGroup(response: ApiResponse<SalesDeskGroupDto>, fallbackMe
 }
 
 function isBackendGroupsUnavailable(error: unknown): boolean {
-  return isAxiosError(error) && [404, 405, 501].includes(error.response?.status ?? 0);
+  if (!isAxiosError(error)) return false;
+  if ([404, 405, 501].includes(error.response?.status ?? 0)) return true;
+  return error.code === 'ECONNABORTED' || !error.response;
 }
 
 async function detectGroupsSource(): Promise<GroupsSource> {

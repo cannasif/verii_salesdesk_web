@@ -7,6 +7,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { shouldRetryQuery } from '@/lib/query-client';
 import type { PagedParams, PagedResponse } from '@/types/api';
 import {
   salesDeskApi,
@@ -635,7 +636,7 @@ export function useSalesDeskVisitForm(id: number | null) {
     queryFn: () => salesDeskApi.visitForms.get(id!),
     enabled: id != null && id > 0,
     staleTime: 30_000,
-    retry: false,
+    retry: shouldRetryQuery,
   });
 }
 export const useCreateSalesDeskVisitForm = () => {
@@ -701,7 +702,7 @@ export function useSalesDeskSoftwareResearch(id: number | null) {
     queryFn: () => salesDeskApi.softwareResearch.get(id!),
     enabled: id != null && id > 0,
     staleTime: 30_000,
-    retry: false,
+    retry: shouldRetryQuery,
   });
 }
 export const useCreateSalesDeskSoftwareResearch = () => {
@@ -729,7 +730,7 @@ export function useSalesDeskErpNews(id: number | null) {
     queryFn: () => salesDeskApi.erpNews.get(id!),
     enabled: id != null && id > 0,
     staleTime: 30_000,
-    retry: false,
+    retry: shouldRetryQuery,
   });
 }
 export const useCreateSalesDeskErpNews = () => {
@@ -814,7 +815,7 @@ export function useSalesDeskOpenItemsList(params: PagedParams): UseQueryResult<P
     gcTime: 30 * 60 * 1000,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    retry: false,
+    retry: shouldRetryQuery,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -829,7 +830,7 @@ export function useSalesDeskActivitiesList(
     gcTime: 30 * 60 * 1000,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    retry: false,
+    retry: shouldRetryQuery,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -844,7 +845,7 @@ export function useSalesDeskProjectsList(
     gcTime: 30 * 60 * 1000,
     refetchOnMount: false,
     refetchOnReconnect: false,
-    retry: false,
+    retry: shouldRetryQuery,
     placeholderData: (previousData) => previousData,
   });
 }
