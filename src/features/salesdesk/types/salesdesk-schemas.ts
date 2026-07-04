@@ -24,7 +24,11 @@ import type {
 } from '../api/salesdesk-api';
 import type { SalesDeskPotentialStatus } from '../api/salesdesk-api';
 import { buildSalesDeskActivityGroupName, parseSalesDeskActivityType } from '../lib/salesdesk-activities';
-import { buildSalesDeskProjectGroupName, parseSalesDeskProjectPhase } from '../lib/salesdesk-project-tracking';
+import {
+  buildSalesDeskProjectGroupName,
+  parseSalesDeskProjectPhase,
+  parseSalesDeskProjectTeam,
+} from '../lib/salesdesk-project-tracking';
 import { idToSelectValue, NONE_SELECT_VALUE, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
 import { buildDefaultVisitFormTitle, parseVisitFormContent, serializeVisitFormContent } from '../lib/visit-form-content';
 
@@ -356,6 +360,7 @@ export function toSalesDeskActivityPayload(values: SalesDeskActivityFormValues):
 export const salesDeskProjectFormSchema = z.object({
   title: z.string().trim().min(1, 'Proje adi zorunludur').max(220),
   description: z.string().max(2000).optional(),
+  projectTeam: z.string().optional(),
   projectPhase: z.string().optional(),
   customerId: optionalCustomerIdSchema,
   assignedUserId: optionalUserIdSchema,
@@ -367,12 +372,17 @@ export const salesDeskProjectFormSchema = z.object({
 export type SalesDeskProjectFormValues = z.input<typeof salesDeskProjectFormSchema>;
 
 function normalizeProjectFormInput(values: SalesDeskProjectFormValues): SalesDeskProjectFormValues {
+  const projectTeam =
+    values.projectTeam != null && values.projectTeam !== NONE_SELECT_VALUE
+      ? String(values.projectTeam)
+      : 'Proje';
   const projectPhase =
     values.projectPhase != null && values.projectPhase !== NONE_SELECT_VALUE
       ? String(values.projectPhase)
       : '';
   return {
     ...values,
+    projectTeam,
     projectPhase,
     customerId: values.customerId != null ? String(values.customerId) : undefined,
     assignedUserId: values.assignedUserId != null ? String(values.assignedUserId) : undefined,
@@ -386,6 +396,7 @@ export function toSalesDeskProjectFormValues(task?: SalesDeskTaskDto | null): Sa
   return {
     title: task?.title ?? '',
     description: task?.description ?? '',
+    projectTeam: parseSalesDeskProjectTeam(task?.groupName) || 'Proje',
     projectPhase: parseSalesDeskProjectPhase(task?.groupName) || '',
     customerId: idToSelectValue(task?.customerId),
     assignedUserId: idToSelectValue(task?.assignedUserId),
@@ -397,12 +408,14 @@ export function toSalesDeskProjectFormValues(task?: SalesDeskTaskDto | null): Sa
 
 export function toSalesDeskProjectPayload(values: SalesDeskProjectFormValues): Partial<SalesDeskTaskDto> {
   const parsed = salesDeskProjectFormSchema.parse(normalizeProjectFormInput(values));
+  const team =
+    parsed.projectTeam && parsed.projectTeam !== NONE_SELECT_VALUE ? parsed.projectTeam.trim() : 'Proje';
   const phase =
     parsed.projectPhase && parsed.projectPhase !== NONE_SELECT_VALUE ? parsed.projectPhase.trim() : '';
   return {
     title: parsed.title.trim(),
     description: parsed.description?.trim() || undefined,
-    groupName: buildSalesDeskProjectGroupName(phase || undefined),
+    groupName: buildSalesDeskProjectGroupName(team, phase || undefined),
     customerId: parsed.customerId,
     assignedUserId: parsed.assignedUserId,
     priority: parsed.priority,
