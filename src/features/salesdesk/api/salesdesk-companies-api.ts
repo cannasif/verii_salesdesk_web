@@ -1,37 +1,27 @@
+import { api } from '@/lib/axios';
 import { normalizePagedResponse } from '@/lib/paged-response';
-import type { PagedParams, PagedResponse } from '@/types/api';
-import { requestLocalServerJson } from '../lib/local-server-request';
+import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import type { SalesDeskCompanyDto } from '../types/company-management-types';
 
-const STORAGE_KEY = 'salesdesk-companies-v1';
-const COMPANIES_PATH = '/companies';
+const BASE = '/api/salesdesk/companies';
+const READ_TIMEOUT_MS = 8_000;
 
-interface CompanyStore {
-  seq: number;
-  companies: SalesDeskCompanyDto[];
+function buildQuery(params: PagedParams = {}): string {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value == null || value === '') return;
+    if (Array.isArray(value)) return;
+    search.set(key, String(value));
+  });
+  const query = search.toString();
+  return query ? `?${query}` : '';
 }
 
-function readLocalStore(): CompanyStore {
-  if (typeof window === 'undefined') {
-    return { seq: 1, companies: [] };
+function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T {
+  if (response.success && response.data != null) {
+    return response.data;
   }
-
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { seq: 1, companies: [] };
-    const parsed = JSON.parse(raw) as Partial<CompanyStore>;
-    return {
-      seq: typeof parsed.seq === 'number' ? parsed.seq : 1,
-      companies: Array.isArray(parsed.companies) ? parsed.companies : [],
-    };
-  } catch {
-    return { seq: 1, companies: [] };
-  }
-}
-
-function writeLocalStore(store: CompanyStore): void {
-  if (typeof window === 'undefined') return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  throw new Error(response.message || fallbackMessage);
 }
 
 function normalizePayload(payload: Omit<SalesDeskCompanyDto, 'id'>): Omit<SalesDeskCompanyDto, 'id'> {
@@ -54,192 +44,50 @@ function normalizePayload(payload: Omit<SalesDeskCompanyDto, 'id'>): Omit<SalesD
   };
 }
 
-function sortCompanies(rows: SalesDeskCompanyDto[], params?: PagedParams): SalesDeskCompanyDto[] {
-  const sortBy = (params?.sortBy ?? 'Name').toLowerCase();
-  const direction = params?.sortDirection === 'desc' ? -1 : 1;
-
-  const fieldMap: Record<string, keyof SalesDeskCompanyDto> = {
-    id: 'id',
-    name: 'name',
-    ipaddress: 'ipAddress',
-    ipusername: 'ipUsername',
-    ippassword: 'ipPassword',
-    vpnname: 'vpnName',
-    vpnusername: 'vpnUsername',
-    vpnpassword: 'vpnPassword',
-    vpnipaddress: 'vpnIpAddress',
-    vpnport: 'vpnPort',
-    databaseusername: 'databaseUsername',
-    databasepassword: 'databasePassword',
-    loginurl: 'loginUrl',
-    description: 'description',
-    description1: 'description1',
-  };
-
-  const field = fieldMap[sortBy.replace(/[^a-z0-9]/g, '')] ?? 'name';
-
-  return [...rows].sort((a, b) => {
-    const left = a[field];
-    const right = b[field];
-    if (typeof left === 'number' && typeof right === 'number') {
-      return (left - right) * direction;
-    }
-    return String(left ?? '').localeCompare(String(right ?? ''), 'tr') * direction;
-  });
-}
-
-function filterCompanies(rows: SalesDeskCompanyDto[], params?: PagedParams): SalesDeskCompanyDto[] {
-  const search = params?.search?.trim().toLocaleLowerCase('tr-TR');
-  if (!search) return rows;
-
-  return rows.filter((row) =>
-    [
-      row.name,
-      row.ipAddress,
-      row.ipUsername,
-      row.vpnName,
-      row.vpnUsername,
-      row.vpnIpAddress,
-      row.vpnPort,
-      row.databaseUsername,
-      row.loginUrl,
-      row.description,
-      row.description1,
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLocaleLowerCase('tr-TR')
-      .includes(search)
-  );
-}
-
-function paginateCompanies(rows: SalesDeskCompanyDto[], params?: PagedParams): PagedResponse<SalesDeskCompanyDto> {
-  const pageNumber = params?.pageNumber ?? 1;
-  const pageSize = params?.pageSize ?? 10;
-  const totalCount = rows.length;
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-  const start = (pageNumber - 1) * pageSize;
-
-  return normalizePagedResponse<SalesDeskCompanyDto>(
-    {
-      data: rows.slice(start, start + pageSize),
-      totalCount,
-      pageNumber,
-      pageSize,
-      totalPages,
-      hasPreviousPage: pageNumber > 1,
-      hasNextPage: pageNumber < totalPages,
-    },
-    { pageNumber, pageSize }
-  );
-}
-
-async function listFromServer(): Promise<SalesDeskCompanyDto[]> {
-  return requestLocalServerJson<SalesDeskCompanyDto[]>(COMPANIES_PATH);
-}
-
-function listFromLocalStore(): SalesDeskCompanyDto[] {
-  return readLocalStore().companies;
-}
-
-function createLocal(body: Omit<SalesDeskCompanyDto, 'id'>): SalesDeskCompanyDto {
-  const payload = normalizePayload(body);
-  if (!payload.name) throw new Error('Sirket adi zorunludur.');
-
-  const store = readLocalStore();
-  const now = new Date().toISOString();
-  const company: SalesDeskCompanyDto = {
-    id: store.seq,
-    ...payload,
-    createdAt: now,
-    updatedAt: now,
-  };
-  store.seq += 1;
-  store.companies = [company, ...store.companies];
-  writeLocalStore(store);
-  return company;
-}
-
 export const salesDeskCompaniesApi = {
   list: async (params?: PagedParams): Promise<PagedResponse<SalesDeskCompanyDto>> => {
-    try {
-      const all = await listFromServer();
-      const filtered = filterCompanies(all, params);
-      const sorted = sortCompanies(filtered, params);
-      return paginateCompanies(sorted, params);
-    } catch (error) {
-      if (!import.meta.env.DEV) throw error;
-      const all = listFromLocalStore();
-      const filtered = filterCompanies(all, params);
-      const sorted = sortCompanies(filtered, params);
-      return paginateCompanies(sorted, params);
-    }
+    const response = await api.get<ApiResponse<PagedResponse<SalesDeskCompanyDto>>>(
+      `${BASE}${buildQuery(params)}`,
+      { timeout: READ_TIMEOUT_MS }
+    );
+    const paged = unwrapApiData(response, 'Sirketler yuklenemedi');
+    return normalizePagedResponse(paged, {
+      pageNumber: params?.pageNumber,
+      pageSize: params?.pageSize,
+    });
   },
 
   get: async (id: number): Promise<SalesDeskCompanyDto> => {
-    try {
-      return await requestLocalServerJson<SalesDeskCompanyDto>(`${COMPANIES_PATH}/${id}`);
-    } catch (error) {
-      if (!import.meta.env.DEV) throw error;
-      const company = listFromLocalStore().find((item) => item.id === id);
-      if (!company) throw new Error('Sirket bulunamadi.');
-      return company;
-    }
+    const response = await api.get<ApiResponse<SalesDeskCompanyDto>>(`${BASE}/${id}`, {
+      timeout: READ_TIMEOUT_MS,
+    });
+    return unwrapApiData(response, 'Sirket bulunamadi.');
   },
 
   create: async (body: Omit<SalesDeskCompanyDto, 'id'>): Promise<SalesDeskCompanyDto> => {
     const payload = normalizePayload(body);
     if (!payload.name) throw new Error('Sirket adi zorunludur.');
 
-    try {
-      return await requestLocalServerJson<SalesDeskCompanyDto>(COMPANIES_PATH, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      if (!import.meta.env.DEV) throw error;
-      return createLocal(payload);
-    }
+    const response = await api.post<ApiResponse<SalesDeskCompanyDto>>(BASE, payload);
+    return unwrapApiData(response, 'Sirket olusturulamadi.');
   },
 
   update: async (id: number, body: Omit<SalesDeskCompanyDto, 'id'>): Promise<SalesDeskCompanyDto> => {
     const payload = normalizePayload(body);
     if (!payload.name) throw new Error('Sirket adi zorunludur.');
 
-    try {
-      return await requestLocalServerJson<SalesDeskCompanyDto>(`${COMPANIES_PATH}/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-    } catch (error) {
-      if (!import.meta.env.DEV) throw error;
-      const store = readLocalStore();
-      const index = store.companies.findIndex((item) => item.id === id);
-      if (index === -1) throw new Error('Sirket bulunamadi.');
-
-      const updated: SalesDeskCompanyDto = {
-        ...store.companies[index],
-        ...payload,
-        id,
-        updatedAt: new Date().toISOString(),
-      };
-      store.companies[index] = updated;
-      writeLocalStore(store);
-      return updated;
-    }
+    const response = await api.put<ApiResponse<SalesDeskCompanyDto>>(`${BASE}/${id}`, payload, {
+      useNativeHttpMethod: true,
+    });
+    return unwrapApiData(response, 'Sirket guncellenemedi.');
   },
 
   delete: async (id: number): Promise<void> => {
-    try {
-      await requestLocalServerJson<null>(`${COMPANIES_PATH}/${id}`, { method: 'DELETE' });
-      return;
-    } catch (error) {
-      if (!import.meta.env.DEV) throw error;
-      const store = readLocalStore();
-      const before = store.companies.length;
-      store.companies = store.companies.filter((item) => item.id !== id);
-      if (store.companies.length === before) throw new Error('Sirket bulunamadi.');
-      writeLocalStore(store);
+    const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`, {
+      useNativeHttpMethod: true,
+    });
+    if (!response.success) {
+      throw new Error(response.message || 'Sirket silinemedi.');
     }
   },
 };

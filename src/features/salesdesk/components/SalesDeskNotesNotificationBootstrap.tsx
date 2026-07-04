@@ -105,6 +105,7 @@ export function SalesDeskNotesNotificationBootstrap(): ReactElement | null {
           });
 
           void tryBackendNotifications(item);
+          void salesDeskNotesApi.ackNotification(item.id).catch(() => undefined);
         }
       } catch {
         // Not sunucusu kapaliysa sessizce gec.
