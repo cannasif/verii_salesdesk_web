@@ -46,6 +46,7 @@ interface DataTableGridProps<TRow, TKey extends string> {
   actionsHeaderLabel?: string;
   renderActionsCell?: (row: TRow) => ReactNode;
   actionsCellClassName?: string;
+  initialActionsColumnWidth?: number;
   iconOnlyActions?: boolean;
   rowClassName?: string | ((row: TRow) => string | undefined);
   onRowClick?: (row: TRow) => void;
@@ -240,6 +241,7 @@ export function DataTableGrid<TRow, TKey extends string>({
   actionsHeaderLabel = '',
   renderActionsCell,
   actionsCellClassName = 'crm-text-end align-middle',
+  initialActionsColumnWidth,
   iconOnlyActions = true,
   rowClassName,
   onRowClick,
@@ -282,7 +284,12 @@ export function DataTableGrid<TRow, TKey extends string>({
   }, [visibleColumnKeys]);
 
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
-  const [actionsColumnWidth, setActionsColumnWidth] = useState<number | null>(null);
+  const resolvedInitialActionsWidth = initialActionsColumnWidth ?? ACTIONS_COL_WIDTH;
+  const [actionsColumnWidth, setActionsColumnWidth] = useState<number>(resolvedInitialActionsWidth);
+
+  useEffect(() => {
+    setActionsColumnWidth(initialActionsColumnWidth ?? ACTIONS_COL_WIDTH);
+  }, [initialActionsColumnWidth]);
   const [resizingKey, setResizingKey] = useState<string | null>(null);
   const resizeStateRef = useRef<{ key: string; startX: number; startWidth: number } | null>(null);
 
@@ -506,9 +513,9 @@ export function DataTableGrid<TRow, TKey extends string>({
                   />
                 ))}
                 {showActionsColumn && (
-                  <col style={{ 
-                    width: `${actionsColumnWidth ?? ACTIONS_COL_WIDTH}px`, 
-                    minWidth: `${actionsColumnWidth ?? ACTIONS_COL_WIDTH}px` 
+                  <col style={{
+                    width: `${actionsColumnWidth}px`,
+                    minWidth: `${actionsColumnWidth}px`,
                   }} />
                 )}
               </colgroup>
@@ -545,8 +552,8 @@ export function DataTableGrid<TRow, TKey extends string>({
                 {showActionsColumn && (
                   <TableHead
                     data-col-actions="true"
+                    style={{ width: `${actionsColumnWidth}px`, minWidth: `${actionsColumnWidth}px` }}
                     className={cn(
-                      iconOnlyActions ? 'w-[84px]' : 'min-w-[280px]',
                       centerColumnHeaders ? 'text-center' : (iconOnlyActions ? 'text-center' : 'crm-text-end')
                     )}
                   >
@@ -629,8 +636,10 @@ export function DataTableGrid<TRow, TKey extends string>({
                       })}
                       {showActionsColumn && (
                         <TableCell
+                          style={{ width: `${actionsColumnWidth}px`, minWidth: `${actionsColumnWidth}px` }}
                           className={cn(
                             actionsCellClassName,
+                            'overflow-visible',
                             iconOnlyActions &&
                             '[&_button]:h-8 [&_button]:w-8 [&_button]:p-0 [&_button]:min-w-8 [&_button]:text-[0px] [&_button]:leading-none [&_button_svg]:h-4 [&_button_svg]:w-4 [&_button_svg]:mx-auto [&_button_svg]:shrink-0 [&_button_span]:hidden'
                           )}

@@ -127,11 +127,36 @@ export const quoteFormSchema = z.object({
   customerId: customerIdSchema,
   quoteDate: z.string().min(1, 'Tarih zorunludur'),
   status: documentStatusSchema,
-  discountRate: z.number().min(0).max(100).default(0),
+  discountRate: z.coerce.number().min(0).max(100).default(0),
   notes: z.string().max(2000).optional(),
 });
 
 export type QuoteFormValues = z.input<typeof quoteFormSchema>;
+export type QuoteFormParsed = z.output<typeof quoteFormSchema>;
+
+export function normalizeQuoteFormInput(
+  values: QuoteFormValues | QuoteFormParsed
+): QuoteFormValues {
+  return {
+    quoteNumber: values.quoteNumber ?? '',
+    customerId: String(values.customerId ?? ''),
+    quoteDate: values.quoteDate ?? toDateInputValue(),
+    status: String(values.status ?? 1),
+    discountRate: Number(values.discountRate ?? 0),
+    notes: values.notes ?? '',
+  };
+}
+
+export function formatZodFormError(error: unknown): string {
+  if (error instanceof z.ZodError) {
+    const messages = error.issues.map((issue) => issue.message).filter(Boolean);
+    return messages.length > 0 ? messages.join(' · ') : 'Form dogrulanamadi.';
+  }
+  if (error instanceof Error && error.message && !error.message.startsWith('[')) {
+    return error.message;
+  }
+  return 'Islem tamamlanamadi.';
+}
 
 export function toQuoteFormValues(quote?: SalesDeskQuoteDto | null): QuoteFormValues {
   return {
@@ -145,10 +170,10 @@ export function toQuoteFormValues(quote?: SalesDeskQuoteDto | null): QuoteFormVa
 }
 
 export function toQuotePayload(
-  values: QuoteFormValues,
+  values: QuoteFormValues | QuoteFormParsed,
   lines: LineUpsertInput[] = []
 ): SalesDeskQuoteCreateBody {
-  const parsed = quoteFormSchema.parse(values);
+  const parsed = quoteFormSchema.parse(normalizeQuoteFormInput(values));
   return {
     quoteNumber: parsed.quoteNumber?.trim() || undefined,
     customerId: parsed.customerId,

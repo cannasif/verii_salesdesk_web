@@ -2,6 +2,12 @@ import { useMutation, useQuery, useQueryClient, type UseMutationResult, type Use
 import { toast } from 'sonner';
 import { DATA_TABLE_QUERY_OPTIONS } from '@/lib/list-query-options';
 import type { PagedParams, PagedResponse } from '@/types/api';
+import { tryWithSalesDeskListTimeout } from '../lib/salesdesk-fast-timeout';
+import {
+  emptySalesDeskPagedResponse,
+  readSalesDeskListCache,
+  writeSalesDeskListCache,
+} from '../lib/salesdesk-list-cache';
 
 interface SalesDeskCrudApi<TDto, TPayload> {
   list: (params?: PagedParams) => Promise<PagedResponse<TDto>>;
@@ -19,10 +25,34 @@ interface SalesDeskCrudMessages {
   deleteError: string;
 }
 
+async function loadListWithCache<TDto extends { id: number }, TPayload>(
+  resourceKey: string,
+  api: SalesDeskCrudApi<TDto, TPayload>,
+  params: PagedParams,
+): Promise<PagedResponse<TDto>> {
+  const cached = readSalesDeskListCache<TDto>(resourceKey, params);
+
+  try {
+    const remote = await tryWithSalesDeskListTimeout(api.list(params));
+    if (remote) {
+      writeSalesDeskListCache(resourceKey, params, remote);
+      return remote;
+    }
+  } catch {
+    // Asagida onbellek / bos liste
+  }
+
+  if (cached) {
+    return cached;
+  }
+
+  return emptySalesDeskPagedResponse<TDto>(params);
+}
+
 export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
   resourceKey: string,
   api: SalesDeskCrudApi<TDto, TPayload>,
-  messages: SalesDeskCrudMessages
+  messages: SalesDeskCrudMessages,
 ) {
   const allKey = ['salesdesk', resourceKey] as const;
   const listKey = (params: PagedParams) => [...allKey, 'list', params] as const;
@@ -31,16 +61,16 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
   const useList = (params: PagedParams): UseQueryResult<PagedResponse<TDto>> =>
     useQuery({
       queryKey: listKey(params),
-      queryFn: () => api.list(params),
+      queryFn: () => loadListWithCache(resourceKey, api, params),
       staleTime: 60_000,
       ...DATA_TABLE_QUERY_OPTIONS,
-      placeholderData: (previousData) => previousData,
+      placeholderData: (previousData) => previousData ?? readSalesDeskListCache<TDto>(resourceKey, params) ?? undefined,
     });
 
   const useStats = (): UseQueryResult<PagedResponse<TDto>> =>
     useQuery({
       queryKey: statsKey,
-      queryFn: () => api.list({ pageNumber: 1, pageSize: 50 }),
+      queryFn: () => loadListWithCache(resourceKey, api, { pageNumber: 1, pageSize: 50 }),
       staleTime: 60_000,
       ...DATA_TABLE_QUERY_OPTIONS,
     });

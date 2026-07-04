@@ -59,6 +59,7 @@
     "cors": "^2.8.6",
     "date-fns": "^4.1.0",
     "express": "^5.2.1",
+    "html2canvas": "^1.4.1",
     "html5-qrcode": "^2.3.8",
     "hugeicons-react": "^0.3.0",
     "i18next": "^25.6.3",

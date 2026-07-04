@@ -15,6 +15,7 @@ interface SalesDeskManagementTableProps<T extends { id: number }> {
   minTableWidthClassName?: string;
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
+  renderExtraActions?: (row: T) => ReactNode;
   pageSize: number;
   pageSizeOptions: readonly number[];
   onPageSizeChange: (size: number) => void;
@@ -37,6 +38,7 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   minTableWidthClassName = 'min-w-[800px] lg:min-w-[1000px]',
   onEdit,
   onDelete,
+  renderExtraActions,
   pageSize,
   pageSizeOptions,
   onPageSizeChange,
@@ -78,16 +80,17 @@ export function SalesDeskManagementTable<T extends { id: number }>({
     return column ? column.render(row) : '-';
   };
 
-  const showActions = Boolean(onEdit || onDelete);
+  const showActions = Boolean(onEdit || onDelete || renderExtraActions);
 
   const renderActionsCell = (row: T): ReactElement => (
     <div
-      className="flex justify-end gap-2 opacity-100"
+      className="flex min-w-max justify-end gap-0.5 opacity-100"
       data-skip-row-double-click
       data-no-drag-scroll
       onClick={(event) => event.stopPropagation()}
       onDoubleClick={(event) => event.stopPropagation()}
     >
+      {renderExtraActions ? renderExtraActions(row) : null}
       {onEdit ? (
         <Button
           variant="ghost"
@@ -128,6 +131,8 @@ export function SalesDeskManagementTable<T extends { id: number }>({
       showActionsColumn={showActions}
       actionsHeaderLabel="Islemler"
       renderActionsCell={showActions ? renderActionsCell : undefined}
+      initialActionsColumnWidth={renderExtraActions ? 280 : undefined}
+      actionsCellClassName="crm-text-end align-middle overflow-visible"
       iconOnlyActions
       rowClassName="group"
       onRowDoubleClick={onEdit}

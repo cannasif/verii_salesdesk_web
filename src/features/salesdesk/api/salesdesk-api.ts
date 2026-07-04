@@ -289,7 +289,7 @@ export function isOpenSalesDeskTask(task: SalesDeskTaskDto): boolean {
 const OPEN_ITEMS_FETCH_SIZE = 50;
 const ACTIVITIES_FETCH_SIZE = 30;
 const PROJECT_FETCH_SIZE = 50;
-const SALESDESK_READ_TIMEOUT_MS = 30_000;
+const SALESDESK_READ_TIMEOUT_MS = 8_000;
 const SALESDESK_TASKS_WRITE_TIMEOUT_MS = 45_000;
 
 const salesDeskReadConfig: AxiosRequestConfig = { timeout: SALESDESK_READ_TIMEOUT_MS };

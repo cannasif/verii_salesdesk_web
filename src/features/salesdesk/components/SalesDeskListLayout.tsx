@@ -80,6 +80,7 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   onAdd: () => void;
   onEdit?: (row: T) => void;
   onDeleteRequest?: (row: T) => void;
+  renderExtraActions?: (row: T) => ReactNode;
   deletingRow?: T | null;
   onDeleteConfirm?: () => void | Promise<void>;
   onDeleteCancel?: () => void;
@@ -129,6 +130,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
   onAdd,
   onEdit,
   onDeleteRequest,
+  renderExtraActions,
   deletingRow,
   onDeleteConfirm,
   onDeleteCancel,
@@ -295,6 +297,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
                   minTableWidthClassName={minTableWidthClassName}
                   onEdit={onEdit}
                   onDelete={onDeleteRequest}
+                  renderExtraActions={renderExtraActions}
                   pageSize={pageSize}
                   pageSizeOptions={PAGE_SIZE_OPTIONS}
                   onPageSizeChange={onPageSizeChange}

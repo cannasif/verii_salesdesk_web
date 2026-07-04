@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormProvider, useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,12 +11,11 @@ import {
   useSalesDeskProductOptions,
 } from '../../hooks/useSalesDeskModules';
 import {
-  quoteFormSchema,
   toQuoteFormValues,
+  quoteFormSchema,
   type QuoteFormValues,
 } from '../../types/salesdesk-schemas';
 import {
-  invoiceLinesToPayload,
   type InvoiceLineFormState,
 } from '../../types/invoice-create-types';
 import {
@@ -40,6 +39,8 @@ import { SalesDeskDocumentCreatePageHeader } from '../invoices/SalesDeskDocument
 import { SalesDeskDocumentLineTable } from '../invoices/SalesDeskDocumentLineTable';
 import { SalesDeskDocumentSummaryCard } from '../invoices/SalesDeskDocumentSummaryCard';
 import { SalesDeskQuoteHeaderForm } from './SalesDeskQuoteHeaderForm';
+import { SalesDeskQuotePreviewDialog } from './SalesDeskQuotePreviewDialog';
+import { buildSalesDeskQuotePreviewData } from '../../lib/build-salesdesk-quote-preview-data';
 import { cn } from '@/lib/utils';
 
 export function SalesDeskQuoteCreateForm(): ReactElement {
@@ -58,6 +59,30 @@ export function SalesDeskQuoteCreateForm(): ReactElement {
     error: productsFetchError,
   } = useSalesDeskProductOptions();
   const [lines, setLines] = useState<InvoiceLineFormState[]>([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<ReturnType<typeof buildSalesDeskQuotePreviewData> | null>(
+    null
+  );
+  const [previewShareContext, setPreviewShareContext] = useState<{
+    customerId: number;
+    customerName: string;
+  } | null>(null);
+
+  const customerNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const item of customers ?? []) {
+      map.set(String(item.id), item.name);
+    }
+    return map;
+  }, [customers]);
+
+  const customerContactById = useMemo(() => {
+    const map = new Map<number, { email?: string | null; phone?: string | null }>();
+    for (const item of customers ?? []) {
+      map.set(item.id, { email: item.email, phone: item.phone });
+    }
+    return map;
+  }, [customers]);
 
   const optionsPending = customersPending || productsPending;
   const optionsErrorMessage =
@@ -77,7 +102,11 @@ export function SalesDeskQuoteCreateForm(): ReactElement {
   useEffect(() => {
     form.reset(toQuoteFormValues());
     setLines([]);
-  }, [form]);
+  }, []);
+
+  const handleInvalidSubmit = (): void => {
+    toast.error('Lutfen zorunlu alanlari kontrol edin (cari, tarih, durum).');
+  };
 
   const handleSubmit = form.handleSubmit(async (values) => {
     if (lines.length === 0) {
@@ -85,16 +114,42 @@ export function SalesDeskQuoteCreateForm(): ReactElement {
       return;
     }
 
-    await createQuote.mutateAsync({
-      values,
-      lines: invoiceLinesToPayload(lines),
-    });
-    toast.success('Teklif basariyla olusturuldu.');
-    navigate('/salesdesk/quotes');
-  });
+    const validLines = lines.filter((line) => line.productId > 0 && line.quantity > 0);
+    if (validLines.length === 0) {
+      toast.error('Her kalemde urun secimi ve gecerli miktar olmalidir.');
+      return;
+    }
+
+    const customerName = customerNameById.get(String(values.customerId)) ?? 'Musteri';
+
+    try {
+      await createQuote.mutateAsync({
+        values,
+        lines: validLines,
+        customerName,
+      });
+      navigate('/salesdesk/quotes');
+    } catch {
+      // Hata toast'u mutation tarafinda gosteriliyor.
+    }
+  }, handleInvalidSubmit);
 
   const handlePreview = (): void => {
-    toast.info('Onizleme yakinda eklenecek.');
+    const values = form.getValues();
+    if (!values.customerId) {
+      toast.error('Onizleme icin once cari secin.');
+      return;
+    }
+    if (lines.length === 0) {
+      toast.error('Onizleme icin en az bir kalem ekleyin.');
+      return;
+    }
+
+    const customerName = customerNameById.get(String(values.customerId)) ?? 'Musteri';
+    const customerId = Number(values.customerId);
+    setPreviewShareContext({ customerId, customerName });
+    setPreviewData(buildSalesDeskQuotePreviewData(values, lines, customerName));
+    setPreviewOpen(true);
   };
 
   return (
@@ -192,7 +247,7 @@ export function SalesDeskQuoteCreateForm(): ReactElement {
 
             <Button
               type="submit"
-              disabled={createQuote.isPending || optionsPending}
+              disabled={createQuote.isPending}
               className={cn('sm:min-w-[140px]', SD_DOCUMENT_BUTTON_BASE, SD_DOCUMENT_BUTTON_SAVE)}
             >
               <Save className="mr-2 h-4 w-4" />
@@ -201,6 +256,31 @@ export function SalesDeskQuoteCreateForm(): ReactElement {
           </div>
         </form>
       </FormProvider>
+
+      <SalesDeskQuotePreviewDialog
+        open={previewOpen}
+        data={previewData}
+        quote={
+          previewShareContext && previewData
+            ? {
+                id: 0,
+                customerId: previewShareContext.customerId,
+                quoteNumber: previewData.quoteNumber,
+                customerName: previewShareContext.customerName,
+              }
+            : null
+        }
+        contact={
+          previewShareContext ? customerContactById.get(previewShareContext.customerId) ?? null : null
+        }
+        onOpenChange={(open) => {
+          setPreviewOpen(open);
+          if (!open) {
+            setPreviewData(null);
+            setPreviewShareContext(null);
+          }
+        }}
+      />
     </div>
   );
 }

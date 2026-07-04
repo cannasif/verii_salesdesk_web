@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   useMutation,
   useQuery,
@@ -21,7 +22,11 @@ import {
 } from '../api/salesdesk-api';
 import { isSalesDeskActivityTask } from '../lib/salesdesk-activities';
 import { isSalesDeskProjectTask } from '../lib/salesdesk-project-tracking';
+import { tryWithSalesDeskListTimeout } from '../lib/salesdesk-fast-timeout';
+import { readSalesDeskListCache, writeSalesDeskListCache } from '../lib/salesdesk-list-cache';
 import { createSalesDeskCrudHooks } from './createSalesDeskCrudHooks';
+import { salesDeskQuotesApi, type CreateSalesDeskQuoteInput, QUOTES_SYNCED_EVENT } from '../api/salesdesk-quotes-api';
+import type { SalesDeskQuoteDto } from '../api/salesdesk-api';
 import { userApi } from '@/features/user-management/api/user-api';
 import type {
   AssetFormValues,
@@ -44,7 +49,9 @@ import {
   toGmailPayload,
   toInvoicePayload,
   toProductPayload,
-  toQuotePayload,
+  quoteFormSchema,
+  formatZodFormError,
+  normalizeQuoteFormInput,
   toRecurringPaymentPayload,
   toSoftwareResearchPayload,
   toTaskPayload,
@@ -295,14 +302,113 @@ const products = createSalesDeskCrudHooks('products', salesDeskApi.products, {
   deleteError: 'Urun silinemedi',
 });
 
-const quotes = createSalesDeskCrudHooks('quotes', salesDeskApi.quotes, {
-  createSuccess: 'Teklif olusturuldu',
-  updateSuccess: 'Teklif guncellendi',
-  deleteSuccess: 'Teklif silindi',
-  createError: 'Teklif olusturulamadi',
-  updateError: 'Teklif guncellenemedi',
-  deleteError: 'Teklif silinemedi',
-});
+const SALESDESK_QUOTES_QUERY_KEY = ['salesdesk', 'quotes'] as const;
+
+function useSalesDeskQuotesSyncInvalidation(): void {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handleSynced = (): void => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_QUOTES_QUERY_KEY });
+    };
+    window.addEventListener(QUOTES_SYNCED_EVENT, handleSynced);
+    return () => window.removeEventListener(QUOTES_SYNCED_EVENT, handleSynced);
+  }, [queryClient]);
+}
+
+export const useSalesDeskQuoteList = (params: PagedParams): UseQueryResult<PagedResponse<SalesDeskQuoteDto>> => {
+  useSalesDeskQuotesSyncInvalidation();
+
+  return useQuery({
+    queryKey: [...SALESDESK_QUOTES_QUERY_KEY, 'list', params],
+    queryFn: () => salesDeskQuotesApi.list(params),
+    initialData: () => salesDeskQuotesApi.listLocalPaged(params),
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    ...DATA_TABLE_QUERY_OPTIONS,
+    placeholderData: (previousData) => previousData ?? salesDeskQuotesApi.listLocalPaged(params),
+  });
+};
+
+export const useSalesDeskQuoteStats = (): UseQueryResult<PagedResponse<SalesDeskQuoteDto>> => {
+  useSalesDeskQuotesSyncInvalidation();
+
+  return useQuery({
+    queryKey: [...SALESDESK_QUOTES_QUERY_KEY, 'stats'],
+    queryFn: () => salesDeskQuotesApi.list({ pageNumber: 1, pageSize: 50 }),
+    initialData: () => salesDeskQuotesApi.listLocalPaged({ pageNumber: 1, pageSize: 50 }),
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    ...DATA_TABLE_QUERY_OPTIONS,
+  });
+};
+
+export const useCreateSalesDeskQuote = (): UseMutationResult<
+  SalesDeskQuoteDto,
+  Error,
+  CreateSalesDeskQuoteInput | QuoteFormValues
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input) => {
+      if (typeof input === 'object' && input !== null && 'values' in input) {
+        const result = await salesDeskQuotesApi.create(input);
+        return result.quote;
+      }
+
+      const customerId = quoteFormSchema.parse(normalizeQuoteFormInput(input)).customerId;
+      const result = await salesDeskQuotesApi.create({
+        values: input,
+        lines: [],
+        customerName: `Cari #${customerId}`,
+      });
+      return result.quote;
+    },
+    onSuccess: (_quote, input) => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_QUOTES_QUERY_KEY });
+      if (typeof input === 'object' && input !== null && 'values' in input) {
+        toast.success('Teklif basariyla olusturuldu.');
+      } else {
+        toast.success('Teklif olusturuldu.');
+      }
+    },
+    onError: (error: Error) => toast.error(formatZodFormError(error) || 'Teklif olusturulamadi'),
+  });
+};
+
+export const useUpdateSalesDeskQuote = (): UseMutationResult<
+  SalesDeskQuoteDto,
+  Error,
+  { id: number; values: QuoteFormValues; lines?: CreateSalesDeskQuoteInput['lines']; customerName?: string }
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, values, lines = [], customerName = 'Musteri' }) => {
+      const result = await salesDeskQuotesApi.update(id, { values, lines, customerName });
+      return result.quote;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_QUOTES_QUERY_KEY });
+      toast.success('Teklif guncellendi');
+    },
+    onError: (error: Error) => toast.error(formatZodFormError(error) || 'Teklif guncellenemedi'),
+  });
+};
+
+export const useDeleteSalesDeskQuote = (): UseMutationResult<void, Error, number> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => salesDeskQuotesApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_QUOTES_QUERY_KEY });
+      toast.success('Teklif silindi');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Teklif silinemedi'),
+  });
+};
 
 const invoices = createSalesDeskCrudHooks('invoices', salesDeskApi.invoices, {
   createSuccess: 'Fatura olusturuldu',
@@ -404,36 +510,6 @@ export const useUpdateSalesDeskProduct = () => {
 };
 export const useDeleteSalesDeskProduct = products.useDelete;
 
-export const useSalesDeskQuoteList = quotes.useList;
-export const useSalesDeskQuoteStats = quotes.useStats;
-export const useCreateSalesDeskQuote = () => {
-  const mutation = quotes.useCreate();
-  return {
-    ...mutation,
-    mutateAsync: (
-      valuesOrInput:
-        | QuoteFormValues
-        | {
-            values: QuoteFormValues;
-            lines?: Parameters<typeof toQuotePayload>[1];
-          }
-    ) => {
-      if (typeof valuesOrInput === 'object' && valuesOrInput !== null && 'values' in valuesOrInput) {
-        return mutation.mutateAsync(toQuotePayload(valuesOrInput.values, valuesOrInput.lines ?? []));
-      }
-      return mutation.mutateAsync(toQuotePayload(valuesOrInput));
-    },
-  };
-};
-export const useUpdateSalesDeskQuote = () => {
-  const mutation = quotes.useUpdate();
-  return {
-    ...mutation,
-    mutateAsync: ({ id, values }: { id: number; values: QuoteFormValues }) =>
-      mutation.mutateAsync({ id, body: toQuotePayload(values) }),
-  };
-};
-export const useDeleteSalesDeskQuote = quotes.useDelete;
 
 export const useSalesDeskInvoiceList = invoices.useList;
 export const useSalesDeskInvoiceStats = invoices.useStats;
@@ -856,15 +932,26 @@ const SALESDESK_OPTIONS_STALE_TIME_MS = 5 * 60 * 1000;
 const SALESDESK_OPTIONS_GC_TIME_MS = 30 * 60 * 1000;
 
 export function useSalesDeskCustomerOptions(): UseQueryResult<SalesDeskCustomerDto[]> {
+  const listParams = { pageNumber: 1, pageSize: 200, sortBy: 'Name', sortDirection: 'asc' as const };
+
   return useQuery({
     queryKey: ['salesdesk', 'customers', 'options'],
     queryFn: async () => {
-      const response = await salesDeskApi.customers.list({ pageNumber: 1, pageSize: 200, sortBy: 'Name', sortDirection: 'asc' });
-      return response.data;
+      const response = await tryWithSalesDeskListTimeout(
+        salesDeskApi.customers.list(listParams),
+      );
+      if (response) {
+        writeSalesDeskListCache('customers-options', listParams, response);
+        return response.data;
+      }
+      return readSalesDeskListCache<SalesDeskCustomerDto>('customers-options', listParams)?.data ?? [];
     },
     staleTime: SALESDESK_OPTIONS_STALE_TIME_MS,
     gcTime: SALESDESK_OPTIONS_GC_TIME_MS,
-    placeholderData: (previousData) => previousData,
+    placeholderData: (previousData) =>
+      previousData ??
+      readSalesDeskListCache<SalesDeskCustomerDto>('customers-options', listParams)?.data ??
+      [],
   });
 }
 

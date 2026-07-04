@@ -8,7 +8,13 @@ export const QUOTATION_EXPORT_PDF_FONT = 'QuotationExportMontserrat';
 
 export async function registerQuotationExportPdfFont(doc: jsPDF): Promise<boolean> {
   try {
-    const response = await fetch(resolveAppPath(FONT_PUBLIC_PATH), { cache: 'force-cache' });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 4_000);
+    const response = await fetch(resolveAppPath(FONT_PUBLIC_PATH), {
+      cache: 'force-cache',
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
     if (!response.ok) {
       return false;
     }
