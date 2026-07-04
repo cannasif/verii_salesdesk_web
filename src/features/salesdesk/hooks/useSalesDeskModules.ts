@@ -7,7 +7,7 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { shouldRetryQuery } from '@/lib/query-client';
+import { DATA_TABLE_QUERY_OPTIONS } from '@/lib/list-query-options';
 import type { PagedParams, PagedResponse } from '@/types/api';
 import {
   salesDeskApi,
@@ -636,7 +636,7 @@ export function useSalesDeskVisitForm(id: number | null) {
     queryFn: () => salesDeskApi.visitForms.get(id!),
     enabled: id != null && id > 0,
     staleTime: 30_000,
-    retry: shouldRetryQuery,
+    ...DATA_TABLE_QUERY_OPTIONS,
   });
 }
 export const useCreateSalesDeskVisitForm = () => {
@@ -702,7 +702,7 @@ export function useSalesDeskSoftwareResearch(id: number | null) {
     queryFn: () => salesDeskApi.softwareResearch.get(id!),
     enabled: id != null && id > 0,
     staleTime: 30_000,
-    retry: shouldRetryQuery,
+    ...DATA_TABLE_QUERY_OPTIONS,
   });
 }
 export const useCreateSalesDeskSoftwareResearch = () => {
@@ -730,7 +730,7 @@ export function useSalesDeskErpNews(id: number | null) {
     queryFn: () => salesDeskApi.erpNews.get(id!),
     enabled: id != null && id > 0,
     staleTime: 30_000,
-    retry: shouldRetryQuery,
+    ...DATA_TABLE_QUERY_OPTIONS,
   });
 }
 export const useCreateSalesDeskErpNews = () => {
@@ -813,9 +813,7 @@ export function useSalesDeskOpenItemsList(params: PagedParams): UseQueryResult<P
     queryFn: () => salesDeskApi.tasks.openItems(params),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    retry: shouldRetryQuery,
+    ...DATA_TABLE_QUERY_OPTIONS,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -828,9 +826,7 @@ export function useSalesDeskActivitiesList(
     queryFn: () => salesDeskApi.tasks.activities(params),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    retry: shouldRetryQuery,
+    ...DATA_TABLE_QUERY_OPTIONS,
     placeholderData: (previousData) => previousData,
   });
 }
@@ -843,9 +839,7 @@ export function useSalesDeskProjectsList(
     queryFn: () => salesDeskApi.tasks.projects(params),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-    retry: shouldRetryQuery,
+    ...DATA_TABLE_QUERY_OPTIONS,
     placeholderData: (previousData) => previousData,
   });
 }

@@ -1,11 +1,12 @@
 import { type ReactElement, useEffect, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { AxiosError } from 'axios';
+import { isAxiosError, type AxiosError } from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
 import { isTokenValid } from '@/utils/jwt';
 import { useMyPermissionsQuery } from '@/features/access-control/hooks/useMyPermissionsQuery';
 import { Button } from '@/components/ui/button';
+import { AppShellLoadingScreen } from '@/components/shared/AppShellLoadingScreen';
 
 function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -27,11 +28,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): ReactElement 
   const hasValidToken = !!(storedToken && isTokenValid(storedToken));
   const isAuthenticated = !!(user && (token || hasValidToken));
   const location = useLocation();
-  const { isError: permissionsIsError, error: permissionsError, refetch: refetchPermissions } = useMyPermissionsQuery();
+  const { isLoading: permissionsLoading, isError: permissionsIsError, error: permissionsError, refetch: refetchPermissions } = useMyPermissionsQuery();
   const autoRetryCount = useRef(0);
 
+  const permissionsTimedOut =
+    permissionsIsError && isAxiosError(permissionsError) && permissionsError.code === 'ECONNABORTED';
+
   useEffect(() => {
-    if (!permissionsIsError) {
+    if (!permissionsIsError || permissionsTimedOut) {
       autoRetryCount.current = 0;
       return;
     }
@@ -47,7 +51,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): ReactElement 
     }, AUTO_RETRY_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [permissionsIsError, permissionsError, refetchPermissions]);
+  }, [permissionsIsError, permissionsError, permissionsTimedOut, refetchPermissions]);
 
   if (!isAuthenticated) {
     return <Navigate to="/auth/login" replace />;
@@ -55,6 +59,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): ReactElement 
 
   if (location.pathname === '/forbidden') {
     return children;
+  }
+
+  if (permissionsLoading) {
+    return <AppShellLoadingScreen />;
   }
 
   if (permissionsIsError) {
@@ -67,7 +75,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): ReactElement 
       return <Navigate to="/forbidden" replace state={{ from: location.pathname }} />;
     }
 
-    const isAutoRetrying = autoRetryCount.current < MAX_AUTO_RETRY;
+    const isAutoRetrying = !permissionsTimedOut && autoRetryCount.current < MAX_AUTO_RETRY;
 
     return (
       <div className="min-h-[60vh] w-full flex items-center justify-center p-6">

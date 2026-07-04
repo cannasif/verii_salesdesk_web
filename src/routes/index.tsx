@@ -61,6 +61,7 @@ const SalesDeskErpNewsEditPage = lazyImport(() => import('@/features/salesdesk')
 const SalesDeskGmailPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGmailPage');
 const SalesDeskSettingsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSettingsPage');
 const SalesDeskGroupsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskGroupsPage');
+const SalesDeskCompaniesPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskCompaniesPage');
 
 export function createAppRouter() {
   return createBrowserRouter([
@@ -76,6 +77,7 @@ export function createAppRouter() {
         { index: true, element: <SalesDeskDashboardPage /> },
         { path: 'forbidden', element: <ForbiddenPage /> },
         { path: 'salesdesk/customers', element: <SalesDeskCustomersPage /> },
+        { path: 'salesdesk/companies', element: <SalesDeskCompaniesPage /> },
         { path: 'salesdesk/potentials', element: <SalesDeskPotentialsPage /> },
         { path: 'salesdesk/products', element: <SalesDeskProductsPage /> },
         { path: 'salesdesk/product-customers', element: <SalesDeskProductCustomersPage /> },

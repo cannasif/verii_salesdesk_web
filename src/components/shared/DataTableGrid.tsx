@@ -463,7 +463,7 @@ export function DataTableGrid<TRow, TKey extends string>({
     <div className="flex min-w-0 w-full flex-col gap-2">
       {actionBar ? <DataTableActionBar {...actionBar} /> : toolbar}
       <div className="relative w-full min-w-0 flex-1">
-        {isLoading && (
+        {isLoading && !isError && (
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-md bg-white/20 backdrop-blur-[1px] dark:bg-slate-950/20">
             <div className="inline-flex items-center gap-3 rounded-2xl border border-white/60 bg-white/90 p-4 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-slate-900/90">
               <Loader2 className="h-8 w-8 animate-spin text-[var(--crm-brand-text)]" />
@@ -557,7 +557,7 @@ export function DataTableGrid<TRow, TKey extends string>({
             </TableHeader>
 
             <TableBody>
-              {isLoading &&
+              {isLoading && !isError &&
                 Array.from({ length: Math.min(pageSize, 10) }).map((_, i) => (
                   <TableRow key={`skeleton-${i}`}>
                     {localVisibleColumnKeys.map((key) => (

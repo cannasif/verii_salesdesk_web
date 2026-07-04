@@ -83,15 +83,24 @@ export default defineConfig(({ mode }) => {
         target: devApiProxyTarget,
         changeOrigin: true,
         secure: false,
+        timeout: 120_000,
+        proxyTimeout: 120_000,
       },
       "/notificationHub": {
         target: devApiProxyTarget,
         changeOrigin: true,
         secure: false,
         ws: true,
+        timeout: 120_000,
+        proxyTimeout: 120_000,
       },
       // /salesdesk/groups React sayfasi ile cakisir; grup API'si /groups uzerinden proxy'lenir.
       "/groups": {
+        target: devLocalServerTarget,
+        changeOrigin: true,
+        secure: false,
+      },
+      "/companies": {
         target: devLocalServerTarget,
         changeOrigin: true,
         secure: false,

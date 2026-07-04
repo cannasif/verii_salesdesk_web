@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient, type UseMutationResult, type UseQueryResult } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { DATA_TABLE_QUERY_OPTIONS } from '@/lib/list-query-options';
 import type { PagedParams, PagedResponse } from '@/types/api';
 import { salesDeskApi, type SalesDeskCustomerDto } from '../api/salesdesk-api';
 import { salesDeskCustomerQueryKeys } from './query-keys';
@@ -13,6 +14,7 @@ export function useSalesDeskCustomerList(
     queryKey: salesDeskCustomerQueryKeys.list(params),
     queryFn: () => salesDeskApi.customers.list(params),
     staleTime: 15000,
+    ...DATA_TABLE_QUERY_OPTIONS,
   });
 }
 
@@ -21,6 +23,7 @@ export function useSalesDeskCustomerStats(): UseQueryResult<PagedResponse<SalesD
     queryKey: salesDeskCustomerQueryKeys.stats(),
     queryFn: () => salesDeskApi.customers.list({ pageNumber: 1, pageSize: 200 }),
     staleTime: 30000,
+    ...DATA_TABLE_QUERY_OPTIONS,
   });
 }
 

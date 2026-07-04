@@ -48,6 +48,7 @@ export {
 export { SalesDeskGmailPage } from './components/pages/SalesDeskGmailPage';
 export { SalesDeskSettingsPage } from './components/pages/SalesDeskSettingsPage';
 export { SalesDeskGroupsPage } from './components/pages/SalesDeskGroupsPage';
+export { SalesDeskCompaniesPage } from './components/pages/SalesDeskCompaniesPage';
 
 export const salesDeskNavItems = [
   { title: 'Ana Sayfa', href: '/', icon: <Home size={22} className="text-slate-400" /> },
@@ -58,6 +59,7 @@ export const salesDeskNavItems = [
     children: [
       { title: 'Cari Yonetimi', href: '/salesdesk/customers' },
       { title: 'Potansiyel Cariler', href: '/salesdesk/potentials' },
+      { title: 'Sirket Yonetimi', href: '/salesdesk/companies' },
     ],
   },
   {

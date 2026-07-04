@@ -426,7 +426,7 @@ export function SalesDeskCustomersPage(): ReactElement {
                 onSort={handleSort}
                 renderSortIcon={renderSortIcon}
                 renderCell={renderCustomerCell}
-                isLoading={isLoading}
+                isLoading={isLoading && !isError}
                 isError={isError}
                 loadingText="Yukleniyor..."
                 errorText={(error as Error)?.message || 'Cari listesi yuklenemedi. API baglantisini kontrol edin.'}
