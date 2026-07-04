@@ -185,7 +185,7 @@ export async function buildSalesDeskQuotePdfBlobWithJsPdf(data: SalesDeskQuotePr
   y = MARGIN;
   doc.setFontSize(18);
   setFont(doc, font, 'bold');
-  doc.text('Fiyat Teklifi', MARGIN, y);
+  doc.text(data.documentTitle ?? 'Fiyat Teklifi', MARGIN, y);
   drawLogo(doc, logoDataUrl, PAGE_W - MARGIN - 28, MARGIN - 2, 10);
   y += 8;
   doc.setFontSize(10);

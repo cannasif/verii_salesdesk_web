@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormProvider, useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +16,6 @@ import {
   type InvoiceFormValues,
 } from '../../types/salesdesk-schemas';
 import {
-  invoiceLinesToPayload,
   type InvoiceLineFormState,
 } from '../../types/invoice-create-types';
 import {
@@ -45,6 +44,8 @@ import { SalesDeskDocumentCreatePageHeader } from './SalesDeskDocumentCreatePage
 import { SalesDeskInvoiceHeaderForm } from './SalesDeskInvoiceHeaderForm';
 import { SalesDeskDocumentLineTable } from './SalesDeskDocumentLineTable';
 import { SalesDeskDocumentSummaryCard } from './SalesDeskDocumentSummaryCard';
+import { SalesDeskQuotePreviewDialog } from '../quotes/SalesDeskQuotePreviewDialog';
+import { buildSalesDeskInvoicePreviewData } from '../../lib/build-salesdesk-invoice-preview-data';
 import { cn } from '@/lib/utils';
 
 const INVOICE_DUE_DAYS = 30;
@@ -63,6 +64,7 @@ interface SalesDeskInvoiceCreateFormProps {
 export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCreateFormProps): ReactElement {
   const navigate = useNavigate();
   const createInvoice = useCreateSalesDeskInvoice();
+  const submitLockRef = useRef(false);
   const {
     data: customers,
     isPending: customersPending,
@@ -76,6 +78,28 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
     error: productsFetchError,
   } = useSalesDeskProductOptions();
   const [lines, setLines] = useState<InvoiceLineFormState[]>([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<ReturnType<typeof buildSalesDeskInvoicePreviewData> | null>(null);
+  const [previewShareContext, setPreviewShareContext] = useState<{
+    customerId: number;
+    customerName: string;
+  } | null>(null);
+
+  const customerNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const item of customers ?? []) {
+      map.set(String(item.id), item.name);
+    }
+    return map;
+  }, [customers]);
+
+  const customerContactById = useMemo(() => {
+    const map = new Map<number, { email?: string | null; phone?: string | null }>();
+    for (const item of customers ?? []) {
+      map.set(item.id, { email: item.email, phone: item.phone });
+    }
+    return map;
+  }, [customers]);
 
   const optionsPending = customersPending || productsPending;
   const optionsErrorMessage =
@@ -113,25 +137,71 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
     });
   }, [form, watchedInvoiceDate]);
 
+  const handleInvalidSubmit = (): void => {
+    toast.error('Lutfen zorunlu alanlari kontrol edin (cari, tarih, durum).');
+  };
+
   const handleSubmit = form.handleSubmit(async (values) => {
+    if (submitLockRef.current || createInvoice.isPending) {
+      return;
+    }
+
     if (lines.length === 0) {
       toast.error('Kaydetmeden once en az bir kalem ekleyin.');
       return;
     }
 
-    await createInvoice.mutateAsync({
-      values: {
-        ...values,
-        invoiceType: String(invoiceType) as InvoiceFormValues['invoiceType'],
-      },
-      lines: invoiceLinesToPayload(lines),
-    });
-    toast.success('Fatura basariyla olusturuldu.');
-    navigate('/salesdesk/invoices');
-  });
+    const validLines = lines.filter((line) => line.productId > 0 && line.quantity > 0);
+    if (validLines.length === 0) {
+      toast.error('Her kalemde urun secimi ve gecerli miktar olmalidir.');
+      return;
+    }
+
+    const customerName = customerNameById.get(String(values.customerId)) ?? 'Cari';
+
+    submitLockRef.current = true;
+    try {
+      await createInvoice.mutateAsync({
+        values: {
+          ...values,
+          invoiceType: String(invoiceType) as InvoiceFormValues['invoiceType'],
+        },
+        lines: validLines,
+        customerName,
+      });
+      navigate(isPurchase ? '/salesdesk/invoices?type=purchase' : '/salesdesk/invoices?type=sales');
+    } catch {
+      // Hata toast'u mutation tarafinda gosteriliyor.
+    } finally {
+      submitLockRef.current = false;
+    }
+  }, handleInvalidSubmit);
 
   const handlePreview = (): void => {
-    toast.info('Onizleme yakinda eklenecek.');
+    const values = form.getValues();
+    if (!values.customerId) {
+      toast.error('Onizleme icin once cari secin.');
+      return;
+    }
+    if (lines.length === 0) {
+      toast.error('Onizleme icin en az bir kalem ekleyin.');
+      return;
+    }
+
+    const customerName = customerNameById.get(String(values.customerId)) ?? 'Cari';
+    const customerId = Number(values.customerId);
+    setPreviewShareContext({ customerId, customerName });
+    setPreviewData(
+      buildSalesDeskInvoicePreviewData(
+        {
+          ...values,
+          invoiceType: String(invoiceType) as InvoiceFormValues['invoiceType'],
+        },
+        lines,
+        customerName
+      )
+    );
+    setPreviewOpen(true);
   };
 
   return (
@@ -243,6 +313,32 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
           </div>
         </form>
       </FormProvider>
+
+      <SalesDeskQuotePreviewDialog
+        open={previewOpen}
+        variant="invoice"
+        data={previewData}
+        invoice={
+          previewShareContext && previewData
+            ? {
+                id: 0,
+                customerId: previewShareContext.customerId,
+                invoiceNumber: previewData.quoteNumber,
+                customerName: previewShareContext.customerName,
+              }
+            : null
+        }
+        contact={
+          previewShareContext ? customerContactById.get(previewShareContext.customerId) ?? null : null
+        }
+        onOpenChange={(open) => {
+          setPreviewOpen(open);
+          if (!open) {
+            setPreviewData(null);
+            setPreviewShareContext(null);
+          }
+        }}
+      />
     </div>
   );
 }

@@ -26,7 +26,10 @@ export const SALES_DESK_INVOICE_TYPE_FILTER_OPTIONS: {
 ];
 
 export function resolveInvoiceType(invoice: SalesDeskInvoiceDto): SalesDeskInvoiceType {
-  return invoice.invoiceType === 2 ? 2 : 1;
+  if (invoice.invoiceType === 2) return 2;
+  const number = invoice.invoiceNumber?.trim().toUpperCase() ?? '';
+  if (number.startsWith('ALF') || number.includes('ALIS')) return 2;
+  return 1;
 }
 
 export function filterInvoicesByType(

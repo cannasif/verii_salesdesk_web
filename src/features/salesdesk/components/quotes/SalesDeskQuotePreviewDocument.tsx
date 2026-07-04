@@ -87,7 +87,7 @@ export function SalesDeskQuotePreviewDocument({
       <section className={`${pageClass} flex flex-col`}>
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Fiyat Teklifi</h2>
+            <h2 className="text-2xl font-semibold text-slate-900">{data.documentTitle ?? 'Fiyat Teklifi'}</h2>
             <p className="mt-1 text-sm text-slate-600">
               {data.customerName}
               {data.quoteNumber ? ` · ${data.quoteNumber}` : ''}

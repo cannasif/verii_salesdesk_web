@@ -193,11 +193,31 @@ export const invoiceFormSchema = z.object({
   invoiceDate: z.string().min(1, 'Fatura tarihi zorunludur'),
   dueDate: z.string().min(1, 'Vade tarihi zorunludur'),
   status: documentStatusSchema,
-  discountRate: z.number().min(0).max(100),
+  discountRate: z.coerce.number().min(0).max(100).default(0),
   notes: z.string().max(2000).optional(),
 });
 
 export type InvoiceFormValues = z.input<typeof invoiceFormSchema>;
+export type InvoiceFormParsed = z.output<typeof invoiceFormSchema>;
+
+export function normalizeInvoiceFormInput(
+  values: InvoiceFormValues | InvoiceFormParsed
+): InvoiceFormValues {
+  return {
+    invoiceNumber: values.invoiceNumber ?? '',
+    invoiceType: String(values.invoiceType ?? '1') as InvoiceFormValues['invoiceType'],
+    customerId: String(values.customerId ?? ''),
+    quoteId:
+      values.quoteId !== undefined && values.quoteId !== null && String(values.quoteId) !== ''
+        ? String(values.quoteId)
+        : '',
+    invoiceDate: values.invoiceDate ?? toDateInputValue(),
+    dueDate: values.dueDate ?? toDateInputValue(),
+    status: String(values.status ?? 5),
+    discountRate: Number(values.discountRate ?? 0),
+    notes: values.notes ?? '',
+  };
+}
 
 export function toInvoiceFormValues(
   invoice?: SalesDeskInvoiceDto | null,
@@ -217,10 +237,10 @@ export function toInvoiceFormValues(
 }
 
 export function toInvoicePayload(
-  values: InvoiceFormValues,
+  values: InvoiceFormValues | InvoiceFormParsed,
   lines: LineUpsertInput[] = []
 ): SalesDeskInvoiceCreateBody {
-  const parsed = invoiceFormSchema.parse(values);
+  const parsed = invoiceFormSchema.parse(normalizeInvoiceFormInput(values));
   return {
     invoiceNumber: parsed.invoiceNumber?.trim() || undefined,
     invoiceType: Number(parsed.invoiceType) as SalesDeskInvoiceType,

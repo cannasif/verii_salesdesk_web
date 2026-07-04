@@ -5,6 +5,10 @@ import type { SalesDeskInvoiceDto } from '../../api/salesdesk-api';
 import { SalesDeskEntityForm, type SalesDeskFormField } from '../SalesDeskEntityForm';
 import { SalesDeskInvoiceTypeTabs } from '../SalesDeskInvoiceTypeTabs';
 import { SalesDeskListLayout } from '../SalesDeskListLayout';
+import { SalesDeskQuotePreviewDialog } from '../quotes/SalesDeskQuotePreviewDialog';
+import { SalesDeskInvoiceShareActions } from '../invoices/SalesDeskInvoiceShareActions';
+import type { SalesDeskQuotePreviewData } from '../../lib/build-salesdesk-quote-preview-data';
+import { salesDeskInvoicesApi } from '../../api/salesdesk-invoices-api';
 import {
   useCreateSalesDeskInvoice,
   useDeleteSalesDeskInvoice,
@@ -46,6 +50,9 @@ export function SalesDeskInvoicesPage(): ReactElement {
   const [formInvoiceType, setFormInvoiceType] = useState<1 | 2>(SALES_DESK_INVOICE_TYPE.sales);
   const [editing, setEditing] = useState<SalesDeskInvoiceDto | null>(null);
   const [deleting, setDeleting] = useState<SalesDeskInvoiceDto | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState<SalesDeskQuotePreviewData | null>(null);
+  const [previewInvoice, setPreviewInvoice] = useState<SalesDeskInvoiceDto | null>(null);
 
   const listParams = useMemo(
     () => ({ ...listPage.listParams, sortBy: 'InvoiceDate', sortDirection: 'desc' }),
@@ -69,6 +76,14 @@ export function SalesDeskInvoicesPage(): ReactElement {
 
   const customerOptions = (customers ?? []).map((item) => ({ value: String(item.id), label: item.name }));
 
+  const customerContacts = useMemo(() => {
+    const map: Record<number, { email?: string | null; phone?: string | null }> = {};
+    for (const customer of customers ?? []) {
+      map[customer.id] = { email: customer.email, phone: customer.phone };
+    }
+    return map;
+  }, [customers]);
+
   const handleTypeFilterChange = (next: SalesDeskInvoiceTypeFilter): void => {
     if (next === 'all') {
       setSearchParams({});
@@ -84,11 +99,27 @@ export function SalesDeskInvoicesPage(): ReactElement {
   };
 
   const handleSubmit = async (values: InvoiceFormValues): Promise<void> => {
+    const customerName =
+      customerOptions.find((option) => option.value === String(values.customerId))?.label ?? 'Cari';
+
     if (editing) {
-      await updateInvoice.mutateAsync({ id: editing.id, values });
+      await updateInvoice.mutateAsync({ id: editing.id, values, customerName });
       return;
     }
-    await createInvoice.mutateAsync(values);
+    await createInvoice.mutateAsync({
+      values: {
+        ...values,
+        invoiceType: String(formInvoiceType) as InvoiceFormValues['invoiceType'],
+      },
+      lines: [],
+      customerName,
+    });
+  };
+
+  const openPreview = (payload: { data: SalesDeskQuotePreviewData; invoice: SalesDeskInvoiceDto }): void => {
+    setPreviewData(payload.data);
+    setPreviewInvoice(payload.invoice);
+    setPreviewOpen(true);
   };
 
   const isPurchaseForm = formInvoiceType === SALES_DESK_INVOICE_TYPE.purchase;
@@ -136,7 +167,8 @@ export function SalesDeskInvoicesPage(): ReactElement {
   }, [customerOptions, isPurchaseForm]);
 
   return (
-    <div className="space-y-4">
+    <>
+      <div className="space-y-4">
       <SalesDeskInvoiceTypeTabs
         value={typeFilter}
         onChange={handleTypeFilterChange}
@@ -150,7 +182,7 @@ export function SalesDeskInvoicesPage(): ReactElement {
       <SalesDeskListLayout
         pageKey={`salesdesk-invoices-${typeFilter}`}
         title="Faturalar"
-        subtitle="Satis ve alis faturalarini ayri kaydedin, listede filtreleyin"
+        subtitle="Satis ve alis faturalarini kaydedin; onizleme, PDF / Excel / Gmail / WhatsApp gonderimi"
         tableTitle={
           typeFilter === 'sales'
             ? 'Satis Fatura Listesi'
@@ -211,13 +243,24 @@ export function SalesDeskInvoicesPage(): ReactElement {
         totalPages={Math.max(1, data?.totalPages ?? 1)}
         totalCount={typeFilter === 'all' ? (data?.totalCount ?? 0) : rows.length}
         onPageChange={listPage.setPageNumber}
-        onRefresh={() => refetch()}
+        onRefresh={() => {
+          void salesDeskInvoicesApi.syncRemoteInvoices({ force: true }).finally(() => {
+            void refetch();
+          });
+        }}
         onAdd={() => openCreateForm(SALES_DESK_INVOICE_TYPE.sales)}
         onEdit={(row) => {
           setEditing(row);
           setFormInvoiceType(resolveInvoiceType(row));
           setFormOpen(true);
         }}
+        renderExtraActions={(row) => (
+          <SalesDeskInvoiceShareActions
+            invoice={row}
+            contact={customerContacts[row.customerId] ?? null}
+            onPreview={openPreview}
+          />
+        )}
         onDeleteRequest={setDeleting}
         deletingRow={deleting}
         onDeleteConfirm={async () => {
@@ -250,6 +293,23 @@ export function SalesDeskInvoicesPage(): ReactElement {
           />
         }
       />
-    </div>
+      </div>
+
+      <SalesDeskQuotePreviewDialog
+        open={previewOpen}
+        variant="invoice"
+        data={previewData}
+        invoice={previewInvoice}
+        invoiceForExcel={previewInvoice}
+        contact={previewInvoice ? customerContacts[previewInvoice.customerId] ?? null : null}
+        onOpenChange={(open) => {
+          setPreviewOpen(open);
+          if (!open) {
+            setPreviewData(null);
+            setPreviewInvoice(null);
+          }
+        }}
+      />
+    </>
   );
 }

@@ -17,6 +17,8 @@ export interface SalesDeskQuotePreviewData {
   customerName: string;
   quoteNumber: string;
   quoteDateLabel: string;
+  /** Sayfa 3 basligi — varsayilan: Fiyat Teklifi */
+  documentTitle?: string;
   notes: string[];
   lines: SalesDeskQuotePreviewLine[];
   grandTotalLabel: string;

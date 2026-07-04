@@ -13,7 +13,10 @@ export async function buildSalesDeskQuotePdfBlob(
   return buildSalesDeskQuotePdfBlobWithJsPdf(data);
 }
 
-export function buildSalesDeskQuotePdfFileName(data: SalesDeskQuotePreviewData): string {
+export function buildSalesDeskQuotePdfFileName(
+  data: SalesDeskQuotePreviewData,
+  kind: 'teklif' | 'fatura' = 'teklif',
+): string {
   const slug = data.customerName
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
@@ -21,8 +24,8 @@ export function buildSalesDeskQuotePdfFileName(data: SalesDeskQuotePreviewData):
     .trim()
     .replace(/\s+/g, '-')
     .slice(0, 40);
-  const quotePart = data.quoteNumber.replace(/[^\w-]/g, '-').slice(0, 20);
-  return `${slug || 'teklif'}-${quotePart || 'taslak'}.pdf`;
+  const docPart = data.quoteNumber.replace(/[^\w-]/g, '-').slice(0, 20);
+  return `${slug || kind}-${docPart || 'taslak'}.pdf`;
 }
 
 export function downloadBlob(blob: Blob, fileName: string): void {

@@ -22,7 +22,14 @@ import {
   shareQuotePreviewViaGmail,
   shareQuotePreviewViaWhatsApp,
 } from '../../lib/salesdesk-quote-share';
-import type { SalesDeskQuoteDto } from '../../api/salesdesk-api';
+import type { InvoiceShareContact } from '../../lib/salesdesk-invoice-share';
+import {
+  exportInvoicePreviewToExcel,
+  exportInvoiceToExcel,
+  shareInvoicePreviewViaGmail,
+  shareInvoicePreviewViaWhatsApp,
+} from '../../lib/salesdesk-invoice-share';
+import type { SalesDeskInvoiceDto, SalesDeskQuoteDto } from '../../api/salesdesk-api';
 import { SalesDeskQuotePreviewDocument } from './SalesDeskQuotePreviewDocument';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -31,9 +38,12 @@ interface SalesDeskQuotePreviewDialogProps {
   open: boolean;
   data: SalesDeskQuotePreviewData | null;
   onOpenChange: (open: boolean) => void;
+  variant?: 'quote' | 'invoice';
   quote?: Pick<SalesDeskQuoteDto, 'id' | 'customerId' | 'quoteNumber' | 'customerName'> | null;
-  contact?: QuoteShareContact | null;
+  invoice?: Pick<SalesDeskInvoiceDto, 'id' | 'customerId' | 'invoiceNumber' | 'customerName'> | null;
+  contact?: QuoteShareContact | InvoiceShareContact | null;
   quoteForExcel?: SalesDeskQuoteDto | null;
+  invoiceForExcel?: SalesDeskInvoiceDto | null;
 }
 
 type ShareAction = 'pdf' | 'excel' | 'gmail' | 'whatsapp' | null;
@@ -42,9 +52,12 @@ export function SalesDeskQuotePreviewDialog({
   open,
   data,
   onOpenChange,
+  variant = 'quote',
   contact,
   quoteForExcel,
+  invoiceForExcel,
   quote,
+  invoice,
 }: SalesDeskQuotePreviewDialogProps): ReactElement {
   const printRootRef = useRef<HTMLDivElement>(null);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
@@ -78,12 +91,17 @@ export function SalesDeskQuotePreviewDialog({
     }
   }, [data, isPdfLoading]);
 
+  const isInvoice = variant === 'invoice';
+  const dialogTitle = isInvoice ? 'Fatura Önizleme' : 'Teklif Önizleme';
+  const emptyLabel = isInvoice ? 'Fatura belgesi' : 'Teklif belgesi';
+
   const getPdfShareOptions = useCallback(
     () => ({
       sourceElement: printRootRef.current,
       quote: quoteForExcel ?? quote ?? null,
+      invoice: invoiceForExcel ?? invoice ?? null,
     }),
-    [quoteForExcel, quote],
+    [quoteForExcel, quote, invoiceForExcel, invoice],
   );
 
   const runShareAction = async (action: ShareAction, task: () => Promise<void>): Promise<void> => {
@@ -144,7 +162,7 @@ export function SalesDeskQuotePreviewDialog({
                   <FileText className="h-5 w-5 text-[var(--crm-brand-accent)]" />
                 </div>
                 <div className="min-w-0">
-                  <DialogTitle className={cn(SD_DIALOG_TITLE, 'text-left')}>Teklif Önizleme</DialogTitle>
+                  <DialogTitle className={cn(SD_DIALOG_TITLE, 'text-left')}>{dialogTitle}</DialogTitle>
                   <DialogDescription className={cn(SD_DIALOG_DESC, 'truncate text-left')}>
                     {data ? (
                       <>
@@ -155,7 +173,7 @@ export function SalesDeskQuotePreviewDialog({
                         <span className="text-[var(--crm-app-text-muted)]">3 sayfa</span>
                       </>
                     ) : (
-                      'Teklif belgesi'
+                      emptyLabel
                     )}
                   </DialogDescription>
                 </div>
@@ -192,7 +210,13 @@ export function SalesDeskQuotePreviewDialog({
                 onClick={() =>
                   data
                     ? void runShareAction('excel', () =>
-                        quoteForExcel ? exportQuoteToExcel(quoteForExcel) : exportQuotePreviewToExcel(data)
+                        isInvoice
+                          ? invoiceForExcel
+                            ? exportInvoiceToExcel(invoiceForExcel)
+                            : exportInvoicePreviewToExcel(data)
+                          : quoteForExcel
+                            ? exportQuoteToExcel(quoteForExcel)
+                            : exportQuotePreviewToExcel(data)
                       )
                     : undefined
                 }
@@ -209,7 +233,9 @@ export function SalesDeskQuotePreviewDialog({
                 onClick={() =>
                   data
                     ? void runShareAction('gmail', () =>
-                        shareQuotePreviewViaGmail(data, contact, getPdfShareOptions()),
+                        isInvoice
+                          ? shareInvoicePreviewViaGmail(data, contact, getPdfShareOptions())
+                          : shareQuotePreviewViaGmail(data, contact, getPdfShareOptions())
                       )
                     : undefined
                 }
@@ -226,7 +252,9 @@ export function SalesDeskQuotePreviewDialog({
                 onClick={() =>
                   data
                     ? void runShareAction('whatsapp', () =>
-                        shareQuotePreviewViaWhatsApp(data, contact, getPdfShareOptions()),
+                        isInvoice
+                          ? shareInvoicePreviewViaWhatsApp(data, contact, getPdfShareOptions())
+                          : shareQuotePreviewViaWhatsApp(data, contact, getPdfShareOptions())
                       )
                     : undefined
                 }

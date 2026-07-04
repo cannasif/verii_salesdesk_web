@@ -26,7 +26,12 @@ import { tryWithSalesDeskListTimeout } from '../lib/salesdesk-fast-timeout';
 import { readSalesDeskListCache, writeSalesDeskListCache } from '../lib/salesdesk-list-cache';
 import { createSalesDeskCrudHooks } from './createSalesDeskCrudHooks';
 import { salesDeskQuotesApi, type CreateSalesDeskQuoteInput, QUOTES_SYNCED_EVENT } from '../api/salesdesk-quotes-api';
-import type { SalesDeskQuoteDto } from '../api/salesdesk-api';
+import {
+  salesDeskInvoicesApi,
+  type CreateSalesDeskInvoiceInput,
+  INVOICES_SYNCED_EVENT,
+} from '../api/salesdesk-invoices-api';
+import type { SalesDeskInvoiceDto, SalesDeskQuoteDto } from '../api/salesdesk-api';
 import { userApi } from '@/features/user-management/api/user-api';
 import type {
   AssetFormValues,
@@ -47,11 +52,12 @@ import {
   toAssetPayload,
   toErpNewsPayload,
   toGmailPayload,
-  toInvoicePayload,
-  toProductPayload,
+  normalizeQuoteFormInput,
+  invoiceFormSchema,
+  normalizeInvoiceFormInput,
   quoteFormSchema,
   formatZodFormError,
-  normalizeQuoteFormInput,
+  toProductPayload,
   toRecurringPaymentPayload,
   toSoftwareResearchPayload,
   toTaskPayload,
@@ -410,14 +416,118 @@ export const useDeleteSalesDeskQuote = (): UseMutationResult<void, Error, number
   });
 };
 
-const invoices = createSalesDeskCrudHooks('invoices', salesDeskApi.invoices, {
-  createSuccess: 'Fatura olusturuldu',
-  updateSuccess: 'Fatura guncellendi',
-  deleteSuccess: 'Fatura silindi',
-  createError: 'Fatura olusturulamadi',
-  updateError: 'Fatura guncellenemedi',
-  deleteError: 'Fatura silinemedi',
-});
+const SALESDESK_INVOICES_QUERY_KEY = ['salesdesk', 'invoices'] as const;
+
+function useSalesDeskInvoicesSyncInvalidation(): void {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handleSynced = (): void => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_INVOICES_QUERY_KEY });
+    };
+    window.addEventListener(INVOICES_SYNCED_EVENT, handleSynced);
+    return () => window.removeEventListener(INVOICES_SYNCED_EVENT, handleSynced);
+  }, [queryClient]);
+}
+
+export const useSalesDeskInvoiceList = (params: PagedParams): UseQueryResult<PagedResponse<SalesDeskInvoiceDto>> => {
+  useSalesDeskInvoicesSyncInvalidation();
+
+  return useQuery({
+    queryKey: [...SALESDESK_INVOICES_QUERY_KEY, 'list', params],
+    queryFn: () => salesDeskInvoicesApi.list(params),
+    initialData: () => salesDeskInvoicesApi.listLocalPaged(params),
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    ...DATA_TABLE_QUERY_OPTIONS,
+    placeholderData: (previousData) => previousData ?? salesDeskInvoicesApi.listLocalPaged(params),
+  });
+};
+
+export const useSalesDeskInvoiceStats = (): UseQueryResult<PagedResponse<SalesDeskInvoiceDto>> => {
+  useSalesDeskInvoicesSyncInvalidation();
+
+  return useQuery({
+    queryKey: [...SALESDESK_INVOICES_QUERY_KEY, 'stats'],
+    queryFn: () => salesDeskInvoicesApi.list({ pageNumber: 1, pageSize: 50 }),
+    initialData: () => salesDeskInvoicesApi.listLocalPaged({ pageNumber: 1, pageSize: 50 }),
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    ...DATA_TABLE_QUERY_OPTIONS,
+  });
+};
+
+export const useCreateSalesDeskInvoice = (): UseMutationResult<
+  SalesDeskInvoiceDto,
+  Error,
+  CreateSalesDeskInvoiceInput | InvoiceFormValues
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input) => {
+      if (typeof input === 'object' && input !== null && 'values' in input) {
+        const result = await salesDeskInvoicesApi.create(input);
+        return result.invoice;
+      }
+
+      const parsed = invoiceFormSchema.parse(normalizeInvoiceFormInput(input));
+      const result = await salesDeskInvoicesApi.create({
+        values: input,
+        lines: [],
+        customerName: `Cari #${parsed.customerId}`,
+      });
+      return result.invoice;
+    },
+    onSuccess: (_invoice, input) => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_INVOICES_QUERY_KEY });
+      if (typeof input === 'object' && input !== null && 'values' in input) {
+        toast.success('Fatura basariyla olusturuldu.');
+      } else {
+        toast.success('Fatura olusturuldu.');
+      }
+    },
+    onError: (error: Error) => toast.error(formatZodFormError(error) || 'Fatura olusturulamadi'),
+  });
+};
+
+export const useUpdateSalesDeskInvoice = (): UseMutationResult<
+  SalesDeskInvoiceDto,
+  Error,
+  {
+    id: number;
+    values: InvoiceFormValues;
+    lines?: CreateSalesDeskInvoiceInput['lines'];
+    customerName?: string;
+  }
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, values, lines = [], customerName = 'Cari' }) => {
+      const result = await salesDeskInvoicesApi.update(id, { values, lines, customerName });
+      return result.invoice;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_INVOICES_QUERY_KEY });
+      toast.success('Fatura guncellendi');
+    },
+    onError: (error: Error) => toast.error(formatZodFormError(error) || 'Fatura guncellenemedi'),
+  });
+};
+
+export const useDeleteSalesDeskInvoice = (): UseMutationResult<void, Error, number> => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => salesDeskInvoicesApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_INVOICES_QUERY_KEY });
+      toast.success('Fatura silindi');
+    },
+    onError: (error: Error) => toast.error(error.message || 'Fatura silinemedi'),
+  });
+};
 
 const tasks = createSalesDeskCrudHooks('tasks', salesDeskApi.tasks, {
   createSuccess: 'Gorev olusturuldu',
@@ -509,40 +619,6 @@ export const useUpdateSalesDeskProduct = () => {
   };
 };
 export const useDeleteSalesDeskProduct = products.useDelete;
-
-
-export const useSalesDeskInvoiceList = invoices.useList;
-export const useSalesDeskInvoiceStats = invoices.useStats;
-export const useCreateSalesDeskInvoice = () => {
-  const mutation = invoices.useCreate();
-  return {
-    ...mutation,
-    mutateAsync: (
-      valuesOrInput:
-        | InvoiceFormValues
-        | {
-            values: InvoiceFormValues;
-            lines?: Parameters<typeof toInvoicePayload>[1];
-          }
-    ) => {
-      if (typeof valuesOrInput === 'object' && valuesOrInput !== null && 'values' in valuesOrInput) {
-        return mutation.mutateAsync(
-          toInvoicePayload(valuesOrInput.values, valuesOrInput.lines ?? [])
-        );
-      }
-      return mutation.mutateAsync(toInvoicePayload(valuesOrInput));
-    },
-  };
-};
-export const useUpdateSalesDeskInvoice = () => {
-  const mutation = invoices.useUpdate();
-  return {
-    ...mutation,
-    mutateAsync: ({ id, values }: { id: number; values: InvoiceFormValues }) =>
-      mutation.mutateAsync({ id, body: toInvoicePayload(values) }),
-  };
-};
-export const useDeleteSalesDeskInvoice = invoices.useDelete;
 
 export const useSalesDeskTaskList = tasks.useList;
 export const useSalesDeskTaskStats = tasks.useStats;

@@ -215,7 +215,7 @@ export function SalesDeskInvoiceHeaderForm({
                     max={100}
                     step={0.01}
                     className={cn(SD_CREATE_FORM_INPUT_CLASSNAME, 'font-mono tabular-nums text-right')}
-                    value={field.value}
+                    value={Number(field.value ?? 0)}
                     onChange={(event) => field.onChange(Number(event.target.value))}
                   />
                 </FormControl>

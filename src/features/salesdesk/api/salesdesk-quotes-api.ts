@@ -56,7 +56,14 @@ function writeStore(store: QuoteStore): void {
 }
 
 function listLocalQuotes(): SalesDeskQuoteDto[] {
-  return readStore().quotes;
+  const store = readStore();
+  const deduped = dedupeQuotes(store.quotes);
+  if (deduped.length !== store.quotes.length) {
+    store.quotes = deduped;
+    writeStore(store);
+    notifyQuotesSynced();
+  }
+  return store.quotes;
 }
 
 function notifyQuotesSynced(): void {
@@ -165,32 +172,80 @@ export function buildSalesDeskQuoteListPage(
   );
 }
 
+function isSameQuoteRecord(a: SalesDeskQuoteDto, b: SalesDeskQuoteDto): boolean {
+  const numberA = a.quoteNumber?.trim();
+  const numberB = b.quoteNumber?.trim();
+  if (numberA && numberB && numberA === numberB) {
+    return true;
+  }
+
+  return (
+    a.customerId === b.customerId &&
+    a.quoteDate === b.quoteDate &&
+    Math.abs(a.grandTotal - b.grandTotal) < 0.01
+  );
+}
+
+function dedupeQuotes(quotes: SalesDeskQuoteDto[]): SalesDeskQuoteDto[] {
+  const byNumber = new Map<string, SalesDeskQuoteDto>();
+  const withoutNumber: SalesDeskQuoteDto[] = [];
+
+  for (const quote of quotes) {
+    const quoteNumber = quote.quoteNumber?.trim();
+    if (!quoteNumber) {
+      withoutNumber.push(quote);
+      continue;
+    }
+
+    const existing = byNumber.get(quoteNumber);
+    if (!existing) {
+      byNumber.set(quoteNumber, quote);
+      continue;
+    }
+
+    const keepServerRecord =
+      existing.id >= LOCAL_ID_START && quote.id < LOCAL_ID_START
+        ? quote
+        : quote.id >= LOCAL_ID_START && existing.id < LOCAL_ID_START
+          ? existing
+          : existing.id <= quote.id
+            ? existing
+            : quote;
+
+    byNumber.set(quoteNumber, keepServerRecord);
+  }
+
+  return [...byNumber.values(), ...withoutNumber];
+}
+
 function mergeRemoteIntoLocalStore(remoteQuotes: SalesDeskQuoteDto[]): boolean {
   if (remoteQuotes.length === 0) return false;
 
   const store = readStore();
-  const byId = new Map<number, SalesDeskQuoteDto>();
-
-  for (const quote of store.quotes) {
-    byId.set(quote.id, quote);
-  }
+  let quotes = [...store.quotes];
 
   for (const remote of remoteQuotes.map(normalizeQuote)) {
-    const existing = byId.get(remote.id);
-    if (existing && existing.id >= LOCAL_ID_START && !remote.quoteNumber) {
-      continue;
+    quotes = quotes.filter(
+      (local) => !(local.id >= LOCAL_ID_START && isSameQuoteRecord(local, remote))
+    );
+
+    const existingIndex = quotes.findIndex((item) => item.id === remote.id);
+    if (existingIndex >= 0) {
+      quotes[existingIndex] = remote;
+    } else {
+      quotes.push(remote);
     }
-    byId.set(remote.id, remote);
   }
 
-  const merged = Array.from(byId.values());
+  quotes = dedupeQuotes(quotes);
+
   const changed =
-    merged.length !== store.quotes.length ||
-    merged.some((quote, index) => quote.id !== store.quotes[index]?.id);
+    quotes.length !== store.quotes.length ||
+    quotes.some((quote, index) => quote.id !== store.quotes[index]?.id);
 
   if (!changed) return false;
 
-  store.quotes = merged;
+  store.quotes = quotes;
   writeStore(store);
   return true;
 }
@@ -269,12 +324,13 @@ export const salesDeskQuotesApi = {
     void tryRemoteCreate(body).then((remoteQuote) => {
       if (!remoteQuote) return;
       const syncedStore = readStore();
-      const index = syncedStore.quotes.findIndex((item) => item.id === quote.id);
-      if (index >= 0) {
-        syncedStore.quotes[index] = { ...remoteQuote, id: quote.id };
-        writeStore(syncedStore);
-        notifyQuotesSynced();
-      }
+      syncedStore.quotes = syncedStore.quotes.filter((item) => item.id !== quote.id);
+      syncedStore.quotes = dedupeQuotes([
+        remoteQuote,
+        ...syncedStore.quotes.filter((item) => item.id !== remoteQuote.id),
+      ]);
+      writeStore(syncedStore);
+      notifyQuotesSynced();
     });
 
     return { quote, savedLocally: true };
