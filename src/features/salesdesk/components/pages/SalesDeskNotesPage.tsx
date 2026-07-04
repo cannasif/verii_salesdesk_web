@@ -46,6 +46,7 @@ import {
   SD_FORM_LABEL,
   SD_PAGE_ICON_BOX,
   SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
 import { markNoteReadForUser } from '../../lib/salesdesk-notes-read-storage';
 
@@ -441,17 +442,17 @@ export function SalesDeskNotesPage(): ReactElement {
       </div>
 
       <AlertDialog open={deleteTarget != null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent className="border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] text-slate-100">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Notu sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-[var(--crm-app-text-muted)]">
+        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
+          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
+            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">Notu sil</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
               &quot;{deleteTarget?.title}&quot; kalici olarak silinecek. Bu islem geri alinamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
             <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Vazgec</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-500"
+              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
               onClick={() => void handleDelete()}
             >
               Sil

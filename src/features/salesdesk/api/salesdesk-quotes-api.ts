@@ -255,7 +255,21 @@ function isRemoteQuoteWriteError(error: unknown): boolean {
 }
 
 async function tryRemoteCreate(body: SalesDeskQuoteCreateBody): Promise<SalesDeskQuoteDto | null> {
-  return tryWithSalesDeskFastTimeout(salesDeskApi.quotes.create(body));
+  return tryWithSalesDeskFastTimeout(salesDeskApi.quotes.create(body), 15_000);
+}
+
+let quoteCreateLock = false;
+let initialQuoteListSync: Promise<boolean> | null = null;
+
+async function ensureInitialQuoteListSync(): Promise<void> {
+  if (!initialQuoteListSync) {
+    initialQuoteListSync = syncRemoteQuotes().catch(() => false);
+  }
+  await initialQuoteListSync;
+}
+
+function isLocalId(id: number): boolean {
+  return id >= LOCAL_ID_START;
 }
 
 async function tryRemoteListAll(): Promise<SalesDeskQuoteDto[] | null> {
@@ -266,6 +280,7 @@ async function tryRemoteListAll(): Promise<SalesDeskQuoteDto[] | null> {
       sortBy: 'QuoteDate',
       sortDirection: 'desc',
     }),
+    8_000,
   );
   return remotePage?.data ?? null;
 }
@@ -285,6 +300,7 @@ export const salesDeskQuotesApi = {
   },
 
   list: async (params?: PagedParams): Promise<PagedResponse<SalesDeskQuoteDto>> => {
+    await ensureInitialQuoteListSync();
     void syncRemoteQuotes();
     return buildSalesDeskQuoteListPage(listLocalQuotes(), params);
   },
@@ -299,6 +315,10 @@ export const salesDeskQuotesApi = {
   },
 
   create: async (input: CreateSalesDeskQuoteInput): Promise<{ quote: SalesDeskQuoteDto; savedLocally: boolean }> => {
+    if (quoteCreateLock) {
+      throw new Error('Teklif kaydi devam ediyor, lutfen bekleyin.');
+    }
+
     const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
 
     if (input.lines.length > 0 && validLines.length === 0) {
@@ -314,58 +334,80 @@ export const salesDeskQuotesApi = {
 
     const body = toQuotePayload(input.values, linePayload);
 
-    const store = readStore();
-    const quote = buildQuoteDto({ ...input, lines: validLines }, store.seq);
-    store.seq += 1;
-    store.quotes = [quote, ...store.quotes];
-    writeStore(store);
-    notifyQuotesSynced();
+    quoteCreateLock = true;
+    try {
+      const remote = await tryRemoteCreate(body);
+      if (remote) {
+        mergeRemoteIntoLocalStore([normalizeQuote(remote)]);
+        notifyQuotesSynced();
+        return { quote: normalizeQuote(remote), savedLocally: false };
+      }
 
-    void tryRemoteCreate(body).then((remoteQuote) => {
-      if (!remoteQuote) return;
-      const syncedStore = readStore();
-      syncedStore.quotes = syncedStore.quotes.filter((item) => item.id !== quote.id);
-      syncedStore.quotes = dedupeQuotes([
-        remoteQuote,
-        ...syncedStore.quotes.filter((item) => item.id !== remoteQuote.id),
-      ]);
-      writeStore(syncedStore);
+      const store = readStore();
+      const quote = buildQuoteDto({ ...input, lines: validLines }, store.seq);
+      store.seq += 1;
+      store.quotes = dedupeQuotes([quote, ...store.quotes]);
+      writeStore(store);
       notifyQuotesSynced();
-    });
 
-    return { quote, savedLocally: true };
+      void tryRemoteCreate(body).then((remoteQuote) => {
+        if (!remoteQuote) return;
+        const syncedStore = readStore();
+        syncedStore.quotes = syncedStore.quotes.filter((item) => item.id !== quote.id);
+        syncedStore.quotes = dedupeQuotes([
+          remoteQuote,
+          ...syncedStore.quotes.filter((item) => item.id !== remoteQuote.id),
+        ]);
+        writeStore(syncedStore);
+        notifyQuotesSynced();
+      });
+
+      return { quote, savedLocally: true };
+    } finally {
+      quoteCreateLock = false;
+    }
   },
 
   update: async (id: number, input: CreateSalesDeskQuoteInput): Promise<{ quote: SalesDeskQuoteDto; savedLocally: boolean }> => {
+    const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
+    const linePayload = (validLines.length > 0 ? validLines : input.lines).map((line) => ({
+      productId: line.productId,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      vatRate: line.vatRate,
+    }));
+    const body = toQuotePayload(input.values, linePayload);
+
+    if (!isLocalId(id)) {
+      try {
+        const quote = normalizeQuote(await salesDeskApi.quotes.update(id, body));
+        const store = readStore();
+        const index = store.quotes.findIndex((item) => item.id === id);
+        if (index >= 0) {
+          store.quotes[index] = quote;
+        } else {
+          store.quotes = dedupeQuotes([quote, ...store.quotes]);
+        }
+        writeStore(store);
+        notifyQuotesSynced();
+        return { quote, savedLocally: false };
+      } catch (error) {
+        if (!isRemoteQuoteWriteError(error)) throw error;
+        throw new Error('Teklif guncellenemedi.');
+      }
+    }
+
     const store = readStore();
     const localIndex = store.quotes.findIndex((item) => item.id === id);
-
-    if (localIndex >= 0) {
-      const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
-      const quote = buildQuoteDto({ ...input, lines: validLines.length > 0 ? validLines : input.lines }, id);
-      store.quotes[localIndex] = quote;
-      writeStore(store);
-      notifyQuotesSynced();
-      return { quote, savedLocally: true };
+    if (localIndex < 0) {
+      throw new Error('Teklif bulunamadi.');
     }
 
-    try {
-      const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
-      const body = toQuotePayload(
-        input.values,
-        validLines.map((line) => ({
-          productId: line.productId,
-          quantity: line.quantity,
-          unitPrice: line.unitPrice,
-          vatRate: line.vatRate,
-        })),
-      );
-      const quote = await salesDeskApi.quotes.update(id, body);
-      return { quote, savedLocally: false };
-    } catch (error) {
-      if (!isRemoteQuoteWriteError(error)) throw error;
-      throw new Error('Teklif guncellenemedi.');
-    }
+    const quote = buildQuoteDto({ ...input, lines: validLines.length > 0 ? validLines : input.lines }, id);
+    store.quotes[localIndex] = quote;
+    writeStore(store);
+    notifyQuotesSynced();
+    return { quote, savedLocally: true };
   },
 
   delete: async (id: number): Promise<void> => {
@@ -375,6 +417,13 @@ export const salesDeskQuotesApi = {
     if (store.quotes.length !== before) {
       writeStore(store);
       notifyQuotesSynced();
+      if (!isLocalId(id)) {
+        try {
+          await salesDeskApi.quotes.delete(id);
+        } catch {
+          // Yerel silindi; sunucu sonra senkronlanir.
+        }
+      }
       return;
     }
 

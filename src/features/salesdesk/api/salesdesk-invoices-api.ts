@@ -49,6 +49,7 @@ export interface CreateSalesDeskInvoiceInput {
 let createLock = false;
 let lastSyncAt = 0;
 let syncInFlight: Promise<boolean> | null = null;
+let initialListSync: Promise<boolean> | null = null;
 const remoteCreateByLocalId = new Map<number, Promise<SalesDeskInvoiceDto | null>>();
 
 function inferInvoiceType(invoiceNumber?: string | null, invoiceType?: SalesDeskInvoiceType): SalesDeskInvoiceType {
@@ -270,6 +271,10 @@ function replaceLocalWithRemote(localId: number, remote: SalesDeskInvoiceDto, in
   notifyInvoicesSynced();
 }
 
+async function tryRemoteCreate(body: SalesDeskInvoiceCreateBody): Promise<SalesDeskInvoiceDto | null> {
+  return tryWithSalesDeskFastTimeout(salesDeskApi.invoices.create(body), REMOTE_CREATE_TIMEOUT_MS);
+}
+
 function scheduleRemoteCreate(
   body: SalesDeskInvoiceCreateBody,
   localInvoice: SalesDeskInvoiceDto,
@@ -411,12 +416,20 @@ export function buildSalesDeskInvoiceListPage(
   );
 }
 
+async function ensureInitialListSync(): Promise<void> {
+  if (!initialListSync) {
+    initialListSync = syncRemoteInvoicesInternal().catch(() => false);
+  }
+  await initialListSync;
+}
+
 export const salesDeskInvoicesApi = {
   listLocalPaged(params?: PagedParams): PagedResponse<SalesDeskInvoiceDto> {
     return buildSalesDeskInvoiceListPage(listLocalInvoices(), params);
   },
 
   list: async (params?: PagedParams): Promise<PagedResponse<SalesDeskInvoiceDto>> => {
+    await ensureInitialListSync();
     scheduleBackgroundSync(false);
     return buildSalesDeskInvoiceListPage(listLocalInvoices(), params);
   },
@@ -471,6 +484,13 @@ export const salesDeskInvoicesApi = {
 
     createLock = true;
     try {
+      const remote = await tryRemoteCreate(body);
+      if (remote) {
+        mergeRemoteIntoLocalStore([normalizeInvoice(remote)]);
+        notifyInvoicesSynced();
+        return { invoice: normalizeInvoice(remote), savedLocally: false };
+      }
+
       const store = readStore();
       const invoice = buildInvoiceDto({ ...input, lines: validLines }, store.seq);
       const pending: PendingSync = {
@@ -499,41 +519,41 @@ export const salesDeskInvoicesApi = {
     id: number,
     input: CreateSalesDeskInvoiceInput
   ): Promise<{ invoice: SalesDeskInvoiceDto; savedLocally: boolean }> => {
+    const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
+    const linePayload = (validLines.length > 0 ? validLines : input.lines).map((line) => ({
+      productId: line.productId,
+      quantity: line.quantity,
+      unitPrice: line.unitPrice,
+      vatRate: line.vatRate,
+    }));
+    const body = toInvoicePayload(input.values, linePayload);
+
+    if (!isLocalId(id)) {
+      try {
+        const invoice = await salesDeskApi.invoices.update(id, body);
+        mergeRemoteIntoLocalStore([invoice]);
+        notifyInvoicesSynced();
+        return { invoice, savedLocally: false };
+      } catch (error) {
+        if (error instanceof Error) throw error;
+        throw new Error('Fatura guncellenemedi.');
+      }
+    }
+
     const store = readStore();
     const localIndex = store.invoices.findIndex((item) => item.id === id);
-
-    if (localIndex >= 0) {
-      const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
-      const invoice = buildInvoiceDto(
-        { ...input, lines: validLines.length > 0 ? validLines : input.lines },
-        id
-      );
-      store.invoices[localIndex] = invoice;
-      writeStore(store);
-      notifyInvoicesSynced();
-      return { invoice, savedLocally: true };
+    if (localIndex < 0) {
+      throw new Error('Fatura bulunamadi.');
     }
 
-    const validLines = input.lines.filter((line) => line.productId > 0 && line.quantity > 0);
-    const body = toInvoicePayload(
-      input.values,
-      validLines.map((line) => ({
-        productId: line.productId,
-        quantity: line.quantity,
-        unitPrice: line.unitPrice,
-        vatRate: line.vatRate,
-      }))
+    const invoice = buildInvoiceDto(
+      { ...input, lines: validLines.length > 0 ? validLines : input.lines },
+      id
     );
-
-    try {
-      const invoice = await salesDeskApi.invoices.update(id, body);
-      mergeRemoteIntoLocalStore([invoice]);
-      notifyInvoicesSynced();
-      return { invoice, savedLocally: false };
-    } catch (error) {
-      if (error instanceof Error) throw error;
-      throw new Error('Fatura guncellenemedi.');
-    }
+    store.invoices[localIndex] = invoice;
+    writeStore(store);
+    notifyInvoicesSynced();
+    return { invoice, savedLocally: true };
   },
 
   delete: async (id: number): Promise<void> => {

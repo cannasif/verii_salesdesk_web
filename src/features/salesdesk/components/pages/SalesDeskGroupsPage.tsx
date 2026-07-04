@@ -14,6 +14,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
@@ -41,6 +51,11 @@ import {
 import { SalesDeskGroupForm } from '../groups/SalesDeskGroupForm';
 import { SalesDeskGroupMemberSelect } from '../groups/SalesDeskGroupMemberSelect';
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../../types/salesdesk-group-types';
+import {
+  SD_DIALOG_CONTENT_FORM,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+} from '../../lib/salesdesk-popup-styles';
 import { Edit2, Loader2, Plus, RefreshCw, Trash2, UserPlus, UsersRound } from 'lucide-react';
 
 const PAGE_KEY = 'salesdesk-groups';
@@ -388,9 +403,9 @@ export function SalesDeskGroupsPage(): ReactElement {
       />
 
       <Dialog open={membersOpen} onOpenChange={setMembersOpen}>
-        <DialogContent className="max-h-[92dvh] w-[95%] !max-w-3xl overflow-hidden border border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] p-0 text-slate-100">
+        <DialogContent className={SD_DIALOG_CONTENT_FORM}>
           <DialogHeader className="border-b border-[var(--crm-app-border)] px-6 py-5">
-            <DialogTitle className="text-xl font-black">
+            <DialogTitle className="text-xl font-black text-slate-900 dark:text-white">
               {membersGroup ? `${membersGroup.name} — Uye Yonetimi` : 'Uye Yonetimi'}
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-400">
@@ -427,24 +442,28 @@ export function SalesDeskGroupsPage(): ReactElement {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="overflow-hidden border-slate-200 bg-white p-0 shadow-2xl dark:border-cyan-800/30 dark:bg-blue-950">
-          <DialogHeader className="border-b border-slate-100 bg-slate-50/80 px-6 py-5 dark:border-cyan-800/30 dark:bg-blue-900/20">
-            <DialogTitle className="text-xl font-black text-slate-900 dark:text-white">Grubu Sil</DialogTitle>
-            <DialogDescription className="text-sm text-slate-500 dark:text-slate-400">
-              &quot;{groupToDelete?.name ?? ''}&quot; grubunu silmek istediginize emin misiniz?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="border-t border-slate-100 bg-slate-50/80 px-6 py-5 dark:border-cyan-800/30 dark:bg-blue-900/20">
-            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={deleteGroup.isPending}>
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
+          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
+            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">Grubu sil</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
+              &quot;{groupToDelete?.name ?? ''}&quot; grubunu silmek istediginize emin misiniz? Bu islem geri alinamaz.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
+            <AlertDialogCancel className={SD_SECONDARY_BUTTON} disabled={deleteGroup.isPending}>
               Iptal
-            </Button>
-            <Button variant="destructive" onClick={() => void handleDeleteConfirm()} disabled={deleteGroup.isPending}>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+              onClick={() => void handleDeleteConfirm()}
+              disabled={deleteGroup.isPending}
+            >
               {deleteGroup.isPending ? 'Siliniyor...' : 'Sil'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

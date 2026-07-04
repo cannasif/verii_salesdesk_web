@@ -1,15 +1,17 @@
 import { normalizePagedResponse } from '@/lib/paged-response';
 import type { PagedParams, PagedResponse } from '@/types/api';
+import { requestLocalServerJson } from '../lib/local-server-request';
 import type { SalesDeskCompanyDto } from '../types/company-management-types';
 
 const STORAGE_KEY = 'salesdesk-companies-v1';
+const COMPANIES_PATH = '/companies';
 
 interface CompanyStore {
   seq: number;
   companies: SalesDeskCompanyDto[];
 }
 
-function readStore(): CompanyStore {
+function readLocalStore(): CompanyStore {
   if (typeof window === 'undefined') {
     return { seq: 1, companies: [] };
   }
@@ -27,7 +29,7 @@ function readStore(): CompanyStore {
   }
 }
 
-function writeStore(store: CompanyStore): void {
+function writeLocalStore(store: CompanyStore): void {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 }
@@ -117,11 +119,10 @@ function paginateCompanies(rows: SalesDeskCompanyDto[], params?: PagedParams): P
   const totalCount = rows.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const start = (pageNumber - 1) * pageSize;
-  const pageRows = rows.slice(start, start + pageSize);
 
   return normalizePagedResponse<SalesDeskCompanyDto>(
     {
-      data: pageRows,
+      data: rows.slice(start, start + pageSize),
       totalCount,
       pageNumber,
       pageSize,
@@ -133,76 +134,112 @@ function paginateCompanies(rows: SalesDeskCompanyDto[], params?: PagedParams): P
   );
 }
 
-function listAll(): SalesDeskCompanyDto[] {
-  return readStore().companies;
+async function listFromServer(): Promise<SalesDeskCompanyDto[]> {
+  return requestLocalServerJson<SalesDeskCompanyDto[]>(COMPANIES_PATH);
+}
+
+function listFromLocalStore(): SalesDeskCompanyDto[] {
+  return readLocalStore().companies;
+}
+
+function createLocal(body: Omit<SalesDeskCompanyDto, 'id'>): SalesDeskCompanyDto {
+  const payload = normalizePayload(body);
+  if (!payload.name) throw new Error('Sirket adi zorunludur.');
+
+  const store = readLocalStore();
+  const now = new Date().toISOString();
+  const company: SalesDeskCompanyDto = {
+    id: store.seq,
+    ...payload,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.seq += 1;
+  store.companies = [company, ...store.companies];
+  writeLocalStore(store);
+  return company;
 }
 
 export const salesDeskCompaniesApi = {
   list: async (params?: PagedParams): Promise<PagedResponse<SalesDeskCompanyDto>> => {
-    const all = listAll();
-    const filtered = filterCompanies(all, params);
-    const sorted = sortCompanies(filtered, params);
-    return paginateCompanies(sorted, params);
+    try {
+      const all = await listFromServer();
+      const filtered = filterCompanies(all, params);
+      const sorted = sortCompanies(filtered, params);
+      return paginateCompanies(sorted, params);
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const all = listFromLocalStore();
+      const filtered = filterCompanies(all, params);
+      const sorted = sortCompanies(filtered, params);
+      return paginateCompanies(sorted, params);
+    }
   },
 
   get: async (id: number): Promise<SalesDeskCompanyDto> => {
-    const company = listAll().find((item) => item.id === id);
-    if (!company) {
-      throw new Error('Sirket bulunamadi.');
+    try {
+      return await requestLocalServerJson<SalesDeskCompanyDto>(`${COMPANIES_PATH}/${id}`);
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const company = listFromLocalStore().find((item) => item.id === id);
+      if (!company) throw new Error('Sirket bulunamadi.');
+      return company;
     }
-    return company;
   },
 
   create: async (body: Omit<SalesDeskCompanyDto, 'id'>): Promise<SalesDeskCompanyDto> => {
     const payload = normalizePayload(body);
-    if (!payload.name) {
-      throw new Error('Sirket adi zorunludur.');
-    }
+    if (!payload.name) throw new Error('Sirket adi zorunludur.');
 
-    const store = readStore();
-    const now = new Date().toISOString();
-    const company: SalesDeskCompanyDto = {
-      id: store.seq,
-      ...payload,
-      createdAt: now,
-      updatedAt: now,
-    };
-    store.seq += 1;
-    store.companies = [company, ...store.companies];
-    writeStore(store);
-    return company;
+    try {
+      return await requestLocalServerJson<SalesDeskCompanyDto>(COMPANIES_PATH, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      return createLocal(payload);
+    }
   },
 
   update: async (id: number, body: Omit<SalesDeskCompanyDto, 'id'>): Promise<SalesDeskCompanyDto> => {
     const payload = normalizePayload(body);
-    if (!payload.name) {
-      throw new Error('Sirket adi zorunludur.');
-    }
+    if (!payload.name) throw new Error('Sirket adi zorunludur.');
 
-    const store = readStore();
-    const index = store.companies.findIndex((item) => item.id === id);
-    if (index === -1) {
-      throw new Error('Sirket bulunamadi.');
-    }
+    try {
+      return await requestLocalServerJson<SalesDeskCompanyDto>(`${COMPANIES_PATH}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const store = readLocalStore();
+      const index = store.companies.findIndex((item) => item.id === id);
+      if (index === -1) throw new Error('Sirket bulunamadi.');
 
-    const updated: SalesDeskCompanyDto = {
-      ...store.companies[index],
-      ...payload,
-      id,
-      updatedAt: new Date().toISOString(),
-    };
-    store.companies[index] = updated;
-    writeStore(store);
-    return updated;
+      const updated: SalesDeskCompanyDto = {
+        ...store.companies[index],
+        ...payload,
+        id,
+        updatedAt: new Date().toISOString(),
+      };
+      store.companies[index] = updated;
+      writeLocalStore(store);
+      return updated;
+    }
   },
 
   delete: async (id: number): Promise<void> => {
-    const store = readStore();
-    const before = store.companies.length;
-    store.companies = store.companies.filter((item) => item.id !== id);
-    if (store.companies.length === before) {
-      throw new Error('Sirket bulunamadi.');
+    try {
+      await requestLocalServerJson<null>(`${COMPANIES_PATH}/${id}`, { method: 'DELETE' });
+      return;
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const store = readLocalStore();
+      const before = store.companies.length;
+      store.companies = store.companies.filter((item) => item.id !== id);
+      if (store.companies.length === before) throw new Error('Sirket bulunamadi.');
+      writeLocalStore(store);
     }
-    writeStore(store);
   },
 };

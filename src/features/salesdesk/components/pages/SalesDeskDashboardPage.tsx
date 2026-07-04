@@ -4,9 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   CalendarDays,
   CalendarPlus,
-  Eye,
   FilePlus,
-  Pencil,
   Receipt,
   UserPlus,
   UsersRound,
@@ -24,20 +22,18 @@ import {
 import { formatSystemDate } from '@/lib/system-settings';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
-import { SD_PRIMARY_BUTTON, SD_SECONDARY_BUTTON } from '../../lib/salesdesk-popup-styles';
+import { SD_PRIMARY_BUTTON } from '../../lib/salesdesk-popup-styles';
 import { SalesDeskMeetingsCard } from '../dashboard/SalesDeskMeetingsCard';
 import { SalesDeskNotesDashboardCard } from '../dashboard/SalesDeskNotesDashboardCard';
 import { SalesDeskOpenItemsDashboardSection } from '../dashboard/SalesDeskOpenItemsDashboardSection';
 
 export function SalesDeskDashboardPage(): ReactElement {
   const { t } = useTranslation('dashboard');
-  const { t: tCommon } = useTranslation('common');
   const navigate = useNavigate();
   const { setPageTitle } = useUIStore();
   const { user } = useAuthStore();
 
   const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>('morning');
-  const [dashboardMode, setDashboardMode] = useState<'view' | 'edit'>('view');
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -79,25 +75,6 @@ export function SalesDeskDashboardPage(): ReactElement {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setDashboardMode((current) => (current === 'view' ? 'edit' : 'view'))}
-            className={`${SD_SECONDARY_BUTTON} hidden h-10 px-4 md:inline-flex`}
-          >
-            {dashboardMode === 'view' ? (
-              <>
-                <Pencil size={16} className="mr-2" />
-                {tCommon('common.reportBuilder.dashboardTabEdit')}
-              </>
-            ) : (
-              <>
-                <Eye size={16} className="mr-2" />
-                {tCommon('common.reportBuilder.dashboardTabView')}
-              </>
-            )}
-          </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className={`${SD_PRIMARY_BUTTON} h-10 flex-1 px-6 md:flex-none`}>
@@ -189,22 +166,11 @@ export function SalesDeskDashboardPage(): ReactElement {
         </div>
       </div>
 
-      {dashboardMode === 'edit' ? (
-        <div
-          className="min-h-[320px] rounded-xl border border-dashed border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_40%,transparent)] px-6 py-10 text-center"
-          aria-hidden
-        >
-          <p className="text-sm text-[var(--crm-app-text-muted)]">
-            Dashboard widget düzenleme yakında eklenecek.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <SalesDeskMeetingsCard />
-          <SalesDeskNotesDashboardCard />
-          <SalesDeskOpenItemsDashboardSection />
-        </div>
-      )}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <SalesDeskMeetingsCard />
+        <SalesDeskNotesDashboardCard />
+        <SalesDeskOpenItemsDashboardSection />
+      </div>
     </div>
   );
 }

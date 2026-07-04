@@ -3,8 +3,10 @@ import type {
   SalesDeskNoteNotificationPayload,
   UpsertSalesDeskNoteInput,
 } from '../types/notes-types';
+import { requestLocalServerJson } from '../lib/local-server-request';
 
 const STORAGE_KEY = 'salesdesk-notes-v1';
+const NOTES_PATH = '/notes';
 
 interface StoredNotification {
   id: number;
@@ -29,7 +31,7 @@ function emptyStore(): NotesStore {
   return { noteSeq: 1, notificationSeq: 1, notes: [], notifications: [] };
 }
 
-function readStore(): NotesStore {
+function readLocalStore(): NotesStore {
   if (typeof window === 'undefined') return emptyStore();
 
   try {
@@ -47,7 +49,7 @@ function readStore(): NotesStore {
   }
 }
 
-function writeStore(store: NotesStore): void {
+function writeLocalStore(store: NotesStore): void {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
   window.dispatchEvent(new CustomEvent('salesdesk-notes-changed'));
@@ -63,7 +65,7 @@ function normalizeIds(ids: number[] | undefined): number[] {
   return [...unique];
 }
 
-function queueNotifications(store: NotesStore, note: SalesDeskNoteDto, actorUserId: number): void {
+function queueLocalNotifications(store: NotesStore, note: SalesDeskNoteDto, actorUserId: number): void {
   const recipients = normalizeIds(note.recipientUserIds).filter((id) => id !== actorUserId);
   const preview = String(note.content ?? '').trim().slice(0, 160);
   const now = new Date().toISOString();
@@ -84,123 +86,169 @@ function queueNotifications(store: NotesStore, note: SalesDeskNoteDto, actorUser
   }
 }
 
+function listLocalForUser(userId: number): SalesDeskNoteDto[] {
+  const store = readLocalStore();
+  return store.notes
+    .filter((note) => note.createdByUserId === userId || note.recipientUserIds.includes(userId))
+    .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+}
+
+function createLocal(input: UpsertSalesDeskNoteInput): SalesDeskNoteDto {
+  const title = String(input.title ?? '').trim();
+  const content = String(input.content ?? '').trim();
+  const createdByUserId = Number(input.createdByUserId);
+  const createdByName = String(input.createdByName ?? '').trim();
+  const recipientUserIds = normalizeIds(input.recipientUserIds);
+
+  if (!title) throw new Error('Not basligi zorunludur.');
+  if (!Number.isFinite(createdByUserId) || createdByUserId <= 0) {
+    throw new Error('Olusturan kullanici gerekli.');
+  }
+
+  const store = readLocalStore();
+  const now = new Date().toISOString();
+  const note: SalesDeskNoteDto = {
+    id: store.noteSeq,
+    title,
+    content,
+    createdByUserId,
+    createdByName,
+    recipientUserIds,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  store.noteSeq += 1;
+  store.notes.unshift(note);
+  queueLocalNotifications(store, note, createdByUserId);
+  writeLocalStore(store);
+  return note;
+}
+
 export const salesDeskNotesApi = {
   listForUser: async (userId: number): Promise<SalesDeskNoteDto[]> => {
-    const store = readStore();
-    return store.notes
-      .filter(
-        (note) => note.createdByUserId === userId || note.recipientUserIds.includes(userId)
-      )
-      .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+    try {
+      return await requestLocalServerJson<SalesDeskNoteDto[]>(
+        `${NOTES_PATH}?userId=${encodeURIComponent(String(userId))}`
+      );
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      return listLocalForUser(userId);
+    }
   },
 
   get: async (id: number): Promise<SalesDeskNoteDto> => {
-    const store = readStore();
-    const note = store.notes.find((item) => item.id === id);
-    if (!note) throw new Error('Not bulunamadi.');
-    return note;
+    try {
+      return await requestLocalServerJson<SalesDeskNoteDto>(`${NOTES_PATH}/${id}`);
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const note = readLocalStore().notes.find((item) => item.id === id);
+      if (!note) throw new Error('Not bulunamadi.');
+      return note;
+    }
   },
 
   create: async (input: UpsertSalesDeskNoteInput): Promise<SalesDeskNoteDto> => {
-    const title = String(input.title ?? '').trim();
-    const content = String(input.content ?? '').trim();
-    const createdByUserId = Number(input.createdByUserId);
-    const createdByName = String(input.createdByName ?? '').trim();
-    const recipientUserIds = normalizeIds(input.recipientUserIds);
-
-    if (!title) throw new Error('Not basligi zorunludur.');
-    if (!Number.isFinite(createdByUserId) || createdByUserId <= 0) {
-      throw new Error('Olusturan kullanici gerekli.');
+    try {
+      return await requestLocalServerJson<SalesDeskNoteDto>(NOTES_PATH, {
+        method: 'POST',
+        body: JSON.stringify(input),
+      });
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      return createLocal(input);
     }
-
-    const store = readStore();
-    const now = new Date().toISOString();
-    const note: SalesDeskNoteDto = {
-      id: store.noteSeq,
-      title,
-      content,
-      createdByUserId,
-      createdByName,
-      recipientUserIds,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    store.noteSeq += 1;
-    store.notes.unshift(note);
-    queueNotifications(store, note, createdByUserId);
-    writeStore(store);
-    return note;
   },
 
   update: async (
     id: number,
     input: Omit<UpsertSalesDeskNoteInput, 'createdByUserId' | 'createdByName'>
   ): Promise<SalesDeskNoteDto> => {
-    const title = String(input.title ?? '').trim();
-    const content = String(input.content ?? '').trim();
-    const recipientUserIds = normalizeIds(input.recipientUserIds);
-    const notifyRecipients = input.notifyRecipients !== false;
+    try {
+      return await requestLocalServerJson<SalesDeskNoteDto>(`${NOTES_PATH}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(input),
+      });
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const title = String(input.title ?? '').trim();
+      const content = String(input.content ?? '').trim();
+      const recipientUserIds = normalizeIds(input.recipientUserIds);
+      const notifyRecipients = input.notifyRecipients !== false;
 
-    if (!title) throw new Error('Not basligi zorunludur.');
+      if (!title) throw new Error('Not basligi zorunludur.');
 
-    const store = readStore();
-    const index = store.notes.findIndex((item) => item.id === id);
-    if (index === -1) throw new Error('Not bulunamadi.');
+      const store = readLocalStore();
+      const index = store.notes.findIndex((item) => item.id === id);
+      if (index === -1) throw new Error('Not bulunamadi.');
 
-    const previous = store.notes[index];
-    const updated: SalesDeskNoteDto = {
-      ...previous,
-      title,
-      content,
-      recipientUserIds,
-      updatedAt: new Date().toISOString(),
-    };
+      const previous = store.notes[index];
+      const updated: SalesDeskNoteDto = {
+        ...previous,
+        title,
+        content,
+        recipientUserIds,
+        updatedAt: new Date().toISOString(),
+      };
 
-    store.notes[index] = updated;
-    if (notifyRecipients) {
-      queueNotifications(store, updated, previous.createdByUserId);
+      store.notes[index] = updated;
+      if (notifyRecipients) {
+        queueLocalNotifications(store, updated, previous.createdByUserId);
+      }
+      writeLocalStore(store);
+      return updated;
     }
-    writeStore(store);
-    return updated;
   },
 
   delete: async (id: number): Promise<void> => {
-    const store = readStore();
-    const before = store.notes.length;
-    store.notes = store.notes.filter((item) => item.id !== id);
-    if (store.notes.length === before) throw new Error('Not bulunamadi.');
-    store.notifications = store.notifications.filter((item) => item.noteId !== id);
-    writeStore(store);
+    try {
+      await requestLocalServerJson<null>(`${NOTES_PATH}/${id}`, { method: 'DELETE' });
+      return;
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const store = readLocalStore();
+      const before = store.notes.length;
+      store.notes = store.notes.filter((item) => item.id !== id);
+      if (store.notes.length === before) throw new Error('Not bulunamadi.');
+      store.notifications = store.notifications.filter((item) => item.noteId !== id);
+      writeLocalStore(store);
+    }
   },
 
   pullPendingNotifications: async (userId: number): Promise<SalesDeskNoteNotificationPayload[]> => {
     const numericUserId = Number(userId);
     if (!Number.isFinite(numericUserId) || numericUserId <= 0) return [];
 
-    const store = readStore();
-    const now = new Date().toISOString();
-    const pending = store.notifications.filter(
-      (item) => item.recipientUserId === numericUserId && !item.deliveredAt
-    );
+    try {
+      return await requestLocalServerJson<SalesDeskNoteNotificationPayload[]>(
+        `${NOTES_PATH}/notifications/pending?userId=${encodeURIComponent(String(numericUserId))}`
+      );
+    } catch (error) {
+      if (!import.meta.env.DEV) throw error;
+      const store = readLocalStore();
+      const now = new Date().toISOString();
+      const pending = store.notifications.filter(
+        (item) => item.recipientUserId === numericUserId && !item.deliveredAt
+      );
 
-    for (const item of pending) {
-      item.deliveredAt = now;
+      for (const item of pending) {
+        item.deliveredAt = now;
+      }
+
+      if (pending.length > 0) {
+        writeLocalStore(store);
+      }
+
+      return pending.map((item) => ({
+        id: item.id,
+        noteId: item.noteId,
+        recipientUserId: item.recipientUserId,
+        title: item.title,
+        message: item.message,
+        createdByUserId: item.createdByUserId,
+        createdByName: item.createdByName,
+        createdAt: item.createdAt,
+      }));
     }
-
-    if (pending.length > 0) {
-      writeStore(store);
-    }
-
-    return pending.map((item) => ({
-      id: item.id,
-      noteId: item.noteId,
-      recipientUserId: item.recipientUserId,
-      title: item.title,
-      message: item.message,
-      createdByUserId: item.createdByUserId,
-      createdByName: item.createdByName,
-      createdAt: item.createdAt,
-    }));
   },
 };
