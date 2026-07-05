@@ -46,7 +46,7 @@ export default defineConfig(({ mode }) => {
     },
   },
   build: {
-    assetsDir: "public/assets",
+    assetsDir: "assets",
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       onwarn(warning, defaultHandler) {
