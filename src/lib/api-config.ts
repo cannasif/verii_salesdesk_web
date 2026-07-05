@@ -1,7 +1,7 @@
 import { setLocalServerUrl } from '@/features/salesdesk/lib/local-server-url';
 
 export const DEFAULT_API_BASE_URL = 'https://salesdeskapi.v3rii.com';
-const RUNTIME_CONFIG_FILE_NAME = 'runtime-settings.json';
+const RUNTIME_CONFIG_FILE_NAME = 'assets/runtime-settings.json';
 const RUNTIME_CONFIG_CACHE_KEY = 'runtime-config-cache';
 
 interface RuntimeConfig {

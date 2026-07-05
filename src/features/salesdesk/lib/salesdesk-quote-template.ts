@@ -2,7 +2,7 @@ export const SALESDESK_QUOTE_TEMPLATE = {
   issuerName: 'V3RII Teknoloji',
   issuerTagline: 'Kurumsal Yazılım ve Entegrasyon Çözümleri',
   coverTagline: 'Kurumsal Yazılım ve Entegrasyon Çözümleri',
-  logoPath: '/v3rii-salesdesk-logo.png',
+  logoPath: '/assets/v3rii-salesdesk-logo.png',
 
   introTitle: 'Biz Kimiz?',
   introLead:
