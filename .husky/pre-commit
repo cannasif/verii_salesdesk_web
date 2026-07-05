@@ -1,0 +1,2 @@
+npx lint-staged --no-stash
+npx tsc -b --noEmit
