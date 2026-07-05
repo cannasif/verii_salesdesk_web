@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig, loadEnv } from "vite"
 
-const allowedHosts = ["https://salesdesk.v3rii.com"]
+const allowedHosts = ["salesdesk.v3rii.com"]
 
 function resolveDevApiProxyTarget(mode: string): string {
   const env = loadEnv(mode, process.cwd(), "")
