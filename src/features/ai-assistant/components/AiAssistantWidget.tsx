@@ -427,7 +427,7 @@ export function AiAssistantWidget(): ReactElement {
                 className={message.role === 'user' ? 'flex justify-end' : 'space-y-3'}
               >
                 {message.role === 'user' ? (
-                  <div className="max-w-[82%] rounded-[1.45rem] rounded-ee-md bg-[image:var(--crm-brand-gradient)] px-4 py-3 text-sm font-black leading-6 text-white shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)]">
+                  <div className="max-w-[82%] rounded-[1.45rem] rounded-ee-md bg-[var(--crm-brand-primary,#c9a227)] px-4 py-3 text-sm font-semibold leading-6 text-white shadow-md ring-1 ring-[color-mix(in_srgb,var(--crm-brand-accent,#e8c547)_35%,transparent)]">
                     <p>{message.content}</p>
                     {message.attachments?.map((attachment) => (
                       <div
@@ -652,7 +652,7 @@ export function AiAssistantWidget(): ReactElement {
                   ref={sendButtonRef}
                   type="submit"
                   disabled={isAssistantBusy || (!question.trim() && !selectedAttachment)}
-                  className="shrink-0 rounded-full bg-[image:var(--crm-brand-gradient)] px-5 text-white shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)]"
+                  className="shrink-0 rounded-full bg-[var(--crm-brand-primary,#c9a227)] px-5 text-white shadow-md ring-1 ring-[color-mix(in_srgb,var(--crm-brand-accent,#e8c547)_40%,transparent)] hover:brightness-110 disabled:opacity-50"
                 >
                   <SendHorizontal size={16} className="me-2" />
                   {isAssistantBusy ? readText('sending') : readText('send')}
@@ -666,7 +666,7 @@ export function AiAssistantWidget(): ReactElement {
           type="button"
           aria-label={readText('openChat')}
           onClick={() => setIsOpen(true)}
-          className="group flex items-center gap-3 rounded-full border border-white/20 bg-[image:var(--crm-brand-gradient)] px-4 py-3 text-sm font-black text-white shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] transition hover:scale-[1.02] hover:shadow-rose-600/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 focus-visible:ring-offset-2 dark:ring-offset-slate-950"
+          className="group flex items-center gap-3 rounded-full border border-white/20 bg-[var(--crm-brand-primary,#c9a227)] px-4 py-3 text-sm font-bold text-white shadow-lg transition hover:scale-[1.02] hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--crm-brand-accent,#e8c547)] focus-visible:ring-offset-2 dark:ring-offset-slate-950"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
             <MessageCircle size={20} />

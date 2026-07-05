@@ -122,3 +122,30 @@ export function requiredIdFromSelect(value: string, field = 'Secim'): number {
   }
   return parsed;
 }
+
+/** API / SQL hatalarini kullaniciya anlasilir Turkce mesaja cevirir. */
+export function formatSalesDeskApiError(error: unknown, fallback: string): string {
+  const raw =
+    error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : fallback;
+  const text = raw.trim() || fallback;
+  const lower = text.toLowerCase();
+
+  if (lower.includes('invalid object name') || lower.includes('invalid column name')) {
+    return 'Veritabani semasi guncel degil. API sunucusunda migration uygulanmali (dotnet ef database update).';
+  }
+  if (lower.includes('status code 405') || lower.includes('method not allowed')) {
+    return 'Sunucu bu islemi kabul etmiyor (405). API endpoint veya HTTP metodu kontrol edilmeli.';
+  }
+  if (lower.includes('entity changes') || lower.includes('inner exception')) {
+    return 'Kayit veritabanina yazilamadi. Zorunlu alanlari kontrol edin; migration uygulanmamis olabilir.';
+  }
+  if (lower.includes('duplicate') || lower.includes('unique') || lower.includes('409')) {
+    return 'Bu kayit numarasi veya benzersiz alan zaten kullaniliyor.';
+  }
+
+  return text;
+}

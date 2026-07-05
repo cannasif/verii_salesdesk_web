@@ -34,7 +34,7 @@ import {
   type ErpNewsDedupePreview,
 } from '../../hooks/useErpNewsDedupe';
 import { salesDeskPageShellClass, salesDeskPageSubtitleClass, salesDeskPageTitleClass } from '../../lib/salesdesk-shared';
-import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG } from '../../lib/salesdesk-popup-styles';
+import { SD_ADD_BUTTON, SD_DELETE_DIALOG_ACTION, SD_PAGE_ICON_BOX, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG } from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskErpNewsPage(): ReactElement {
   const navigate = useNavigate();
@@ -261,7 +261,7 @@ export function SalesDeskErpNewsPage(): ReactElement {
           <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
             <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
             <AlertDialogAction
-              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+              className={SD_DELETE_DIALOG_ACTION}
               onClick={async () => {
                 if (!deleting) return;
                 await deleteNews.mutateAsync(deleting.id);
@@ -339,7 +339,7 @@ export function SalesDeskErpNewsPage(): ReactElement {
               Iptal
             </AlertDialogCancel>
             <AlertDialogAction
-              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-60"
+              className={`${SD_DELETE_DIALOG_ACTION} disabled:opacity-60`}
               disabled={isDedupeBusy || !dedupePreview || dedupePreview.duplicateCount === 0}
               onClick={(event) => {
                 event.preventDefault();

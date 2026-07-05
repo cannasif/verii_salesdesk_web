@@ -58,6 +58,13 @@ export const SD_DIALOG_BODY_FORM =
 
 export const SD_DELETE_FOOTER = 'border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)]';
 
+/** Silme onay dialogu — koyu temada beyaz buton sorununu onler. */
+export const SD_DELETE_DIALOG_ACTION = [
+  'h-10 rounded-lg px-5 text-sm font-semibold',
+  'bg-rose-600 text-white hover:bg-rose-500',
+  'dark:bg-rose-600 dark:text-white dark:hover:bg-rose-500',
+].join(' ');
+
 export const SD_DIALOG_FOOTER_FORM = [
   SD_DELETE_FOOTER,
   'flex shrink-0 flex-row items-center justify-end gap-3 px-6 py-4 sm:px-8',
@@ -72,7 +79,7 @@ export const SD_DIALOG_ICON_GRADIENT = [
 export const SD_DIALOG_ICON_RING_FORM = SD_DIALOG_ICON_GRADIENT;
 
 export const SD_FORM_INPUT_MD = [
-  'h-12 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-900 dark:text-slate-100',
+  'h-12 w-full min-w-0 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-sm text-slate-900 dark:text-slate-100',
   'placeholder:text-[var(--crm-app-text-muted)]',
   SD_FORM_FOCUS_GLOW,
   'transition-[color,box-shadow,border-color] duration-200',
@@ -118,8 +125,16 @@ export const SD_DIALOG_DESC = 'text-sm text-[var(--crm-app-text-muted)]';
 export const SD_DIALOG_ICON_RING_COMPACT =
   'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-brand-soft)]';
 
-export const SD_SELECT_CONTENT =
-  'border border-[var(--crm-app-border)] bg-[var(--crm-app-popover)] text-slate-100';
+export const SD_SELECT_CONTENT = [
+  'z-[100] border border-[var(--crm-app-border)] bg-[var(--crm-app-popover)] text-slate-100 shadow-xl',
+  '[&_[data-slot=select-item]]:text-slate-100',
+  '[&_[data-slot=select-item]:focus]:bg-[color-mix(in_srgb,var(--crm-brand-primary)_24%,transparent)]',
+  '[&_[data-slot=select-item]:focus]:text-slate-50',
+  '[&_[data-slot=select-item][data-highlighted]]:bg-[color-mix(in_srgb,var(--crm-brand-primary)_24%,transparent)]',
+  '[&_[data-slot=select-item][data-highlighted]]:text-slate-50',
+].join(' ');
+
+export const SD_SELECT_TRIGGER = `${SD_FORM_INPUT} h-10 w-full min-w-0`;
 
 export const SD_PRIMARY_BUTTON_COMPACT = [
   SD_BRAND_PRIMARY,

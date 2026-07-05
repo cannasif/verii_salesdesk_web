@@ -47,8 +47,10 @@ import {
   SD_PAGE_ICON_BOX,
   SD_SECONDARY_BUTTON,
   SD_SURFACE_DIALOG,
+  SD_DELETE_DIALOG_ACTION,
 } from '../../lib/salesdesk-popup-styles';
 import { markNoteReadForUser } from '../../lib/salesdesk-notes-read-storage';
+import { formatSalesDeskApiError } from '../../lib/salesdesk-shared';
 
 function formatNoteDate(value?: string): string {
   if (!value) return '';
@@ -247,7 +249,7 @@ export function SalesDeskNotesPage(): ReactElement {
               </div>
             ) : isError ? (
               <div className="space-y-3 px-2 py-8 text-center">
-                <p className="text-sm text-red-400">{(error as Error)?.message || 'Notlar yuklenemedi.'}</p>
+                <p className="text-sm text-red-400">{formatSalesDeskApiError(error, 'Notlar yuklenemedi.')}</p>
                 <Button type="button" variant="outline" size="sm" onClick={() => refetch()}>
                   Tekrar dene
                 </Button>
@@ -452,7 +454,7 @@ export function SalesDeskNotesPage(): ReactElement {
           <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
             <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Vazgec</AlertDialogCancel>
             <AlertDialogAction
-              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+              className={SD_DELETE_DIALOG_ACTION}
               onClick={() => void handleDelete()}
             >
               Sil

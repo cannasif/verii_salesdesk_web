@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTableActionBar, ManagementDataTableChrome } from '@/components/shared';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import { applyFilterRowsClient, type FilterColumnConfig, type FilterRow } from '@/lib/advanced-filter-types';
-import { PAGE_SIZE_OPTIONS } from '../lib/salesdesk-shared';
+import { PAGE_SIZE_OPTIONS, formatSalesDeskApiError } from '../lib/salesdesk-shared';
 import { salesDeskMetricsToKpiItems } from '../lib/salesdesk-kpi-utils';
 import {
   buildSalesDeskExportData,
@@ -24,7 +24,7 @@ import {
 } from '../lib/salesdesk-list-toolbar-utils';
 import { SalesDeskKpiCards } from './SalesDeskKpiCards';
 import { SalesDeskManagementTable } from './SalesDeskManagementTable';
-import { SD_PAGE_PULSE, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG } from '../lib/salesdesk-popup-styles';
+import { SD_PAGE_PULSE, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG, SD_DELETE_DIALOG_ACTION } from '../lib/salesdesk-popup-styles';
 import {
   ADD_BUTTON_CLASS,
   MANAGEMENT_LIST_CARD_CLASSNAME,
@@ -280,7 +280,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
 
           {isError ? (
             <div className="mb-4 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-              {error?.message || 'Liste yuklenemedi. API baglantisini kontrol edin.'}
+              {formatSalesDeskApiError(error, 'Liste yuklenemedi. API baglantisini kontrol edin.')}
             </div>
           ) : null}
 
@@ -333,7 +333,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
             <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
               <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
               <AlertDialogAction
-                className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+                className={SD_DELETE_DIALOG_ACTION}
                 onClick={onDeleteConfirm}
                 disabled={isDeleting}
               >

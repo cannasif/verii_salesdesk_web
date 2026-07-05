@@ -53,6 +53,7 @@ import { SalesDeskGroupMemberSelect } from '../groups/SalesDeskGroupMemberSelect
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../../types/salesdesk-group-types';
 import {
   SD_DIALOG_CONTENT_FORM,
+  SD_DELETE_DIALOG_ACTION,
   SD_SECONDARY_BUTTON,
   SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
@@ -455,7 +456,7 @@ export function SalesDeskGroupsPage(): ReactElement {
               Iptal
             </AlertDialogCancel>
             <AlertDialogAction
-              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+              className={SD_DELETE_DIALOG_ACTION}
               onClick={() => void handleDeleteConfirm()}
               disabled={deleteGroup.isPending}
             >

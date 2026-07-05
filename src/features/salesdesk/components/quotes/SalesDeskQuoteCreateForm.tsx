@@ -98,11 +98,12 @@ export function SalesDeskQuoteCreateForm(): ReactElement {
     resolver: zodResolver(quoteFormSchema as never) as Resolver<QuoteFormValues>,
     defaultValues: toQuoteFormValues(),
   });
+  const { reset } = form;
 
   useEffect(() => {
-    form.reset(toQuoteFormValues());
+    reset(toQuoteFormValues());
     setLines([]);
-  }, []);
+  }, [reset]);
 
   const handleInvalidSubmit = (): void => {
     toast.error('Lutfen zorunlu alanlari kontrol edin (cari, tarih, durum).');

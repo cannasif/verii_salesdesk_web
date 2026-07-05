@@ -3,6 +3,13 @@ import { CalendarDays, CheckSquare, Tag, Trash2, UserRound, X } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Sheet,
@@ -32,8 +39,8 @@ import {
   type ProjectChecklistItem,
   type ProjectLabelId,
 } from '../../lib/salesdesk-project-meta';
-import { SD_FORM_INPUT, SD_FORM_LABEL, SD_SECONDARY_BUTTON } from '../../lib/salesdesk-popup-styles';
-import { formatDate, NONE_SELECT_VALUE } from '../../lib/salesdesk-shared';
+import { SD_FORM_INPUT, SD_FORM_LABEL, SD_PRIMARY_BUTTON, SD_SECONDARY_BUTTON, SD_SELECT_CONTENT, SD_SELECT_TRIGGER } from '../../lib/salesdesk-popup-styles';
+import { formatDate, NONE_SELECT_VALUE, normalizeSelectValue } from '../../lib/salesdesk-shared';
 import { PRIORITY_LABELS, TASK_STATUS_LABELS } from '../../lib/salesdesk-labels';
 import type { SalesDeskProjectFormValues } from '../../types/salesdesk-schemas';
 import { PriorityBadge, TaskStatusBadge } from '../pages/salesdesk-badges';
@@ -52,6 +59,54 @@ interface SalesDeskProjectTrelloDetailSheetProps {
 
 function newChecklistItem(text: string): ProjectChecklistItem {
   return { id: `chk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, text, done: false };
+}
+
+interface ProjectDetailSelectProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{ value: string; label: string }>;
+  placeholder?: string;
+  allowEmpty?: boolean;
+  emptyLabel?: string;
+}
+
+function ProjectDetailSelect({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder = 'Secin',
+  allowEmpty = false,
+  emptyLabel = 'Secilmedi',
+}: ProjectDetailSelectProps): ReactElement {
+  const selectValue = allowEmpty
+    ? normalizeSelectValue(value || NONE_SELECT_VALUE)
+    : value || options[0]?.value || '';
+
+  return (
+    <div>
+      <label className={SD_FORM_LABEL}>{label}</label>
+      <Select
+        value={selectValue}
+        onValueChange={(next) => onChange(next === NONE_SELECT_VALUE ? '' : next)}
+      >
+        <SelectTrigger className={SD_SELECT_TRIGGER}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent className={SD_SELECT_CONTENT} position="popper">
+          {allowEmpty ? (
+            <SelectItem value={NONE_SELECT_VALUE}>{emptyLabel}</SelectItem>
+          ) : null}
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 }
 
 export function SalesDeskProjectTrelloDetailSheet({
@@ -138,11 +193,11 @@ export function SalesDeskProjectTrelloDetailSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col gap-0 overflow-hidden border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] p-0 sm:max-w-lg"
+        className="flex w-full flex-col gap-0 overflow-hidden border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] p-0 shadow-2xl sm:max-w-xl"
       >
-        <SheetHeader className="border-b border-[var(--crm-app-border)] px-5 py-4 text-left">
+        <SheetHeader className="border-b border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-dialog)_95%,transparent)] px-5 py-4 text-left backdrop-blur-md">
           <SheetTitle className="pr-8 text-lg font-bold text-slate-50">Proje Detayi</SheetTitle>
-          <SheetDescription className="text-[var(--crm-app-text-muted)]">
+          <SheetDescription className="text-sm text-[var(--crm-app-text-muted)]">
             Kart detaylarini duzenleyin, etiket ve checklist ekleyin.
           </SheetDescription>
         </SheetHeader>
@@ -198,106 +253,65 @@ export function SalesDeskProjectTrelloDetailSheet({
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={SD_FORM_LABEL}>Ekip</label>
-                  <select
-                    value={projectTeam}
-                    onChange={(event) => setProjectTeam(event.target.value)}
-                    className={cn(SD_FORM_INPUT, 'h-10 w-full px-3')}
-                  >
-                    {getSalesDeskProjectTeamOptions().map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={SD_FORM_LABEL}>Asama</label>
-                  <select
-                    value={projectPhase}
-                    onChange={(event) => setProjectPhase(event.target.value)}
-                    className={cn(SD_FORM_INPUT, 'h-10 w-full px-3')}
-                  >
-                    <option value="">Secilmedi</option>
-                    {getSalesDeskProjectPhaseOptions().map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={SD_FORM_LABEL}>Durum</label>
-                  <select
-                    value={status}
-                    onChange={(event) => setStatus(event.target.value)}
-                    className={cn(SD_FORM_INPUT, 'h-10 w-full px-3')}
-                  >
-                    {Object.entries(TASK_STATUS_LABELS).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={SD_FORM_LABEL}>Oncelik</label>
-                  <select
-                    value={priority}
-                    onChange={(event) => setPriority(event.target.value)}
-                    className={cn(SD_FORM_INPUT, 'h-10 w-full px-3')}
-                  >
-                    {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <ProjectDetailSelect
+                  label="Ekip"
+                  value={projectTeam}
+                  onChange={setProjectTeam}
+                  options={getSalesDeskProjectTeamOptions()}
+                />
+                <ProjectDetailSelect
+                  label="Asama"
+                  value={projectPhase}
+                  onChange={setProjectPhase}
+                  options={getSalesDeskProjectPhaseOptions()}
+                  allowEmpty
+                  emptyLabel="Secilmedi"
+                />
+                <ProjectDetailSelect
+                  label="Durum"
+                  value={status}
+                  onChange={setStatus}
+                  options={Object.entries(TASK_STATUS_LABELS).map(([optionValue, optionLabel]) => ({
+                    value: optionValue,
+                    label: optionLabel,
+                  }))}
+                />
+                <ProjectDetailSelect
+                  label="Oncelik"
+                  value={priority}
+                  onChange={setPriority}
+                  options={Object.entries(PRIORITY_LABELS).map(([optionValue, optionLabel]) => ({
+                    value: optionValue,
+                    label: optionLabel,
+                  }))}
+                />
               </div>
 
-              <div>
-                <label className={SD_FORM_LABEL}>Sorumlu</label>
-                <select
-                  value={assignedUserId}
-                  onChange={(event) => setAssignedUserId(event.target.value)}
-                  className={cn(SD_FORM_INPUT, 'h-10 w-full px-3')}
-                >
-                  <option value="">Atanmadi</option>
-                  {userOptions
-                    .filter((option) => option.value !== NONE_SELECT_VALUE)
-                    .map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                </select>
-                {project.assignedUserId ? (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-[var(--crm-app-text-muted)]">
-                    <UserRound className="h-3.5 w-3.5" />
-                    {userNameById.get(project.assignedUserId) ?? `#${project.assignedUserId}`}
-                  </p>
-                ) : null}
-              </div>
+              <ProjectDetailSelect
+                label="Sorumlu"
+                value={assignedUserId}
+                onChange={setAssignedUserId}
+                options={userOptions.filter((option) => option.value !== NONE_SELECT_VALUE)}
+                allowEmpty
+                emptyLabel="Atanmadi"
+                placeholder="Sorumlu secin"
+              />
+              {project.assignedUserId ? (
+                <p className="-mt-2 flex items-center gap-1 text-xs text-[var(--crm-app-text-muted)]">
+                  <UserRound className="h-3.5 w-3.5" />
+                  {userNameById.get(project.assignedUserId) ?? `#${project.assignedUserId}`}
+                </p>
+              ) : null}
 
-              <div>
-                <label className={SD_FORM_LABEL}>Cari</label>
-                <select
-                  value={customerId}
-                  onChange={(event) => setCustomerId(event.target.value)}
-                  className={cn(SD_FORM_INPUT, 'h-10 w-full px-3')}
-                >
-                  <option value="">Secilmedi</option>
-                  {customerOptions
-                    .filter((option) => option.value !== NONE_SELECT_VALUE)
-                    .map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                </select>
-              </div>
+              <ProjectDetailSelect
+                label="Cari"
+                value={customerId}
+                onChange={setCustomerId}
+                options={customerOptions.filter((option) => option.value !== NONE_SELECT_VALUE)}
+                allowEmpty
+                emptyLabel="Secilmedi"
+                placeholder="Cari secin"
+              />
 
               <div>
                 <label className={SD_FORM_LABEL} htmlFor="trello-detail-due">
@@ -439,7 +453,7 @@ export function SalesDeskProjectTrelloDetailSheet({
             <Button type="button" variant="outline" className={SD_SECONDARY_BUTTON} onClick={() => onOpenChange(false)}>
               Kapat
             </Button>
-            <Button type="button" disabled={isSaving || !title.trim()} onClick={() => void handleSave()}>
+            <Button type="button" className={SD_PRIMARY_BUTTON} disabled={isSaving || !title.trim()} onClick={() => void handleSave()}>
               {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
             </Button>
           </div>

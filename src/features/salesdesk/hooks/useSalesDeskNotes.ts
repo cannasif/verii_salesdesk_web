@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { DATA_TABLE_QUERY_OPTIONS } from '@/lib/list-query-options';
 import { salesDeskNotesApi } from '../api/salesdesk-notes-api';
 import { notifyNoteRecipientsViaBackend } from '../lib/notify-note-recipients';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 import type { SalesDeskNoteDto, UpsertSalesDeskNoteInput } from '../types/notes-types';
 
 export const SALESDESK_NOTES_QUERY_KEY = ['salesdesk', 'notes'] as const;
@@ -30,7 +31,7 @@ export function useCreateSalesDeskNote(): UseMutationResult<SalesDeskNoteDto, Er
       void queryClient.invalidateQueries({ queryKey: SALESDESK_NOTES_QUERY_KEY });
       toast.success('Not kaydedildi ve kullanicilara bildirildi.');
     },
-    onError: (error) => toast.error(error.message || 'Not kaydedilemedi.'),
+    onError: (error) => toast.error(formatSalesDeskApiError(error, 'Not kaydedilemedi.')),
   });
 }
 
@@ -48,7 +49,7 @@ export function useUpdateSalesDeskNote(): UseMutationResult<
       void queryClient.invalidateQueries({ queryKey: SALESDESK_NOTES_QUERY_KEY });
       toast.success('Not guncellendi ve kullanicilara bildirildi.');
     },
-    onError: (error) => toast.error(error.message || 'Not guncellenemedi.'),
+    onError: (error) => toast.error(formatSalesDeskApiError(error, 'Not guncellenemedi.')),
   });
 }
 
@@ -61,6 +62,6 @@ export function useDeleteSalesDeskNote(): UseMutationResult<void, Error, number>
       void queryClient.invalidateQueries({ queryKey: SALESDESK_NOTES_QUERY_KEY });
       toast.success('Not silindi.');
     },
-    onError: (error) => toast.error(error.message || 'Not silinemedi.'),
+    onError: (error) => toast.error(formatSalesDeskApiError(error, 'Not silinemedi.')),
   });
 }

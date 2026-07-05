@@ -1,6 +1,8 @@
 import {
+  Building2,
   CalendarDays,
   CreditCard,
+  FolderKanban,
   Home,
   Search,
   Settings,
@@ -54,7 +56,7 @@ export { SalesDeskNotesPage } from './components/pages/SalesDeskNotesPage';
 export const salesDeskNavItems = [
   { title: 'Ana Sayfa', href: '/', icon: <Home size={22} className="text-slate-400" /> },
   {
-    title: 'Cari & Potansiyel',
+    title: 'Cari & Musteri',
     icon: <UsersRound size={22} className="text-slate-400" />,
     defaultExpanded: true,
     children: [
@@ -64,12 +66,11 @@ export const salesDeskNavItems = [
     ],
   },
   {
-    title: 'Stok & Urunler',
+    title: 'Urun & Stok',
     icon: <ShoppingCart size={22} className="text-emerald-300" />,
-    defaultExpanded: true,
     children: [
       { title: 'Stok / Urunler', href: '/salesdesk/products' },
-      { title: 'Urun Bazli Musteriler', href: '/salesdesk/product-customers' },
+      { title: 'Urun-Cari Baglantilari', href: '/salesdesk/product-customers' },
     ],
   },
   {
@@ -78,25 +79,31 @@ export const salesDeskNavItems = [
     defaultExpanded: true,
     children: [
       { title: 'Teklifler', href: '/salesdesk/quotes' },
-      { title: 'Teklif Ekle', href: '/salesdesk/quotes/new' },
       { title: 'Faturalar', href: '/salesdesk/invoices' },
-      { title: 'Satis Faturasi Ekle', href: '/salesdesk/invoices/sales/new' },
-      { title: 'Alis Faturasi Ekle', href: '/salesdesk/invoices/purchase/new' },
       { title: 'Satis Takip', href: '/salesdesk/sales-tracking' },
     ],
   },
   {
     title: 'Operasyon',
     icon: <CalendarDays size={22} className="text-slate-400" />,
-    defaultExpanded: true,
     children: [
       { title: 'Haftalik Ziyaretler', href: '/salesdesk/weekly-visits' },
       { title: 'Aktiviteler', href: '/salesdesk/activities' },
       { title: 'Notlar', href: '/salesdesk/notes' },
-      { title: 'Proje Takibi', href: '/salesdesk/proje-takibi' },
-      { title: 'Acik Maddeler', href: '/salesdesk/open-items' },
       { title: 'Haftalik Plan', href: '/salesdesk/weekly-plan' },
-      { title: 'Ziyaret Formu', href: '/salesdesk/visit-forms' },
+      { title: 'Acik Maddeler', href: '/salesdesk/open-items' },
+      { title: 'Ziyaret Formlari', href: '/salesdesk/visit-forms' },
+    ],
+  },
+  {
+    title: 'Proje Yonetimi',
+    icon: <FolderKanban size={22} className="text-violet-300" />,
+    children: [{ title: 'Proje Takibi', href: '/salesdesk/proje-takibi' }],
+  },
+  {
+    title: 'Finans & Demirbas',
+    icon: <Building2 size={22} className="text-sky-300" />,
+    children: [
       { title: 'Demirbaslar', href: '/salesdesk/assets' },
       { title: 'Standart Odemeler', href: '/salesdesk/recurring-payments' },
     ],
@@ -104,7 +111,6 @@ export const salesDeskNavItems = [
   {
     title: 'Araclar',
     icon: <Search size={22} className="text-yellow-300" />,
-    defaultExpanded: true,
     children: [
       { title: 'Yazilim Arastirma', href: '/salesdesk/software-research' },
       { title: 'ERP Haber Takibi', href: '/salesdesk/erp-news' },
@@ -112,12 +118,11 @@ export const salesDeskNavItems = [
     ],
   },
   {
-    title: 'Kullanici & Ekip',
+    title: 'Ekip & Yetki',
     icon: <UserCog size={22} className="text-violet-300" />,
-    defaultExpanded: true,
     children: [
-      { title: 'Kullanici Yonetimi', href: '/user-management' },
       { title: 'Grup Yonetimi', href: '/salesdesk/groups' },
+      { title: 'Kullanici Yonetimi', href: '/user-management' },
       { title: 'Kullanici Yetkileri', href: '/access-control/user-authorization' },
     ],
   },

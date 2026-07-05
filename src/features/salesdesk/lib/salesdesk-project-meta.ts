@@ -129,10 +129,11 @@ export function filterProjectsForTrello(
         );
       case 'high-priority':
         return project.priority >= 3;
-      case 'due-week':
+      case 'due-week': {
         if (!project.dueDate) return false;
         const due = project.dueDate.slice(0, 10);
         return due >= todayKey && due <= weekEndKey;
+      }
       default:
         return true;
     }

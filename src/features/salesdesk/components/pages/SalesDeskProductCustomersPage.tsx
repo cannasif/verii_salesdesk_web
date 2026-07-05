@@ -37,6 +37,7 @@ import {
 } from '../../types/salesdesk-schemas';
 import {
   SD_PAGE_PULSE,
+  SD_DELETE_DIALOG_ACTION,
   SD_SEARCH_FOCUS,
   SD_SECONDARY_BUTTON,
   SD_SURFACE_DIALOG,
@@ -266,7 +267,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
               type: 'select',
               options: [{ value: String(selectedProduct.id), label: selectedProduct.name }],
             },
-            { name: 'customerId', label: 'Cari', type: 'select', options: withNoneOption(customerOptions) },
+            { name: 'customerId', label: 'Cari', type: 'select', options: withNoneOption(customerOptions), colSpan: 2 },
             {
               name: 'potentialCustomerId',
               label: 'Potansiyel',
@@ -290,7 +291,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
           <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
             <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
             <AlertDialogAction
-              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+              className={SD_DELETE_DIALOG_ACTION}
               onClick={async () => {
                 if (!deletingLink) return;
                 await deleteLink.mutateAsync(deletingLink.id);

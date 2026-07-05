@@ -29,7 +29,7 @@ export const SD_CREATE_HEADER_FORM_SURFACE_CLASSNAME = [
   '[&_[data-slot=select-trigger]]:shadow-sm',
   '[&_[data-slot=select-trigger]]:focus-visible:border-[var(--crm-brand-accent)]',
   '[&_[data-slot=select-trigger]]:focus-visible:ring-[3px]',
-  '[&_[data-slot=select-trigger]]:focus-visible:ring-[var(--crm-brand-focus-glow)]',
+  '[&_[data-slot=select-trigger]]:w-full [&_[data-slot=select-trigger]]:max-w-none',
 ].join(' ');
 
 export const SD_CREATE_SECTION_BODY_CLASSNAME =
@@ -52,6 +52,9 @@ export const SD_CREATE_FORM_INPUT_CLASSNAME = [
   'focus-visible:border-[var(--crm-brand-accent)] focus-visible:ring-4',
   'focus-visible:ring-[var(--crm-brand-focus-glow)] focus-visible:ring-offset-0',
 ].join(' ');
+
+/** SelectTrigger varsayilan w-fit oldugu icin tam genislik sinifi. */
+export const SD_CREATE_FORM_SELECT_CLASSNAME = `${SD_CREATE_FORM_INPUT_CLASSNAME} w-full min-w-0`;
 
 export const SD_CREATE_FORM_LABEL_CLASSNAME =
   'text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-zinc-300 mb-2 flex items-center gap-2';

@@ -315,7 +315,7 @@ export function SalesDeskChatWidget(): ReactElement | null {
                             className={cn(
                               'max-w-[72%] px-3.5 py-2 text-[13.5px] leading-relaxed shadow-sm',
                               mine
-                                ? 'rounded-2xl rounded-br-md bg-[image:var(--crm-brand-gradient)] font-medium text-slate-950'
+                                ? 'rounded-2xl rounded-br-md bg-[var(--crm-brand-primary)] font-medium text-white shadow-md ring-1 ring-[color-mix(in_srgb,var(--crm-brand-accent)_35%,transparent)]'
                                 : 'rounded-2xl rounded-bl-md border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-strong)] text-slate-100',
                               message.pending && 'opacity-60'
                             )}
@@ -324,7 +324,7 @@ export function SalesDeskChatWidget(): ReactElement | null {
                             <p
                               className={cn(
                                 'mt-0.5 text-right text-[10px]',
-                                mine ? 'text-slate-900/55' : 'text-[var(--crm-app-text-muted)]'
+                                mine ? 'text-white/70' : 'text-[var(--crm-app-text-muted)]'
                               )}
                             >
                               {timeShort(message.createdAt)}
@@ -365,7 +365,7 @@ export function SalesDeskChatWidget(): ReactElement | null {
                     type="button"
                     onClick={handleSend}
                     disabled={!draft.trim()}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[image:var(--crm-brand-gradient)] text-slate-950 shadow-md transition-all hover:brightness-110 active:scale-95 disabled:opacity-40"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--crm-brand-primary)] text-white shadow-md ring-1 ring-[color-mix(in_srgb,var(--crm-brand-accent)_40%,transparent)] transition-all hover:brightness-110 active:scale-95 disabled:opacity-40"
                     aria-label="Gönder"
                   >
                     <Send size={17} />
@@ -386,8 +386,8 @@ export function SalesDeskChatWidget(): ReactElement | null {
         type="button"
         onClick={() => setOpen(!isOpen)}
         className={cn(
-          'group relative flex h-14 items-center gap-2.5 rounded-full pl-4 pr-5 font-bold tracking-tight text-slate-950 shadow-xl shadow-black/40 transition-transform hover:scale-[1.03] active:scale-95',
-          '[background-image:var(--crm-brand-gradient)]'
+          'group relative flex h-14 items-center gap-2.5 rounded-full pl-4 pr-5 font-bold tracking-tight text-white shadow-xl shadow-black/40 transition-transform hover:scale-[1.03] active:scale-95',
+          'bg-[var(--crm-brand-primary,#c9a227)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-accent,#e8c547)_35%,transparent)] hover:brightness-110'
         )}
         aria-label="Sohbet"
       >

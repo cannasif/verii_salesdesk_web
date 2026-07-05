@@ -23,6 +23,7 @@ import { SD_SELECT_CONTENT } from '../../lib/salesdesk-popup-styles';
 import {
   SD_CREATE_FORM_INPUT_CLASSNAME,
   SD_CREATE_FORM_LABEL_CLASSNAME,
+  SD_CREATE_FORM_SELECT_CLASSNAME,
   SD_CREATE_GLASS_CARD_CLASSNAME,
 } from '../../lib/salesdesk-document-create-styles';
 import type { QuoteFormValues } from '../../types/salesdesk-schemas';
@@ -70,12 +71,12 @@ export function SalesDeskQuoteHeaderForm({
       <div className="pointer-events-none absolute -right-16 top-10 h-80 w-80 rounded-full bg-[var(--crm-brand-secondary)]/8 blur-[80px]" />
 
       <div className={cn(SD_CREATE_GLASS_CARD_CLASSNAME, 'p-5 md:p-6')}>
-        <div className="grid gap-6 xl:grid-cols-3">
+        <div className="grid gap-6">
           <FormField
             control={form.control}
             name="customerId"
             render={({ field }) => (
-              <FormItem className="xl:col-span-2">
+              <FormItem className="col-span-full w-full">
                 <FormLabel className={SD_CREATE_FORM_LABEL_CLASSNAME}>
                   <LabelIconBox tone="brand">
                     <BookUser className="h-3.5 w-3.5" />
@@ -89,8 +90,8 @@ export function SalesDeskQuoteHeaderForm({
                   }
                   disabled={optionsPending && customerOptions.length === 0}
                 >
-                  <FormControl>
-                    <SelectTrigger className={cn(SD_CREATE_FORM_INPUT_CLASSNAME, 'pl-3')}>
+                  <FormControl className="w-full">
+                    <SelectTrigger className={cn(SD_CREATE_FORM_SELECT_CLASSNAME, 'pl-3 w-full')}>
                       <SelectValue
                         placeholder={optionsPending && customerOptions.length === 0 ? 'Cariler yukleniyor...' : 'Cari secin'}
                       />
@@ -108,6 +109,7 @@ export function SalesDeskQuoteHeaderForm({
               </FormItem>
             )}
           />
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           <FormField
             control={form.control}
             name="status"
@@ -126,7 +128,7 @@ export function SalesDeskQuoteHeaderForm({
                   }
                 >
                   <FormControl>
-                    <SelectTrigger className={SD_CREATE_FORM_INPUT_CLASSNAME}>
+                    <SelectTrigger className={SD_CREATE_FORM_SELECT_CLASSNAME}>
                       <SelectValue placeholder="Durum secin" />
                     </SelectTrigger>
                   </FormControl>
@@ -142,6 +144,7 @@ export function SalesDeskQuoteHeaderForm({
               </FormItem>
             )}
           />
+          </div>
         </div>
       </div>
 

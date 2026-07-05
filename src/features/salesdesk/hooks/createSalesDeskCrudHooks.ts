@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { DATA_TABLE_QUERY_OPTIONS } from '@/lib/list-query-options';
 import type { PagedParams, PagedResponse } from '@/types/api';
 import { tryWithSalesDeskListTimeout } from '../lib/salesdesk-fast-timeout';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 import {
   emptySalesDeskPagedResponse,
   readSalesDeskListCache,
@@ -83,7 +84,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
         queryClient.invalidateQueries({ queryKey: allKey });
         toast.success(messages.createSuccess);
       },
-      onError: (error: Error) => toast.error(error.message || messages.createError),
+      onError: (error: Error) => toast.error(formatSalesDeskApiError(error, messages.createError)),
     });
   };
 
@@ -95,7 +96,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
         queryClient.invalidateQueries({ queryKey: allKey });
         toast.success(messages.updateSuccess);
       },
-      onError: (error: Error) => toast.error(error.message || messages.updateError),
+      onError: (error: Error) => toast.error(formatSalesDeskApiError(error, messages.updateError)),
     });
   };
 
@@ -107,7 +108,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
         queryClient.invalidateQueries({ queryKey: allKey });
         toast.success(messages.deleteSuccess);
       },
-      onError: (error: Error) => toast.error(error.message || messages.deleteError),
+      onError: (error: Error) => toast.error(formatSalesDeskApiError(error, messages.deleteError)),
     });
   };
 

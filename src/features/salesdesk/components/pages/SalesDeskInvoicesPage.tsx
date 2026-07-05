@@ -143,6 +143,7 @@ export function SalesDeskInvoicesPage(): ReactElement {
         type: 'select',
         options: customerOptions,
         required: true,
+        colSpan: 2,
       },
       { name: 'invoiceDate', label: 'Fatura Tarihi', type: 'date', required: true },
       { name: 'dueDate', label: 'Vade Tarihi', type: 'date', required: true },

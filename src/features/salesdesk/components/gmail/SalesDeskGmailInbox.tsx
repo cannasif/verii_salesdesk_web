@@ -41,6 +41,7 @@ import {
 } from '../../types/salesdesk-schemas';
 import {
   SD_ADD_BUTTON,
+  SD_DELETE_DIALOG_ACTION,
   SD_PAGE_ICON_BOX,
   SD_SECONDARY_BUTTON,
   SD_SURFACE_DIALOG,
@@ -511,7 +512,7 @@ export function SalesDeskGmailInbox(): ReactElement {
           <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
             <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
             <AlertDialogAction
-              className="h-10 rounded-lg bg-rose-600 px-5 text-sm font-semibold text-white hover:bg-rose-500"
+              className={SD_DELETE_DIALOG_ACTION}
               disabled={deleteGmail.isPending}
               onClick={async () => {
                 if (!deleting) return;
