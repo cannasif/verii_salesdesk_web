@@ -202,7 +202,8 @@ function renderField<T extends FieldValues>(
               placeholder={field.placeholder}
               onChange={(event) => {
                 if (field.type === 'number') {
-                  controlField.onChange(Number(event.target.value));
+                  const parsed = Number(event.target.value);
+                  controlField.onChange(Number.isFinite(parsed) ? parsed : 0);
                   return;
                 }
                 controlField.onChange(event.target.value);

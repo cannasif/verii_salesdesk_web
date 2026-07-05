@@ -130,6 +130,7 @@ export function SalesDeskVisitsPage(): ReactElement {
           mapEntityToForm={(entity) => toVisitFormValues(entity as SalesDeskVisitDto)}
           onSubmit={handleSubmit}
           isLoading={createVisit.isPending || updateVisit.isPending}
+          validateMode="onSubmit"
           fields={[
             { name: 'visitDate', label: 'Tarih', type: 'date', required: true },
             { name: 'visitTime', label: 'Saat', type: 'time' },

@@ -5,6 +5,7 @@ import type { PagedParams, PagedResponse } from '@/types/api';
 import { tryWithSalesDeskListTimeout } from '../lib/salesdesk-fast-timeout';
 import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 import {
+  clearSalesDeskListCache,
   emptySalesDeskPagedResponse,
   readSalesDeskListCache,
   writeSalesDeskListCache,
@@ -81,6 +82,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
     return useMutation({
       mutationFn: (body: TPayload) => api.create(body),
       onSuccess: () => {
+        clearSalesDeskListCache(resourceKey);
         queryClient.invalidateQueries({ queryKey: allKey });
         toast.success(messages.createSuccess);
       },
@@ -93,6 +95,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
     return useMutation({
       mutationFn: ({ id, body }) => api.update(id, body),
       onSuccess: () => {
+        clearSalesDeskListCache(resourceKey);
         queryClient.invalidateQueries({ queryKey: allKey });
         toast.success(messages.updateSuccess);
       },
@@ -105,6 +108,7 @@ export function createSalesDeskCrudHooks<TDto extends { id: number }, TPayload>(
     return useMutation({
       mutationFn: (id: number) => api.delete(id),
       onSuccess: () => {
+        clearSalesDeskListCache(resourceKey);
         queryClient.invalidateQueries({ queryKey: allKey });
         toast.success(messages.deleteSuccess);
       },

@@ -25,13 +25,15 @@ import { isSalesDeskProjectTask } from '../lib/salesdesk-project-tracking';
 import { tryWithSalesDeskListTimeout } from '../lib/salesdesk-fast-timeout';
 import { readSalesDeskListCache, writeSalesDeskListCache } from '../lib/salesdesk-list-cache';
 import { createSalesDeskCrudHooks } from './createSalesDeskCrudHooks';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
+import { salesDeskAssetsApi, ASSETS_SYNCED_EVENT } from '../api/salesdesk-assets-api';
 import { salesDeskQuotesApi, type CreateSalesDeskQuoteInput, QUOTES_SYNCED_EVENT } from '../api/salesdesk-quotes-api';
 import {
   salesDeskInvoicesApi,
   type CreateSalesDeskInvoiceInput,
   INVOICES_SYNCED_EVENT,
 } from '../api/salesdesk-invoices-api';
-import type { SalesDeskInvoiceDto, SalesDeskQuoteDto } from '../api/salesdesk-api';
+import type { SalesDeskInvoiceDto, SalesDeskQuoteDto, SalesDeskFixedAssetDto } from '../api/salesdesk-api';
 import { userApi } from '@/features/user-management/api/user-api';
 import type {
   AssetFormValues,
@@ -556,14 +558,19 @@ const visitForms = createSalesDeskCrudHooks('visit-forms', salesDeskApi.visitFor
   deleteError: 'Ziyaret formu silinemedi',
 });
 
-const assets = createSalesDeskCrudHooks('assets', salesDeskApi.assets, {
-  createSuccess: 'Demirbas olusturuldu',
-  updateSuccess: 'Demirbas guncellendi',
-  deleteSuccess: 'Demirbas silindi',
-  createError: 'Demirbas olusturulamadi',
-  updateError: 'Demirbas guncellenemedi',
-  deleteError: 'Demirbas silinemedi',
-});
+const SALESDESK_ASSETS_QUERY_KEY = ['salesdesk', 'assets'] as const;
+
+function useSalesDeskAssetsSyncInvalidation(): void {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handleSynced = (): void => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_ASSETS_QUERY_KEY });
+    };
+    window.addEventListener(ASSETS_SYNCED_EVENT, handleSynced);
+    return () => window.removeEventListener(ASSETS_SYNCED_EVENT, handleSynced);
+  }, [queryClient]);
+}
 
 const recurringPayments = createSalesDeskCrudHooks('recurring-payments', salesDeskApi.recurringPayments, {
   createSuccess: 'Odeme kalemi olusturuldu',
@@ -808,24 +815,72 @@ export const useUpdateSalesDeskVisitForm = () => {
 };
 export const useDeleteSalesDeskVisitForm = visitForms.useDelete;
 
-export const useSalesDeskAssetList = assets.useList;
-export const useSalesDeskAssetStats = assets.useStats;
-export const useCreateSalesDeskAsset = () => {
-  const mutation = assets.useCreate();
-  return {
-    ...mutation,
-    mutateAsync: (values: AssetFormValues) => mutation.mutateAsync(toAssetPayload(values)),
-  };
+export const useSalesDeskAssetList = (params: PagedParams): UseQueryResult<PagedResponse<SalesDeskFixedAssetDto>> => {
+  useSalesDeskAssetsSyncInvalidation();
+
+  return useQuery({
+    queryKey: [...SALESDESK_ASSETS_QUERY_KEY, 'list', params],
+    queryFn: () => salesDeskAssetsApi.list(params),
+    initialData: () => salesDeskAssetsApi.listLocalPaged(params),
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    ...DATA_TABLE_QUERY_OPTIONS,
+    placeholderData: (previousData) => previousData ?? salesDeskAssetsApi.listLocalPaged(params),
+  });
 };
-export const useUpdateSalesDeskAsset = () => {
-  const mutation = assets.useUpdate();
-  return {
-    ...mutation,
-    mutateAsync: ({ id, values }: { id: number; values: AssetFormValues }) =>
-      mutation.mutateAsync({ id, body: toAssetPayload(values) }),
-  };
+
+export const useSalesDeskAssetStats = (): UseQueryResult<PagedResponse<SalesDeskFixedAssetDto>> => {
+  useSalesDeskAssetsSyncInvalidation();
+
+  return useQuery({
+    queryKey: [...SALESDESK_ASSETS_QUERY_KEY, 'stats'],
+    queryFn: () => salesDeskAssetsApi.list({ pageNumber: 1, pageSize: 50 }),
+    initialData: () => salesDeskAssetsApi.listLocalPaged({ pageNumber: 1, pageSize: 50 }),
+    initialDataUpdatedAt: 0,
+    staleTime: 60_000,
+    ...DATA_TABLE_QUERY_OPTIONS,
+  });
 };
-export const useDeleteSalesDeskAsset = assets.useDelete;
+
+export const useCreateSalesDeskAsset = (): UseMutationResult<SalesDeskFixedAssetDto, Error, AssetFormValues> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (values: AssetFormValues) => salesDeskAssetsApi.create(toAssetPayload(values)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_ASSETS_QUERY_KEY });
+      toast.success('Demirbas olusturuldu');
+    },
+    onError: (error: Error) => toast.error(formatSalesDeskApiError(error, 'Demirbas olusturulamadi')),
+  });
+};
+
+export const useUpdateSalesDeskAsset = (): UseMutationResult<
+  SalesDeskFixedAssetDto,
+  Error,
+  { id: number; values: AssetFormValues }
+> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, values }) => salesDeskAssetsApi.update(id, toAssetPayload(values)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_ASSETS_QUERY_KEY });
+      toast.success('Demirbas guncellendi');
+    },
+    onError: (error: Error) => toast.error(formatSalesDeskApiError(error, 'Demirbas guncellenemedi')),
+  });
+};
+
+export const useDeleteSalesDeskAsset = (): UseMutationResult<void, Error, number> => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => salesDeskAssetsApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SALESDESK_ASSETS_QUERY_KEY });
+      toast.success('Demirbas silindi');
+    },
+    onError: (error: Error) => toast.error(formatSalesDeskApiError(error, 'Demirbas silinemedi')),
+  });
+};
 
 export const useSalesDeskRecurringPaymentList = recurringPayments.useList;
 export const useSalesDeskRecurringPaymentStats = recurringPayments.useStats;

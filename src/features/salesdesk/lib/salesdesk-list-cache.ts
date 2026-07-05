@@ -34,6 +34,22 @@ export function writeSalesDeskListCache<T>(
   }
 }
 
+export function clearSalesDeskListCache(resourceKey: string): void {
+  if (typeof window === 'undefined') return;
+
+  const prefix = `${CACHE_PREFIX}${resourceKey}:`;
+  try {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < window.sessionStorage.length; i += 1) {
+      const key = window.sessionStorage.key(i);
+      if (key?.startsWith(prefix)) keysToRemove.push(key);
+    }
+    keysToRemove.forEach((key) => window.sessionStorage.removeItem(key));
+  } catch {
+    // sessionStorage erisilemez — sessiz gec
+  }
+}
+
 export function emptySalesDeskPagedResponse<T>(params?: PagedParams): PagedResponse<T> {
   const pageNumber = params?.pageNumber ?? 1;
   const pageSize = params?.pageSize ?? 10;

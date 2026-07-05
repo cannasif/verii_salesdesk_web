@@ -261,7 +261,7 @@ function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T 
   if (response.success && response.data != null) {
     return response.data;
   }
-  throw new Error(response.message || fallbackMessage);
+  throw new Error(response.message || response.exceptionMessage || fallbackMessage);
 }
 
 async function getPaged<T>(
@@ -291,6 +291,7 @@ const ACTIVITIES_FETCH_SIZE = 30;
 const PROJECT_FETCH_SIZE = 50;
 const SALESDESK_READ_TIMEOUT_MS = 8_000;
 const SALESDESK_TASKS_WRITE_TIMEOUT_MS = 45_000;
+const SALESDESK_WRITE_TIMEOUT_MS = 45_000;
 
 const salesDeskReadConfig: AxiosRequestConfig = { timeout: SALESDESK_READ_TIMEOUT_MS };
 
@@ -595,8 +596,14 @@ export const salesDeskApi = {
   },
   assets: {
     list: (params?: PagedParams) => getPaged<SalesDeskFixedAssetDto>('assets', params),
-    create: (body: Partial<SalesDeskFixedAssetDto>) => createOne<SalesDeskFixedAssetDto, Partial<SalesDeskFixedAssetDto>>('assets', body),
-    update: (id: number, body: Partial<SalesDeskFixedAssetDto>) => updateOne<SalesDeskFixedAssetDto, Partial<SalesDeskFixedAssetDto>>('assets', id, body),
+    create: (body: Partial<SalesDeskFixedAssetDto>) =>
+      createOne<SalesDeskFixedAssetDto, Partial<SalesDeskFixedAssetDto>>('assets', body, {
+        timeout: SALESDESK_WRITE_TIMEOUT_MS,
+      }),
+    update: (id: number, body: Partial<SalesDeskFixedAssetDto>) =>
+      updateOne<SalesDeskFixedAssetDto, Partial<SalesDeskFixedAssetDto>>('assets', id, body, {
+        timeout: SALESDESK_WRITE_TIMEOUT_MS,
+      }),
     delete: (id: number) => deleteOne('assets', id),
   },
   recurringPayments: {

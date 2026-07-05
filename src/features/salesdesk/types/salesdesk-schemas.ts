@@ -29,7 +29,7 @@ import {
   parseSalesDeskProjectPhase,
   parseSalesDeskProjectTeam,
 } from '../lib/salesdesk-project-tracking';
-import { idToSelectValue, NONE_SELECT_VALUE, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue } from '../lib/salesdesk-shared';
+import { idToSelectValue, NONE_SELECT_VALUE, optionalGroupNameFromSelect, optionalIdFromSelect, requiredIdFromSelect, toDateInputValue, toTimeInputValue, toTimePayloadValue, buildAutoAssetCode } from '../lib/salesdesk-shared';
 import { buildDefaultVisitFormTitle, parseVisitFormContent, serializeVisitFormContent } from '../lib/visit-form-content';
 
 const documentStatusSchema = z
@@ -480,6 +480,25 @@ export const visitFormSchema = z.object({
 });
 
 export type VisitFormValues = z.input<typeof visitFormSchema>;
+export type VisitFormParsed = z.output<typeof visitFormSchema>;
+
+export function normalizeVisitFormInput(
+  values: VisitFormValues | VisitFormParsed
+): VisitFormValues {
+  const customerId =
+    typeof values.customerId === 'number'
+      ? idToSelectValue(values.customerId)
+      : (values.customerId ?? NONE_SELECT_VALUE);
+  return {
+    visitDate: values.visitDate ?? toDateInputValue(),
+    visitTime: values.visitTime ?? '',
+    title: values.title ?? '',
+    customerId,
+    visitType: values.visitType ?? 'Yuz Yuze',
+    status: String(values.status ?? 1),
+    notes: values.notes ?? '',
+  };
+}
 
 export function toVisitFormValues(visit?: SalesDeskVisitDto | null): VisitFormValues {
   return {
@@ -493,10 +512,13 @@ export function toVisitFormValues(visit?: SalesDeskVisitDto | null): VisitFormVa
   };
 }
 
-export function toVisitPayload(values: VisitFormValues): Partial<SalesDeskVisitDto> {
-  const parsed = visitFormSchema.parse(values);
+export function toVisitPayload(
+  values: VisitFormValues | VisitFormParsed
+): Partial<SalesDeskVisitDto> {
+  const parsed = visitFormSchema.parse(normalizeVisitFormInput(values));
+  const visitDate = parsed.visitDate.trim();
   return {
-    visitDate: parsed.visitDate,
+    visitDate: visitDate.includes('T') ? visitDate : `${visitDate.slice(0, 10)}T00:00:00`,
     visitTime: toTimePayloadValue(parsed.visitTime),
     title: parsed.title.trim(),
     customerId: parsed.customerId,
@@ -605,15 +627,31 @@ export function toVisitFormRecordPayload(values: VisitFormRecordValues): Partial
 }
 
 export const assetFormSchema = z.object({
-  code: z.string().trim().min(1, 'Kod zorunludur').max(32),
+  code: z.string().trim().max(32).optional().default(''),
   name: z.string().trim().min(1, 'Ad zorunludur').max(220),
   category: z.string().max(80).optional(),
   purchaseDate: z.string().min(1, 'Alis tarihi zorunludur'),
-  value: z.number().min(0),
+  value: z.coerce.number().min(0),
   status: assetStatusSchema,
 });
 
 export type AssetFormValues = z.input<typeof assetFormSchema>;
+export type AssetFormParsed = z.output<typeof assetFormSchema>;
+
+export function normalizeAssetFormInput(
+  values: AssetFormValues | AssetFormParsed
+): AssetFormValues {
+  const rawValue = values.value;
+  const value = typeof rawValue === 'number' && Number.isFinite(rawValue) ? rawValue : Number(rawValue ?? 0);
+  return {
+    code: values.code ?? '',
+    name: values.name ?? '',
+    category: values.category ?? '',
+    purchaseDate: values.purchaseDate ?? toDateInputValue(),
+    value: Number.isFinite(value) ? value : 0,
+    status: String(values.status ?? 1),
+  };
+}
 
 export function toAssetFormValues(asset?: SalesDeskFixedAssetDto | null): AssetFormValues {
   return {
@@ -626,13 +664,17 @@ export function toAssetFormValues(asset?: SalesDeskFixedAssetDto | null): AssetF
   };
 }
 
-export function toAssetPayload(values: AssetFormValues): Partial<SalesDeskFixedAssetDto> {
-  const parsed = assetFormSchema.parse(values);
+export function toAssetPayload(
+  values: AssetFormValues | AssetFormParsed
+): Partial<SalesDeskFixedAssetDto> {
+  const parsed = assetFormSchema.parse(normalizeAssetFormInput(values));
+  const code = parsed.code?.trim() || buildAutoAssetCode();
+  const purchaseDate = parsed.purchaseDate.trim();
   return {
-    code: parsed.code.trim(),
+    code,
     name: parsed.name.trim(),
     category: parsed.category?.trim() || undefined,
-    purchaseDate: parsed.purchaseDate,
+    purchaseDate: purchaseDate.includes('T') ? purchaseDate : `${purchaseDate.slice(0, 10)}T00:00:00`,
     value: parsed.value,
     status: parsed.status,
   };

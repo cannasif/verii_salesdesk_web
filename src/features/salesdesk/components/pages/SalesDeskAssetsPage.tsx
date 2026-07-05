@@ -114,8 +114,9 @@ export function SalesDeskAssetsPage(): ReactElement {
           mapEntityToForm={(entity) => toAssetFormValues(entity as SalesDeskFixedAssetDto)}
           onSubmit={handleSubmit}
           isLoading={createAsset.isPending || updateAsset.isPending}
+          validateMode="onSubmit"
           fields={[
-            { name: 'code', label: 'Kod', required: true },
+            { name: 'code', label: 'Kod', placeholder: 'Bos birakilirsa otomatik uretilir' },
             { name: 'name', label: 'Ad', required: true },
             { name: 'category', label: 'Kategori' },
             { name: 'purchaseDate', label: 'Alis Tarihi', type: 'date', required: true },

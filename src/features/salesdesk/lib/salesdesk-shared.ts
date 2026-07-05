@@ -56,6 +56,13 @@ export function toTimePayloadValue(value?: string | null): string | undefined {
   return `${hours}:${minutes}:${seconds ?? '00'}`;
 }
 
+/** API NextCodeAsync beklemeden benzersiz demirbas kodu uretir. */
+export function buildAutoAssetCode(): string {
+  const year = new Date().getUTCFullYear();
+  const stamp = String(Date.now()).slice(-6);
+  return `DMR${year}${stamp.padStart(6, '0')}`;
+}
+
 export interface SalesDeskSelectOption {
   value: string;
   label: string;
