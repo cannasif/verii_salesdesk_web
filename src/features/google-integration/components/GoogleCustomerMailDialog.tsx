@@ -246,7 +246,7 @@ export function GoogleCustomerMailDialog({
   }, [moduleKey]);
 
   const pdfTemplatesQuery = useQuery({
-    queryKey: ['google-mail-pdf-templates', documentRuleType],
+    queryKey: ['google-mail-report-templates', documentRuleType],
     enabled: open && documentRuleType !== null,
     queryFn: async () =>
       pdfReportTemplateApi.getList({

@@ -1,9 +1,7 @@
-import { PDFDocument } from 'pdf-lib';
 import { resolveAppPath } from '@/lib/api-config';
 import { formatCurrency } from './format-currency';
 import layoutSpecJson from '../specs/windo-quotation-layout-spec.json';
 
-const ATLAS_COVER_PDF_PATH = '/assets/pdf-templates/atlas-cover-first-3-pages.pdf';
 const PDF_FONT_PATH = '/assets/fonts/arial.ttf';
 const PDF_FONT_NAME = 'ArialCustom';
 const BRAND_LOGO_PATH = '/assets/logo.png';
@@ -487,42 +485,11 @@ async function buildLinesPdfBytes(params: ExportQuotationLinesPdfParams): Promis
   return doc.output('arraybuffer') as ArrayBuffer;
 }
 
-async function mergeAtlasCoverWithLinesPdf(linesPdfBytes: ArrayBuffer): Promise<Blob> {
-  const coverResponse = await fetch(resolveAppPath(ATLAS_COVER_PDF_PATH), {
-    cache: 'no-cache',
-  });
-
-  if (!coverResponse.ok) {
-    throw new Error(`Atlas cover PDF yüklenemedi: ${coverResponse.status}`);
-  }
-
-  const coverPdfBytes = await coverResponse.arrayBuffer();
-  const mergedPdf = await PDFDocument.create();
-  const [coverPdf, linesPdf] = await Promise.all([
-    PDFDocument.load(coverPdfBytes),
-    PDFDocument.load(linesPdfBytes),
-  ]);
-
-  const coverPages = await mergedPdf.copyPages(coverPdf, coverPdf.getPageIndices());
-  coverPages.forEach((page) => mergedPdf.addPage(page));
-
-  const linePages = await mergedPdf.copyPages(linesPdf, linesPdf.getPageIndices());
-  linePages.forEach((page) => mergedPdf.addPage(page));
-
-  const mergedBytes = await mergedPdf.save();
-  return new Blob([mergedBytes], { type: 'application/pdf' });
-}
-
 export async function createQuotationLinesPdfBlob(
   params: ExportQuotationLinesPdfParams
 ): Promise<Blob> {
   const linesPdfBytes = await buildLinesPdfBytes(params);
-
-  try {
-    return await mergeAtlasCoverWithLinesPdf(linesPdfBytes);
-  } catch {
-    return new Blob([linesPdfBytes], { type: 'application/pdf' });
-  }
+  return new Blob([linesPdfBytes], { type: 'application/pdf' });
 }
 
 export async function exportQuotationLinesPdf(params: ExportQuotationLinesPdfParams): Promise<void> {

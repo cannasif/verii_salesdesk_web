@@ -246,7 +246,7 @@ export function OutlookCustomerMailDialog({
   }, [moduleKey]);
 
   const pdfTemplatesQuery = useQuery({
-    queryKey: ['outlook-mail-pdf-templates', documentRuleType],
+    queryKey: ['outlook-mail-report-templates', documentRuleType],
     enabled: open && documentRuleType !== null,
     queryFn: async () =>
       pdfReportTemplateApi.getList({
