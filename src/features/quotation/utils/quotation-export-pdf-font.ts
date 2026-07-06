@@ -1,7 +1,7 @@
 import { resolveAppPath } from '@/lib/api-config';
 import type { jsPDF } from 'jspdf';
 
-const FONT_PUBLIC_PATH = '/fonts/Montserrat-Regular.ttf';
+const FONT_PUBLIC_PATH = '/assets/fonts/Montserrat-Regular.ttf';
 const FONT_VFS_NAME = 'QuotationExport-Montserrat.ttf';
 
 export const QUOTATION_EXPORT_PDF_FONT = 'QuotationExportMontserrat';

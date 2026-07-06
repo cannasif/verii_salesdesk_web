@@ -3,11 +3,11 @@ import { resolveAppPath } from '@/lib/api-config';
 import { formatCurrency } from './format-currency';
 import layoutSpecJson from '../specs/windo-quotation-layout-spec.json';
 
-const ATLAS_COVER_PDF_PATH = '/pdf-templates/atlas-cover-first-3-pages.pdf';
-const PDF_FONT_PATH = '/fonts/arial.ttf';
+const ATLAS_COVER_PDF_PATH = '/assets/pdf-templates/atlas-cover-first-3-pages.pdf';
+const PDF_FONT_PATH = '/assets/fonts/arial.ttf';
 const PDF_FONT_NAME = 'ArialCustom';
-const BRAND_LOGO_PATH = '/logo.png';
-const REFERENCE_IMAGE_PATHS = ['/logo.png', '/login.jpg', '/v3rii.jpeg'] as const;
+const BRAND_LOGO_PATH = '/assets/logo.png';
+const REFERENCE_IMAGE_PATHS = ['/assets/logo.png', '/assets/login.jpg', '/assets/v3rii.jpeg'] as const;
 
 const COMPANY_NAME = 'WINDOFORM KAPI & PENCERE AKS.';
 const COMPANY_CONTACT_LINES = [
