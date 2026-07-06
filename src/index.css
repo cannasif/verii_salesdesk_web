@@ -1517,3 +1517,121 @@ input[type="number"].allow-native-number-spinners {
     transform: translateX(240%);
   }
 }
+
+/* --- V3RII ÖZEL TEMALAR (GÜNCELLENMİŞ VE KATI) --- */
+
+/* Seçicinin gücünü artırmak için html üzerindeki sınıflarla birlikte hedefliyoruz */
+html.theme-v3rii-merkez,
+html.theme-v3rii-merkez :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
+html[data-brand-theme='v3rii-merkez'],
+html[data-brand-theme='v3rii-merkez'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell) {
+  --primary: 43 96% 56% !important;
+  --primary-foreground: 0 0% 9% !important;
+  --ring: 43 96% 56% !important;
+  --sidebar-primary: 43 96% 56% !important;
+  --sidebar-ring: 43 96% 56% !important;
+  --crm-brand-primary: #fbbf24 !important;
+  --crm-brand-secondary: #f59e0b !important;
+  --crm-brand-accent: #d97706 !important;
+  --crm-brand-on-primary: #0a0e17 !important;
+  --crm-brand-text: #b45309 !important;
+  --crm-brand-on-soft: #92400e !important;
+  --crm-brand-soft: rgb(251 191 36 / 10%) !important;
+  --crm-brand-ring: rgb(251 191 36 / 28%) !important;
+  --crm-brand-focus-glow: rgb(251 191 36 / 35%) !important;
+  --crm-brand-shadow: rgb(217 119 6 / 22%) !important;
+  --crm-brand-gradient: linear-gradient(180deg, #fbbf24 0%, #d97706 100%) !important;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(251 191 36 / 14%) 0%, rgb(245 158 11 / 10%) 100%) !important;
+}
+
+html.theme-gece-operasyonu,
+html.theme-gece-operasyonu :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
+html[data-brand-theme='gece-operasyonu'],
+html[data-brand-theme='gece-operasyonu'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell) {
+  --primary: 217 91% 60% !important;
+  --primary-foreground: 0 0% 100% !important;
+  --ring: 217 91% 60% !important;
+  --sidebar-primary: 217 91% 60% !important;
+  --sidebar-ring: 217 91% 60% !important;
+  --crm-brand-primary: #3b82f6 !important;
+  --crm-brand-secondary: #334155 !important;
+  --crm-brand-accent: #1e293b !important;
+  --crm-brand-on-primary: #ffffff !important;
+  --crm-brand-text: #60a5fa !important;
+  --crm-brand-on-soft: #93c5fd !important;
+  --crm-brand-soft: rgb(59 130 246 / 10%) !important;
+  --crm-brand-ring: rgb(59 130 246 / 28%) !important;
+  --crm-brand-focus-glow: rgb(59 130 246 / 35%) !important;
+  --crm-brand-shadow: rgb(30 41 59 / 24%) !important;
+  --crm-brand-gradient: linear-gradient(180deg, #334155 0%, #3b82f6 100%) !important;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(30 41 59 / 16%) 0%, rgb(59 130 246 / 12%) 100%) !important;
+}
+
+html.theme-canli-satis,
+html.theme-canli-satis :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
+html[data-brand-theme='canli-satis'],
+html[data-brand-theme='canli-satis'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell) {
+  --primary: 160 84% 39% !important;
+  --primary-foreground: 0 0% 100% !important;
+  --ring: 160 84% 39% !important;
+  --sidebar-primary: 160 84% 39% !important;
+  --sidebar-ring: 160 84% 39% !important;
+  --crm-brand-primary: #059669 !important;
+  --crm-brand-secondary: #10b981 !important;
+  --crm-brand-accent: #047857 !important;
+  --crm-brand-on-primary: #ffffff !important;
+  --crm-brand-text: #047857 !important;
+  --crm-brand-on-soft: #065f46 !important;
+  --crm-brand-soft: rgb(16 185 129 / 10%) !important;
+  --crm-brand-ring: rgb(5 150 105 / 28%) !important;
+  --crm-brand-focus-glow: rgb(16 185 129 / 35%) !important;
+  --crm-brand-shadow: rgb(4 120 87 / 22%) !important;
+  --crm-brand-gradient: linear-gradient(180deg, #10b981 0%, #047857 100%) !important;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(16 185 129 / 14%) 0%, rgb(5 150 105 / 10%) 100%) !important;
+}
+
+html.theme-minimal-masa,
+html.theme-minimal-masa :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
+html[data-brand-theme='minimal-masa'],
+html[data-brand-theme='minimal-masa'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell) {
+  --primary: 215 16% 47% !important;
+  --primary-foreground: 0 0% 100% !important;
+  --ring: 215 16% 47% !important;
+  --sidebar-primary: 215 16% 47% !important;
+  --sidebar-ring: 215 16% 47% !important;
+  --crm-brand-primary: #64748b !important;
+  --crm-brand-secondary: #94a3b8 !important;
+  --crm-brand-accent: #e2e8f0 !important;
+  --crm-brand-on-primary: #ffffff !important;
+  --crm-brand-text: #475569 !important;
+  --crm-brand-on-soft: #64748b !important;
+  --crm-brand-soft: rgb(100 116 139 / 10%) !important;
+  --crm-brand-ring: rgb(100 116 139 / 24%) !important;
+  --crm-brand-focus-glow: rgb(148 163 184 / 30%) !important;
+  --crm-brand-shadow: rgb(71 85 105 / 18%) !important;
+  --crm-brand-gradient: linear-gradient(180deg, #94a3b8 0%, #64748b 100%) !important;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(248 250 252 / 96%) 0%, rgb(226 232 240 / 92%) 100%) !important;
+}
+
+html.theme-yonetici,
+html.theme-yonetici :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
+html[data-brand-theme='yonetici'],
+html[data-brand-theme='yonetici'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell) {
+  --primary: 243 75% 59% !important;
+  --primary-foreground: 0 0% 100% !important;
+  --ring: 243 75% 59% !important;
+  --sidebar-primary: 243 75% 59% !important;
+  --sidebar-ring: 243 75% 59% !important;
+  --crm-brand-primary: #6366f1 !important;
+  --crm-brand-secondary: #4f46e5 !important;
+  --crm-brand-accent: #312e81 !important;
+  --crm-brand-on-primary: #ffffff !important;
+  --crm-brand-text: #818cf8 !important;
+  --crm-brand-on-soft: #a5b4fc !important;
+  --crm-brand-soft: rgb(99 102 241 / 10%) !important;
+  --crm-brand-ring: rgb(99 102 241 / 28%) !important;
+  --crm-brand-focus-glow: rgb(99 102 241 / 35%) !important;
+  --crm-brand-shadow: rgb(49 46 129 / 24%) !important;
+  --crm-brand-gradient: linear-gradient(180deg, #6366f1 0%, #312e81 100%) !important;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(79 70 229 / 14%) 0%, rgb(49 46 129 / 12%) 100%) !important;
+}

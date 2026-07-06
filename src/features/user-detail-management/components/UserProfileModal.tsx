@@ -16,6 +16,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { BrandThemeSettings } from '@/components/BrandThemeSettings';
 import { useTheme } from '@/components/theme-provider';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserDetailByUserId } from '@/features/user-detail-management/hooks/useUserDetailByUserId';
@@ -37,7 +38,7 @@ export function UserProfileModal({
   onOpenProfileDetails
 }: UserProfileModalProps): ReactElement {
   const { t } = useTranslation();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isBrandThemeActive } = useTheme();
   const { user, logout, branch } = useAuthStore();
   const navigate = useNavigate();
   const { data: userDetail } = useUserDetailByUserId(user?.id || 0, open);
@@ -64,7 +65,10 @@ export function UserProfileModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
-        "p-0 gap-0 border-none shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col w-[95vw] md:max-w-4xl lg:max-w-[1100px] max-h-[92dvh] md:max-h-[620px] rounded-[2rem] md:rounded-[2.5rem] transition-all duration-500 [&>button:last-of-type]:hidden",
+        "p-0 gap-0 border-none shadow-[0_0_50px_rgba(0,0,0,0.5)] !flex !flex-col !overflow-hidden",
+        "w-[95vw] md:max-w-4xl lg:max-w-[1100px]",
+        "h-[min(92dvh,820px)] md:h-[min(92dvh,860px)]",
+        "rounded-[2rem] md:rounded-[2.5rem] transition-all duration-500 [&>button:last-of-type]:hidden",
         "bg-[var(--crm-app-panel)] text-slate-900 dark:text-white"
       )}>
         <DialogPrimitive.Close className={cn(
@@ -78,9 +82,9 @@ export function UserProfileModal({
 
         <DialogTitle className="sr-only">{t('sidebar.settings')}</DialogTitle>
 
-        <div className="flex flex-col md:flex-row w-full h-full overflow-y-auto md:overflow-hidden">
+        <div className="flex min-h-0 flex-1 w-full flex-col overflow-hidden md:flex-row md:items-stretch">
           <div className={cn(
-            "w-full md:w-[280px] lg:w-[340px] rounded-[1.5rem] md:rounded-[2rem] flex flex-col items-center justify-center md:justify-start md:pt-16 p-6 md:p-10 border-b md:border-b-0 md:border-r shrink-0 relative overflow-hidden transition-all duration-500",
+            "w-full md:w-[280px] lg:w-[340px] rounded-[1.5rem] md:rounded-[2rem] flex flex-col items-center justify-center md:justify-start md:pt-16 p-6 md:p-10 border-b md:border-b-0 md:border-r shrink-0 relative overflow-hidden transition-all duration-500 md:max-h-full",
             "bg-slate-50/80 border-slate-100 dark:border-white/5 dark:bg-[linear-gradient(180deg,var(--crm-app-panel-strong)_0%,var(--crm-app-panel)_100%)]"
           )}>
             <div className="absolute left-[-20%] top-[-20%] h-64 w-64 rounded-full bg-[var(--crm-brand-soft)] blur-[80px]" />
@@ -128,16 +132,19 @@ export function UserProfileModal({
             </div>
           </div>
 
-          <div className="flex-1 p-5 md:p-10 lg:p-6 flex flex-col min-h-0 relative">
-            <div className="flex items-center gap-3 mb-2 md:mb-6 shrink-0 pb-3 md:pb- border-b border-dashed border-slate-200 dark:border-white/10">
+          <div className="relative grid min-h-0 min-w-0 flex-1 grid-rows-[auto_minmax(0,1fr)] overflow-hidden p-5 md:max-h-full md:p-10 lg:p-6">
+            <div className="mb-2 flex shrink-0 items-center gap-3 pb-3 md:mb-6 md:pb- border-b border-dashed border-slate-200 dark:border-white/10">
               <div className="h-5 w-1.5 rounded-full bg-[image:var(--crm-brand-gradient)] md:h-8" />
               <h3 className="text-lg md:text-4xl lg:text-3x1 font-black tracking-tight uppercase">{t('sidebar.settings')}</h3>
             </div>
 
-            <div className={cn(
-              "flex flex-col gap-3 md:gap-4 flex-none md:flex-1 pr-1",
-              "md:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']"
-            )}>
+            <div
+              className={cn(
+                'custom-scrollbar-lg min-h-0 overflow-y-scroll overscroll-y-contain touch-pan-y pr-1',
+                '[scrollbar-gutter:stable]',
+              )}
+            >
+              <div className="flex flex-col gap-3 md:gap-4">
               <button
                 className={cn(
                   "group w-full p-2 md:p-3 lg:p-4 flex items-center justify-between border rounded-[1.5rem] md:rounded-[2rem] transition-all duration-300",
@@ -193,22 +200,26 @@ export function UserProfileModal({
                 <Switch
                   checked={isDark}
                   onCheckedChange={() => setTheme(isDark ? 'light' : 'dark')}
+                  disabled={isBrandThemeActive}
                   className="scale-75 data-[state=checked]:bg-[var(--crm-brand-primary)] md:scale-100"
                 />
               </div>
-            </div>
 
-            <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-dashed border-slate-200 dark:border-white/10 shrink-0 pb-1 md:pb-0">
-              <Button
-                className="h-11 w-full rounded-[1.2rem] bg-[image:var(--crm-brand-gradient)] text-sm font-black text-white shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] transition-all hover:scale-[1.01] active:scale-[0.98] md:h-14 md:rounded-[1.3rem] md:text-lg lg:h-15 lg:text-xl
+              <BrandThemeSettings />
+
+              <div className="mt-2 border-t border-dashed border-slate-200 pt-4 dark:border-white/10 md:mt-4 md:pt-6">
+                <Button
+                  className="h-11 w-full rounded-[1.2rem] bg-[image:var(--crm-brand-gradient)] text-sm font-black text-white shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] transition-all hover:scale-[1.01] active:scale-[0.98] md:h-14 md:rounded-[1.3rem] md:text-lg lg:h-15 lg:text-xl
                 opacity-90 grayscale-[0] 
                 dark:opacity-100 dark:grayscale-0
                 "
-                onClick={handleLogout}
-              >
-                <Logout02Icon size={18} className="mr-3 md:w-5 md:h-5" />
-                {t('logout')}
-              </Button>
+                  onClick={handleLogout}
+                >
+                  <Logout02Icon size={18} className="mr-3 md:w-5 md:h-5" />
+                  {t('logout')}
+                </Button>
+              </div>
+              </div>
             </div>
           </div>
         </div>
