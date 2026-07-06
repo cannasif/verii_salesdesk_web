@@ -896,11 +896,24 @@ export function toGmailPayload(values: GmailFormValues): Partial<SalesDeskGmailM
   };
 }
 
-export const productCustomerFormSchema = z.object({
-  productId: customerIdSchema,
-  customerId: optionalCustomerIdSchema,
-  potentialCustomerId: optionalPotentialIdSchema,
-});
+export const productCustomerFormSchema = z
+  .object({
+    productId: customerIdSchema,
+    customerId: optionalCustomerIdSchema,
+    potentialCustomerId: optionalPotentialIdSchema,
+  })
+  .superRefine((value, context) => {
+    const hasCustomer = Boolean(value.customerId);
+    const hasPotential = Boolean(value.potentialCustomerId);
+
+    if (hasCustomer === hasPotential) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['customerId'],
+        message: 'Cari veya potansiyel cariden sadece birini secin',
+      });
+    }
+  });
 
 export type ProductCustomerFormValues = z.input<typeof productCustomerFormSchema>;
 
@@ -918,7 +931,11 @@ export function toProductCustomerFormValues(
 export function toProductCustomerPayload(
   values: ProductCustomerFormValues
 ): Partial<SalesDeskProductCustomerDto> {
-  const parsed = productCustomerFormSchema.parse(values);
+  const hasCustomer = values.customerId && values.customerId !== NONE_SELECT_VALUE;
+  const normalizedValues = hasCustomer
+    ? { ...values, potentialCustomerId: NONE_SELECT_VALUE }
+    : values;
+  const parsed = productCustomerFormSchema.parse(normalizedValues);
   return {
     productId: parsed.productId,
     customerId: parsed.customerId,
