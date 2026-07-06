@@ -123,6 +123,7 @@ export function SalesDeskPaymentsPage(): ReactElement {
           mapEntityToForm={(entity) => toRecurringPaymentFormValues(entity as SalesDeskRecurringPaymentDto)}
           onSubmit={handleSubmit}
           isLoading={createPayment.isPending || updatePayment.isPending}
+          validateMode="onSubmit"
           fields={[
             { name: 'name', label: 'Ad', required: true, colSpan: 2 },
             { name: 'type', label: 'Tip', type: 'select', options: enumToSelectOptions(PAYMENT_TYPE_LABELS), required: true },

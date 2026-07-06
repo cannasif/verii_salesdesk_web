@@ -691,6 +691,31 @@ export const recurringPaymentFormSchema = z.object({
 });
 
 export type RecurringPaymentFormValues = z.input<typeof recurringPaymentFormSchema>;
+export type RecurringPaymentFormParsed = z.output<typeof recurringPaymentFormSchema>;
+
+export function normalizeRecurringPaymentFormInput(
+  values: RecurringPaymentFormValues | RecurringPaymentFormParsed
+): RecurringPaymentFormValues {
+  const rawDay = values.dayOfMonth;
+  const dayOfMonth =
+    typeof rawDay === 'number' && Number.isFinite(rawDay) ? rawDay : Number(rawDay ?? 1);
+  const rawAmount = values.amount;
+  const amount =
+    typeof rawAmount === 'number' && Number.isFinite(rawAmount) ? rawAmount : Number(rawAmount ?? 0);
+
+  return {
+    name: values.name ?? '',
+    type: String(values.type ?? 1),
+    category: values.category ?? '',
+    dayOfMonth: Number.isFinite(dayOfMonth) ? dayOfMonth : 1,
+    amount: Number.isFinite(amount) ? amount : 0,
+    customerId:
+      values.customerId != null && values.customerId !== ''
+        ? String(values.customerId)
+        : NONE_SELECT_VALUE,
+    isActive: values.isActive ?? true,
+  };
+}
 
 export function toRecurringPaymentFormValues(
   payment?: SalesDeskRecurringPaymentDto | null
@@ -707,9 +732,9 @@ export function toRecurringPaymentFormValues(
 }
 
 export function toRecurringPaymentPayload(
-  values: RecurringPaymentFormValues
+  values: RecurringPaymentFormValues | RecurringPaymentFormParsed
 ): Partial<SalesDeskRecurringPaymentDto> {
-  const parsed = recurringPaymentFormSchema.parse(values);
+  const parsed = recurringPaymentFormSchema.parse(normalizeRecurringPaymentFormInput(values));
   return {
     name: parsed.name.trim(),
     type: parsed.type,
