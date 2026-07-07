@@ -15,13 +15,12 @@ import {
   MANAGEMENT_LIST_ID_COLUMN_CELL_CLASSNAME,
   MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
-  ADD_BUTTON_CLASS,
 } from '@/lib/management-list-layout';
 import { loadTableSortPreference, saveTableSortPreference } from '@/lib/table-sort-preferences';
 import { arraysEqual } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
-import { SD_PAGE_PULSE } from '../lib/salesdesk-popup-styles';
+import { SD_PAGE_ADD_BUTTON, SD_PAGE_HEADER_ROW, SD_PAGE_PULSE, SD_PAGE_TITLE } from '../lib/salesdesk-popup-styles';
 import { SalesDeskCustomerDeleteDialog } from './SalesDeskCustomerDeleteDialog';
 import { SalesDeskCustomerForm } from './SalesDeskCustomerForm';
 import { SalesDeskKpiCards } from './SalesDeskKpiCards';
@@ -331,17 +330,15 @@ export function SalesDeskCustomersPage(): ReactElement {
 
   return (
     <div className="relative w-full space-y-6">
-      <div className="flex flex-col justify-between gap-6 pt-2 md:flex-row md:items-center">
+      <div className={SD_PAGE_HEADER_ROW}>
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 transition-colors dark:text-white">
-            Cari Yonetimi
-          </h1>
+          <h1 className={SD_PAGE_TITLE}>Cari Yonetimi</h1>
           <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
             <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
             Gelismis filtre, sutun tercihi ve sayfalama ile cari listesi
           </p>
         </div>
-        <Button onClick={handleCreateClick} className={ADD_BUTTON_CLASS}>
+        <Button onClick={handleCreateClick} className={SD_PAGE_ADD_BUTTON}>
           <Plus size={20} className="mr-2 stroke-[3px]" />
           Yeni Cari Ekle
         </Button>

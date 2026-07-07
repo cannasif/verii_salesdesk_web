@@ -1,6 +1,7 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  ArrowLeft,
   CalendarClock,
   CheckCheck,
   Inbox,
@@ -31,9 +32,13 @@ import {
   type GmailFormValues,
 } from '../../types/salesdesk-schemas';
 import {
-  SD_ADD_BUTTON,
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
   SD_PAGE_ICON_BOX,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
   SD_SECONDARY_BUTTON,
+  SD_TABLE_ACTION_BUTTON,
 } from '../../lib/salesdesk-popup-styles';
 import { useSalesDeskGmailConnectionStore } from '../../stores/salesdesk-gmail-connection-store';
 import { useSalesDeskMeetingStore } from '../../stores/salesdesk-meeting-store';
@@ -96,6 +101,7 @@ export function SalesDeskGmailInbox(): ReactElement {
   const [editing, setEditing] = useState<SalesDeskGmailMessageDto | null>(null);
   const [deleting, setDeleting] = useState<SalesDeskGmailMessageDto | null>(null);
   const [connectOpen, setConnectOpen] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<'list' | 'detail'>('list');
 
   const connection = useSalesDeskGmailConnectionStore();
   const connected = connection.connected;
@@ -191,27 +197,28 @@ export function SalesDeskGmailInbox(): ReactElement {
 
   return (
     <div className="space-y-5 text-slate-100">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
           <div className={SD_PAGE_ICON_BOX}>
             <Mail size={22} />
           </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-50">Gmail</h1>
-            <p className="mt-1 text-sm text-slate-400">
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>Gmail</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
               {connected
                 ? 'Gerçek gelen kutunuz · yeni toplantilar otomatik bildirilir'
                 : 'Hesabinizi baglayin, gerçek gelen kutunuzu goruntuleyin'}
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={() => setConnectOpen(true)}
             className={cn(
               SD_SECONDARY_BUTTON,
-              'inline-flex items-center gap-2',
+              'inline-flex w-full items-center justify-center gap-2 sm:w-auto',
               connected && 'text-emerald-300'
             )}
           >
@@ -225,9 +232,9 @@ export function SalesDeskGmailInbox(): ReactElement {
                 setEditing(null);
                 setFormOpen(true);
               }}
-              className={SD_ADD_BUTTON}
+              className={SD_PAGE_ADD_BUTTON}
             >
-              <Plus size={16} />
+              <Plus size={16} className="mr-2" />
               Kayit Ekle
             </button>
           )}
@@ -247,8 +254,13 @@ export function SalesDeskGmailInbox(): ReactElement {
         </div>
       )}
 
-      <div className="grid h-[calc(100vh-320px)] min-h-[520px] grid-cols-1 gap-4 lg:grid-cols-[minmax(0,400px)_1fr]">
-        <div className="flex flex-col overflow-hidden rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)]">
+      <div className="grid min-h-[min(72vh,640px)] grid-cols-1 gap-4 lg:grid-cols-[minmax(0,400px)_1fr]">
+        <div
+          className={cn(
+            'flex flex-col overflow-hidden rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)]',
+            mobilePanel === 'detail' ? 'hidden lg:flex' : 'flex'
+          )}
+        >
           <div className="border-b border-[var(--crm-app-border)] p-3">
             <div className="relative">
               <Search
@@ -269,7 +281,7 @@ export function SalesDeskGmailInbox(): ReactElement {
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors',
+                    'min-h-[44px] rounded-lg px-3 py-2 text-xs font-semibold transition-colors',
                     activeTab === tab.id
                       ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-accent)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)]'
                       : 'text-slate-400 hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-200'
@@ -281,7 +293,7 @@ export function SalesDeskGmailInbox(): ReactElement {
               <button
                 type="button"
                 onClick={() => refetch()}
-                className="ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-200"
+                className={cn(SD_TABLE_ACTION_BUTTON, 'ml-auto rounded-lg text-slate-400 transition-colors hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-200')}
                 aria-label="Yenile"
               >
                 <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
@@ -314,9 +326,12 @@ export function SalesDeskGmailInbox(): ReactElement {
                   <li key={message.key}>
                     <button
                       type="button"
-                      onClick={() => setSelectedKey(message.key)}
+                      onClick={() => {
+                        setSelectedKey(message.key);
+                        setMobilePanel('detail');
+                      }}
                       className={cn(
-                        'flex w-full items-start gap-3 px-3.5 py-3 text-left transition-colors',
+                        'flex min-h-[44px] w-full items-start gap-3 px-3.5 py-3 text-left transition-colors',
                         selectedKey === message.key
                           ? 'bg-[var(--crm-brand-soft)]'
                           : 'hover:bg-[var(--crm-app-panel-muted)]'
@@ -375,10 +390,26 @@ export function SalesDeskGmailInbox(): ReactElement {
           </div>
         </div>
 
-        <div className="hidden flex-col overflow-hidden rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] lg:flex">
+        <div
+          className={cn(
+            'flex-col overflow-hidden rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)]',
+            mobilePanel === 'list' ? 'hidden lg:flex' : 'flex'
+          )}
+        >
           {selected ? (
             <>
-              <div className="border-b border-[var(--crm-app-border)] p-5">
+              <div className="border-b border-[var(--crm-app-border)] p-4 sm:p-5">
+                <button
+                  type="button"
+                  onClick={() => setMobilePanel('list')}
+                  className={cn(
+                    SD_TABLE_ACTION_BUTTON,
+                    'mb-3 rounded-lg text-slate-300 hover:bg-[var(--crm-app-panel-muted)] lg:hidden'
+                  )}
+                  aria-label="Mesaj listesine don"
+                >
+                  <ArrowLeft size={18} />
+                </button>
                 {selected.isMeeting && (
                   <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-emerald-500/12 px-3 py-1.5 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-500/30">
                     <CalendarClock size={14} />
@@ -413,7 +444,7 @@ export function SalesDeskGmailInbox(): ReactElement {
                           <Button
                             type="button"
                             variant="outline"
-                            className="h-9 rounded-lg px-3 text-xs"
+                            className="h-11 min-h-[44px] rounded-lg px-3 text-xs"
                             disabled={updateGmail.isPending}
                             onClick={() => handleMarkRead(selected.record!)}
                           >
@@ -428,7 +459,7 @@ export function SalesDeskGmailInbox(): ReactElement {
                             setEditing(selected.record);
                             setFormOpen(true);
                           }}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-200"
+                          className={cn(SD_TABLE_ACTION_BUTTON, 'rounded-lg text-slate-400 transition-colors hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-200')}
                           aria-label="Duzenle"
                         >
                           <MailOpen size={16} />
@@ -436,7 +467,7 @@ export function SalesDeskGmailInbox(): ReactElement {
                         <button
                           type="button"
                           onClick={() => selected.record && setDeleting(selected.record)}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg text-rose-400 transition-colors hover:bg-rose-500/10"
+                          className={cn(SD_TABLE_ACTION_BUTTON, 'rounded-lg text-rose-400 transition-colors hover:bg-rose-500/10')}
                           aria-label="Sil"
                         >
                           <Trash2 size={16} />

@@ -140,14 +140,15 @@ export function SalesDeskProjectTrelloHub({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-wrap gap-2">
         {PROJECT_TRELLO_FILTERS.map((filter) => (
           <button
             key={filter.id}
             type="button"
             onClick={() => onFilterChange?.(filter.id)}
             className={cn(
-              'rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition',
+              'min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold ring-1 transition sm:min-h-0 sm:py-1.5',
               filterId === filter.id
                 ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-text)] ring-[var(--crm-brand-primary)]/40'
                 : 'bg-[var(--crm-app-panel-muted)] text-[var(--crm-app-text-muted)] ring-[var(--crm-app-border)] hover:text-slate-200'
@@ -156,11 +157,12 @@ export function SalesDeskProjectTrelloHub({
             {filter.label}
           </button>
         ))}
+        </div>
         <button
           type="button"
           onClick={() => onHideCompletedChange?.(!hideCompleted)}
           className={cn(
-            'ml-auto inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition',
+            'inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold ring-1 transition sm:ml-auto sm:w-auto sm:min-h-0 sm:py-1.5',
             hideCompleted
               ? 'bg-emerald-500/15 text-emerald-200 ring-emerald-500/30'
               : 'bg-[var(--crm-app-panel-muted)] text-[var(--crm-app-text-muted)] ring-[var(--crm-app-border)]'
@@ -173,7 +175,7 @@ export function SalesDeskProjectTrelloHub({
           <button
             type="button"
             onClick={() => setFocusedTeamId(null)}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[var(--crm-app-panel-muted)] px-3 py-1.5 text-xs font-semibold text-slate-200 ring-1 ring-[var(--crm-app-border)]"
+            className="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-full bg-[var(--crm-app-panel-muted)] px-3 py-2 text-xs font-semibold text-slate-200 ring-1 ring-[var(--crm-app-border)] sm:w-auto sm:min-h-0 sm:py-1.5"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Tum panolara don
@@ -224,7 +226,7 @@ export function SalesDeskProjectTrelloHub({
                       <button
                         type="button"
                         onClick={() => setFocusedTeamId(board.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--crm-brand-accent)] transition hover:bg-[var(--crm-brand-soft)]"
+                        className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-[var(--crm-brand-accent)] transition hover:bg-[var(--crm-brand-soft)]"
                         title="Pane odakla"
                       >
                         <Maximize2 className="h-4 w-4" />
@@ -235,7 +237,7 @@ export function SalesDeskProjectTrelloHub({
                     type="button"
                     onClick={() => onAddProject(board.id)}
                     className={cn(
-                      'mt-3 w-full rounded-lg border border-dashed border-[var(--crm-app-border)] px-3 py-2 text-xs font-semibold transition hover:bg-[var(--crm-brand-soft)]',
+                      'mt-3 min-h-[44px] w-full rounded-lg border border-dashed border-[var(--crm-app-border)] px-3 py-2.5 text-xs font-semibold transition hover:bg-[var(--crm-brand-soft)]',
                       board.accentClassName
                     )}
                   >
@@ -243,8 +245,8 @@ export function SalesDeskProjectTrelloHub({
                   </button>
                 </header>
 
-                <div className="relative flex-1 overflow-x-auto p-4">
-                  <div className="flex min-h-full gap-3">
+                <div className="relative flex-1 overflow-x-auto p-3 sm:p-4">
+                  <div className="flex min-h-full gap-3 pb-1">
                     {visibleLists.map((list) => {
                       const rawItems = byStatus[list.status];
                       const items = sortProjectsInColumn(rawItems, board.id, list.status);

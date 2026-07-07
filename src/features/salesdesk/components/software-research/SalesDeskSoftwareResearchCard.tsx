@@ -92,39 +92,41 @@ export function SalesDeskSoftwareResearchCard({
           <p className="mt-4 text-xs italic text-[var(--crm-app-text-muted)]">Anahtar kelime eklenmemis</p>
         )}
 
-        <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">
+        <div className="mt-auto flex flex-col gap-2 pt-5 sm:flex-row sm:flex-wrap sm:items-center">
           {sourceUrl ? (
             <a
               href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[var(--crm-app-border)] px-3 text-xs font-semibold text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300"
+              className="inline-flex h-11 min-h-[44px] w-full items-center justify-center gap-1.5 rounded-lg border border-[var(--crm-app-border)] px-3 text-xs font-semibold text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300 sm:w-auto"
             >
               <ExternalLink size={14} />
               Kaynak
             </a>
           ) : (
-            <span className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-dashed border-[var(--crm-app-border)] px-3 text-xs text-[var(--crm-app-text-muted)]">
+            <span className="inline-flex h-11 min-h-[44px] w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[var(--crm-app-border)] px-3 text-xs text-[var(--crm-app-text-muted)] sm:w-auto">
               <Globe size={14} />
               Kaynak yok
             </span>
           )}
-          <button
-            type="button"
-            onClick={() => onEdit(item)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-500 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
-            aria-label="Duzenle"
-          >
-            <Pencil size={15} />
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(item)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-500 transition-colors hover:border-rose-400/40 hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300"
-            aria-label="Sil"
-          >
-            <Trash2 size={15} />
-          </button>
+          <div className="inline-flex shrink-0 items-center gap-1 self-end sm:self-auto">
+            <button
+              type="button"
+              onClick={() => onEdit(item)}
+              className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-500 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
+              aria-label="Duzenle"
+            >
+              <Pencil size={15} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(item)}
+              className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-500 transition-colors hover:border-rose-400/40 hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300"
+              aria-label="Sil"
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
         </div>
       </div>
     </article>

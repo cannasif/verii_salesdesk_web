@@ -25,7 +25,7 @@ export function SalesDeskProjectStatusPipeline({
 
   return (
     <div className={cn('rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] p-4', className)}>
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--crm-app-text-muted)]">
             Durum Dagilimi

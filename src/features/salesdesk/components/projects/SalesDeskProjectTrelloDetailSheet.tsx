@@ -252,7 +252,7 @@ export function SalesDeskProjectTrelloDetailSheet({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <ProjectDetailSelect
                   label="Ekip"
                   value={projectTeam}
@@ -439,21 +439,21 @@ export function SalesDeskProjectTrelloDetailSheet({
           </div>
         ) : null}
 
-        <div className="flex items-center justify-between gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-5 py-4">
+        <div className="flex flex-col-reverse gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <Button
             type="button"
             variant="outline"
-            className="border-red-500/30 text-red-300 hover:bg-red-500/10"
+            className="h-11 w-full border-red-500/30 text-red-300 hover:bg-red-500/10 sm:w-auto"
             onClick={() => project && onDelete(project)}
           >
             <Trash2 className="mr-1.5 h-4 w-4" />
             Sil
           </Button>
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" className={SD_SECONDARY_BUTTON} onClick={() => onOpenChange(false)}>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button type="button" variant="outline" className={cn(SD_SECONDARY_BUTTON, 'h-11 w-full sm:w-auto')} onClick={() => onOpenChange(false)}>
               Kapat
             </Button>
-            <Button type="button" className={SD_PRIMARY_BUTTON} disabled={isSaving || !title.trim()} onClick={() => void handleSave()}>
+            <Button type="button" className={cn(SD_PRIMARY_BUTTON, 'h-11 w-full sm:w-auto')} disabled={isSaving || !title.trim()} onClick={() => void handleSave()}>
               {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
             </Button>
           </div>

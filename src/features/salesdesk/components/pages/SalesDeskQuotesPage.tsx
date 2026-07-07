@@ -139,6 +139,8 @@ export function SalesDeskQuotesPage(): ReactElement {
         isDeleting={deleteQuote.isPending}
         deleteTitle="Teklifi sil"
         deleteLabel={(row) => row.quoteNumber}
+        mobilePrimaryKey="quoteNumber"
+        mobileDetailKeys={['customer', 'quoteDate', 'status', 'subTotal', 'grandTotal']}
         formDialog={
           <SalesDeskEntityForm
             open={formOpen}

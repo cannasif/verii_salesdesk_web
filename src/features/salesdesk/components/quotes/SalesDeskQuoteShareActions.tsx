@@ -28,6 +28,7 @@ import {
   type SalesDeskQuotePreviewData,
 } from '../../lib/build-salesdesk-quote-preview-data';
 import { cn } from '@/lib/utils';
+import { SD_TABLE_ACTION_BUTTON } from '../../lib/salesdesk-popup-styles';
 
 type ShareAction = 'preview' | 'pdf' | 'excel' | 'gmail' | 'whatsapp';
 
@@ -71,7 +72,7 @@ function ActionIconButton({
           aria-label={label}
           data-no-drag-scroll="true"
           data-skip-row-double-click="true"
-          className={cn('h-8 w-8 shrink-0', toneClass)}
+          className={cn(SD_TABLE_ACTION_BUTTON, toneClass)}
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
@@ -113,7 +114,7 @@ export function SalesDeskQuoteShareActions({
   return (
     <TooltipProvider delayDuration={150}>
       <div
-        className="flex items-center justify-end gap-0.5"
+        className="flex flex-wrap items-center justify-end gap-1"
         data-no-drag-scroll="true"
         data-skip-row-double-click="true"
         onClick={(event) => event.stopPropagation()}

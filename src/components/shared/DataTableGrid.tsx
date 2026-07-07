@@ -68,6 +68,8 @@ interface DataTableGridProps<TRow, TKey extends string> {
   enableColumnDragAndDrop?: boolean;
   onColumnOrderChange?: (newOrder: TKey[]) => void;
   enableColumnResize?: boolean;
+  /** Mobilde tablo yerine gosterilecek icerik (or. SalesDesk kart listesi). */
+  mobileView?: ReactNode;
 }
 
 const MIN_COL_WIDTH = 60;
@@ -263,6 +265,7 @@ export function DataTableGrid<TRow, TKey extends string>({
   enableColumnDragAndDrop = true,
   onColumnOrderChange,
   enableColumnResize = true,
+  mobileView,
 }: DataTableGridProps<TRow, TKey>): ReactElement {
   const { t } = useTranslation('common');
   const MISSING_TRANSLATION = 'Çeviri eksik';
@@ -470,7 +473,7 @@ export function DataTableGrid<TRow, TKey extends string>({
     <div className="flex min-w-0 w-full flex-col gap-2">
       {actionBar ? <DataTableActionBar {...actionBar} /> : toolbar}
       <div className="relative w-full min-w-0 flex-1">
-        {isLoading && !isError && (
+        {isLoading && !isError && !mobileView && (
           <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-md bg-white/20 backdrop-blur-[1px] dark:bg-slate-950/20">
             <div className="inline-flex items-center gap-3 rounded-2xl border border-white/60 bg-white/90 p-4 shadow-xl backdrop-blur-md dark:border-white/10 dark:bg-slate-900/90">
               <Loader2 className="h-8 w-8 animate-spin text-[var(--crm-brand-text)]" />
@@ -478,10 +481,12 @@ export function DataTableGrid<TRow, TKey extends string>({
             </div>
           </div>
         )}
+        {mobileView ? <div className="md:hidden">{mobileView}</div> : null}
         <div
           ref={tableScrollRef}
           className={cn(
             'relative rounded-md border overflow-x-auto w-full min-w-0 *:data-[slot=table-container]:overflow-visible',
+            mobileView && 'hidden md:block',
             resizingKey
               ? 'cursor-col-resize select-none'
               : isDragging
@@ -641,7 +646,7 @@ export function DataTableGrid<TRow, TKey extends string>({
                             actionsCellClassName,
                             'overflow-visible',
                             iconOnlyActions &&
-                            '[&_button]:h-8 [&_button]:w-8 [&_button]:p-0 [&_button]:min-w-8 [&_button]:text-[0px] [&_button]:leading-none [&_button_svg]:h-4 [&_button_svg]:w-4 [&_button_svg]:mx-auto [&_button_svg]:shrink-0 [&_button_span]:hidden'
+                            '[&_button]:h-11 [&_button]:w-11 [&_button]:p-0 [&_button]:min-w-11 [&_button]:min-h-11 [&_button]:text-[0px] [&_button]:leading-none [&_button_svg]:h-4 [&_button_svg]:w-4 [&_button_svg]:mx-auto [&_button_svg]:shrink-0 [&_button_span]:hidden'
                           )}
                           onClick={(event) => event.stopPropagation()}
                           onDoubleClick={(event) => event.stopPropagation()}
@@ -660,7 +665,7 @@ export function DataTableGrid<TRow, TKey extends string>({
       </div>
     </div>
 
-      <div className="mt-1 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200/90 px-3 pb-6 pt-3 sm:px-4 dark:border-white/10">
+      <div className="mt-1 flex flex-col items-stretch justify-between gap-3 border-t border-slate-200/90 px-3 pb-6 pt-3 sm:flex-row sm:items-center sm:px-4 dark:border-white/10">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -684,11 +689,11 @@ export function DataTableGrid<TRow, TKey extends string>({
           <div className="text-xs text-muted-foreground">{paginationInfoText}</div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
           <Button
             variant="outline"
             size="sm"
-            className="border-slate-300 bg-white shadow-sm hover:bg-stone-50 dark:border-white/15 dark:bg-transparent dark:shadow-none"
+            className="h-11 min-w-[44px] flex-1 border-slate-300 bg-white shadow-sm hover:bg-stone-50 sm:h-8 sm:flex-none dark:border-white/15 dark:bg-transparent dark:shadow-none"
             onClick={onPreviousPage}
             disabled={!hasPreviousPage || disablePaginationButtons}
           >
@@ -700,7 +705,7 @@ export function DataTableGrid<TRow, TKey extends string>({
           <Button
             variant="outline"
             size="sm"
-            className="border-slate-300 bg-white shadow-sm hover:bg-stone-50 dark:border-white/15 dark:bg-transparent dark:shadow-none"
+            className="h-11 min-w-[44px] flex-1 border-slate-300 bg-white shadow-sm hover:bg-stone-50 sm:h-8 sm:flex-none dark:border-white/15 dark:bg-transparent dark:shadow-none"
             onClick={onNextPage}
             disabled={!hasNextPage || disablePaginationButtons}
           >

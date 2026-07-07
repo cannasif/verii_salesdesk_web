@@ -95,7 +95,7 @@ export function SalesDeskVisitFormsList({
             type="button"
             onClick={onRefresh}
             disabled={isFetching}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300"
+            className="inline-flex h-11 min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300 sm:w-auto"
           >
             <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
             Yenile
@@ -173,7 +173,7 @@ export function SalesDeskVisitFormsList({
               type="button"
               onClick={() => onPageChange(pageNumber - 1)}
               disabled={!hasPreviousPage}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
             >
               <ChevronLeft size={16} />
             </button>
@@ -184,7 +184,7 @@ export function SalesDeskVisitFormsList({
               type="button"
               onClick={() => onPageChange(pageNumber + 1)}
               disabled={!hasNextPage}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
             >
               <ChevronRight size={16} />
             </button>

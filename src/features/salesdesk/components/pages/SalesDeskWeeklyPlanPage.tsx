@@ -22,7 +22,7 @@ import {
   type WeeklyPlanAssignee,
 } from '../../lib/salesdesk-weekly-plan';
 import { useSalesDeskGroupList } from '../../hooks/useSalesDeskGroups';
-import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
+import { SD_PAGE_ADD_BUTTON, SD_PAGE_HEADER_ROW, SD_PAGE_ICON_BOX, SD_PAGE_PULSE, SD_PAGE_TITLE } from '../../lib/salesdesk-popup-styles';
 import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import type { TaskFormValues } from '../../types/salesdesk-schemas';
 import { SalesDeskWeeklyPlanGrid } from '../weekly-plan/SalesDeskWeeklyPlanGrid';
@@ -136,30 +136,31 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
 
   return (
     <div className="space-y-5 text-slate-100">
-      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
           <div className={SD_PAGE_ICON_BOX}>
             <CalendarDays size={22} />
           </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-50">Haftalik Plan</h1>
-            <p className="mt-1 text-sm text-slate-400">
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>Haftalik Plan</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
               Tum ekibin haftalik aktivitelerini goruntule ve guncelle
             </p>
           </div>
         </div>
-        <button type="button" onClick={openNewDialog} className={SD_ADD_BUTTON}>
-          <Plus size={18} className="stroke-[3px]" />
+        <button type="button" onClick={openNewDialog} className={SD_PAGE_ADD_BUTTON}>
+          <Plus size={18} className="mr-2 stroke-[3px]" />
           Yeni Gorev
         </button>
       </div>
 
       <div className="flex flex-col gap-3 rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setWeekStart((current) => addDays(current, -7))}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-300 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-300 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
             aria-label="Onceki hafta"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -167,19 +168,19 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
           <button
             type="button"
             onClick={() => setWeekStart(getWeekStart())}
-            className="h-9 rounded-lg border border-[var(--crm-app-border)] px-3 text-sm font-medium text-slate-200 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
+            className="h-11 min-h-[44px] rounded-lg border border-[var(--crm-app-border)] px-3 text-sm font-medium text-slate-200 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
           >
             Bu Hafta
           </button>
           <button
             type="button"
             onClick={() => setWeekStart((current) => addDays(current, 7))}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-300 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-300 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
             aria-label="Sonraki hafta"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
-          <span className="ml-2 text-sm font-semibold text-[var(--crm-brand-accent)]">
+          <span className="w-full text-sm font-semibold text-[var(--crm-brand-accent)] sm:ml-2 sm:w-auto">
             {formatWeekRange(weekStart)}
           </span>
         </div>

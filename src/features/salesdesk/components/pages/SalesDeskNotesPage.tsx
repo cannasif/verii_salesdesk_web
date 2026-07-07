@@ -1,6 +1,7 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
+  ArrowLeft,
   Loader2,
   NotebookPen,
   Plus,
@@ -27,16 +28,19 @@ import {
 import type { SalesDeskNoteDto } from '../../types/notes-types';
 import {
   salesDeskPageShellClass,
-  salesDeskPageSubtitleClass,
-  salesDeskPageTitleClass,
   surfaceClass,
 } from '../../lib/salesdesk-shared';
 import {
   SD_ADD_BUTTON,
   SD_FORM_INPUT,
   SD_FORM_LABEL,
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
   SD_PAGE_ICON_BOX,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
   SD_SECONDARY_BUTTON,
+  SD_TABLE_ACTION_BUTTON,
 } from '../../lib/salesdesk-popup-styles';
 import { markNoteReadForUser } from '../../lib/salesdesk-notes-read-storage';
 import { formatSalesDeskApiError } from '../../lib/salesdesk-shared';
@@ -78,6 +82,7 @@ export function SalesDeskNotesPage(): ReactElement {
   const [recipientUserIds, setRecipientUserIds] = useState<number[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<SalesDeskNoteDto | null>(null);
   const [showRecipients, setShowRecipients] = useState(true);
+  const [mobilePanel, setMobilePanel] = useState<'list' | 'editor'>('list');
 
   const filteredNotes = useMemo(() => {
     const term = search.trim().toLocaleLowerCase('tr-TR');
@@ -109,19 +114,25 @@ export function SalesDeskNotesPage(): ReactElement {
     setSelectedId('new');
     resetDraft();
     setShowRecipients(true);
+    setMobilePanel('editor');
   }, [resetDraft]);
 
-  const loadNoteIntoDraft = useCallback((note: SalesDeskNoteDto): void => {
+  const loadNoteIntoDraft = useCallback((note: SalesDeskNoteDto, options?: { showMobileEditor?: boolean }): void => {
     setSelectedId(note.id);
     setTitle(note.title);
     setContent(note.content);
     setRecipientUserIds(note.recipientUserIds ?? []);
     setShowRecipients(true);
+    if (options?.showMobileEditor) {
+      setMobilePanel('editor');
+    }
   }, []);
 
   useEffect(() => {
     if (selectedId === null && notes.length > 0 && !isLoading && !noteIdParam) {
-      loadNoteIntoDraft(notes[0]);
+      if (window.matchMedia('(min-width: 1024px)').matches) {
+        loadNoteIntoDraft(notes[0]);
+      }
     }
   }, [isLoading, loadNoteIntoDraft, noteIdParam, notes, selectedId]);
 
@@ -133,7 +144,7 @@ export function SalesDeskNotesPage(): ReactElement {
     const note = notes.find((item) => item.id === noteId);
     if (!note) return;
 
-    loadNoteIntoDraft(note);
+    loadNoteIntoDraft(note, { showMobileEditor: true });
     markNoteReadForUser(userId, noteId);
     setSearchParams({}, { replace: true });
   }, [isLoading, loadNoteIntoDraft, noteIdParam, notes, setSearchParams, userId]);
@@ -176,30 +187,31 @@ export function SalesDeskNotesPage(): ReactElement {
 
   return (
     <div className={salesDeskPageShellClass}>
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
           <div className={SD_PAGE_ICON_BOX}>
             <NotebookPen size={22} />
           </div>
-          <div>
-            <h1 className={salesDeskPageTitleClass}>Notlar</h1>
-            <p className={salesDeskPageSubtitleClass}>
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>Notlar</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
               Not olusturun, kaydedin ve eklediginiz kullanicilara bildirim gonderin
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
           <Button
             type="button"
             variant="outline"
-            className={SD_SECONDARY_BUTTON}
+            className={cn(SD_SECONDARY_BUTTON, 'w-full sm:w-auto')}
             onClick={() => refetch()}
             disabled={isFetching}
           >
             <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
             Yenile
           </Button>
-          <Button type="button" className={SD_ADD_BUTTON} onClick={startNewNote}>
+          <Button type="button" className={SD_PAGE_ADD_BUTTON} onClick={startNewNote}>
             <Plus className="h-4 w-4" />
             Yeni Not
           </Button>
@@ -214,7 +226,12 @@ export function SalesDeskNotesPage(): ReactElement {
         )}
       >
         {/* Sol: not listesi */}
-        <aside className="flex flex-col border-b border-[var(--crm-app-border)] lg:border-b-0 lg:border-r">
+        <aside
+          className={cn(
+            'flex flex-col border-b border-[var(--crm-app-border)] lg:border-b-0 lg:border-r',
+            mobilePanel === 'editor' ? 'hidden lg:flex' : 'flex'
+          )}
+        >
           <div className="border-b border-[var(--crm-app-border)] p-4">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--crm-app-text-muted)]" />
@@ -264,9 +281,9 @@ export function SalesDeskNotesPage(): ReactElement {
                     <li key={note.id}>
                       <button
                         type="button"
-                        onClick={() => loadNoteIntoDraft(note)}
+                        onClick={() => loadNoteIntoDraft(note, { showMobileEditor: true })}
                         className={cn(
-                          'w-full rounded-xl border px-3 py-3 text-left transition-colors',
+                          'min-h-[44px] w-full rounded-xl border px-3 py-3 text-left transition-colors',
                           active
                             ? 'border-[var(--crm-brand-primary)] bg-[var(--crm-brand-soft)]/40'
                             : 'border-transparent hover:border-[var(--crm-app-border)] hover:bg-[var(--crm-app-panel-muted)]/50'
@@ -305,7 +322,12 @@ export function SalesDeskNotesPage(): ReactElement {
         </aside>
 
         {/* Sag: editor */}
-        <section className="flex min-h-0 flex-col">
+        <section
+          className={cn(
+            'flex min-h-0 flex-col',
+            mobilePanel === 'list' ? 'hidden lg:flex' : 'flex'
+          )}
+        >
           {selectedId === null && !isLoading ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)]/60 text-[var(--crm-brand-primary)]">
@@ -324,38 +346,54 @@ export function SalesDeskNotesPage(): ReactElement {
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--crm-app-border)] px-5 py-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]">
-                    {selectedId === 'new' ? 'Yeni Not' : isOwner ? 'Not Duzenle' : 'Paylasilan Not'}
-                  </p>
-                  {selectedNote && !isOwner && (
-                    <p className="mt-0.5 text-xs text-[var(--crm-app-text-muted)]">
-                      {selectedNote.createdByName} tarafindan paylasildi
+              <div className="flex flex-col gap-3 border-b border-[var(--crm-app-border)] px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-5">
+                <div className="flex min-w-0 items-start gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={cn(SD_TABLE_ACTION_BUTTON, 'shrink-0 lg:hidden')}
+                    onClick={() => setMobilePanel('list')}
+                    aria-label="Not listesine don"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]">
+                      {selectedId === 'new' ? 'Yeni Not' : isOwner ? 'Not Duzenle' : 'Paylasilan Not'}
                     </p>
-                  )}
+                    {selectedNote && !isOwner && (
+                      <p className="mt-0.5 text-xs text-[var(--crm-app-text-muted)]">
+                        {selectedNote.createdByName} tarafindan paylasildi
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                   {selectedNote && isOwner && (
                     <Button
                       type="button"
                       variant="outline"
-                      size="sm"
-                      className="border-red-500/30 text-red-300 hover:bg-red-500/10 hover:text-red-200"
+                      className="h-11 w-full border-red-500/30 text-red-300 hover:bg-red-500/10 hover:text-red-200 sm:w-auto"
                       onClick={() => setDeleteTarget(selectedNote)}
                     >
                       <Trash2 className="h-4 w-4" />
                       Sil
                     </Button>
                   )}
-                  <Button type="button" className={SD_ADD_BUTTON} disabled={!canSave} onClick={() => void handleSave()}>
+                  <Button
+                    type="button"
+                    className={cn(SD_PAGE_ADD_BUTTON, 'w-full sm:w-auto')}
+                    disabled={!canSave}
+                    onClick={() => void handleSave()}
+                  >
                     {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     {selectedId === 'new' ? 'Kaydet ve Bildir' : 'Guncelle ve Bildir'}
                   </Button>
                 </div>
               </div>
 
-              <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-5">
+              <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-5">
                 <div>
                   <label htmlFor="note-title" className={SD_FORM_LABEL}>
                     Baslik

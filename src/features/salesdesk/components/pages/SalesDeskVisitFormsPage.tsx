@@ -1,6 +1,7 @@
 import { type ReactElement, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BriefcaseBusiness, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import type { SalesDeskVisitFormDto } from '../../api/salesdesk-api';
 import { SalesDeskVisitFormsList } from '../visit-forms/SalesDeskVisitFormsList';
@@ -12,9 +13,15 @@ import {
   useSalesDeskVisitFormList,
 } from '../../hooks/useSalesDeskModules';
 import { useSalesDeskListPage } from '../../hooks/useSalesDeskListPage';
-import { salesDeskPageShellClass, salesDeskPageSubtitleClass, salesDeskPageTitleClass } from '../../lib/salesdesk-shared';
+import { salesDeskPageShellClass } from '../../lib/salesdesk-shared';
 import { previewVisitFormPdf } from '../../lib/visit-form-share';
-import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
+import {
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
+  SD_PAGE_ICON_BOX,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
+} from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskVisitFormsPage(): ReactElement {
   const navigate = useNavigate();
@@ -81,22 +88,28 @@ export function SalesDeskVisitFormsPage(): ReactElement {
 
   return (
     <div className={salesDeskPageShellClass}>
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
           <div className={SD_PAGE_ICON_BOX}>
             <BriefcaseBusiness size={22} />
           </div>
-          <div>
-            <h1 className={salesDeskPageTitleClass}>Ziyaret Formu</h1>
-            <p className={salesDeskPageSubtitleClass}>
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>Ziyaret Formu</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
               Cari ziyaretlerini kayit altina al, PDF olustur, Gmail / WhatsApp ile gonder
             </p>
           </div>
         </div>
-        <button type="button" onClick={() => navigate('/salesdesk/visit-forms/new')} className={SD_ADD_BUTTON}>
-          <Plus size={16} />
+        <Button
+          type="button"
+          variant="ghost"
+          className={SD_PAGE_ADD_BUTTON}
+          onClick={() => navigate('/salesdesk/visit-forms/new')}
+        >
+          <Plus size={16} className="mr-2" />
           Yeni Ziyaret Formu
-        </button>
+        </Button>
       </div>
 
       <SalesDeskVisitFormsList

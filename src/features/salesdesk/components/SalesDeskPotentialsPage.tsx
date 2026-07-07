@@ -113,6 +113,8 @@ export function SalesDeskPotentialsPage(): ReactElement {
       isDeleting={deletePotential.isPending}
       deleteTitle="Potansiyel cariyi sil"
       deleteLabel={(row) => row.companyName}
+      mobilePrimaryKey="companyName"
+      mobileDetailKeys={['code', 'contactName', 'phone', 'email', 'status', 'city']}
       formDialog={
         <SalesDeskPotentialForm
           open={formOpen}

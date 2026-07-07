@@ -1,7 +1,14 @@
 import { type ReactElement, useMemo } from 'react';
-import { Columns3, Loader2 } from 'lucide-react';
+import { Columns3 } from 'lucide-react';
 import { useSalesDeskDashboard, useSalesDeskInvoiceStats, useSalesDeskQuoteStats } from '../../hooks/useSalesDeskModules';
-import { formatMoney, surfaceClass, salesDeskPageShellClass, salesDeskPageTitleClass, salesDeskPageSubtitleClass, salesDeskSectionTitleClass, salesDeskStatValueClass } from '../../lib/salesdesk-shared';
+import { formatMoney, surfaceClass } from '../../lib/salesdesk-shared';
+import {
+  SD_PAGE_HEADER_ROW,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
+} from '../../lib/salesdesk-popup-styles';
+import { SalesDeskKpiCards } from '../SalesDeskKpiCards';
+import { salesDeskMetricsToKpiItems } from '../../lib/salesdesk-kpi-utils';
 
 export function SalesDeskSalesTrackingPage(): ReactElement {
   const { data: dashboard, isLoading: dashboardLoading, isError, error } = useSalesDeskDashboard();
@@ -17,78 +24,70 @@ export function SalesDeskSalesTrackingPage(): ReactElement {
   );
   const approvedQuotes = quoteRows.filter((item) => item.status === 3).length;
   const orderedQuotes = quoteRows.filter((item) => item.status === 4).length;
-  const uniqueCustomers = new Set(invoiceRows.map((item) => item.customerId)).size;
 
   return (
-    <div className={salesDeskPageShellClass}>
-      <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
-          <Columns3 size={22} />
-        </div>
-        <div>
-          <h1 className={salesDeskPageTitleClass}>Satis Takip</h1>
-          <p className={salesDeskPageSubtitleClass}>Aylik performans ve fatura ozetleri</p>
+    <div className="relative w-full space-y-6">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
+            <Columns3 size={22} />
+          </div>
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>Satis Takip</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
+              Aylik performans ve fatura ozetleri
+            </p>
+          </div>
         </div>
       </div>
 
-      {isError && (
+      {isError ? (
         <div className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
           {(error as Error)?.message || 'Veriler yuklenemedi.'}
         </div>
-      )}
+      ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {[
+      <SalesDeskKpiCards
+        isLoading={dashboardLoading}
+        items={salesDeskMetricsToKpiItems([
           {
             label: 'Aylik Satis',
             value: dashboardLoading ? '...' : formatMoney(dashboard?.monthlySalesTotal ?? 0),
-            hint: 'Dashboard metrigi',
-            tone: 'text-blue-600 dark:text-blue-300',
+            tone: 'cyan',
           },
           {
-            label: 'Kesilen Fatura Toplami',
+            label: 'Kesilen Fatura',
             value: formatMoney(issuedTotal),
-            hint: `${uniqueCustomers} cari`,
-            tone: 'text-emerald-600 dark:text-emerald-300',
+            tone: 'green',
           },
           {
             label: 'Onayli Teklif',
             value: approvedQuotes,
-            hint: 'Faturaya donusturulebilir',
-            tone: 'text-green-600 dark:text-green-300',
+            tone: 'green',
           },
           {
             label: 'Siparise Donen',
             value: orderedQuotes,
-            hint: 'Teklif durumu',
-            tone: 'text-[var(--crm-brand-on-soft)]',
+            tone: 'blue',
           },
-        ].map((metric) => (
-          <div key={metric.label} className={`min-h-[116px] rounded-xl p-5 ${surfaceClass}`}>
-            <p className="text-xs font-semibold uppercase text-slate-500">{metric.label}</p>
-            {dashboardLoading && metric.label === 'Aylik Satis' ? (
-              <Loader2 className="mt-3 animate-spin text-violet-300" />
-            ) : (
-              <>
-                <p className={`mt-3 text-3xl font-semibold ${metric.tone}`}>{metric.value}</p>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{metric.hint}</p>
-              </>
-            )}
-          </div>
-        ))}
-      </div>
+        ])}
+      />
 
-      <section className={`rounded-xl p-5 ${surfaceClass}`}>
-        <h2 className={salesDeskSectionTitleClass}>Fatura Durum Ozeti</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <section className={`rounded-xl p-4 sm:p-5 ${surfaceClass}`}>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Fatura Durum Ozeti</h2>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[
             { label: 'Toplam Fatura', value: invoiceStats?.totalCount ?? 0 },
             { label: 'Kesilecek', value: invoiceRows.filter((item) => item.status === 5).length },
             { label: 'Kesildi', value: invoiceRows.filter((item) => item.status === 6).length },
           ].map((item) => (
-            <div key={item.label} className="rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] p-4">
+            <div
+              key={item.label}
+              className="rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] p-4"
+            >
               <p className="text-xs uppercase text-slate-500">{item.label}</p>
-              <p className={`mt-2 text-2xl ${salesDeskStatValueClass}`}>{item.value}</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{item.value}</p>
             </div>
           ))}
         </div>

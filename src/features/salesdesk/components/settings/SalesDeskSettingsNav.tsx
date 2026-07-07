@@ -34,7 +34,7 @@ export function SalesDeskSettingsNav({ activeTab, onTabChange }: SalesDeskSettin
               type="button"
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                'inline-flex shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold transition',
+                'inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-semibold transition',
                 active
                   ? 'border-[var(--crm-brand-ring)] bg-[var(--crm-brand-soft)] text-[var(--crm-brand-text)]'
                   : 'border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] text-slate-600 dark:text-slate-300'

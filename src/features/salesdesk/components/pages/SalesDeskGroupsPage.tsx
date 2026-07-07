@@ -14,15 +14,15 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
+import { SalesDeskMobileCardList } from '../SalesDeskMobileCardList';
 import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
-  ManagementListPageHeader,
   type DataTableGridColumn,
 } from '@/components/shared';
+import { cn } from '@/lib/utils';
 import {
-  ADD_BUTTON_CLASS,
   MANAGEMENT_LIST_CARD_CLASSNAME,
   MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME,
   MANAGEMENT_LIST_CARD_HEADER_CLASSNAME,
@@ -44,6 +44,11 @@ import { SalesDeskGroupMemberSelect } from '../groups/SalesDeskGroupMemberSelect
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../../types/salesdesk-group-types';
 import {
   SD_DIALOG_CONTENT_FORM,
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
+  SD_TABLE_ACTION_BUTTON,
 } from '../../lib/salesdesk-popup-styles';
 import { Edit2, Loader2, Plus, RefreshCw, Trash2, UserPlus, UsersRound } from 'lucide-react';
 
@@ -186,19 +191,21 @@ export function SalesDeskGroupsPage(): ReactElement {
 
   return (
     <div className="w-full space-y-6">
-      <ManagementListPageHeader
-        title="Grup Yonetimi"
-        description="Ekiplerinizi gruplara ayirin, kullanicilari ekleyin ve yonetin."
-        backLabel={t('common.back', { defaultValue: 'Geri' })}
-        actions={
-          canCreate ? (
-            <Button onClick={handleAddClick} className={ADD_BUTTON_CLASS}>
-              <Plus size={20} className="mr-2 stroke-[3px]" />
-              Yeni Grup
-            </Button>
-          ) : null
-        }
-      />
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="min-w-0 space-y-1">
+          <h1 className={SD_PAGE_TITLE}>Grup Yonetimi</h1>
+          <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+            <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
+            Ekiplerinizi gruplara ayirin, kullanicilari ekleyin ve yonetin.
+          </p>
+        </div>
+        {canCreate ? (
+          <Button onClick={handleAddClick} variant="ghost" className={SD_PAGE_ADD_BUTTON}>
+            <Plus size={20} className="mr-2 stroke-[3px]" />
+            Yeni Grup
+          </Button>
+        ) : null}
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]/70 p-5">
@@ -265,6 +272,7 @@ export function SalesDeskGroupsPage(): ReactElement {
             searchValue={searchTerm}
             searchPlaceholder={t('common.search', { defaultValue: 'Ara...' })}
             onSearchChange={setSearchTerm}
+            compactSearchOnMobile
             leftSlot={
               <Button
                 variant="outline"
@@ -324,42 +332,102 @@ export function SalesDeskGroupsPage(): ReactElement {
                 showActionsColumn={canUpdate || canDelete}
                 actionsHeaderLabel={t('common.actions', { defaultValue: 'Islemler' })}
                 renderActionsCell={(row) => (
-                  <div className="flex justify-end gap-2">
+                  <div className="flex w-full flex-col items-end gap-2 md:flex-row md:justify-end md:gap-1">
                     {canUpdate ? (
-                      <>
+                      <div className="inline-flex shrink-0 items-center gap-1">
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="rounded-xl font-semibold text-cyan-400 hover:bg-cyan-500/10"
+                          size="icon"
+                          className={cn(SD_TABLE_ACTION_BUTTON, 'text-cyan-400 hover:bg-cyan-500/10')}
                           onClick={() => handleMembersClick(row)}
+                          title="Uyeler"
                         >
-                          <UserPlus size={16} className="mr-2" />
-                          Uyeler
+                          <UserPlus size={18} />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
-                          className="rounded-xl font-semibold text-blue-400 hover:bg-blue-500/10"
+                          size="icon"
+                          className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
                           onClick={() => handleEditClick(row)}
+                          title={t('common.edit', { defaultValue: 'Duzenle' })}
                         >
-                          <Edit2 size={16} className="mr-2" />
-                          {t('common.edit', { defaultValue: 'Duzenle' })}
+                          <Edit2 size={18} />
                         </Button>
-                      </>
+                      </div>
                     ) : null}
                     {canDelete ? (
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="rounded-xl font-semibold text-red-400 hover:bg-red-500/10"
+                        size="icon"
+                        className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
                         onClick={() => handleDeleteClick(row)}
+                        title={t('common.delete.action', { defaultValue: 'Sil' })}
                       >
-                        <Trash2 size={16} className="mr-2" />
-                        {t('common.delete.action', { defaultValue: 'Sil' })}
+                        <Trash2 size={18} />
                       </Button>
                     ) : null}
                   </div>
                 )}
+                mobileView={
+                  <SalesDeskMobileCardList
+                    columns={columns.map((column) => ({ key: column.key, label: column.label }))}
+                    visibleColumnKeys={columns.map((column) => column.key)}
+                    rows={pagedGroups}
+                    rowKey={(row) => row.id}
+                    renderCell={(row, key) => {
+                      if (key === 'name') return <span className="font-semibold text-slate-100">{row.name}</span>;
+                      if (key === 'description') return row.description?.trim() || '-';
+                      if (key === 'memberCount') return row.memberCount;
+                      if (key === 'updatedAt') return formatDate(row.updatedAt);
+                      return '-';
+                    }}
+                    primaryKey="name"
+                    detailKeys={['description', 'memberCount', 'updatedAt']}
+                    renderActions={
+                      canUpdate || canDelete
+                        ? (row) => (
+                            <div className="flex w-full flex-col items-end gap-2">
+                              {canUpdate ? (
+                                <div className="inline-flex shrink-0 items-center gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-cyan-400 hover:bg-cyan-500/10')}
+                                    onClick={() => handleMembersClick(row)}
+                                  >
+                                    <UserPlus size={18} />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
+                                    onClick={() => handleEditClick(row)}
+                                  >
+                                    <Edit2 size={18} />
+                                  </Button>
+                                </div>
+                              ) : null}
+                              {canDelete ? (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
+                                  onClick={() => handleDeleteClick(row)}
+                                >
+                                  <Trash2 size={18} />
+                                </Button>
+                              ) : null}
+                            </div>
+                          )
+                        : undefined
+                    }
+                    isLoading={isLoading}
+                    isError={isError}
+                    errorText={queryErrorMessage}
+                    emptyText="Henuz grup yok. Yeni Grup ile baslayin."
+                    pageSize={pageSize}
+                  />
+                }
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}
                 onPageSizeChange={(size) => {
@@ -413,11 +481,11 @@ export function SalesDeskGroupsPage(): ReactElement {
               </div>
             ) : null}
           </div>
-          <DialogFooter className="border-t border-[var(--crm-app-border)] px-6 py-4">
-            <Button variant="outline" onClick={() => setMembersOpen(false)} disabled={setMembers.isPending}>
+          <DialogFooter className="flex flex-col-reverse gap-2 border-t border-[var(--crm-app-border)] px-4 py-4 sm:flex-row sm:px-6">
+            <Button variant="outline" className="h-11 w-full sm:w-auto" onClick={() => setMembersOpen(false)} disabled={setMembers.isPending}>
               Iptal
             </Button>
-            <Button onClick={() => void handleMembersSave()} disabled={setMembers.isPending}>
+            <Button className="h-11 w-full sm:w-auto" onClick={() => void handleMembersSave()} disabled={setMembers.isPending}>
               {setMembers.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

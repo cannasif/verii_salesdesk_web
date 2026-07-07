@@ -34,20 +34,22 @@ import {
   parseSalesDeskProjectTeam,
   type SalesDeskProjectTeamId,
 } from '../../lib/salesdesk-project-tracking';
+import { SalesDeskKpiCards } from '../SalesDeskKpiCards';
+import { salesDeskMetricsToKpiItems } from '../../lib/salesdesk-kpi-utils';
 import {
-  SD_ADD_BUTTON,
   SD_FORM_INPUT,
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
   SD_PAGE_ICON_BOX,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
   SD_SECONDARY_BUTTON,
 } from '../../lib/salesdesk-popup-styles';
 import {
   salesDeskPageShellClass,
-  salesDeskPageSubtitleClass,
-  salesDeskPageTitleClass,
   enumToSelectOptions,
   formatDate,
   NONE_SELECT_VALUE,
-  surfaceClass,
   withNoneOption,
 } from '../../lib/salesdesk-shared';
 import { PRIORITY_LABELS, TASK_STATUS_LABELS } from '../../lib/salesdesk-labels';
@@ -227,13 +229,13 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
   };
 
   const viewToggle = (
-    <div className="inline-flex rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-input)]/50 p-1">
+    <div className="inline-flex w-full rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-input)]/50 p-1 sm:w-auto">
       <Button
         type="button"
         variant="ghost"
         size="sm"
         className={cn(
-          'h-8 rounded-lg px-3 text-xs font-semibold',
+          'h-11 min-h-[44px] flex-1 rounded-lg px-3 text-xs font-semibold sm:h-9 sm:flex-none',
           viewMode === 'trello' && 'bg-indigo-500/15 text-indigo-200'
         )}
         onClick={() => setViewMode('trello')}
@@ -246,7 +248,7 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
         variant="ghost"
         size="sm"
         className={cn(
-          'h-8 rounded-lg px-3 text-xs font-semibold',
+          'h-11 min-h-[44px] flex-1 rounded-lg px-3 text-xs font-semibold sm:h-9 sm:flex-none',
           viewMode === 'list' && 'bg-indigo-500/15 text-indigo-200'
         )}
         onClick={() => setViewMode('list')}
@@ -314,59 +316,56 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
   if (viewMode === 'trello') {
     return (
       <div className={salesDeskPageShellClass}>
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex items-start gap-3">
+        <div className={SD_PAGE_HEADER_ROW}>
+          <div className="flex min-w-0 items-start gap-3">
             <div className={SD_PAGE_ICON_BOX}>
               <FolderKanban size={22} />
             </div>
-            <div>
-              <h1 className={salesDeskPageTitleClass}>Proje Takibi</h1>
-              <p className={salesDeskPageSubtitleClass}>
+            <div className="min-w-0 space-y-1">
+              <h1 className={SD_PAGE_TITLE}>Proje Takibi</h1>
+              <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+                <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
                 Trello mantigi: 3 ekip panosu, surukle-birak ile durum guncelleme
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             {viewToggle}
             <Button
               type="button"
               variant="outline"
-              className={SD_SECONDARY_BUTTON}
+              className={cn(SD_SECONDARY_BUTTON, 'w-full sm:w-auto')}
               onClick={() => refetch()}
               disabled={isFetching}
             >
               <RefreshCw className={cn('h-4 w-4', isFetching && 'animate-spin')} />
               Yenile
             </Button>
-            <Button type="button" className={SD_ADD_BUTTON} onClick={() => openCreateForm()}>
+            <Button type="button" variant="ghost" className={SD_PAGE_ADD_BUTTON} onClick={() => openCreateForm()}>
               <Plus className="h-4 w-4" />
               Yeni Proje
             </Button>
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            { label: 'Toplam', value: data?.totalCount ?? rows.length },
-            { label: 'Aktif', value: projectStats?.active ?? 0 },
-            { label: 'Devam Eden', value: projectStats?.inProgress ?? 0 },
-            { label: 'Gecikmis', value: projectStats?.overdue ?? 0 },
-          ].map((metric) => (
-            <div key={metric.label} className={cn('rounded-xl px-4 py-3', surfaceClass)}>
-              <p className="text-xs text-[var(--crm-app-text-muted)]">{metric.label}</p>
-              <p className="mt-1 text-2xl font-bold text-slate-50">{metric.value}</p>
-            </div>
-          ))}
-        </div>
+        <SalesDeskKpiCards
+          isLoading={isPending && !isError}
+          items={salesDeskMetricsToKpiItems([
+            { label: 'Toplam', value: data?.totalCount ?? rows.length, tone: 'blue' },
+            { label: 'Aktif', value: projectStats?.active ?? 0, tone: 'cyan' },
+            { label: 'Devam Eden', value: projectStats?.inProgress ?? 0, tone: 'yellow' },
+            { label: 'Gecikmis', value: projectStats?.overdue ?? 0, tone: 'red' },
+          ])}
+        />
 
-        <div className="relative">
+        <div className="relative w-full">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--crm-app-text-muted)]" />
           <Input
             value={listPage.searchTerm}
             onChange={(event) => listPage.setSearchTerm(event.target.value)}
             placeholder="Proje ara..."
-            className={cn(SD_FORM_INPUT, 'h-10 max-w-md pl-9')}
+            className={cn(SD_FORM_INPUT, 'h-11 w-full pl-9 sm:max-w-md')}
           />
         </div>
 
@@ -524,6 +523,8 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
       isDeleting={deleteProject.isPending}
       deleteTitle="Projeyi sil"
       deleteLabel={(row) => row.title}
+      mobilePrimaryKey="title"
+      mobileDetailKeys={['team', 'phase', 'status', 'priority', 'assignedUser', 'customer', 'dueDate']}
       formDialog={formDialog}
     />
   );

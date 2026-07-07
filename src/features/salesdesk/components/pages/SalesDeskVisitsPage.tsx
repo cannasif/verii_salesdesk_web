@@ -119,6 +119,8 @@ export function SalesDeskVisitsPage(): ReactElement {
       isDeleting={deleteVisit.isPending}
       deleteTitle="Ziyareti sil"
       deleteLabel={(row) => row.title}
+      mobilePrimaryKey="title"
+      mobileDetailKeys={['visitDate', 'visitTime', 'customer', 'visitType', 'status']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}

@@ -14,10 +14,9 @@ import {
 } from '../lib/salesdesk-list-toolbar-utils';
 import { SalesDeskKpiCards } from './SalesDeskKpiCards';
 import { SalesDeskManagementTable } from './SalesDeskManagementTable';
-import { SD_PAGE_PULSE } from '../lib/salesdesk-popup-styles';
+import { SD_PAGE_ADD_BUTTON, SD_PAGE_HEADER_ROW, SD_PAGE_PULSE, SD_PAGE_TITLE } from '../lib/salesdesk-popup-styles';
 import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from './SalesDeskDeleteDialog';
 import {
-  ADD_BUTTON_CLASS,
   MANAGEMENT_LIST_CARD_CLASSNAME,
   MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME,
   MANAGEMENT_LIST_CARD_HEADER_CLASSNAME,
@@ -81,6 +80,8 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   formDialog?: ReactNode;
   emptyMessage?: string;
   minTableWidthClassName?: string;
+  mobilePrimaryKey?: string;
+  mobileDetailKeys?: string[];
   hideAddButton?: boolean;
   headerActions?: ReactNode;
   filterColumns?: readonly FilterColumnConfig[];
@@ -132,6 +133,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
   formDialog,
   emptyMessage = 'Kayit bulunamadi.',
   minTableWidthClassName,
+  mobilePrimaryKey,
+  mobileDetailKeys,
   hideAddButton = false,
   headerActions,
   filterColumns,
@@ -204,20 +207,18 @@ export function SalesDeskListLayout<T extends { id: number }>({
 
   return (
     <div className="relative w-full space-y-6">
-      <div className="flex flex-col justify-between gap-6 pt-2 md:flex-row md:items-center">
+      <div className={SD_PAGE_HEADER_ROW}>
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 transition-colors dark:text-white">
-            {title}
-          </h1>
+          <h1 className={SD_PAGE_TITLE}>{title}</h1>
           <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
             <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
             {subtitle}
           </p>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-3">
+        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
           {headerActions}
           {!hideAddButton ? (
-            <Button onClick={onAdd} variant="ghost" className={ADD_BUTTON_CLASS}>
+            <Button onClick={onAdd} variant="ghost" className={SD_PAGE_ADD_BUTTON}>
               <Plus size={20} className="mr-2 stroke-[3px]" />
               {actionLabel}
             </Button>
@@ -288,6 +289,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
                   errorText={error?.message || 'Liste yuklenemedi.'}
                   emptyText={emptyMessage}
                   minTableWidthClassName={minTableWidthClassName}
+                  mobilePrimaryKey={mobilePrimaryKey}
+                  mobileDetailKeys={mobileDetailKeys}
                   onEdit={onEdit}
                   onDelete={onDeleteRequest}
                   renderExtraActions={renderExtraActions}

@@ -28,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { SD_SELECT_CONTENT } from '../../lib/salesdesk-popup-styles';
+import { SD_SELECT_CONTENT, SD_TABLE_ACTION_BUTTON } from '../../lib/salesdesk-popup-styles';
 import {
   SD_CREATE_FORM_INPUT_CLASSNAME,
   SD_CREATE_FORM_LABEL_CLASSNAME,
@@ -145,7 +145,7 @@ export function SalesDeskDocumentLineTable({
         </div>
         <Button
           type="button"
-          className={SD_DOCUMENT_LINE_ADD_BUTTON}
+          className={cn(SD_DOCUMENT_LINE_ADD_BUTTON, 'w-full sm:w-auto')}
           onClick={() => setDialog(createDialogState())}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -162,7 +162,60 @@ export function SalesDeskDocumentLineTable({
           <p className="mt-1 text-xs text-[var(--crm-app-text-muted)]">Kalem Ekle ile urun satiri olusturun.</p>
         </div>
       ) : (
-        <div className="custom-scrollbar cursor-grab overflow-x-auto pb-3">
+        <>
+          <div className="space-y-3 p-4 md:hidden">
+            {lines.map((line) => (
+              <article
+                key={line.id}
+                className="rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] p-4"
+              >
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{line.productCode || '—'}</p>
+                  <p className="text-xs text-zinc-500">{line.productName || 'Urun secilmedi'}</p>
+                  <p className="mt-1 text-[11px] font-semibold text-[var(--crm-brand-text)]">{line.unit}</p>
+                </div>
+                <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <dt className="text-[var(--crm-app-text-muted)]">Miktar</dt>
+                    <dd className="font-mono font-semibold tabular-nums">{line.quantity}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--crm-app-text-muted)]">Birim Fiyat</dt>
+                    <dd className="font-mono font-semibold tabular-nums">{formatMoney(line.unitPrice)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--crm-app-text-muted)]">KDV</dt>
+                    <dd className="font-mono font-semibold tabular-nums">%{line.vatRate}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[var(--crm-app-text-muted)]">Tutar</dt>
+                    <dd className="font-mono font-semibold tabular-nums">{formatMoney(calculateInvoiceLineTotal(line))}</dd>
+                  </div>
+                </dl>
+                <div className="mt-4 flex justify-end gap-2 border-t border-[var(--crm-app-border)] pt-3">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-500 hover:bg-blue-500/10')}
+                    onClick={() => setDialog(createDialogState(line, line.id))}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-500 hover:bg-red-500/10')}
+                    onClick={() => handleDelete(line.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </article>
+            ))}
+          </div>
+          <div className="custom-scrollbar hidden cursor-grab overflow-x-auto pb-3 md:block">
           <table className="min-w-[980px] border-separate border-spacing-0">
             <thead>
               <tr>
@@ -220,7 +273,7 @@ export function SalesDeskDocumentLineTable({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-blue-500 hover:bg-blue-500/10 hover:scale-105"
+                        className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-500 hover:bg-blue-500/10 hover:scale-105')}
                         onClick={() => setDialog(createDialogState(line, line.id))}
                       >
                         <Edit className="h-4 w-4" />
@@ -229,7 +282,7 @@ export function SalesDeskDocumentLineTable({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-lg text-red-500 hover:bg-red-500/10 hover:scale-105"
+                        className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-500 hover:bg-red-500/10 hover:scale-105')}
                         onClick={() => handleDelete(line.id)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -241,12 +294,13 @@ export function SalesDeskDocumentLineTable({
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       <Dialog open={dialog.open} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent
           className={cn(
-            'gap-0 overflow-hidden !p-0 sm:max-w-[540px]',
+            'w-[calc(100%-1rem)] gap-0 overflow-hidden !p-0 sm:max-w-[540px]',
             'rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)]',
             'shadow-2xl shadow-black/50'
           )}
@@ -321,7 +375,7 @@ export function SalesDeskDocumentLineTable({
               </div>
             ) : null}
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
                 <Label className={cn(SD_CREATE_FORM_LABEL_CLASSNAME, 'mb-1.5')}>
                   <Hash className="h-3.5 w-3.5 text-[var(--crm-brand-accent)]" />
@@ -409,14 +463,14 @@ export function SalesDeskDocumentLineTable({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <Button type="button" variant="outline" className="h-10 rounded-xl px-5" onClick={closeDialog}>
+          <div className="flex flex-col-reverse gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:px-6">
+            <Button type="button" variant="outline" className="h-11 w-full rounded-xl px-5 sm:h-10 sm:w-auto" onClick={closeDialog}>
               Iptal
             </Button>
             <Button
               type="button"
               disabled={!isLineValid}
-              className={cn('h-10 rounded-xl px-6 font-bold', SD_DOCUMENT_BUTTON_SAVE)}
+              className={cn('h-11 w-full rounded-xl px-6 font-bold sm:h-10 sm:w-auto', SD_DOCUMENT_BUTTON_SAVE)}
               onClick={handleSaveLine}
             >
               <Plus className="mr-2 h-4 w-4" />

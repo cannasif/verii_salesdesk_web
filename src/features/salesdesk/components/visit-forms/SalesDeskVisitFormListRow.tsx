@@ -10,6 +10,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SD_TABLE_ACTION_BUTTON } from '../../lib/salesdesk-popup-styles';
 import type { SalesDeskVisitFormDto } from '../../api/salesdesk-api';
 import { formatDate } from '../../lib/salesdesk-shared';
 import type { VisitFormCustomerContact } from '../../lib/visit-form-recipient';
@@ -42,7 +43,7 @@ function ActionButton({
       onClick={onClick}
       disabled={loading}
       className={cn(
-        'inline-flex h-9 min-w-[72px] items-center justify-center gap-1.5 rounded-lg border border-[var(--crm-app-border)] px-3 text-xs font-semibold transition-colors',
+        'inline-flex h-11 min-h-[44px] min-w-[72px] items-center justify-center gap-1.5 rounded-lg border border-[var(--crm-app-border)] px-3 text-xs font-semibold transition-colors',
         loading
           ? 'cursor-wait opacity-70'
           : 'text-slate-600 hover:border-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)] hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300'
@@ -71,7 +72,8 @@ function IconButton({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        'flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] transition-colors',
+        SD_TABLE_ACTION_BUTTON,
+        'rounded-lg border border-[var(--crm-app-border)]',
         tone === 'danger'
           ? 'text-slate-500 hover:border-rose-400/40 hover:bg-rose-500/10 hover:text-rose-500 dark:hover:text-rose-300'
           : 'text-slate-500 hover:border-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)] hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]'
@@ -128,39 +130,43 @@ export function SalesDeskVisitFormListRow({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <ActionButton
-            label="PDF"
-            icon={FileText}
-            loading={activeAction === 'pdf'}
-            onClick={() =>
-              void runAction('pdf', async () => {
-                await onPreviewPdf(form);
-              })
-            }
-          />
-          <ActionButton
-            label="Gmail"
-            icon={Mail}
-            loading={activeAction === 'gmail'}
-            onClick={() =>
-              void runAction('gmail', async () => {
-                await shareVisitFormViaGmail(form, customerContact);
-              })
-            }
-          />
-          <ActionButton
-            label="WhatsApp"
-            icon={MessageCircle}
-            loading={activeAction === 'whatsapp'}
-            onClick={() =>
-              void runAction('whatsapp', async () => {
-                await shareVisitFormViaWhatsApp(form, customerContact);
-              })
-            }
-          />
-          <IconButton label="Duzenle" icon={Pencil} onClick={() => onEdit(form)} />
-          <IconButton label="Sil" icon={Trash2} tone="danger" onClick={() => onDelete(form)} />
+        <div className="flex w-full flex-col items-end gap-2">
+          <div className="flex flex-wrap justify-end gap-2">
+            <ActionButton
+              label="PDF"
+              icon={FileText}
+              loading={activeAction === 'pdf'}
+              onClick={() =>
+                void runAction('pdf', async () => {
+                  await onPreviewPdf(form);
+                })
+              }
+            />
+            <ActionButton
+              label="Gmail"
+              icon={Mail}
+              loading={activeAction === 'gmail'}
+              onClick={() =>
+                void runAction('gmail', async () => {
+                  await shareVisitFormViaGmail(form, customerContact);
+                })
+              }
+            />
+            <ActionButton
+              label="WhatsApp"
+              icon={MessageCircle}
+              loading={activeAction === 'whatsapp'}
+              onClick={() =>
+                void runAction('whatsapp', async () => {
+                  await shareVisitFormViaWhatsApp(form, customerContact);
+                })
+              }
+            />
+          </div>
+          <div className="inline-flex shrink-0 items-center gap-2">
+            <IconButton label="Duzenle" icon={Pencil} onClick={() => onEdit(form)} />
+            <IconButton label="Sil" icon={Trash2} tone="danger" onClick={() => onDelete(form)} />
+          </div>
         </div>
       </div>
     </article>

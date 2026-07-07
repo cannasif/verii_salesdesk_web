@@ -1,4 +1,4 @@
-import { type ReactElement, useState, useEffect, useRef } from 'react';
+import { type ChangeEvent, type ReactElement, type RefObject, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SidebarLeft01Icon, SearchList01Icon, Cancel01Icon, Mic01Icon } from 'hugeicons-react'
@@ -44,6 +44,80 @@ const pageTitles: Record<string, string> = {
   '/access-control/permission-groups': 'Izin Gruplari',
   '/access-control/user-authorization': 'Kullanici Yetkileri',
 };
+
+interface NavbarSearchFieldProps {
+  searchInputRef: RefObject<HTMLInputElement | null>;
+  searchQuery: string;
+  onSearch: (e: ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
+  placeholder: string;
+  isSupported: boolean;
+  isListening: boolean;
+  onStartListening: () => void;
+  voiceSearchTitle: string;
+}
+
+function NavbarSearchField({
+  searchInputRef,
+  searchQuery,
+  onSearch,
+  onClear,
+  placeholder,
+  isSupported,
+  isListening,
+  onStartListening,
+  voiceSearchTitle,
+}: NavbarSearchFieldProps): ReactElement {
+  return (
+    <div className="relative flex min-w-0 items-center">
+      <SearchList01Icon className="absolute left-3 h-4 w-4 text-slate-500 transition-colors duration-300 group-focus-within:text-violet-300 md:left-4 md:h-5 md:w-5" />
+      <input
+        ref={searchInputRef}
+        type="search"
+        value={searchQuery}
+        onChange={onSearch}
+        placeholder={placeholder}
+        className={cn(
+          'h-10 w-full min-w-0 rounded-xl border py-0 pl-9 pr-14 text-sm font-medium outline-none transition-all duration-300 md:h-12 md:rounded-2xl md:pl-12 md:pr-24',
+          'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400',
+          'focus:border-violet-400/60 focus:bg-white focus:ring-4 focus:ring-violet-500/10',
+          'dark:border-white/10 dark:bg-[#0b0d19]/90 dark:text-white dark:placeholder:text-slate-500',
+          'dark:focus:border-violet-400/60 dark:focus:bg-[#0f1222]'
+        )}
+      />
+      <div className="absolute right-1.5 flex items-center gap-1 md:right-3 md:gap-2">
+        {isSupported && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              onStartListening();
+            }}
+            className={cn(
+              'rounded-lg p-1.5 transition-all duration-300 md:rounded-xl md:p-2',
+              isListening
+                ? 'animate-pulse bg-violet-500/10 text-violet-300'
+                : 'text-slate-400 hover:bg-white/10 hover:text-violet-300'
+            )}
+            title={voiceSearchTitle}
+          >
+            <Mic01Icon size={16} className="md:hidden" />
+            <Mic01Icon size={18} className="hidden md:block" />
+          </button>
+        )}
+        {searchQuery ? (
+          <button
+            type="button"
+            onClick={onClear}
+            className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-white/20 dark:hover:text-white"
+          >
+            <Cancel01Icon size={14} />
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 export function Navbar(): ReactElement {
   const { t } = useTranslation();
@@ -104,12 +178,14 @@ export function Navbar(): ReactElement {
 
   return (
     <>
-      <header className={cn(
-        "min-h-[76px] h-auto pt-[env(safe-area-inset-top)] px-4 sm:px-6 flex items-center justify-between border-b transition-all sticky top-0 z-40",
-        CRM_APP_PANEL_GLASS,
-        "shadow-[0_10px_26px_rgba(0,0,0,.18)]"
-      )}>
-        <div className="flex h-[76px] min-w-0 flex-1 items-center gap-4">
+      <header
+        className={cn(
+          'sticky top-0 z-40 flex min-h-[64px] items-center justify-between gap-3 border-b px-3 pt-[env(safe-area-inset-top)] transition-all sm:min-h-[76px] sm:gap-4 sm:px-6',
+          CRM_APP_PANEL_GLASS,
+          'shadow-[0_10px_26px_rgba(0,0,0,.18)]'
+        )}
+      >
+        <div className="flex h-[52px] min-w-0 flex-1 items-center gap-2 sm:h-[76px] sm:gap-4">
           <button
             type="button"
             onClick={toggleSidebar}
@@ -119,86 +195,37 @@ export function Navbar(): ReactElement {
             <SidebarLeft01Icon size={21} />
           </button>
 
-          <div className="hidden min-w-[140px] border-l border-slate-200 pl-5 dark:border-white/10 md:block">
+          <div className="hidden min-w-[140px] shrink-0 border-l border-slate-200 pl-4 dark:border-white/10 md:block">
             <p className="text-[11px] text-slate-500">Sales Desk</p>
             <p className="mt-1 truncate text-base font-semibold text-slate-900 dark:text-slate-100">{pageTitle}</p>
           </div>
 
-          <div className="group relative mx-auto hidden w-full max-w-[760px] md:block">
-            <div className="relative flex items-center">
-              <SearchList01Icon className="absolute left-4 h-5 w-5 text-slate-500 transition-colors duration-300 group-focus-within:text-violet-300" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder={t('navbar.search_placeholder')}
-                className={cn(
-                  "h-12 w-full rounded-2xl border py-0 pl-12 pr-24 text-sm font-medium outline-none transition-all duration-300",
-                  "border-slate-200 bg-white text-slate-900 placeholder:text-slate-400",
-                  "focus:border-violet-400/60 focus:bg-white focus:ring-4 focus:ring-violet-500/10",
-                  "dark:border-white/10 dark:bg-[#0b0d19]/90 dark:text-white dark:placeholder:text-slate-500",
-                  "dark:focus:border-violet-400/60 dark:focus:bg-[#0f1222]"
-                )}
-              />
-              <div className="absolute right-3 flex items-center gap-2">
-                {isSupported && (
-                  <button
-                    onClick={(e) => { e.preventDefault(); startListening(); }}
-                    className={cn(
-                      "rounded-xl p-2 transition-all duration-300",
-                      isListening
-                        ? "animate-pulse bg-violet-500/10 text-violet-300"
-                        : "text-slate-400 hover:bg-white/10 hover:text-violet-300"
-                    )}
-                    title={t('common.voiceSearchTitle')}
-                  >
-                    <Mic01Icon size={18} />
-                  </button>
-                )}
-
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/20 transition-colors"
-                  >
-                    <Cancel01Icon size={14} />
-                  </button>
-                )}
-              </div>
-            </div>
+          <div className="group relative min-w-0 flex-1 md:mx-auto md:max-w-[760px]">
+            <NavbarSearchField
+              searchInputRef={searchInputRef}
+              searchQuery={searchQuery}
+              onSearch={handleSearch}
+              onClear={() => setSearchQuery('')}
+              placeholder={t('navbar.search_placeholder')}
+              isSupported={isSupported}
+              isListening={isListening}
+              onStartListening={startListening}
+              voiceSearchTitle={t('common.voiceSearchTitle')}
+            />
           </div>
-
-          {isSupported && (
-            <button
-              onClick={(e) => { e.preventDefault(); startListening(); }}
-              className={cn(
-                "p-2 md:hidden rounded-xl transition-all duration-300 relative",
-                isListening
-                  ? "text-[var(--crm-brand-primary)] bg-[var(--crm-brand-soft)] animate-pulse shadow-[0_0_15px_var(--crm-brand-shadow)]"
-                  : "text-slate-500 dark:text-slate-400 hover:text-[var(--crm-brand-primary)] hover:bg-[var(--crm-brand-soft)]"
-              )}
-            >
-              <Mic01Icon size={24} />
-              {isListening && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-[var(--crm-brand-primary)] rounded-full animate-ping" />
-              )}
-            </button>
-          )}
         </div>
 
-        <div className="flex h-[76px] shrink-0 items-center justify-end gap-3 sm:gap-5">
-          <div className="flex shrink-0 items-center gap-3 sm:gap-5">
-            <div className="group relative flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-violet-500/10 hover:text-violet-300">
-              <NotificationIcon />
-            </div>
-          </div>
+        <div className="flex h-[52px] shrink-0 items-center gap-2 sm:h-[76px] sm:gap-4">
+          <NotificationIcon />
 
-          {user && <div className="hidden h-8 w-px shrink-0 bg-slate-200 dark:bg-white/10 xs:block" />}
+          {user ? <div className="hidden h-8 w-px shrink-0 bg-slate-200 dark:bg-white/10 sm:block" /> : null}
 
-          {user && (
-            <div onClick={() => setUserProfileModalOpen(true)} className="group flex shrink-0 cursor-pointer items-center gap-2 sm:gap-3">
-              <div className="text-right hidden lg:block">
+          {user ? (
+            <div
+              onClick={() => setUserProfileModalOpen(true)}
+              className="group flex shrink-0 cursor-pointer items-center gap-2 sm:gap-3"
+            >
+              <div className="hidden text-right lg:block">
                 <p className="max-w-[160px] truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-violet-600 dark:text-slate-100 dark:group-hover:text-violet-300">
                   {displayName}
                 </p>
@@ -207,10 +234,14 @@ export function Navbar(): ReactElement {
                 </p>
               </div>
               <div className="relative shrink-0">
-                <div className="h-11 w-11 rounded-full bg-[image:var(--crm-brand-gradient)] p-[2px] transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(115,103,255,.45)]">
+                <div className="h-10 w-10 rounded-full bg-[image:var(--crm-brand-gradient)] p-[2px] transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(115,103,255,.45)] sm:h-11 sm:w-11">
                   <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-slate-200 bg-slate-100 dark:border-[#080915] dark:bg-[#090b16]">
                     {userDetail?.profilePictureUrl ? (
-                      <img src={getImageUrl(userDetail.profilePictureUrl) || ''} alt={displayName} className="w-full h-full object-cover" />
+                      <img
+                        src={getImageUrl(userDetail.profilePictureUrl) || ''}
+                        alt={displayName}
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <span className="text-xs font-bold text-[var(--crm-brand-primary)]">{displayInitials}</span>
                     )}
@@ -218,7 +249,7 @@ export function Navbar(): ReactElement {
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </header>
 

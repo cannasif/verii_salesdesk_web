@@ -40,21 +40,21 @@ export const SD_DIALOG_CONTENT_COMPACT = [
 
 /** Form dialog — CRM duzeni, SalesDesk renk token'lari. */
 export const SD_DIALOG_CONTENT_FORM = [
-  'flex !max-h-[90vh] w-[95%] !max-w-[900px] !flex-col !gap-0 overflow-hidden !p-0',
+  'flex !max-h-[90vh] w-[calc(100%-1rem)] !max-w-[900px] !flex-col !gap-0 overflow-hidden !p-0',
   'rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] text-slate-900 shadow-2xl dark:text-white',
-  'sm:w-full',
+  'sm:w-[95%] md:w-full',
 ].join(' ');
 
 export const SD_DIALOG_HEADER_FORM = [
   'sticky top-0 z-10 flex shrink-0 flex-col gap-5 border-b border-[var(--crm-app-border)]',
-  'bg-[color-mix(in_srgb,var(--crm-app-dialog)_95%,transparent)] px-6 py-5 backdrop-blur-md',
+  'bg-[color-mix(in_srgb,var(--crm-app-dialog)_95%,transparent)] px-4 py-4 backdrop-blur-md sm:px-6 sm:py-5',
 ].join(' ');
 
 export const SD_DIALOG_HEADER_ROW =
-  'flex w-full flex-row items-center justify-between gap-4';
+  'flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between';
 
 export const SD_DIALOG_BODY_FORM =
-  'custom-scrollbar min-h-0 flex-1 overflow-y-auto p-6 sm:p-8';
+  'custom-scrollbar min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 md:p-8';
 
 export const SD_DELETE_FOOTER = 'border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)]';
 
@@ -67,7 +67,7 @@ export const SD_DELETE_DIALOG_ACTION = [
 
 export const SD_DIALOG_FOOTER_FORM = [
   SD_DELETE_FOOTER,
-  'flex shrink-0 flex-row items-center justify-end gap-3 px-6 py-4 sm:px-8',
+  'flex shrink-0 flex-col-reverse gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-end sm:px-6 sm:py-4 md:px-8',
 ].join(' ');
 
 /** Gradient ikon kutusu — CRM basligi, marka gradyani. */
@@ -97,14 +97,14 @@ export const SD_FORM_HINT =
 
 export const SD_PRIMARY_BUTTON_FORM = [
   SD_BRAND_PRIMARY,
-  'h-12 min-w-[140px] rounded-xl px-10 text-sm font-bold',
+  'h-12 w-full min-w-0 rounded-xl px-6 text-sm font-bold sm:w-auto sm:min-w-[140px] sm:px-10',
   'shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
   'transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
 ].join(' ');
 
 export const SD_SECONDARY_BUTTON_FORM = [
   SD_BRAND_SECONDARY,
-  'h-12 rounded-xl px-6 text-sm font-medium text-slate-600 dark:text-slate-300',
+  'h-12 w-full rounded-xl px-6 text-sm font-medium text-slate-600 sm:w-auto dark:text-slate-300',
   'transition-all duration-200 hover:scale-[1.01]',
 ].join(' ');
 
@@ -158,7 +158,7 @@ export const SD_DIALOG_ICON_INNER = 'flex items-center justify-center';
 export const SD_DIALOG_ICON = 'text-[var(--crm-brand-primary)]';
 
 export const SD_DIALOG_CLOSE = [
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+  'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
   'bg-[var(--crm-app-panel-muted)] text-[var(--crm-app-text-muted)] shadow-sm',
   'transition-all duration-300 hover:scale-110 hover:bg-[var(--crm-brand-primary)] hover:text-[var(--crm-brand-on-primary)]',
 ].join(' ');
@@ -177,10 +177,28 @@ export const SD_SECONDARY_BUTTON = [
 
 export const SD_ADD_BUTTON = [
   SD_BRAND_PRIMARY,
-  'inline-flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-bold',
+  'inline-flex h-11 min-h-[44px] w-full items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold sm:w-auto',
   'shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
   'transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
 ].join(' ');
+
+/** Cari & Musteri listeleri — sayfa basligi ve aksiyon butonu. */
+export const SD_PAGE_HEADER_ROW =
+  'flex flex-col justify-between gap-4 pt-2 sm:flex-row sm:items-start sm:gap-4 lg:items-center lg:gap-6';
+
+export const SD_PAGE_TITLE =
+  'text-2xl font-extrabold tracking-tight text-zinc-900 transition-colors sm:text-3xl dark:text-white';
+
+export const SD_PAGE_ADD_BUTTON = [
+  SD_BRAND_PRIMARY,
+  'inline-flex h-11 w-full min-w-0 shrink-0 items-center justify-center gap-2 rounded-lg px-5 text-sm font-bold sm:w-auto',
+  'shadow-[0_10px_20px_-10px_var(--crm-brand-shadow)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_35%,transparent)]',
+  'transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
+].join(' ');
+
+/** Tablo satir aksiyonlari — minimum 44px dokunma alani. */
+export const SD_TABLE_ACTION_BUTTON =
+  'h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 p-0';
 
 export const SD_PAGE_PULSE = 'bg-[var(--crm-brand-primary)]';
 

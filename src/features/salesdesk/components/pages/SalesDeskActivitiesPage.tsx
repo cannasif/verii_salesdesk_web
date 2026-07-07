@@ -160,6 +160,8 @@ export function SalesDeskActivitiesPage(): ReactElement {
       isDeleting={deleteActivity.isPending}
       deleteTitle="Aktiviteyi sil"
       deleteLabel={(row) => row.title}
+      mobilePrimaryKey="title"
+      mobileDetailKeys={['activityType', 'status', 'priority', 'assignedUser', 'customer', 'dueDate']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}

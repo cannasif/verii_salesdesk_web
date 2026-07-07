@@ -103,6 +103,8 @@ export function SalesDeskProductsPage(): ReactElement {
       isDeleting={deleteProduct.isPending}
       deleteTitle="Urunu sil"
       deleteLabel={(row) => row.name}
+      mobilePrimaryKey="name"
+      mobileDetailKeys={['code', 'category', 'unit', 'salesPrice', 'stock', 'minStock']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}

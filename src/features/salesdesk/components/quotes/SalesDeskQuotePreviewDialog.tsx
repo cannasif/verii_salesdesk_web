@@ -48,6 +48,9 @@ interface SalesDeskQuotePreviewDialogProps {
 
 type ShareAction = 'pdf' | 'excel' | 'gmail' | 'whatsapp' | null;
 
+const PREVIEW_TOOLBAR_BUTTON =
+  'h-11 min-h-[44px] gap-1.5 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] sm:h-9';
+
 export function SalesDeskQuotePreviewDialog({
   open,
   data,
@@ -183,7 +186,7 @@ export function SalesDeskQuotePreviewDialog({
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-9 shrink-0 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]"
+                  className={cn('shrink-0', PREVIEW_TOOLBAR_BUTTON)}
                 >
                   Kapat
                 </Button>
@@ -197,7 +200,7 @@ export function SalesDeskQuotePreviewDialog({
                 size="sm"
                 disabled={!data || isPdfLoading}
                 onClick={() => void handleDownload()}
-                className="h-9 gap-1.5 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]"
+                className={PREVIEW_TOOLBAR_BUTTON}
               >
                 {isPdfLoading ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
                 PDF
@@ -220,7 +223,7 @@ export function SalesDeskQuotePreviewDialog({
                       )
                     : undefined
                 }
-                className="h-9 gap-1.5 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]"
+                className={PREVIEW_TOOLBAR_BUTTON}
               >
                 {shareAction === 'excel' ? <Loader2 size={15} className="animate-spin" /> : <FileSpreadsheet size={15} />}
                 Excel
@@ -239,7 +242,7 @@ export function SalesDeskQuotePreviewDialog({
                       )
                     : undefined
                 }
-                className="h-9 gap-1.5 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]"
+                className={PREVIEW_TOOLBAR_BUTTON}
               >
                 {shareAction === 'gmail' ? <Loader2 size={15} className="animate-spin" /> : <Mail size={15} />}
                 Gmail
@@ -258,7 +261,7 @@ export function SalesDeskQuotePreviewDialog({
                       )
                     : undefined
                 }
-                className="h-9 gap-1.5 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]"
+                className={PREVIEW_TOOLBAR_BUTTON}
               >
                 {shareAction === 'whatsapp' ? (
                   <Loader2 size={15} className="animate-spin" />
@@ -273,7 +276,7 @@ export function SalesDeskQuotePreviewDialog({
                 size="sm"
                 disabled={!data}
                 onClick={handlePrint}
-                className="h-9 gap-1.5 border-[var(--crm-app-border)] bg-[var(--crm-app-panel)]"
+                className={PREVIEW_TOOLBAR_BUTTON}
               >
                 <Printer size={15} />
                 Yazdır

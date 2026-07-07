@@ -27,11 +27,14 @@ import {
   type ProductCustomerFormValues,
 } from '../../types/salesdesk-schemas';
 import {
+  SD_BRAND_PRIMARY,
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
   SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
   SD_SEARCH_FOCUS,
 } from '../../lib/salesdesk-popup-styles';
 import {
-  ADD_BUTTON_CLASS,
   MANAGEMENT_LIST_CARD_CLASSNAME,
   MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME,
   MANAGEMENT_LIST_CARD_HEADER_CLASSNAME,
@@ -101,11 +104,9 @@ export function SalesDeskProductCustomersPage(): ReactElement {
 
   return (
     <div className="relative w-full space-y-6">
-      <div className="flex flex-col justify-between gap-6 pt-2 md:flex-row md:items-center">
+      <div className={SD_PAGE_HEADER_ROW}>
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 transition-colors dark:text-white">
-            Urun Bazli Musteriler
-          </h1>
+          <h1 className={SD_PAGE_TITLE}>Urun Bazli Musteriler</h1>
           <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
             <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
             Urun secin; o urunle iliskili carileri ve potansiyel musterileri listeleyin
@@ -115,12 +116,34 @@ export function SalesDeskProductCustomersPage(): ReactElement {
           onClick={() => setLinkOpen(true)}
           disabled={!selectedProduct}
           variant="ghost"
-          className={ADD_BUTTON_CLASS}
+          className={cn(SD_PAGE_ADD_BUTTON, !selectedProduct && 'opacity-60')}
         >
           <Plus size={20} className="mr-2 stroke-[3px]" />
           Baglanti Ekle
         </Button>
       </div>
+
+      {selectedProduct ? (
+        <div className="sticky top-0 z-20 flex items-center justify-between gap-3 rounded-xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] px-4 py-3 shadow-sm backdrop-blur-md lg:hidden">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--crm-app-text-muted)]">
+              Secili urun
+            </p>
+            <p className="truncate text-sm font-bold text-slate-900 dark:text-white">{selectedProduct.name}</p>
+            <p className="text-xs text-[var(--crm-app-text-muted)]">
+              {customerCount} cari · {potentialCount} potansiyel
+            </p>
+          </div>
+          <Button
+            type="button"
+            onClick={() => setLinkOpen(true)}
+            className={cn(SD_BRAND_PRIMARY, 'h-11 shrink-0 px-4 text-sm font-semibold')}
+          >
+            <Plus className="mr-1.5 h-4 w-4" />
+            Ekle
+          </Button>
+        </div>
+      ) : null}
 
       <SalesDeskKpiCards
         isLoading={productsLoading}
@@ -131,40 +154,42 @@ export function SalesDeskProductCustomersPage(): ReactElement {
         ])}
       />
 
-      <div className="grid gap-4 xl:grid-cols-[380px_1fr]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,380px)_1fr]">
         <Card className={MANAGEMENT_LIST_CARD_CLASSNAME}>
           <CardHeader className={MANAGEMENT_LIST_CARD_HEADER_CLASSNAME}>
             <CardTitle className={MANAGEMENT_LIST_CARD_TITLE_CLASSNAME}>Stok Listesi</CardTitle>
-            <div className="group/search relative w-full">
-              <Search
-                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--crm-app-text-muted)] transition-colors group-focus-within/search:text-[var(--crm-brand-primary)]"
-                aria-hidden
-              />
-              <input
-                type="search"
-                className={cn(
-                  'h-9 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] py-0 pl-9 pr-3 text-sm text-slate-100 shadow-sm placeholder:text-[var(--crm-app-text-muted)]',
-                  'focus:outline-none',
-                  SD_SEARCH_FOCUS
-                )}
-                placeholder="Stok ara..."
-                value={productListPage.searchTerm}
-                onChange={(event) => productListPage.setSearchTerm(event.target.value)}
-              />
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="group/search relative min-w-0 flex-1">
+                <Search
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--crm-app-text-muted)] transition-colors group-focus-within/search:text-[var(--crm-brand-primary)]"
+                  aria-hidden
+                />
+                <input
+                  type="search"
+                  className={cn(
+                    'h-11 w-full rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] py-0 pl-9 pr-3 text-sm text-slate-100 shadow-sm placeholder:text-[var(--crm-app-text-muted)]',
+                    'focus:outline-none',
+                    SD_SEARCH_FOCUS
+                  )}
+                  placeholder="Stok ara..."
+                  value={productListPage.searchTerm}
+                  onChange={(event) => productListPage.setSearchTerm(event.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => refetchProducts()}
+                className={cn(MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME, 'h-11 shrink-0 sm:w-auto')}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Yenile
+              </Button>
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => refetchProducts()}
-              className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Yenile
-            </Button>
           </CardHeader>
           <CardContent className={MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME}>
-            <div className="max-h-[480px] overflow-y-auto rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-table-shell)]">
+            <div className="max-h-[min(480px,50vh)] overflow-y-auto rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-table-shell)] lg:max-h-[480px]">
               {productsLoading ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="animate-spin text-slate-400" />
@@ -178,7 +203,7 @@ export function SalesDeskProductCustomersPage(): ReactElement {
                     type="button"
                     onClick={() => setSelectedProduct(product)}
                     className={cn(
-                      'block w-full border-b border-[var(--crm-app-border)] px-4 py-3 text-left text-sm transition last:border-b-0',
+                      'block w-full min-h-[44px] border-b border-[var(--crm-app-border)] px-4 py-3.5 text-left text-sm transition last:border-b-0',
                       selectedProduct?.id === product.id
                         ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-on-soft)]'
                         : 'text-slate-300 hover:bg-[var(--crm-app-table-row-hover)]'
@@ -195,22 +220,26 @@ export function SalesDeskProductCustomersPage(): ReactElement {
 
         <Card className={MANAGEMENT_LIST_CARD_CLASSNAME}>
           <CardHeader className={MANAGEMENT_LIST_CARD_HEADER_CLASSNAME}>
-            <CardTitle className={MANAGEMENT_LIST_CARD_TITLE_CLASSNAME}>Bagli Cariler</CardTitle>
-            <p className="text-sm text-[var(--crm-app-text-muted)]">
-              {selectedProduct
-                ? `${selectedProduct.name}: ${customerCount} cari, ${potentialCount} potansiyel`
-                : 'Sol taraftan bir urun secin.'}
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => refetchLinks()}
-              className={MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME}
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Baglantilari Yenile
-            </Button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 space-y-1">
+                <CardTitle className={MANAGEMENT_LIST_CARD_TITLE_CLASSNAME}>Bagli Cariler</CardTitle>
+                <p className="text-sm text-[var(--crm-app-text-muted)]">
+                  {selectedProduct
+                    ? `${selectedProduct.name}: ${customerCount} cari, ${potentialCount} potansiyel`
+                    : 'Once bir urun secin (mobilde yukaridaki listeden).'}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => refetchLinks()}
+                className={cn(MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME, 'h-11 shrink-0 sm:w-auto')}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Baglantilari Yenile
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className={MANAGEMENT_LIST_CARD_CONTENT_CLASSNAME}>
             <div className={MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME}>
@@ -219,8 +248,10 @@ export function SalesDeskProductCustomersPage(): ReactElement {
                   columns={linkColumns}
                   rows={selectedProduct ? filteredLinks : []}
                   isLoading={Boolean(selectedProduct) && linksLoading}
-                  emptyText={selectedProduct ? 'Bagli kayit yok.' : 'Urun secilmedi.'}
-                  minTableWidthClassName="min-w-[480px]"
+                  emptyText={selectedProduct ? 'Bagli kayit yok.' : 'Baglanti gormek icin once urun secin.'}
+                  minTableWidthClassName="min-w-0 md:min-w-[480px]"
+                  mobilePrimaryKey="name"
+                  mobileDetailKeys={['type']}
                   onDelete={selectedProduct ? setDeletingLink : undefined}
                   pageSize={Math.max(filteredLinks.length, 10)}
                   pageSizeOptions={[10, 20, 50] as const}

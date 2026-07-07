@@ -69,6 +69,7 @@ interface SalesDeskEntityFormProps<T extends FieldValues> {
   submitLabel?: string;
   icon?: LucideIcon;
   validateMode?: Mode;
+  maxWidthClass?: string;
 }
 
 function colSpanClass(colSpan?: 1 | 2 | 3): string {
@@ -232,6 +233,7 @@ export function SalesDeskEntityForm<T extends FieldValues>({
   submitLabel,
   icon: Icon = FilePenLine,
   validateMode = 'onChange',
+  maxWidthClass,
 }: SalesDeskEntityFormProps<T>): ReactElement {
   const isEditMode = entity != null;
   const formId = 'salesdesk-entity-form';
@@ -277,6 +279,7 @@ export function SalesDeskEntityForm<T extends FieldValues>({
       formId={formId}
       submitLabel={submitLabel ?? (isEditMode ? 'Guncelle' : 'Kaydet')}
       isSaving={isSaving}
+      maxWidthClass={maxWidthClass}
     >
       <Form {...form}>
         <form id={formId} onSubmit={handleSubmit} className={SD_FORM_GRID_MD}>

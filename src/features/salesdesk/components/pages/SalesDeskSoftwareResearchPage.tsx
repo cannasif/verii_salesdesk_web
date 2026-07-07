@@ -14,8 +14,14 @@ import {
   useSalesDeskSoftwareResearchStats,
 } from '../../hooks/useSalesDeskModules';
 import { useSalesDeskListPage } from '../../hooks/useSalesDeskListPage';
-import { salesDeskPageShellClass, salesDeskPageSubtitleClass, salesDeskPageTitleClass } from '../../lib/salesdesk-shared';
-import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
+import { salesDeskPageShellClass } from '../../lib/salesdesk-shared';
+import {
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
+  SD_PAGE_ICON_BOX,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
+} from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskSoftwareResearchPage(): ReactElement {
   const navigate = useNavigate();
@@ -41,20 +47,25 @@ export function SalesDeskSoftwareResearchPage(): ReactElement {
 
   return (
     <div className={salesDeskPageShellClass}>
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
           <div className={SD_PAGE_ICON_BOX}>
             <SearchCode size={22} />
           </div>
-          <div>
-            <h1 className={salesDeskPageTitleClass}>Yazilim Arastirma</h1>
-            <p className={salesDeskPageSubtitleClass}>
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>Yazilim Arastirma</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
               Potansiyel carilerde kullanilan yazilimlari kartlar halinde takip edin
             </p>
           </div>
         </div>
-        <button type="button" onClick={() => navigate('/salesdesk/software-research/new')} className={SD_ADD_BUTTON}>
-          <Plus size={16} />
+        <button
+          type="button"
+          onClick={() => navigate('/salesdesk/software-research/new')}
+          className={SD_PAGE_ADD_BUTTON}
+        >
+          <Plus size={16} className="mr-2" />
           Yeni Arastirma
         </button>
       </div>

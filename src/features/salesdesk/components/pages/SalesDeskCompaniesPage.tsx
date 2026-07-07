@@ -128,12 +128,15 @@ export function SalesDeskCompaniesPage(): ReactElement {
       deleteTitle="Sirketi sil"
       deleteLabel={(row) => row.name}
       minTableWidthClassName="min-w-[2200px]"
+      mobilePrimaryKey="name"
+      mobileDetailKeys={['ipAddress', 'vpnName', 'vpnIpAddress', 'databaseUsername', 'loginUrl']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}
           onOpenChange={setFormOpen}
           title={editing ? 'Sirketi Duzenle' : 'Yeni Sirket'}
           description="Musteri sirketine ait erisim ve baglanti bilgilerini girin."
+          maxWidthClass="!max-w-[960px]"
           schema={salesDeskCompanyFormSchema}
           defaultValues={toCompanyFormValues()}
           entity={editing}

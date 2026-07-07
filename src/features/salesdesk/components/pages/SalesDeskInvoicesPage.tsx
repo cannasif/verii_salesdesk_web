@@ -34,7 +34,7 @@ import {
 } from '../../types/invoice-types';
 import { DocumentStatusBadge, InvoiceTypeBadge } from './salesdesk-badges';
 import { Button } from '@/components/ui/button';
-import { ADD_BUTTON_CLASS } from '@/lib/management-list-layout';
+import { SD_PAGE_ADD_BUTTON } from '../../lib/salesdesk-popup-styles';
 
 function parseTypeFilter(value: string | null): SalesDeskInvoiceTypeFilter {
   if (value === 'sales' || value === 'purchase') return value;
@@ -194,10 +194,10 @@ export function SalesDeskInvoicesPage(): ReactElement {
         actionLabel="Yeni Fatura Ekle"
         hideAddButton
         headerActions={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-2">
             <Button
               variant="ghost"
-              className={ADD_BUTTON_CLASS}
+              className={SD_PAGE_ADD_BUTTON}
               onClick={() => navigate('/salesdesk/invoices/sales/new')}
             >
               <Plus size={18} className="mr-2 stroke-[3px]" />
@@ -205,7 +205,7 @@ export function SalesDeskInvoicesPage(): ReactElement {
             </Button>
             <Button
               variant="ghost"
-              className={ADD_BUTTON_CLASS}
+              className={SD_PAGE_ADD_BUTTON}
               onClick={() => navigate('/salesdesk/invoices/purchase/new')}
             >
               <ShoppingBag size={18} className="mr-2" />
@@ -273,6 +273,8 @@ export function SalesDeskInvoicesPage(): ReactElement {
         isDeleting={deleteInvoice.isPending}
         deleteTitle="Faturayi sil"
         deleteLabel={(row) => row.invoiceNumber}
+        mobilePrimaryKey="invoiceNumber"
+        mobileDetailKeys={['invoiceType', 'customer', 'invoiceDate', 'dueDate', 'status', 'grandTotal']}
         formDialog={
           <SalesDeskEntityForm
             open={formOpen}
@@ -283,6 +285,7 @@ export function SalesDeskInvoicesPage(): ReactElement {
                 ? 'Alis faturasi baslik bilgilerini girin.'
                 : 'Satis faturasi baslik bilgilerini girin.'
             }
+            maxWidthClass="!max-w-[960px]"
             schema={invoiceFormSchema}
             defaultValues={toInvoiceFormValues(undefined, formInvoiceType)}
             entity={editing}

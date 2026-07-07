@@ -33,6 +33,28 @@ function timeShort(iso: string): string {
   return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
 }
 
+/** Dialog / sheet acikken sohbet FAB'inin modal butonlarinin ustune binmesini onler. */
+function useBlockingOverlayOpen(): boolean {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const sync = (): void => {
+      const hasOpenOverlay =
+        document.querySelector('[data-slot="dialog-overlay"][data-state="open"]') != null ||
+        document.querySelector('[data-slot="sheet-overlay"][data-state="open"]') != null ||
+        document.querySelector('[role="alertdialog"][data-state="open"]') != null;
+      setOpen(hasOpenOverlay);
+    };
+
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-state'] });
+    return () => observer.disconnect();
+  }, []);
+
+  return open;
+}
+
 export function SalesDeskChatWidget(): ReactElement | null {
   const currentUserId = useSalesDeskChatStore((state) => state.currentUserId);
   const isOpen = useSalesDeskChatStore((state) => state.isOpen);
@@ -47,6 +69,7 @@ export function SalesDeskChatWidget(): ReactElement | null {
 
   const authUser = useAuthStore((state) => state.user);
   const { data: users } = useSalesDeskUserOptions();
+  const blockingOverlayOpen = useBlockingOverlayOpen();
 
   const [search, setSearch] = useState('');
   const [draft, setDraft] = useState('');
@@ -92,6 +115,12 @@ export function SalesDeskChatWidget(): ReactElement | null {
   }, [isOpen, selectedUserId]);
 
   useEffect(() => {
+    if (blockingOverlayOpen && isOpen) {
+      setOpen(false);
+    }
+  }, [blockingOverlayOpen, isOpen, setOpen]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length, partnerTyping, selectedUserId]);
 
@@ -120,7 +149,13 @@ export function SalesDeskChatWidget(): ReactElement | null {
   if (currentUserId == null || !authUser) return null;
 
   return (
-    <div className="fixed bottom-12 right-5 z-[60] flex flex-col items-end gap-3 font-sans antialiased">
+    <div
+      className={cn(
+        'fixed bottom-12 right-5 z-40 flex flex-col items-end gap-3 font-sans antialiased transition-opacity duration-200',
+        blockingOverlayOpen && 'pointer-events-none opacity-0'
+      )}
+      aria-hidden={blockingOverlayOpen}
+    >
       {isOpen && (
         <div className="flex h-[70vh] max-h-[600px] w-[94vw] max-w-[740px] overflow-hidden rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] text-slate-100 shadow-2xl shadow-black/60 ring-1 ring-black/20">
           {/* Sol: kisi listesi */}

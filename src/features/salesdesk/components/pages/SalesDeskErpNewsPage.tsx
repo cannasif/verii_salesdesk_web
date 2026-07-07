@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { useAuthStore } from '@/stores/auth-store';
 import type { SalesDeskErpNewsItemEnriched, ErpNewsFeedFilter } from '../../lib/erp-news-types';
@@ -34,8 +35,17 @@ import {
   usePreviewErpNewsDedupe,
   type ErpNewsDedupePreview,
 } from '../../hooks/useErpNewsDedupe';
-import { salesDeskPageShellClass, salesDeskPageSubtitleClass, salesDeskPageTitleClass } from '../../lib/salesdesk-shared';
-import { SD_ADD_BUTTON, SD_DELETE_DIALOG_ACTION, SD_PAGE_ICON_BOX, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG } from '../../lib/salesdesk-popup-styles';
+import { salesDeskPageShellClass } from '../../lib/salesdesk-shared';
+import {
+  SD_DELETE_DIALOG_ACTION,
+  SD_PAGE_ADD_BUTTON,
+  SD_PAGE_HEADER_ROW,
+  SD_PAGE_ICON_BOX,
+  SD_PAGE_PULSE,
+  SD_PAGE_TITLE,
+  SD_SECONDARY_BUTTON,
+  SD_SURFACE_DIALOG,
+} from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskErpNewsPage(): ReactElement {
   const navigate = useNavigate();
@@ -145,25 +155,26 @@ export function SalesDeskErpNewsPage(): ReactElement {
 
   return (
     <div className={salesDeskPageShellClass}>
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="flex items-start gap-3">
+      <div className={SD_PAGE_HEADER_ROW}>
+        <div className="flex min-w-0 items-start gap-3">
           <div className={SD_PAGE_ICON_BOX}>
             <Newspaper size={22} />
           </div>
-          <div>
-            <h1 className={salesDeskPageTitleClass}>ERP Haber Takibi</h1>
-            <p className={salesDeskPageSubtitleClass}>
+          <div className="min-w-0 space-y-1">
+            <h1 className={SD_PAGE_TITLE}>ERP Haber Takibi</h1>
+            <p className="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-muted-foreground">
+              <span className={`h-2 w-2 animate-pulse rounded-full ${SD_PAGE_PULSE}`} />
               Sistem tetikleyicileri, modul olaylari ve dis kaynak haberlerini tek akista yonetin
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
           {(statsData?.totalCount ?? 0) > 20 ? (
             <button
               type="button"
               onClick={() => void handleOpenDedupe()}
               disabled={isDedupeBusy}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-rose-500/40 bg-rose-500/10 px-4 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20 disabled:opacity-60"
+              className="inline-flex h-11 min-h-[44px] w-full items-center justify-center gap-2 rounded-lg border border-rose-500/40 bg-rose-500/10 px-4 text-sm font-semibold text-rose-200 transition hover:bg-rose-500/20 disabled:opacity-60 sm:w-auto"
             >
               <CopySlash size={16} />
               {isDedupeBusy ? 'Temizleniyor...' : 'Yinelenenleri Temizle'}
@@ -173,13 +184,13 @@ export function SalesDeskErpNewsPage(): ReactElement {
             type="button"
             onClick={() => triggerAutomation.mutate({ groups, silent: false })}
             disabled={triggerAutomation.isPending}
-            className={SD_SECONDARY_BUTTON}
+            className={cn(SD_SECONDARY_BUTTON, 'w-full sm:w-auto')}
           >
             <Bot size={16} />
             {triggerAutomation.isPending ? 'Taraniyor...' : 'Tetikleyicileri Calistir'}
           </button>
-          <button type="button" onClick={() => navigate('/salesdesk/erp-news/new')} className={SD_ADD_BUTTON}>
-            <Plus size={16} />
+          <button type="button" onClick={() => navigate('/salesdesk/erp-news/new')} className={SD_PAGE_ADD_BUTTON}>
+            <Plus size={16} className="mr-2" />
             Yeni Haber
           </button>
         </div>

@@ -2,7 +2,10 @@ import { type ReactElement, type ReactNode } from 'react';
 import { Edit2, Trash2 } from 'lucide-react';
 import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
+import { SD_TABLE_ACTION_BUTTON } from '../lib/salesdesk-popup-styles';
+import { SalesDeskMobileCardList } from './SalesDeskMobileCardList';
 
 export type SalesDeskCustomerColumnKey =
   | 'id'
@@ -89,20 +92,44 @@ export function SalesDeskCustomerTable({
         size="icon"
         onClick={() => onEdit(customer)}
         title="Düzenle"
-        className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10"
+        className={cn(
+          SD_TABLE_ACTION_BUTTON,
+          'text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10'
+        )}
       >
-        <Edit2 size={16} />
+        <Edit2 size={18} />
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={() => onDelete(customer)}
         title="Sil"
-        className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
+        className={cn(
+          SD_TABLE_ACTION_BUTTON,
+          'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10'
+        )}
       >
-        <Trash2 size={16} />
+        <Trash2 size={18} />
       </Button>
     </div>
+  );
+
+  const mobileView = (
+    <SalesDeskMobileCardList
+      columns={columns}
+      visibleColumnKeys={visibleColumnKeys}
+      rows={rows}
+      rowKey={(row) => row.id}
+      renderCell={(row, key) => renderCell(row, key)}
+      primaryKey="name"
+      renderActions={renderActionsCell}
+      onRowActivate={onEdit}
+      isLoading={isLoading}
+      isError={isError}
+      errorText={errorText}
+      emptyText={emptyText}
+      pageSize={pageSize}
+    />
   );
 
   return (
@@ -122,6 +149,7 @@ export function SalesDeskCustomerTable({
       errorText={errorText}
       emptyText={emptyText}
       minTableWidthClassName="min-w-[800px] lg:min-w-[1100px]"
+      mobileView={mobileView}
       showActionsColumn
       actionsHeaderLabel="İşlemler"
       renderActionsCell={renderActionsCell}

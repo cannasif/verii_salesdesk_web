@@ -89,9 +89,14 @@ export function SalesDeskFormDialog({
 
           <div className={SD_DIALOG_BODY_FORM}>{children}</div>
 
-          <DialogFooter className={cn(SD_DIALOG_FOOTER_FORM, footerLeading && 'justify-between')}>
-            {footerLeading ? <div className="flex items-center">{footerLeading}</div> : null}
-            <div className={cn('flex items-center gap-3', footerLeading && 'ml-auto')}>
+          <DialogFooter className={cn(SD_DIALOG_FOOTER_FORM, footerLeading && 'sm:justify-between')}>
+            {footerLeading ? <div className="flex w-full items-center sm:w-auto">{footerLeading}</div> : null}
+            <div
+              className={cn(
+                'flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-3',
+                footerLeading && 'sm:ml-auto'
+              )}
+            >
               <Button
                 type="button"
                 variant="ghost"

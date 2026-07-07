@@ -2,6 +2,9 @@ import { type ReactElement } from 'react';
 import type { TFunction } from 'i18next';
 import { DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
+import { SalesDeskMobileCardList } from '@/features/salesdesk/components/SalesDeskMobileCardList';
+import { SD_TABLE_ACTION_BUTTON } from '@/features/salesdesk/lib/salesdesk-popup-styles';
+import { cn } from '@/lib/utils';
 import type { UserDto } from '../types/user-types';
 import { Edit2, Trash2 } from 'lucide-react';
 import { MANAGEMENT_LIST_ID_COLUMN_DEF } from '@/lib/management-list-layout';
@@ -122,28 +125,77 @@ export function UserTable({
   };
 
   const renderActionsCell = (user: UserDto): ReactElement => (
-    <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-      {onEdit ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(user)}
-          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-        >
-          <Edit2 size={16} />
-        </Button>
-      ) : null}
-      {onDelete ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(user)}
-          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-        >
-          <Trash2 size={16} />
-        </Button>
+    <div className="flex justify-end gap-1 opacity-100 transition-opacity">
+      {onEdit || onDelete ? (
+        <div className="inline-flex shrink-0 items-center gap-1">
+          {onEdit ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(user)}
+              className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
+            >
+              <Edit2 size={18} />
+            </Button>
+          ) : null}
+          {onDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(user)}
+              className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
+            >
+              <Trash2 size={18} />
+            </Button>
+          ) : null}
+        </div>
       ) : null}
     </div>
+  );
+
+  const mobileView = (
+    <SalesDeskMobileCardList
+      columns={columns.map((column) => ({ key: column.key, label: column.label }))}
+      visibleColumnKeys={visibleColumnKeys}
+      rows={rows}
+      rowKey={rowKey}
+      renderCell={renderCell}
+      primaryKey="fullName"
+      detailKeys={['username', 'email', 'role', 'status']}
+      renderActions={
+        onEdit || onDelete
+          ? (user) => (
+              <div className="inline-flex shrink-0 items-center gap-1">
+                {onEdit ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEdit(user)}
+                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
+                  >
+                    <Edit2 size={18} />
+                  </Button>
+                ) : null}
+                {onDelete ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDelete(user)}
+                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+                ) : null}
+              </div>
+            )
+          : undefined
+      }
+      isLoading={isLoading}
+      isError={false}
+      errorText={errorText}
+      emptyText={emptyText}
+      pageSize={pageSize}
+    />
   );
 
   return (
@@ -168,6 +220,7 @@ export function UserTable({
       showActionsColumn={showActionsColumn}
       actionsHeaderLabel={actionsHeaderLabel}
       renderActionsCell={renderActionsCell}
+      mobileView={mobileView}
       rowClassName={rowClassName}
       onRowDoubleClick={onEdit}
       pageSize={pageSize}

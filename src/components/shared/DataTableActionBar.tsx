@@ -372,7 +372,7 @@ export function DataTableActionBar({
           )}
           {leftSlot}
 
-          <div className="relative crm-ms-auto flex min-w-0 max-w-full flex-wrap items-center justify-end gap-2">
+          <div className="relative crm-ms-auto flex min-w-0 max-w-full flex-nowrap items-center justify-end gap-2 overflow-x-auto pb-0.5 sm:pb-0">
           <Popover open={showFilters} onOpenChange={handleFilterOpenChange}>
             <PopoverTrigger asChild>
               <Button
@@ -447,7 +447,7 @@ export function DataTableActionBar({
             </PopoverContent>
           </Popover>
 
-          <div className="hidden min-w-0 max-w-full flex-wrap items-center justify-end gap-2 overflow-x-auto pb-1 sm:flex">
+          <div className="hidden min-w-0 shrink-0 items-center gap-2 sm:flex">
             {additionalFilterActions}
 
             <GridExportMenu

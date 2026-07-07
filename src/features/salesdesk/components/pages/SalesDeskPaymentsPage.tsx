@@ -112,6 +112,8 @@ export function SalesDeskPaymentsPage(): ReactElement {
       isDeleting={deletePayment.isPending}
       deleteTitle="Odemeyi sil"
       deleteLabel={(row) => row.name}
+      mobilePrimaryKey="name"
+      mobileDetailKeys={['type', 'category', 'dayOfMonth', 'amount', 'customer', 'active']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}

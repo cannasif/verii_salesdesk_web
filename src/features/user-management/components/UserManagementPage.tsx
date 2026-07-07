@@ -26,8 +26,8 @@ import {
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
-  ADD_BUTTON_CLASS,
 } from '@/lib/management-list-layout';
+import { SD_PAGE_ADD_BUTTON } from '@/features/salesdesk/lib/salesdesk-popup-styles';
 
 import { USER_MANAGEMENT_QUERY_KEYS } from '../utils/query-keys';
 import { UserStats } from './UserStats';
@@ -309,7 +309,7 @@ export function UserManagementPage(): ReactElement {
           hideStatsLabel={t('hideStats', { defaultValue: 'İstatistikleri Gizle' })}
           actions={
             canCreate ? (
-              <Button onClick={handleAddClick} className={ADD_BUTTON_CLASS}>
+              <Button onClick={handleAddClick} variant="ghost" className={SD_PAGE_ADD_BUTTON}>
                 <Plus size={20} className="mr-2 stroke-[3px]" />
                 {t('addButton')}
               </Button>
@@ -349,6 +349,7 @@ export function UserManagementPage(): ReactElement {
             searchValue={searchTerm}
             searchPlaceholder={t('searchPlaceholder', { defaultValue: t('common.search') })}
             onSearchChange={setSearchTerm}
+            compactSearchOnMobile
             leftSlot={
               <>
                 <Button

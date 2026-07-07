@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   AlertTriangle,
+  ArrowLeft,
   Layers,
   Loader2,
   RotateCcw,
@@ -51,6 +52,7 @@ export function UserAuthorizationPage(): ReactElement {
   const [userSearch, setUserSearch] = useState('');
   const debouncedUserSearch = useDebouncedValue(userSearch, 350);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<'list' | 'detail'>('list');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -164,12 +166,12 @@ export function UserAuthorizationPage(): ReactElement {
         <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[var(--crm-brand-primary)]/10 blur-[90px]" />
         <div className="pointer-events-none absolute -left-16 -bottom-16 h-64 w-64 rounded-full bg-amber-500/10 blur-[90px]" />
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[image:var(--crm-brand-gradient)] shadow-lg shadow-black/20">
-              <ShieldCheck className="size-7 text-white" strokeWidth={2.4} />
+          <div className="flex min-w-0 items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[image:var(--crm-brand-gradient)] shadow-lg shadow-black/20 sm:h-14 sm:w-14">
+              <ShieldCheck className="size-6 text-white sm:size-7" strokeWidth={2.4} />
             </div>
             <div className="min-w-0">
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">Kullanici Yetkileri</h1>
+              <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl md:text-4xl">Kullanici Yetkileri</h1>
               <p className="mt-1.5 max-w-2xl text-sm font-medium text-slate-400">
                 Soldan bir kullanici secin, sagdan hangi sayfalara girebilecegini ve o sayfalarda
                 ekleme / duzenleme / silme yapabilecegini isaretleyin.
@@ -185,7 +187,13 @@ export function UserAuthorizationPage(): ReactElement {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
         {/* User selector */}
-        <Card className={cn(MANAGEMENT_LIST_CARD_CLASSNAME, 'flex flex-col overflow-hidden')}>
+        <Card
+          className={cn(
+            MANAGEMENT_LIST_CARD_CLASSNAME,
+            'flex flex-col overflow-hidden',
+            mobilePanel === 'detail' ? 'hidden xl:flex' : 'flex'
+          )}
+        >
           <div className="flex items-center gap-2 border-b border-[var(--crm-app-border)] px-4 py-4">
             <Users2 className="size-4 text-[var(--crm-brand-primary)]" />
             <span className="text-sm font-black uppercase tracking-wider text-slate-300">Kullanicilar</span>
@@ -197,7 +205,7 @@ export function UserAuthorizationPage(): ReactElement {
                 value={userSearch}
                 onChange={(e) => setUserSearch(e.target.value)}
                 placeholder="Kullanici ara..."
-                className="h-10 rounded-xl border-[var(--crm-app-border)] bg-[var(--crm-app-input)] pl-9 text-sm"
+                className="h-11 min-h-[44px] rounded-xl border-[var(--crm-app-border)] bg-[var(--crm-app-input)] pl-9 text-sm"
               />
             </div>
           </div>
@@ -230,9 +238,12 @@ export function UserAuthorizationPage(): ReactElement {
                     <button
                       key={user.id}
                       type="button"
-                      onClick={() => setSelectedUserId(user.id)}
+                      onClick={() => {
+                        setSelectedUserId(user.id);
+                        setMobilePanel('detail');
+                      }}
                       className={cn(
-                        'flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all',
+                        'flex w-full min-h-[44px] items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all',
                         active
                           ? 'border-[var(--crm-brand-primary)]/60 bg-[var(--crm-brand-primary)]/10 shadow-sm'
                           : 'border-transparent bg-white/[0.02] hover:border-[var(--crm-app-border)] hover:bg-white/[0.05]'
@@ -260,7 +271,13 @@ export function UserAuthorizationPage(): ReactElement {
         </Card>
 
         {/* Matrix */}
-        <Card className={cn(MANAGEMENT_LIST_CARD_CLASSNAME, 'flex flex-col overflow-hidden')}>
+        <Card
+          className={cn(
+            MANAGEMENT_LIST_CARD_CLASSNAME,
+            'flex flex-col overflow-hidden',
+            mobilePanel === 'list' ? 'hidden xl:flex' : 'flex'
+          )}
+        >
           {selectedUserId == null ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 py-24 text-center">
               <UserRound className="size-12 text-slate-600" />
@@ -269,11 +286,23 @@ export function UserAuthorizationPage(): ReactElement {
           ) : (
             <>
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--crm-app-border)] p-4 md:p-5">
-                <div className="min-w-0">
-                  <h2 className="truncate text-lg font-black text-white">{selectedUserLabel}</h2>
-                  <p className="mt-0.5 text-xs font-medium text-slate-400">
-                    Bu kullaniciya ozel sayfa ve islem yetkileri.
-                  </p>
+                <div className="flex min-w-0 flex-1 items-start gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-11 w-11 shrink-0 rounded-xl xl:hidden"
+                    onClick={() => setMobilePanel('list')}
+                    aria-label="Kullanici listesine don"
+                  >
+                    <ArrowLeft className="size-5" />
+                  </Button>
+                  <div className="min-w-0">
+                    <h2 className="truncate text-lg font-black text-white">{selectedUserLabel}</h2>
+                    <p className="mt-0.5 text-xs font-medium text-slate-400">
+                      Bu kullaniciya ozel sayfa ve islem yetkileri.
+                    </p>
+                  </div>
                 </div>
                 <Badge variant="outline" className="rounded-full border-[var(--crm-brand-primary)]/40 bg-[var(--crm-brand-primary)]/10 px-3 py-1 text-xs font-bold text-[var(--crm-brand-primary)]">
                   {selectedIds.length} yetki secili
@@ -308,7 +337,7 @@ export function UserAuthorizationPage(): ReactElement {
               />
 
               {canUpdate && (
-                <div className="flex items-center justify-between gap-3 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] px-4 py-3.5 md:px-5">
+                <div className="flex flex-col gap-3 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between md:px-5">
                   <div className="text-xs font-semibold">
                     {isDirty ? (
                       <span className="text-amber-300">{dirtyCount} degisiklik kaydedilmedi</span>
@@ -316,13 +345,13 @@ export function UserAuthorizationPage(): ReactElement {
                       <span className="text-emerald-400">Tum degisiklikler kayitli</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedIds(savedIds)}
                       disabled={!isDirty || isSaving}
-                      className="h-10 rounded-xl border-[var(--crm-app-border)] text-xs font-bold"
+                      className="h-11 min-h-[44px] w-full rounded-xl border-[var(--crm-app-border)] text-xs font-bold sm:w-auto"
                     >
                       <RotateCcw className="mr-1.5 size-3.5" /> Geri Al
                     </Button>
@@ -330,7 +359,7 @@ export function UserAuthorizationPage(): ReactElement {
                       size="sm"
                       onClick={handleSave}
                       disabled={!isDirty || isSaving}
-                      className="h-10 rounded-xl bg-[image:var(--crm-brand-gradient)] px-6 text-xs font-black text-white shadow-lg hover:brightness-110 disabled:opacity-50"
+                      className="h-11 min-h-[44px] w-full rounded-xl bg-[image:var(--crm-brand-gradient)] px-6 text-xs font-black text-white shadow-lg hover:brightness-110 disabled:opacity-50 sm:w-auto"
                     >
                       {isSaving ? (
                         <>

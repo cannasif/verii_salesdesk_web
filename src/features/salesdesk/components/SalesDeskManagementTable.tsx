@@ -2,8 +2,10 @@ import { type ReactElement, type ReactNode, useEffect, useMemo, useState } from 
 import { Edit2, Trash2 } from 'lucide-react';
 import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
-import { arraysEqual } from '@/lib/utils';
+import { cn, arraysEqual } from '@/lib/utils';
 import type { SalesDeskColumn } from './SalesDeskListLayout';
+import { SD_TABLE_ACTION_BUTTON } from '../lib/salesdesk-popup-styles';
+import { SalesDeskMobileCardList } from './SalesDeskMobileCardList';
 
 interface SalesDeskManagementTableProps<T extends { id: number }> {
   columns: SalesDeskColumn<T>[];
@@ -13,6 +15,8 @@ interface SalesDeskManagementTableProps<T extends { id: number }> {
   errorText?: string;
   emptyText?: string;
   minTableWidthClassName?: string;
+  mobilePrimaryKey?: string;
+  mobileDetailKeys?: string[];
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
   renderExtraActions?: (row: T) => ReactNode;
@@ -36,6 +40,8 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   errorText = 'Liste yuklenemedi.',
   emptyText = 'Kayit bulunamadi.',
   minTableWidthClassName = 'min-w-[800px] lg:min-w-[1000px]',
+  mobilePrimaryKey,
+  mobileDetailKeys,
   onEdit,
   onDelete,
   renderExtraActions,
@@ -84,36 +90,67 @@ export function SalesDeskManagementTable<T extends { id: number }>({
 
   const renderActionsCell = (row: T): ReactElement => (
     <div
-      className="flex min-w-max justify-end gap-0.5 opacity-100"
+      className="flex w-full flex-col items-end gap-2 md:flex-row md:flex-wrap md:justify-end md:gap-1"
       data-skip-row-double-click
       data-no-drag-scroll
       onClick={(event) => event.stopPropagation()}
       onDoubleClick={(event) => event.stopPropagation()}
     >
-      {renderExtraActions ? renderExtraActions(row) : null}
-      {onEdit ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(row)}
-          title="Duzenle"
-          className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10"
-        >
-          <Edit2 size={16} />
-        </Button>
+      {renderExtraActions ? (
+        <div className="flex flex-wrap items-center justify-end gap-1">{renderExtraActions(row)}</div>
       ) : null}
-      {onDelete ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(row)}
-          title="Sil"
-          className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10"
-        >
-          <Trash2 size={16} />
-        </Button>
+      {onEdit || onDelete ? (
+        <div className="inline-flex shrink-0 items-center gap-1">
+          {onEdit ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(row)}
+              title="Duzenle"
+              className={cn(
+                SD_TABLE_ACTION_BUTTON,
+                'text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10'
+              )}
+            >
+              <Edit2 size={18} />
+            </Button>
+          ) : null}
+          {onDelete ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(row)}
+              title="Sil"
+              className={cn(
+                SD_TABLE_ACTION_BUTTON,
+                'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10'
+              )}
+            >
+              <Trash2 size={18} />
+            </Button>
+          ) : null}
+        </div>
       ) : null}
     </div>
+  );
+
+  const mobileView = (
+    <SalesDeskMobileCardList
+      columns={gridColumns}
+      visibleColumnKeys={visibleKeys}
+      rows={rows}
+      rowKey={(row) => row.id}
+      renderCell={renderCell}
+      primaryKey={mobilePrimaryKey}
+      detailKeys={mobileDetailKeys}
+      renderActions={showActions ? renderActionsCell : undefined}
+      onRowActivate={onEdit}
+      isLoading={isLoading}
+      isError={isError}
+      errorText={errorText}
+      emptyText={emptyText}
+      pageSize={pageSize}
+    />
   );
 
   return (
@@ -128,10 +165,11 @@ export function SalesDeskManagementTable<T extends { id: number }>({
       errorText={errorText}
       emptyText={emptyText}
       minTableWidthClassName={minTableWidthClassName}
+      mobileView={mobileView}
       showActionsColumn={showActions}
       actionsHeaderLabel="Islemler"
       renderActionsCell={showActions ? renderActionsCell : undefined}
-      initialActionsColumnWidth={renderExtraActions ? 280 : undefined}
+      initialActionsColumnWidth={renderExtraActions ? 320 : undefined}
       actionsCellClassName="crm-text-end align-middle overflow-visible"
       iconOnlyActions
       rowClassName="group"

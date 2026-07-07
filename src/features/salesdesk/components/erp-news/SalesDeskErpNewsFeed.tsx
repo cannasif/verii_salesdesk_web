@@ -110,7 +110,7 @@ export function SalesDeskErpNewsFeed({
             type="button"
             onClick={onRefresh}
             disabled={isFetching}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300 sm:w-auto"
           >
             <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
             Yenile
@@ -124,7 +124,7 @@ export function SalesDeskErpNewsFeed({
               type="button"
               onClick={() => onFeedFilterChange(filter.id)}
               className={cn(
-                'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+                'min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold transition-colors sm:min-h-0 sm:py-1.5',
                 feedFilter === filter.id
                   ? 'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-accent)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)]'
                   : 'border border-[var(--crm-app-border)] text-[var(--crm-app-text-muted)] hover:bg-[var(--crm-app-panel-muted)] hover:text-slate-700 dark:hover:text-slate-200'
@@ -215,7 +215,7 @@ export function SalesDeskErpNewsFeed({
               type="button"
               onClick={() => onPageChange(pageNumber - 1)}
               disabled={!hasPreviousPage}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
             >
               <ChevronLeft size={16} />
             </button>
@@ -226,7 +226,7 @@ export function SalesDeskErpNewsFeed({
               type="button"
               onClick={() => onPageChange(pageNumber + 1)}
               disabled={!hasNextPage}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] disabled:opacity-40"
             >
               <ChevronRight size={16} />
             </button>
