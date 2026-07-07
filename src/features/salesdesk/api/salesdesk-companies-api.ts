@@ -2,6 +2,7 @@ import { api } from '@/lib/axios';
 import { normalizePagedResponse } from '@/lib/paged-response';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
 import type { SalesDeskCompanyDto } from '../types/company-management-types';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 
 const BASE = '/api/salesdesk/companies';
 const READ_TIMEOUT_MS = 8_000;
@@ -21,7 +22,7 @@ function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T 
   if (response.success && response.data != null) {
     return response.data;
   }
-  throw new Error(response.message || fallbackMessage);
+  throw new Error(formatSalesDeskApiError(response, fallbackMessage));
 }
 
 function normalizePayload(payload: Omit<SalesDeskCompanyDto, 'id'>): Omit<SalesDeskCompanyDto, 'id'> {
@@ -83,7 +84,7 @@ export const salesDeskCompaniesApi = {
   delete: async (id: number): Promise<void> => {
     const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`);
     if (!response.success) {
-      throw new Error(response.message || 'Sirket silinemedi.');
+      throw new Error(formatSalesDeskApiError(response, 'Sirket silinemedi.'));
     }
   },
 };

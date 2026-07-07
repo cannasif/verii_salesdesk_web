@@ -5,6 +5,7 @@ import type {
   SalesDeskNoteNotificationPayload,
   UpsertSalesDeskNoteInput,
 } from '../types/notes-types';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 
 const BASE = '/api/salesdesk/notes';
 const READ_TIMEOUT_MS = 8_000;
@@ -13,7 +14,7 @@ function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T 
   if (response.success && response.data != null) {
     return response.data;
   }
-  throw new Error(response.message || fallbackMessage);
+  throw new Error(formatSalesDeskApiError(response, fallbackMessage));
 }
 
 function normalizeIds(ids: number[] | undefined): number[] {
@@ -63,7 +64,7 @@ export const salesDeskNotesApi = {
   delete: async (id: number): Promise<void> => {
     const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`);
     if (!response.success) {
-      throw new Error(response.message || 'Not silinemedi.');
+      throw new Error(formatSalesDeskApiError(response, 'Not silinemedi.'));
     }
   },
 
@@ -84,7 +85,7 @@ export const salesDeskNotesApi = {
       {}
     );
     if (!response.success) {
-      throw new Error(response.message || 'Bildirim onaylanamadi.');
+      throw new Error(formatSalesDeskApiError(response, 'Bildirim onaylanamadi.'));
     }
   },
 };

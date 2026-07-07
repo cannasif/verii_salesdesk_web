@@ -132,26 +132,46 @@ export function requiredIdFromSelect(value: string, field = 'Secim'): number {
 
 /** API / SQL hatalarini kullaniciya anlasilir Turkce mesaja cevirir. */
 export function formatSalesDeskApiError(error: unknown, fallback: string): string {
+  const responseLike = error && typeof error === 'object' ? (error as Record<string, unknown>) : null;
+  const responseMessage =
+    typeof responseLike?.message === 'string' && responseLike.message.trim().length > 0
+      ? responseLike.message
+      : typeof responseLike?.exceptionMessage === 'string' && responseLike.exceptionMessage.trim().length > 0
+        ? responseLike.exceptionMessage
+        : Array.isArray(responseLike?.errors)
+          ? responseLike.errors.find((item): item is string => typeof item === 'string' && item.trim().length > 0)
+          : null;
   const raw =
     error instanceof Error
       ? error.message
       : typeof error === 'string'
         ? error
+        : responseMessage
+          ? responseMessage
         : fallback;
   const text = raw.trim() || fallback;
   const lower = text.toLowerCase();
 
   if (lower.includes('invalid object name') || lower.includes('invalid column name')) {
-    return 'Veritabani semasi guncel degil. API sunucusunda migration uygulanmali (dotnet ef database update).';
+    return 'Veritabani guncellemesi eksik. API sunucusunda migration uygulanmali.';
   }
   if (lower.includes('status code 405') || lower.includes('method not allowed')) {
-    return 'Sunucu bu islemi kabul etmiyor (405). API endpoint veya HTTP metodu kontrol edilmeli.';
+    return 'Bu islem su anda tamamlanamiyor. Sayfayi yenileyip tekrar deneyin; devam ederse destek ekibi kontrol etmeli.';
   }
   if (lower.includes('entity changes') || lower.includes('inner exception')) {
-    return 'Kayit veritabanina yazilamadi. Zorunlu alanlari kontrol edin; migration uygulanmamis olabilir.';
+    return 'Kayit veritabanina yazilamadi. Zorunlu alanlari ve veritabani guncelligini kontrol edin.';
   }
   if (lower.includes('duplicate') || lower.includes('unique') || lower.includes('409')) {
     return 'Bu kayit numarasi veya benzersiz alan zaten kullaniliyor.';
+  }
+  if (
+    lower.includes('sql exception') ||
+    lower.includes('microsoft.data.sqlclient') ||
+    lower.includes('stack trace') ||
+    lower.includes('internal server error') ||
+    lower.includes('sunucu hatasi')
+  ) {
+    return fallback;
   }
 
   return text;

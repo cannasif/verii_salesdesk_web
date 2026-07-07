@@ -2,6 +2,7 @@ import { api } from '@/lib/axios';
 import { isAxiosError, type AxiosRequestConfig } from 'axios';
 import { normalizePagedResponse } from '@/lib/paged-response';
 import type { ApiResponse, PagedParams, PagedResponse } from '@/types/api';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 import { isWeeklyPlanTask } from '../lib/salesdesk-weekly-plan';
 import { isSalesDeskActivityTask } from '../lib/salesdesk-activities';
 import { isSalesDeskProjectTask } from '../lib/salesdesk-project-tracking';
@@ -261,7 +262,7 @@ function unwrapApiData<T>(response: ApiResponse<T>, fallbackMessage: string): T 
   if (response.success && response.data != null) {
     return response.data;
   }
-  throw new Error(response.message || response.exceptionMessage || fallbackMessage);
+  throw new Error(formatSalesDeskApiError(response, fallbackMessage));
 }
 
 async function getPaged<T>(
@@ -502,7 +503,7 @@ async function updateOne<T, TBody>(
 async function deleteOne(path: string, id: number): Promise<void> {
   const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${path}/${id}`);
   if (!response.success) {
-    throw new Error(response.message || 'Kayit silinemedi');
+    throw new Error(formatSalesDeskApiError(response, 'Kayit silinemedi'));
   }
 }
 

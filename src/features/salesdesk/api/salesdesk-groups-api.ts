@@ -2,6 +2,7 @@ import { isAxiosError } from 'axios';
 import { api } from '@/lib/axios';
 import type { ApiResponse } from '@/types/api';
 import { getLocalServerUrl } from '../lib/local-server-url';
+import { formatSalesDeskApiError } from '../lib/salesdesk-shared';
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../types/salesdesk-group-types';
 
 interface ApiEnvelope<T> {
@@ -22,14 +23,14 @@ function unwrapBackendGroups(response: ApiResponse<SalesDeskGroupDto[]>): SalesD
   if (response.success && Array.isArray(response.data)) {
     return response.data;
   }
-  throw new Error(response.message || 'Gruplar yuklenemedi.');
+  throw new Error(formatSalesDeskApiError(response, 'Gruplar yuklenemedi.'));
 }
 
 function unwrapBackendGroup(response: ApiResponse<SalesDeskGroupDto>, fallbackMessage: string): SalesDeskGroupDto {
   if (response.success && response.data) {
     return response.data;
   }
-  throw new Error(response.message || fallbackMessage);
+  throw new Error(formatSalesDeskApiError(response, fallbackMessage));
 }
 
 function isBackendGroupsUnavailable(error: unknown): boolean {
@@ -162,7 +163,7 @@ export const salesDeskGroupsApi = {
       if (source === 'backend') {
         const response = await api.delete<ApiResponse<unknown>>(`${BACKEND_GROUPS_BASE}/${id}`);
         if (!response.success) {
-          throw new Error(response.message || 'Grup silinemedi.');
+          throw new Error(formatSalesDeskApiError(response, 'Grup silinemedi.'));
         }
         return;
       }
