@@ -23,6 +23,7 @@ import {
 } from '../../lib/salesdesk-weekly-plan';
 import { useSalesDeskGroupList } from '../../hooks/useSalesDeskGroups';
 import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import type { TaskFormValues } from '../../types/salesdesk-schemas';
 import { SalesDeskWeeklyPlanGrid } from '../weekly-plan/SalesDeskWeeklyPlanGrid';
 import {
@@ -36,6 +37,7 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<SalesDeskTaskDto | null>(null);
   const [dialogInitial, setDialogInitial] = useState<WeeklyPlanDialogInitial>({});
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
 
   const {
     data: users,
@@ -111,8 +113,14 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
     setDialogOpen(false);
   };
 
-  const handleDelete = async (id: number): Promise<void> => {
-    await deleteTask.mutateAsync(id);
+  const handleDeleteRequest = async (id: number): Promise<void> => {
+    setDeletingTaskId(id);
+  };
+
+  const handleDeleteConfirm = async (): Promise<void> => {
+    if (deletingTaskId == null) return;
+    await deleteTask.mutateAsync(deletingTaskId);
+    setDeletingTaskId(null);
     setDialogOpen(false);
   };
 
@@ -244,8 +252,21 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         editingTask={editingTask}
         initial={dialogInitial}
         onSubmit={handleSubmit}
-        onDelete={handleDelete}
+        onDelete={handleDeleteRequest}
         isSaving={createTask.isPending || updateTask.isPending}
+        isDeleting={deleteTask.isPending}
+      />
+
+      <SalesDeskDeleteDialog
+        open={deletingTaskId != null}
+        onOpenChange={(open) => !open && setDeletingTaskId(null)}
+        title="Gorevi sil"
+        description={
+          editingTask && deletingTaskId === editingTask.id
+            ? buildSalesDeskDeleteDescription(editingTask.title)
+            : 'Bu gorevi silmek istediginize emin misiniz? Bu islem geri alinamaz.'
+        }
+        onConfirm={handleDeleteConfirm}
         isDeleting={deleteTask.isPending}
       />
     </div>

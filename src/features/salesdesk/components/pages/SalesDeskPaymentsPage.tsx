@@ -110,6 +110,7 @@ export function SalesDeskPaymentsPage(): ReactElement {
       }}
       onDeleteCancel={() => setDeleting(null)}
       isDeleting={deletePayment.isPending}
+      deleteTitle="Odemeyi sil"
       deleteLabel={(row) => row.name}
       formDialog={
         <SalesDeskEntityForm

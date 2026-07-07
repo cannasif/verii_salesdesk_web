@@ -1,16 +1,7 @@
 import { type ReactElement, useMemo, useState } from 'react';
 import { Link2, Loader2, Plus, RefreshCw, Search } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ManagementDataTableChrome } from '@/components/shared';
 import type { SalesDeskProductCustomerDto, SalesDeskProductDto } from '../../api/salesdesk-api';
@@ -37,10 +28,7 @@ import {
 } from '../../types/salesdesk-schemas';
 import {
   SD_PAGE_PULSE,
-  SD_DELETE_DIALOG_ACTION,
   SD_SEARCH_FOCUS,
-  SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
 import {
   ADD_BUTTON_CLASS,
@@ -278,32 +266,18 @@ export function SalesDeskProductCustomersPage(): ReactElement {
         />
       ) : null}
 
-      <AlertDialog open={deletingLink != null} onOpenChange={(open) => !open && setDeletingLink(null)}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Baglantiyi sil
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              Bu urun-cari baglantisini silmek istediginize emin misiniz?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              onClick={async () => {
-                if (!deletingLink) return;
-                await deleteLink.mutateAsync(deletingLink.id);
-                setDeletingLink(null);
-              }}
-              disabled={deleteLink.isPending}
-            >
-              {deleteLink.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deletingLink != null}
+        onOpenChange={(open) => !open && setDeletingLink(null)}
+        title="Baglantiyi sil"
+        description="Bu urun-cari baglantisini silmek istediginize emin misiniz? Bu islem geri alinamaz."
+        onConfirm={async () => {
+          if (!deletingLink) return;
+          await deleteLink.mutateAsync(deletingLink.id);
+          setDeletingLink(null);
+        }}
+        isDeleting={deleteLink.isPending}
+      />
     </div>
   );
 }

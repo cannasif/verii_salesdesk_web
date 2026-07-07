@@ -13,16 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { cn } from '@/lib/utils';
 import type { SalesDeskGmailMessageDto } from '../../api/salesdesk-api';
 import { SalesDeskEntityForm } from '../SalesDeskEntityForm';
@@ -41,10 +32,8 @@ import {
 } from '../../types/salesdesk-schemas';
 import {
   SD_ADD_BUTTON,
-  SD_DELETE_DIALOG_ACTION,
   SD_PAGE_ICON_BOX,
   SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
 import { useSalesDeskGmailConnectionStore } from '../../stores/salesdesk-gmail-connection-store';
 import { useSalesDeskMeetingStore } from '../../stores/salesdesk-meeting-store';
@@ -497,35 +486,23 @@ export function SalesDeskGmailInbox(): ReactElement {
         ]}
       />
 
-      <AlertDialog open={deleting != null} onOpenChange={(open) => !open && setDeleting(null)}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Kaydi sil
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              {deleting
-                ? `"${deleting.subject}" kaydini silmek istediginize emin misiniz?`
-                : 'Bu islem geri alinamaz.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              disabled={deleteGmail.isPending}
-              onClick={async () => {
-                if (!deleting) return;
-                await deleteGmail.mutateAsync(deleting.id);
-                if (selectedKey === `record-${deleting.id}`) setSelectedKey(null);
-                setDeleting(null);
-              }}
-            >
-              {deleteGmail.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deleting != null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title="Kaydi sil"
+        description={
+          deleting
+            ? buildSalesDeskDeleteDescription(deleting.subject)
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={async () => {
+          if (!deleting) return;
+          await deleteGmail.mutateAsync(deleting.id);
+          if (selectedKey === `record-${deleting.id}`) setSelectedKey(null);
+          setDeleting(null);
+        }}
+        isDeleting={deleteGmail.isPending}
+      />
     </div>
   );
 }

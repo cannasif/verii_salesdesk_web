@@ -3,15 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Plus, RefreshCw } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Plus, RefreshCw, Trash2 } from 'lucide-react';
+  SalesDeskDeleteDialog,
+} from '@/features/salesdesk/components/SalesDeskDeleteDialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { DataTableActionBar, ManagementListPageHeader, type DataTableGridColumn } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -508,47 +503,22 @@ export function UserManagementPage(): ReactElement {
         isLoading={createUser.isPending || updateUser.isPending}
       />
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="overflow-hidden border-[var(--crm-app-border)] bg-[var(--crm-app-dialog)] p-0 shadow-2xl sm:max-w-md">
-          <DialogHeader className="flex flex-col items-center gap-3 px-6 pb-2 pt-8 text-center">
-            <div className="flex size-16 items-center justify-center rounded-full bg-red-500/10">
-              <Trash2 className="size-7 text-red-400" />
-            </div>
-            <DialogTitle className="text-xl font-black text-white">{t('delete.confirmTitle')}</DialogTitle>
-            <DialogDescription className="text-sm text-slate-400">
-              {t('delete.confirmMessage', {
-                username: deletingUser?.fullName?.trim() || deletingUser?.username || '',
-              })}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex flex-row gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] px-6 py-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              disabled={deleteUser.isPending}
-              className="flex-1 rounded-xl border-[var(--crm-app-border)]"
-            >
-              {t('form.cancel')}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => void handleDeleteConfirm()}
-              disabled={deleteUser.isPending}
-              className="flex-1 rounded-xl bg-red-600 text-white hover:bg-red-700"
-            >
-              {deleteUser.isPending ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  {t('form.saving')}
-                </>
-              ) : (
-                t('table.delete')
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SalesDeskDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title={t('delete.confirmTitle')}
+        description={
+          deletingUser
+            ? `${t('delete.confirmMessage', {
+                username: deletingUser.fullName?.trim() || deletingUser.username || '',
+              })} Bu islem geri alinamaz.`
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={handleDeleteConfirm}
+        isDeleting={deleteUser.isPending}
+        cancelLabel={t('form.cancel')}
+        confirmLabel={t('table.delete')}
+      />
     </div>
   );
 }

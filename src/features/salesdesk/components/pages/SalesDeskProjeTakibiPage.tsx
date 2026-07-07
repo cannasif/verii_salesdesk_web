@@ -2,16 +2,7 @@ import { type ReactElement, useMemo, useState } from 'react';
 import { FolderKanban, LayoutGrid, List, Plus, RefreshCw, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
@@ -48,7 +39,6 @@ import {
   SD_FORM_INPUT,
   SD_PAGE_ICON_BOX,
   SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
 import {
   salesDeskPageShellClass,
@@ -427,32 +417,23 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
 
         {formDialog}
 
-        <AlertDialog open={deleting != null} onOpenChange={(open) => !open && setDeleting(null)}>
-          <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-            <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-              <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-                Projeyi sil
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-                {deleting ? `"${deleting.title}" kaydini silmek istediginize emin misiniz?` : ''}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-              <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-red-600 text-white hover:bg-red-500"
-                onClick={() => void (async () => {
-                  if (!deleting) return;
-                  await deleteProject.mutateAsync(deleting.id);
-                  removeProjectFromAllColumnOrders(deleting.id);
-                  setDeleting(null);
-                })()}
-              >
-                Sil
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <SalesDeskDeleteDialog
+          open={deleting != null}
+          onOpenChange={(open) => !open && setDeleting(null)}
+          title="Projeyi sil"
+          description={
+            deleting
+              ? buildSalesDeskDeleteDescription(deleting.title)
+              : 'Bu islem geri alinamaz.'
+          }
+          onConfirm={async () => {
+            if (!deleting) return;
+            await deleteProject.mutateAsync(deleting.id);
+            removeProjectFromAllColumnOrders(deleting.id);
+            setDeleting(null);
+          }}
+          isDeleting={deleteProject.isPending}
+        />
       </div>
     );
   }
@@ -541,6 +522,7 @@ export function SalesDeskProjeTakibiPage(): ReactElement {
       }}
       onDeleteCancel={() => setDeleting(null)}
       isDeleting={deleteProject.isPending}
+      deleteTitle="Projeyi sil"
       deleteLabel={(row) => row.title}
       formDialog={formDialog}
     />

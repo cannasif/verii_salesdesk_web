@@ -13,16 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import {
   DataTableActionBar,
   DataTableGrid,
@@ -53,9 +44,6 @@ import { SalesDeskGroupMemberSelect } from '../groups/SalesDeskGroupMemberSelect
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../../types/salesdesk-group-types';
 import {
   SD_DIALOG_CONTENT_FORM,
-  SD_DELETE_DIALOG_ACTION,
-  SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
 } from '../../lib/salesdesk-popup-styles';
 import { Edit2, Loader2, Plus, RefreshCw, Trash2, UserPlus, UsersRound } from 'lucide-react';
 
@@ -443,28 +431,18 @@ export function SalesDeskGroupsPage(): ReactElement {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">Grubu sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              &quot;{groupToDelete?.name ?? ''}&quot; grubunu silmek istediginize emin misiniz? Bu islem geri alinamaz.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON} disabled={deleteGroup.isPending}>
-              Iptal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              onClick={() => void handleDeleteConfirm()}
-              disabled={deleteGroup.isPending}
-            >
-              {deleteGroup.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Grubu sil"
+        description={
+          groupToDelete
+            ? `"${groupToDelete.name}" grubunu silmek istediginize emin misiniz? Bu islem geri alinamaz.`
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={handleDeleteConfirm}
+        isDeleting={deleteGroup.isPending}
+      />
     </div>
   );
 }

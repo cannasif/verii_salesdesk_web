@@ -137,6 +137,7 @@ export function SalesDeskQuotesPage(): ReactElement {
         }}
         onDeleteCancel={() => setDeleting(null)}
         isDeleting={deleteQuote.isPending}
+        deleteTitle="Teklifi sil"
         deleteLabel={(row) => row.quoteNumber}
         formDialog={
           <SalesDeskEntityForm

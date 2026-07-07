@@ -1,15 +1,5 @@
 import { type ReactElement, type ReactNode, useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTableActionBar, ManagementDataTableChrome } from '@/components/shared';
@@ -24,7 +14,8 @@ import {
 } from '../lib/salesdesk-list-toolbar-utils';
 import { SalesDeskKpiCards } from './SalesDeskKpiCards';
 import { SalesDeskManagementTable } from './SalesDeskManagementTable';
-import { SD_PAGE_PULSE, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG, SD_DELETE_DIALOG_ACTION } from '../lib/salesdesk-popup-styles';
+import { SD_PAGE_PULSE } from '../lib/salesdesk-popup-styles';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from './SalesDeskDeleteDialog';
 import {
   ADD_BUTTON_CLASS,
   MANAGEMENT_LIST_CARD_CLASSNAME,
@@ -86,6 +77,7 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   onDeleteCancel?: () => void;
   isDeleting?: boolean;
   deleteLabel?: (row: T) => string;
+  deleteTitle?: string;
   formDialog?: ReactNode;
   emptyMessage?: string;
   minTableWidthClassName?: string;
@@ -136,6 +128,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
   onDeleteCancel,
   isDeleting,
   deleteLabel,
+  deleteTitle = 'Kaydi sil',
   formDialog,
   emptyMessage = 'Kayit bulunamadi.',
   minTableWidthClassName,
@@ -318,30 +311,18 @@ export function SalesDeskListLayout<T extends { id: number }>({
       {formDialog}
 
       {onDeleteConfirm && onDeleteCancel ? (
-        <AlertDialog open={deletingRow != null} onOpenChange={(open) => !open && onDeleteCancel()}>
-          <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-            <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-              <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-                Kaydi sil
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-                {deletingRow
-                  ? `"${deleteLabel?.(deletingRow) ?? deletingRow.id}" kaydini silmek istediginize emin misiniz?`
-                  : 'Bu islem geri alinamaz.'}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-              <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-              <AlertDialogAction
-                className={SD_DELETE_DIALOG_ACTION}
-                onClick={onDeleteConfirm}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Siliniyor...' : 'Sil'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <SalesDeskDeleteDialog
+          open={deletingRow != null}
+          onOpenChange={(open) => !open && onDeleteCancel()}
+          title={deleteTitle}
+          description={
+            deletingRow
+              ? buildSalesDeskDeleteDescription(String(deleteLabel?.(deletingRow) ?? deletingRow.id))
+              : 'Bu islem geri alinamaz.'
+          }
+          onConfirm={onDeleteConfirm}
+          isDeleting={isDeleting}
+        />
       ) : null}
     </div>
   );

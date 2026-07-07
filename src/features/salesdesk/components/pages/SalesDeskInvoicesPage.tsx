@@ -271,6 +271,7 @@ export function SalesDeskInvoicesPage(): ReactElement {
         }}
         onDeleteCancel={() => setDeleting(null)}
         isDeleting={deleteInvoice.isPending}
+        deleteTitle="Faturayi sil"
         deleteLabel={(row) => row.invoiceNumber}
         formDialog={
           <SalesDeskEntityForm

@@ -125,6 +125,7 @@ export function SalesDeskCompaniesPage(): ReactElement {
       }}
       onDeleteCancel={() => setDeleting(null)}
       isDeleting={deleteCompany.isPending}
+      deleteTitle="Sirketi sil"
       deleteLabel={(row) => row.name}
       minTableWidthClassName="min-w-[2200px]"
       formDialog={

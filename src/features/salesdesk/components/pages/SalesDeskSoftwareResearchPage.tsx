@@ -1,17 +1,8 @@
 import { type ReactElement, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, SearchCode } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import type { SalesDeskSoftwareResearchDto } from '../../api/salesdesk-api';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { SalesDeskKpiCards } from '../SalesDeskKpiCards';
 import {
   SalesDeskSoftwareResearchBoard,
@@ -24,7 +15,7 @@ import {
 } from '../../hooks/useSalesDeskModules';
 import { useSalesDeskListPage } from '../../hooks/useSalesDeskListPage';
 import { salesDeskPageShellClass, salesDeskPageSubtitleClass, salesDeskPageTitleClass } from '../../lib/salesdesk-shared';
-import { SD_ADD_BUTTON, SD_DELETE_DIALOG_ACTION, SD_PAGE_ICON_BOX, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG } from '../../lib/salesdesk-popup-styles';
+import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskSoftwareResearchPage(): ReactElement {
   const navigate = useNavigate();
@@ -128,34 +119,22 @@ export function SalesDeskSoftwareResearchPage(): ReactElement {
         onAdd={() => navigate('/salesdesk/software-research/new')}
       />
 
-      <AlertDialog open={deleting != null} onOpenChange={(open) => !open && setDeleting(null)}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Arastirmayi sil
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              {deleting
-                ? `"${deleting.provider}" kaydini silmek istediginize emin misiniz? Bu islem geri alinamaz.`
-                : 'Bu islem geri alinamaz.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              onClick={async () => {
-                if (!deleting) return;
-                await deleteResearch.mutateAsync(deleting.id);
-                setDeleting(null);
-              }}
-              disabled={deleteResearch.isPending}
-            >
-              {deleteResearch.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deleting != null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title="Arastirmayi sil"
+        description={
+          deleting
+            ? buildSalesDeskDeleteDescription(deleting.provider)
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={async () => {
+          if (!deleting) return;
+          await deleteResearch.mutateAsync(deleting.id);
+          setDeleting(null);
+        }}
+        isDeleting={deleteResearch.isPending}
+      />
     </div>
   );
 }

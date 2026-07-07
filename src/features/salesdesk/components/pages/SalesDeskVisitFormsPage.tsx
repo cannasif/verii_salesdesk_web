@@ -2,19 +2,10 @@ import { type ReactElement, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BriefcaseBusiness, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import type { SalesDeskVisitFormDto } from '../../api/salesdesk-api';
 import { SalesDeskVisitFormsList } from '../visit-forms/SalesDeskVisitFormsList';
 import { SalesDeskVisitFormPdfDialog } from '../visit-forms/SalesDeskVisitFormPdfDialog';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import {
   useDeleteSalesDeskVisitForm,
   useSalesDeskCustomerOptions,
@@ -23,7 +14,7 @@ import {
 import { useSalesDeskListPage } from '../../hooks/useSalesDeskListPage';
 import { salesDeskPageShellClass, salesDeskPageSubtitleClass, salesDeskPageTitleClass } from '../../lib/salesdesk-shared';
 import { previewVisitFormPdf } from '../../lib/visit-form-share';
-import { SD_ADD_BUTTON, SD_DELETE_DIALOG_ACTION, SD_PAGE_ICON_BOX, SD_SECONDARY_BUTTON, SD_SURFACE_DIALOG } from '../../lib/salesdesk-popup-styles';
+import { SD_ADD_BUTTON, SD_PAGE_ICON_BOX } from '../../lib/salesdesk-popup-styles';
 
 export function SalesDeskVisitFormsPage(): ReactElement {
   const navigate = useNavigate();
@@ -140,34 +131,22 @@ export function SalesDeskVisitFormsPage(): ReactElement {
         }}
       />
 
-      <AlertDialog open={deleting != null} onOpenChange={(open) => !open && setDeleting(null)}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Formu sil
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              {deleting
-                ? `"${deleting.title}" kaydini silmek istediginize emin misiniz? Bu islem geri alinamaz.`
-                : 'Bu islem geri alinamaz.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              onClick={async () => {
-                if (!deleting) return;
-                await deleteForm.mutateAsync(deleting.id);
-                setDeleting(null);
-              }}
-              disabled={deleteForm.isPending}
-            >
-              {deleteForm.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deleting != null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title="Formu sil"
+        description={
+          deleting
+            ? buildSalesDeskDeleteDescription(deleting.title)
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={async () => {
+          if (!deleting) return;
+          await deleteForm.mutateAsync(deleting.id);
+          setDeleting(null);
+        }}
+        isDeleting={deleteForm.isPending}
+      />
     </div>
   );
 }

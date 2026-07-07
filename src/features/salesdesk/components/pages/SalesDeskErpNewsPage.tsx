@@ -11,6 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { useAuthStore } from '@/stores/auth-store';
 import type { SalesDeskErpNewsItemEnriched, ErpNewsFeedFilter } from '../../lib/erp-news-types';
 import { isNewsVisibleToUser } from '../../lib/erp-news-automation';
@@ -250,31 +251,23 @@ export function SalesDeskErpNewsPage(): ReactElement {
         onAdd={() => navigate('/salesdesk/erp-news/new')}
       />
 
-      <AlertDialog open={deleting != null} onOpenChange={(open) => !open && setDeleting(null)}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">Haberi sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              {deleting ? `"${deleting.title}" kaydini silmek istediginize emin misiniz?` : 'Bu islem geri alinamaz.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Iptal</AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              onClick={async () => {
-                if (!deleting) return;
-                await deleteNews.mutateAsync(deleting.id);
-                deleteOverlay.mutate(deleting.id);
-                setDeleting(null);
-              }}
-              disabled={deleteNews.isPending}
-            >
-              {deleteNews.isPending ? 'Siliniyor...' : 'Sil'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deleting != null}
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title="Haberi sil"
+        description={
+          deleting
+            ? buildSalesDeskDeleteDescription(deleting.title)
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={async () => {
+          if (!deleting) return;
+          await deleteNews.mutateAsync(deleting.id);
+          deleteOverlay.mutate(deleting.id);
+          setDeleting(null);
+        }}
+        isDeleting={deleteNews.isPending}
+      />
 
       <AlertDialog
         open={dedupeOpen}

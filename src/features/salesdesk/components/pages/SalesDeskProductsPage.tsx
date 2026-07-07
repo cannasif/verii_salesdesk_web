@@ -101,6 +101,7 @@ export function SalesDeskProductsPage(): ReactElement {
       }}
       onDeleteCancel={() => setDeleting(null)}
       isDeleting={deleteProduct.isPending}
+      deleteTitle="Urunu sil"
       deleteLabel={(row) => row.name}
       formDialog={
         <SalesDeskEntityForm

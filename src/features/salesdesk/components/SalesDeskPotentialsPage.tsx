@@ -111,6 +111,7 @@ export function SalesDeskPotentialsPage(): ReactElement {
       }}
       onDeleteCancel={() => setDeletingPotential(null)}
       isDeleting={deletePotential.isPending}
+      deleteTitle="Potansiyel cariyi sil"
       deleteLabel={(row) => row.companyName}
       formDialog={
         <SalesDeskPotentialForm

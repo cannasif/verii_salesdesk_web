@@ -14,16 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { SalesDeskDeleteDialog } from '../SalesDeskDeleteDialog';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 import { SalesDeskGroupMemberSelect } from '../groups/SalesDeskGroupMemberSelect';
@@ -46,8 +37,6 @@ import {
   SD_FORM_LABEL,
   SD_PAGE_ICON_BOX,
   SD_SECONDARY_BUTTON,
-  SD_SURFACE_DIALOG,
-  SD_DELETE_DIALOG_ACTION,
 } from '../../lib/salesdesk-popup-styles';
 import { markNoteReadForUser } from '../../lib/salesdesk-notes-read-storage';
 import { formatSalesDeskApiError } from '../../lib/salesdesk-shared';
@@ -443,25 +432,19 @@ export function SalesDeskNotesPage(): ReactElement {
         </section>
       </div>
 
-      <AlertDialog open={deleteTarget != null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent className={`w-[90%] max-w-md gap-0 overflow-hidden rounded-2xl p-0 sm:w-full ${SD_SURFACE_DIALOG}`}>
-          <AlertDialogHeader className="px-6 pb-4 pt-8 text-center sm:text-left">
-            <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">Notu sil</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-[var(--crm-app-text-muted)]">
-              &quot;{deleteTarget?.title}&quot; kalici olarak silinecek. Bu islem geri alinamaz.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-row justify-end gap-2 border-t border-[var(--crm-app-border)] bg-[var(--crm-app-dialog-footer)] px-6 py-4">
-            <AlertDialogCancel className={SD_SECONDARY_BUTTON}>Vazgec</AlertDialogCancel>
-            <AlertDialogAction
-              className={SD_DELETE_DIALOG_ACTION}
-              onClick={() => void handleDelete()}
-            >
-              Sil
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <SalesDeskDeleteDialog
+        open={deleteTarget != null}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Notu sil"
+        description={
+          deleteTarget
+            ? `"${deleteTarget.title}" kalici olarak silinecek. Bu islem geri alinamaz.`
+            : 'Bu islem geri alinamaz.'
+        }
+        onConfirm={() => void handleDelete()}
+        isDeleting={deleteNote.isPending}
+        cancelLabel="Vazgec"
+      />
     </div>
   );
 }
