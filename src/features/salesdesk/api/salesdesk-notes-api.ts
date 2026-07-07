@@ -56,14 +56,12 @@ export const salesDeskNotesApi = {
       content: String(input.content ?? '').trim(),
       recipientUserIds: normalizeIds(input.recipientUserIds),
       notifyRecipients: input.notifyRecipients !== false,
-    }, { useNativeHttpMethod: true });
+    });
     return unwrapApiData(response, 'Not guncellenemedi.');
   },
 
   delete: async (id: number): Promise<void> => {
-    const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`, {
-      useNativeHttpMethod: true,
-    });
+    const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`);
     if (!response.success) {
       throw new Error(response.message || 'Not silinemedi.');
     }

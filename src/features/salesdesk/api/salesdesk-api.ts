@@ -495,15 +495,12 @@ async function updateOne<T, TBody>(
   body: TBody,
   requestConfig?: AxiosRequestConfig
 ): Promise<T> {
-  const response = await api.put<ApiResponse<T>>(`${BASE}/${path}/${id}`, body, {
-    useNativeHttpMethod: true,
-    ...requestConfig,
-  });
+  const response = await api.put<ApiResponse<T>>(`${BASE}/${path}/${id}`, body, requestConfig);
   return unwrapApiData(response, 'Kayit guncellenemedi');
 }
 
 async function deleteOne(path: string, id: number): Promise<void> {
-  const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${path}/${id}`, { useNativeHttpMethod: true });
+  const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${path}/${id}`);
   if (!response.success) {
     throw new Error(response.message || 'Kayit silinemedi');
   }

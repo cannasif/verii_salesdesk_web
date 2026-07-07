@@ -622,8 +622,9 @@ api.interceptors.response.use(
       !error.response &&
       (!error.message || error.message === 'Network Error')
     ) {
-      error.message =
-        'API sunucusuna ulasilamadi. npm run dev ile baslatin ve adres cubugundaki portu (or. localhost:5174) kullanin.';
+      error.message = import.meta.env.DEV
+        ? 'API sunucusuna ulasilamadi. npm run dev ile baslatin ve adres cubugundaki portu (or. localhost:5174) kullanin.'
+        : 'API sunucusuna ulasilamadi. Baglantinizi kontrol edin; sorun devam ederse sunucu CORS/IIS ayarlarini kontrol edin.';
     }
 
     const apiMessage = extractApiErrorMessage(apiError);

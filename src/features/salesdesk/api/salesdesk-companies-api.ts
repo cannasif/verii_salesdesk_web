@@ -76,16 +76,12 @@ export const salesDeskCompaniesApi = {
     const payload = normalizePayload(body);
     if (!payload.name) throw new Error('Sirket adi zorunludur.');
 
-    const response = await api.put<ApiResponse<SalesDeskCompanyDto>>(`${BASE}/${id}`, payload, {
-      useNativeHttpMethod: true,
-    });
+    const response = await api.put<ApiResponse<SalesDeskCompanyDto>>(`${BASE}/${id}`, payload);
     return unwrapApiData(response, 'Sirket guncellenemedi.');
   },
 
   delete: async (id: number): Promise<void> => {
-    const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`, {
-      useNativeHttpMethod: true,
-    });
+    const response = await api.delete<ApiResponse<unknown>>(`${BASE}/${id}`);
     if (!response.success) {
       throw new Error(response.message || 'Sirket silinemedi.');
     }
