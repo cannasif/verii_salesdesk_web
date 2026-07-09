@@ -198,7 +198,7 @@ export const SD_PAGE_ADD_BUTTON = [
 
 /** Tablo satir aksiyonlari — minimum 44px dokunma alani. */
 export const SD_TABLE_ACTION_BUTTON =
-  'h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 p-0';
+  'inline-flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center p-0';
 
 export const SD_PAGE_PULSE = 'bg-[var(--crm-brand-primary)]';
 
