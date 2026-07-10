@@ -5,13 +5,22 @@ import sharp from 'sharp';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, '..');
-const source = join(root, 'public', 'v3rii-salesdesk-logo.png');
+const source = join(root, 'public', '_logo-import.png');
+
 const targets = [
   'v3rii-salesdesk-logo.png',
-  'veriicrmlogo-sm.png',
   'veriicrmlogo.png',
+  'veriicrmlogo-sm.png',
   'v3logo-sm.png',
+  'assets/v3rii-salesdesk-logo.png',
+  'assets/veriicrmlogo.png',
+  'assets/veriicrmlogo-sm.png',
+  'assets/v3logo.png',
+  'assets/v3logo-sm.png',
+  'assets/logo.png',
 ];
+
+const smallTargets = new Set(['veriicrmlogo-sm.png', 'v3logo-sm.png', 'assets/veriicrmlogo-sm.png', 'assets/v3logo-sm.png']);
 
 function shouldMakeTransparent(r, g, b, a) {
   if (a === 0) return true;
@@ -69,10 +78,14 @@ async function removeBackground(inputPath) {
     .toBuffer();
 }
 
-const output = await removeBackground(source);
+const fullBuffer = await removeBackground(source);
 
 for (const name of targets) {
-  writeFileSync(join(root, 'public', name), output);
+  const outputPath = join(root, 'public', name);
+  const buffer = smallTargets.has(name)
+    ? await sharp(fullBuffer).resize({ height: 48 }).png().toBuffer()
+    : fullBuffer;
+  writeFileSync(outputPath, buffer);
 }
 
 console.log(`Logo arka plani kaldirildi: ${targets.join(', ')}`);

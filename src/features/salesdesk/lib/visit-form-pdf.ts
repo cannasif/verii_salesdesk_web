@@ -18,14 +18,14 @@ const SECTION_HEADER_SPACE = 16;
 type PdfFont = typeof QUOTATION_EXPORT_PDF_FONT | 'helvetica';
 type Rgb = readonly [number, number, number];
 
-/** Beyaz zemin + logo gradyanı (pembe → turuncu → altın) */
+/** Beyaz zemin + Minimal Masa slate gri paleti */
 const C = {
-  gold: [245, 158, 11] as Rgb,
-  goldDark: [180, 83, 9] as Rgb,
-  brandPink: [219, 39, 119] as Rgb,
-  cream: [255, 251, 245] as Rgb,
-  creamDeep: [254, 243, 225] as Rgb,
-  border: [254, 230, 200] as Rgb,
+  gold: [100, 116, 139] as Rgb,
+  goldDark: [71, 85, 105] as Rgb,
+  brandPink: [148, 163, 184] as Rgb,
+  cream: [248, 250, 252] as Rgb,
+  creamDeep: [226, 232, 240] as Rgb,
+  border: [203, 213, 225] as Rgb,
   text: [15, 23, 42] as Rgb,
   muted: [71, 85, 105] as Rgb,
   soft: [100, 116, 139] as Rgb,

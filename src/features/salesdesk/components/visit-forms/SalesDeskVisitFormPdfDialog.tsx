@@ -62,6 +62,7 @@ export function SalesDeskVisitFormPdfDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        showCloseButton={false}
         className={`flex h-[min(92vh,820px)] w-[calc(100%-1.5rem)] max-w-4xl flex-col gap-0 overflow-hidden rounded-2xl p-0 ${SD_SURFACE_DIALOG}`}
       >
         <DialogHeader className="flex shrink-0 flex-row items-center justify-between border-b border-[var(--crm-app-border)] px-5 py-4">
