@@ -39,6 +39,7 @@ export interface SalesDeskColumn<T> {
   cellClassName?: string;
   filterType?: FilterColumnConfig['type'];
   exportValue?: (row: T) => string | number | boolean | null | undefined;
+  copyValue?: (row: T) => string | null | undefined;
 }
 
 interface SalesDeskListLayoutProps<T extends { id: number }> {
@@ -89,6 +90,7 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   hideToolbar?: boolean;
   contentAboveTable?: ReactNode;
   customTable?: ReactNode;
+  enableCellCopyButton?: boolean;
 }
 
 function loadSalesDeskColumnPrefs(pageKey: string, userId: number | undefined, defaultOrder: string[]) {
@@ -142,6 +144,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
   hideToolbar = false,
   contentAboveTable,
   customTable,
+  enableCellCopyButton = false,
 }: SalesDeskListLayoutProps<T>): ReactElement {
   const user = useAuthStore((state) => state.user);
   const showTableLoading = Boolean(isLoading && !isError);
@@ -304,6 +307,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
                   onPageChange={onPageChange}
                   totalCount={totalCount}
                   onColumnOrderChange={handleColumnOrderChange}
+                  enableCellCopyButton={enableCellCopyButton}
                 />
               </ManagementDataTableChrome>
             </div>

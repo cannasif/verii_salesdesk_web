@@ -1,10 +1,11 @@
 import { type ReactElement, type ReactNode, useEffect, useMemo, useState } from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Copy, Edit2, Trash2 } from 'lucide-react';
 import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { cn, arraysEqual } from '@/lib/utils';
 import type { SalesDeskColumn } from './SalesDeskListLayout';
 import { SD_TABLE_ACTION_BUTTON } from '../lib/salesdesk-popup-styles';
+import { copySalesDeskCellValue, resolveSalesDeskColumnCopyValue } from '../lib/salesdesk-cell-copy';
 import { SalesDeskMobileCardList } from './SalesDeskMobileCardList';
 
 interface SalesDeskManagementTableProps<T extends { id: number }> {
@@ -30,6 +31,7 @@ interface SalesDeskManagementTableProps<T extends { id: number }> {
   onPageChange: (page: number) => void;
   totalCount: number;
   onColumnOrderChange?: (order: string[]) => void;
+  enableCellCopyButton?: boolean;
 }
 
 export function SalesDeskManagementTable<T extends { id: number }>({
@@ -55,6 +57,7 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   onPageChange,
   totalCount,
   onColumnOrderChange,
+  enableCellCopyButton = false,
 }: SalesDeskManagementTableProps<T>): ReactElement {
   const defaultOrder = useMemo(() => columns.map((column) => column.key), [columns]);
   const [internalColumnOrder, setInternalColumnOrder] = useState<string[]>(defaultOrder);
@@ -83,7 +86,38 @@ export function SalesDeskManagementTable<T extends { id: number }>({
 
   const renderCell = (row: T, key: string): ReactNode => {
     const column = columns.find((item) => item.key === key);
-    return column ? column.render(row) : '-';
+    if (!column) return '-';
+
+    const content = column.render(row);
+    if (!enableCellCopyButton) return content;
+
+    const copyText = resolveSalesDeskColumnCopyValue(row, column);
+    if (!copyText) return content;
+
+    return (
+      <div className="flex min-w-0 items-center gap-0.5">
+        <span className="min-w-0 flex-1 truncate">{content}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          title="Kopyala"
+          aria-label="Kopyala"
+          data-skip-row-double-click
+          data-no-drag-scroll
+          className={cn(
+            SD_TABLE_ACTION_BUTTON,
+            'h-7 w-7 shrink-0 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-zinc-100'
+          )}
+          onClick={(event) => {
+            event.stopPropagation();
+            void copySalesDeskCellValue(copyText, column.header);
+          }}
+        >
+          <Copy size={14} />
+        </Button>
+      </div>
+    );
   };
 
   const showActions = Boolean(onEdit || onDelete || renderExtraActions);

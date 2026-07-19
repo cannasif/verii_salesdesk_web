@@ -70,6 +70,7 @@ export function SalesDeskCompaniesPage(): ReactElement {
       title="Sirket Yonetimi"
       subtitle="Musteri sirketlerinin IP, VPN, veritabani ve erisim bilgileri"
       tableTitle="Sirket Listesi"
+      enableCellCopyButton
       actionLabel="Yeni Sirket Ekle"
       icon={<Building2 size={22} />}
       exportFileName="sirket-yonetimi"

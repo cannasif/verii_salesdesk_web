@@ -105,11 +105,7 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         secure: false,
       },
-      "/salesdesk/companies": {
-        target: devLocalServerTarget,
-        changeOrigin: true,
-        secure: false,
-      },
+      // /salesdesk/companies React sayfasi ile cakisir; sirket API'si /companies uzerinden proxy'lenir.
       "/notes": {
         target: devLocalServerTarget,
         changeOrigin: true,
