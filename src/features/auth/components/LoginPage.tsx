@@ -179,7 +179,7 @@ export function LoginPage(): React.JSX.Element {
             <img
               src={SALESDESK_LOGO_URL}
               alt={SALESDESK_LOGO_ALT}
-              className="inline-flex h-auto w-full max-w-[320px] object-contain p-2"
+              className="inline-flex h-auto w-full max-w-[320px] bg-transparent object-contain p-2"
             />
             <p className="text-slate-400 text-xs uppercase tracking-[0.15em] mt-2 font-medium">
               {t('auth.login.title')}

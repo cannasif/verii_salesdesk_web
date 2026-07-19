@@ -22,7 +22,7 @@ export function SalesDeskSettingsAdminPanel(): ReactElement {
         <div className="mt-4 space-y-3 rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)] p-4 text-sm">
           <p className="flex flex-wrap items-center gap-2 text-slate-700 dark:text-slate-300">
             <span className="text-[var(--crm-app-text-muted)]">Veritabani:</span>
-            <span className={salesDeskStatValueClass}>V3RIISALESDESK</span>
+            <span className={salesDeskStatValueClass}>YAZIHANE</span>
           </p>
           <p className="text-slate-700 dark:text-slate-300">
             <span className="text-[var(--crm-app-text-muted)]">API URL:</span>{' '}

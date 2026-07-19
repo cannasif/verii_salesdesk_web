@@ -1472,7 +1472,7 @@
   },
   "dashboard": {
     "title": "dashboard",
-    "subtitle": "Welcome to the SalesDesk system",
+    "subtitle": "Welcome to Yazıhane",
     "monthlyRevenue": "Monthly Revenue",
     "conversionRate": "Conversion Rate",
     "totalCustomers": "Total Customers",

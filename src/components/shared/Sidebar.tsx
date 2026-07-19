@@ -455,7 +455,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
               onDoubleClick={handleLogoDoubleClick}
               className="flex justify-center flex-1 cursor-pointer select-none rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--crm-brand-ring)]"
             >
-              <img src={SALESDESK_LOGO_URL} alt={SALESDESK_LOGO_ALT} className="h-20 max-w-[220px] object-contain pointer-events-none" />
+              <img src={SALESDESK_LOGO_URL} alt={SALESDESK_LOGO_ALT} className="h-20 max-w-[220px] bg-transparent object-contain pointer-events-none" />
             </button>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:text-red-400 rounded-lg">
               <X size={24} />
@@ -474,7 +474,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
             <img
               src={SALESDESK_LOGO_URL}
               alt={SALESDESK_LOGO_ALT}
-              className="h-full w-full max-h-[72px] object-contain object-left scale-110 pointer-events-none"
+              className="h-full w-full max-h-[72px] bg-transparent object-contain object-left scale-110 pointer-events-none"
             />
           </button>
         </div>

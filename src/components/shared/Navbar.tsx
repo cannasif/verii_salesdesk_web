@@ -9,6 +9,7 @@ import { UserProfileModal } from '@/features/user-detail-management/components/U
 import { useAppShellStore } from '@/stores/app-shell-store';
 import { getImageUrl } from '@/features/user-detail-management/utils/image-url';
 import { cn } from '@/lib/utils';
+import { APP_DISPLAY_NAME } from '@/lib/brand-assets';
 import { CRM_APP_PANEL_GLASS } from '@/lib/management-list-layout';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
@@ -155,7 +156,7 @@ export function Navbar(): ReactElement {
         ? 'Yazilim Arastirmasi Duzenle'
         : location.pathname.match(/^\/salesdesk\/erp-news\/\d+\/edit$/)
           ? 'ERP Haberi Duzenle'
-          : 'Sales Desk');
+          : APP_DISPLAY_NAME);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -196,7 +197,7 @@ export function Navbar(): ReactElement {
           </button>
 
           <div className="hidden min-w-[140px] shrink-0 border-l border-slate-200 pl-4 dark:border-white/10 md:block">
-            <p className="text-[11px] text-slate-500">Sales Desk</p>
+            <p className="text-[11px] text-slate-500">{APP_DISPLAY_NAME}</p>
             <p className="mt-1 truncate text-base font-semibold text-slate-900 dark:text-slate-100">{pageTitle}</p>
           </div>
 

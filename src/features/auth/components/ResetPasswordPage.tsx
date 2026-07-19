@@ -90,7 +90,7 @@ export function ResetPasswordPage(): React.JSX.Element {
             <img
               src={SALESDESK_LOGO_URL}
               alt={SALESDESK_LOGO_ALT}
-              className="inline-flex h-auto w-full max-w-[320px] object-contain p-2"
+              className="inline-flex h-auto w-full max-w-[320px] bg-transparent object-contain p-2"
             />
             <p className="mt-2 text-xs font-medium uppercase tracking-[0.15em] text-[var(--crm-app-text-muted)]">
               {t('auth.resetPassword.title')}

@@ -59,3 +59,4 @@ server/data/*.json
 .eslintcache
 .turbo
 .vercel
+public/_logo-import.png
