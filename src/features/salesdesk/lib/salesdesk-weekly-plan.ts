@@ -21,8 +21,8 @@ export type WeeklyPlanAssignee =
   | { kind: 'group'; id: number };
 
 export interface WeeklyPlanIndex {
-  users: Map<string, SalesDeskTaskDto>;
-  groups: Map<string, SalesDeskTaskDto>;
+  users: Map<string, SalesDeskTaskDto[]>;
+  groups: Map<string, SalesDeskTaskDto[]>;
 }
 
 export function weeklyPlanGroupAssigneeTag(groupId: number): string {
@@ -195,23 +195,111 @@ export function formatWeekRange(weekStart: Date): string {
   return `${startLabel} – ${endLabel}`;
 }
 
-/** Kullanici ve grup satirlari icin (id|dateKey) -> gorev haritalari olusturur. */
+/** Kullanici / grup adlarini her kelimenin ilk harfi buyuk olacak sekilde gosterir. */
+export function formatWeeklyPlanDisplayName(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return trimmed;
+  return trimmed
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => {
+      if (word.length === 0) return word;
+      return word.charAt(0).toLocaleUpperCase('tr-TR') + word.slice(1).toLocaleLowerCase('tr-TR');
+    })
+    .join(' ');
+}
+
+export function getWeeklyPlanTaskTimeLabel(dueDate?: string | null): string | null {
+  if (!dueDate?.includes('T')) return null;
+  const date = new Date(dueDate);
+  if (Number.isNaN(date.getTime())) return null;
+  if (date.getHours() === 0 && date.getMinutes() === 0 && date.getSeconds() === 0) return null;
+  return date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+}
+
+const WEEKLY_PLAN_ATTENDEES_MARKER = /^\[\[wpa:([\d,]+)\]\]\n?/;
+
+export function parseWeeklyPlanAttendeeIds(task: SalesDeskTaskDto): number[] {
+  const description = task.description ?? '';
+  const match = description.match(WEEKLY_PLAN_ATTENDEES_MARKER);
+  if (match?.[1]) {
+    const ids = match[1]
+      .split(',')
+      .map((value) => Number(value.trim()))
+      .filter((id) => Number.isFinite(id) && id > 0);
+    if (ids.length > 0) return [...new Set(ids)];
+  }
+  if (task.assignedUserId && task.assignedUserId > 0) {
+    return [task.assignedUserId];
+  }
+  return [];
+}
+
+export function stripWeeklyPlanAttendeesMarker(description?: string | null): string {
+  if (!description) return '';
+  return description.replace(WEEKLY_PLAN_ATTENDEES_MARKER, '').trim();
+}
+
+export function buildWeeklyPlanDescription(attendeeIds: number[], note: string): string | undefined {
+  const uniqueIds = [...new Set(attendeeIds.filter((id) => Number.isFinite(id) && id > 0))];
+  const trimmedNote = note.trim();
+  if (uniqueIds.length === 0 && !trimmedNote) return undefined;
+  if (uniqueIds.length === 0) return trimmedNote || undefined;
+  const marker = `[[wpa:${uniqueIds.join(',')}]]`;
+  return trimmedNote ? `${marker}\n${trimmedNote}` : marker;
+}
+
+export function formatWeeklyPlanAttendeeNames(
+  attendeeIds: number[],
+  users: Array<{ id: number; name: string }>
+): string {
+  const names = attendeeIds
+    .map((id) => users.find((user) => user.id === id)?.name)
+    .filter((name): name is string => Boolean(name?.trim()))
+    .map((name) => formatWeeklyPlanDisplayName(name));
+  return names.length > 0 ? names.join(', ') : '-';
+}
+
+function pushWeeklyPlanTask(
+  map: Map<string, SalesDeskTaskDto[]>,
+  key: string,
+  task: SalesDeskTaskDto
+): void {
+  const existing = map.get(key);
+  if (existing) {
+    existing.push(task);
+    return;
+  }
+  map.set(key, [task]);
+}
+
+/** Kullanici ve grup satirlari icin (id|dateKey) -> gorev listeleri olusturur. */
 export function buildWeeklyPlanIndex(tasks: SalesDeskTaskDto[]): WeeklyPlanIndex {
-  const users = new Map<string, SalesDeskTaskDto>();
-  const groups = new Map<string, SalesDeskTaskDto>();
+  const users = new Map<string, SalesDeskTaskDto[]>();
+  const groups = new Map<string, SalesDeskTaskDto[]>();
 
   tasks.forEach((task) => {
     if (!task.dueDate) return;
     const dateKey = task.dueDate.slice(0, 10);
     const groupId = parseWeeklyPlanGroupAssignee(task.groupName);
     if (groupId != null) {
-      groups.set(weeklyPlanGroupCellKey(groupId, dateKey), task);
+      pushWeeklyPlanTask(groups, weeklyPlanGroupCellKey(groupId, dateKey), task);
       return;
     }
     if (task.groupName === WEEKLY_PLAN_GROUP && task.assignedUserId) {
-      users.set(weeklyPlanCellKey(task.assignedUserId, dateKey), task);
+      const attendeeIds = parseWeeklyPlanAttendeeIds(task);
+      const targetUserIds = attendeeIds.length > 0 ? attendeeIds : [task.assignedUserId];
+      targetUserIds.forEach((userId) => {
+        pushWeeklyPlanTask(users, weeklyPlanCellKey(userId, dateKey), task);
+      });
     }
   });
+
+  const sortById = (list: SalesDeskTaskDto[]): SalesDeskTaskDto[] =>
+    [...list].sort((a, b) => a.id - b.id);
+
+  users.forEach((list, key) => users.set(key, sortById(list)));
+  groups.forEach((list, key) => groups.set(key, sortById(list)));
 
   return { users, groups };
 }

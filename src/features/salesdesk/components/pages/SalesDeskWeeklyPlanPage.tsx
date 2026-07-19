@@ -79,11 +79,15 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
   const planCount = useMemo(() => {
     const weekKeys = new Set(weekDays.map((day) => day.dateKey));
     let count = 0;
-    planIndex.users.forEach((task) => {
-      if (task.dueDate && weekKeys.has(task.dueDate.slice(0, 10))) count += 1;
+    planIndex.users.forEach((tasks) => {
+      tasks.forEach((task) => {
+        if (task.dueDate && weekKeys.has(task.dueDate.slice(0, 10))) count += 1;
+      });
     });
-    planIndex.groups.forEach((task) => {
-      if (task.dueDate && weekKeys.has(task.dueDate.slice(0, 10))) count += 1;
+    planIndex.groups.forEach((tasks) => {
+      tasks.forEach((task) => {
+        if (task.dueDate && weekKeys.has(task.dueDate.slice(0, 10))) count += 1;
+      });
     });
     return count;
   }, [planIndex, weekDays]);
@@ -159,18 +163,18 @@ export function SalesDeskWeeklyPlanPage(): ReactElement {
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
+            onClick={() => setWeekStart(getWeekStart())}
+            className="h-11 min-h-[44px] rounded-lg border border-[var(--crm-app-border)] px-3 text-sm font-medium text-slate-200 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
+          >
+            Bu Hafta
+          </button>
+          <button
+            type="button"
             onClick={() => setWeekStart((current) => addDays(current, -7))}
             className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-[var(--crm-app-border)] text-slate-300 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
             aria-label="Onceki hafta"
           >
             <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setWeekStart(getWeekStart())}
-            className="h-11 min-h-[44px] rounded-lg border border-[var(--crm-app-border)] px-3 text-sm font-medium text-slate-200 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)]"
-          >
-            Bu Hafta
           </button>
           <button
             type="button"
