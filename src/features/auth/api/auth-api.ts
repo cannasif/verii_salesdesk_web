@@ -1,6 +1,16 @@
 import { api } from '@/lib/axios';
+import { resolveAppPath } from '@/lib/api-config';
 import type { ApiResponse } from '@/types/api';
 import type { LoginRequest, LoginResponse, ActiveUsersResponse, RefreshTokenRequest } from '../types/auth';
+
+function buildClientResetPasswordPageUrl(): string {
+  if (typeof window === 'undefined') {
+    return 'https://salesdesk.v3rii.com/reset-password';
+  }
+
+  const path = resolveAppPath('/reset-password');
+  return `${window.location.origin}${path.startsWith('/') ? path : `/${path}`}`;
+}
 
 export const authApi = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
@@ -23,8 +33,12 @@ export const authApi = {
     return response;
   },
   requestPasswordReset: async (email: string): Promise<ApiResponse<string>> => {
+    const normalizedEmail = email.trim();
+    const resetUrl = buildClientResetPasswordPageUrl();
     const response = await api.post<ApiResponse<string>>('/api/auth/request-password-reset', {
-      email,
+      email: normalizedEmail,
+      resetUrl,
+      resetPasswordUrl: resetUrl,
     });
     return response;
   },

@@ -31,7 +31,11 @@ export function ResetPasswordPage(): React.JSX.Element {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const token =
+    searchParams.get('token')?.trim() ||
+    searchParams.get('resetToken')?.trim() ||
+    searchParams.get('code')?.trim() ||
+    '';
   const { mutate: resetPassword, isPending } = useResetPassword();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);

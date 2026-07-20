@@ -16,7 +16,16 @@ export function useSendTestMailMutation() {
       toast.success(t('mailSettings.TestMail.Success'));
     },
     onError: (error: Error) => {
-      toast.error(t(error.message) || error.message || t('common.UnexpectedError'));
+      const rawMessage = error.message?.trim() ?? '';
+      const translated = rawMessage ? t(rawMessage) : '';
+      const message =
+        rawMessage &&
+        translated &&
+        translated !== rawMessage &&
+        translated !== 'Çeviri eksik'
+          ? translated
+          : rawMessage || t('common.UnexpectedError');
+      toast.error(message);
     },
   });
 }

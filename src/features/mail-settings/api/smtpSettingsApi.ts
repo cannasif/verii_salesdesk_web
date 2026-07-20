@@ -20,11 +20,15 @@ export const smtpSettingsApi = {
   },
 
   update: async (data: UpdateSmtpSettingsDto): Promise<SmtpSettingsDto> => {
-    const response = await api.put<ApiResponse<SmtpSettingsDto>>(SMTP_SETTINGS_BASE, data);
+    const response = await api.post<ApiResponse<SmtpSettingsDto>>(
+      `${SMTP_SETTINGS_BASE}/update`,
+      data
+    );
+
     if (response.success === true && response.data) {
       return response.data;
     }
-    throw new Error(getErrorMessage(response, 'common.UnexpectedError'));
+    throw new Error(getErrorMessage(response, 'mailSettings.SaveFailed'));
   },
 
   sendTest: async (to?: string): Promise<boolean> => {

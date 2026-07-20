@@ -461,7 +461,7 @@ function clearStoredTokens(): void {
   sessionStorage.removeItem('refresh_token');
 }
 
-function shouldSkipRefresh(url?: string): boolean {
+function isPublicAuthApiUrl(url?: string): boolean {
   if (!url) return false;
 
   return [
@@ -469,7 +469,11 @@ function shouldSkipRefresh(url?: string): boolean {
     '/api/auth/refresh-token',
     '/api/auth/request-password-reset',
     '/api/auth/reset-password',
-  ].some((path) => url.includes(path));
+  ].some((path) => url.toLowerCase().includes(path));
+}
+
+function shouldSkipRefresh(url?: string): boolean {
+  return isPublicAuthApiUrl(url);
 }
 
 async function refreshAccessToken(): Promise<string | null> {
@@ -561,7 +565,7 @@ api.interceptors.request.use((config) => {
   }
 
   const token = getStoredAccessToken();
-  if (token) {
+  if (token && !isPublicAuthApiUrl(config.url)) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 

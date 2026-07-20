@@ -18,6 +18,7 @@
   "TestMail": {
     "Send": "Test E-postası Gönder",
     "Sending": "Test gönderiliyor...",
-    "Success": "Test e-postası gönderildi"
+    "Success": "Test e-postası gönderildi",
+    "CompleteFormFirst": "Önce tüm zorunlu alanları doldurup Kaydet ile kaydedin."
   }
 }

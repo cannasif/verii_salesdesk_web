@@ -231,17 +231,7 @@ export function MailSettingsForm({
                 {t('mailSettings.Fields.FromName')}
               </FormLabel>
               <FormControl>
-                <Input
-                  type="text"
-                  readOnly
-                  disabled
-                  {...field}
-                  className={
-                    isSalesDesk
-                      ? `${fieldClass} w-full opacity-70`
-                      : 'bg-slate-50 border-slate-200 dark:bg-[#190b20] dark:border-[#3b3142] text-muted-foreground rounded-xl'
-                  }
-                />
+                <Input type="text" placeholder="Yazıhane" {...field} className={inputClass} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -305,7 +295,14 @@ export function MailSettingsForm({
               <button
                 type="button"
                 onClick={() => testMailMutation.mutate({})}
-                disabled={isSubmitting || testMailMutation.isPending}
+                disabled={isSubmitting || testMailMutation.isPending || !isFormValid}
+                title={
+                  !isFormValid
+                    ? t('mailSettings.TestMail.CompleteFormFirst', {
+                        defaultValue: 'Önce tüm zorunlu alanları doldurup Kaydet ile kaydedin.',
+                      })
+                    : undefined
+                }
                 className={SD_SECONDARY_BUTTON}
               >
                 {testMailMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}

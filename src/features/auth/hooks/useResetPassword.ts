@@ -12,7 +12,7 @@ export const useResetPassword = () => {
     mutationFn: (data: { token: string; newPassword: string }) =>
       authApi.resetPassword(data),
     onSuccess: (response) => {
-      if (response.success) {
+      if (response.success !== false) {
         toast.success(t('auth.resetPassword.successRedirect'));
         setTimeout(() => {
           navigate('/auth/login', { replace: true });

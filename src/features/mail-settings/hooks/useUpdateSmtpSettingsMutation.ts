@@ -18,7 +18,16 @@ export function useUpdateSmtpSettingsMutation() {
       toast.success(t('mailSettings.SavedSuccessfully'));
     },
     onError: (error: Error) => {
-      toast.error(t(error.message) || error.message || t('common.UnexpectedError'));
+      const rawMessage = error.message?.trim() ?? '';
+      const translated = rawMessage ? t(rawMessage) : '';
+      const message =
+        rawMessage &&
+        translated &&
+        translated !== rawMessage &&
+        translated !== 'Çeviri eksik'
+          ? translated
+          : rawMessage || t('mailSettings.SaveFailed');
+      toast.error(message);
     },
   });
 }
