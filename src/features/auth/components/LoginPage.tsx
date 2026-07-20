@@ -47,7 +47,7 @@ import {
   AUTH_TOGGLE_ACTIVE,
   AUTH_TOGGLE_IDLE,
 } from '../lib/auth-page-styles';
-import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
+import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_AUTH_CLASS, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
 const AuthBackground = lazy(async () => import('./AuthBackground').then((mod) => ({ default: mod.AuthBackground })));
 
 import { 
@@ -175,15 +175,12 @@ export function LoginPage(): React.JSX.Element {
       <div className="relative z-10 w-full h-full flex flex-col justify-between items-center px-4 py-8 overflow-y-auto">
 
         <div className={`${AUTH_CARD} ${AUTH_CARD_ANIMATE} mb-auto mt-10 md:mt-auto`}>
-          <div className="text-center mb-8">
+          <div className="mb-8 text-center">
             <img
               src={SALESDESK_LOGO_URL}
               alt={SALESDESK_LOGO_ALT}
-              className="inline-flex h-auto w-full max-w-[320px] bg-transparent object-contain p-2"
+              className={SALESDESK_LOGO_AUTH_CLASS}
             />
-            <p className="text-slate-400 text-xs uppercase tracking-[0.15em] mt-2 font-medium">
-              {t('auth.login.title')}
-            </p>
           </div>
           
           <Form {...form}>

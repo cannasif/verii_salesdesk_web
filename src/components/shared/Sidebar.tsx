@@ -4,7 +4,7 @@ import { useUIStore } from '@/stores/ui-store';
 import { cn } from '@/lib/utils';
 import { CRM_APP_PANEL_GLASS } from '@/lib/management-list-layout';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
-import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
+import { SALESDESK_LOGO_ALT, SALESDESK_LOGO_SIDEBAR_CLASS, SALESDESK_LOGO_SIDEBAR_COLLAPSED_CLASS, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
 
 const SIDEBAR_EASE = 'ease-[cubic-bezier(0.4,0,0.2,1)]';
 const SIDEBAR_TRANSITION = `duration-[260ms] ${SIDEBAR_EASE}`;
@@ -437,7 +437,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
       >
         
         <div className={cn(
-          "h-[104px] flex items-center justify-center border-b border-slate-200 shrink-0 relative overflow-hidden dark:border-white/10",
+          "h-[88px] flex items-center justify-center border-b border-slate-200 shrink-0 relative overflow-hidden dark:border-white/10",
           "pt-[env(safe-area-inset-top)] transition-[padding] duration-[260ms]",
           SIDEBAR_EASE,
           isSidebarOpen ? "px-4" : "px-0"
@@ -455,7 +455,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
               onDoubleClick={handleLogoDoubleClick}
               className="flex justify-center flex-1 cursor-pointer select-none rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--crm-brand-ring)]"
             >
-              <img src={SALESDESK_LOGO_URL} alt={SALESDESK_LOGO_ALT} className="h-20 max-w-[220px] bg-transparent object-contain pointer-events-none" />
+              <img src={SALESDESK_LOGO_URL} alt={SALESDESK_LOGO_ALT} className={SALESDESK_LOGO_SIDEBAR_CLASS} />
             </button>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-slate-500 hover:text-red-400 rounded-lg">
               <X size={24} />
@@ -474,7 +474,7 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
             <img
               src={SALESDESK_LOGO_URL}
               alt={SALESDESK_LOGO_ALT}
-              className="h-full w-full max-h-[72px] bg-transparent object-contain object-left scale-110 pointer-events-none"
+              className={SALESDESK_LOGO_SIDEBAR_COLLAPSED_CLASS}
             />
           </button>
         </div>
