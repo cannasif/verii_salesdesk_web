@@ -31,6 +31,7 @@ export { SalesDeskActivitiesPage } from './components/pages/SalesDeskActivitiesP
 export { SalesDeskProjeTakibiPage } from './components/pages/SalesDeskProjeTakibiPage';
 export { SalesDeskWeeklyPlanPage } from './components/pages/SalesDeskWeeklyPlanPage';
 export { SalesDeskVisitFormsPage } from './components/pages/SalesDeskVisitFormsPage';
+export { SalesDeskVisitFormReportPage } from './components/pages/SalesDeskVisitFormReportPage';
 export {
   SalesDeskVisitFormCreatePage,
   SalesDeskVisitFormEditPage,
@@ -93,6 +94,7 @@ export const salesDeskNavItems = [
       { title: 'Haftalik Plan', href: '/salesdesk/weekly-plan' },
       { title: 'Acik Maddeler', href: '/salesdesk/open-items' },
       { title: 'Ziyaret Formlari', href: '/salesdesk/visit-forms' },
+      { title: 'Ziyaret Form Raporu', href: '/salesdesk/visit-form-report' },
     ],
   },
   {

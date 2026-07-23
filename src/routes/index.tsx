@@ -44,6 +44,7 @@ const SalesDeskWeeklyPlanPage = lazyImport(() => import('@/features/salesdesk'),
 const SalesDeskVisitFormsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitFormsPage');
 const SalesDeskVisitFormCreatePage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitFormCreatePage');
 const SalesDeskVisitFormEditPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitFormEditPage');
+const SalesDeskVisitFormReportPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskVisitFormReportPage');
 const SalesDeskAssetsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskAssetsPage');
 const SalesDeskPaymentsPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskPaymentsPage');
 const SalesDeskSoftwareResearchPage = lazyImport(() => import('@/features/salesdesk'), 'SalesDeskSoftwareResearchPage');
@@ -98,6 +99,7 @@ export function createAppRouter() {
         { path: 'salesdesk/visit-forms', element: <SalesDeskVisitFormsPage /> },
         { path: 'salesdesk/visit-forms/new', element: <SalesDeskVisitFormCreatePage /> },
         { path: 'salesdesk/visit-forms/:id/edit', element: <SalesDeskVisitFormEditPage /> },
+        { path: 'salesdesk/visit-form-report', element: <SalesDeskVisitFormReportPage /> },
         { path: 'salesdesk/assets', element: <SalesDeskAssetsPage /> },
         { path: 'salesdesk/recurring-payments', element: <SalesDeskPaymentsPage /> },
         { path: 'salesdesk/software-research', element: <SalesDeskSoftwareResearchPage /> },

@@ -33,6 +33,7 @@ const pageTitles: Record<string, string> = {
   '/salesdesk/open-items': 'Acik Maddeler',
   '/salesdesk/weekly-plan': 'Haftalik Plan',
   '/salesdesk/visit-forms': 'Ziyaret Formu',
+  '/salesdesk/visit-form-report': 'Ziyaret Form Raporu',
   '/salesdesk/visit-forms/new': 'Yeni Ziyaret Formu',
   '/salesdesk/assets': 'Demirbaslar',
   '/salesdesk/recurring-payments': 'Standart Odemeler',
