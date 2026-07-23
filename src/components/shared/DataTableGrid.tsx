@@ -10,6 +10,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { resolveRowCellCopyValue } from '@/lib/table-cell-copy';
+import { wrapTableCellWithCopy } from './TableCellWithCopy';
 import { DataTableActionBar, type DataTableActionBarProps } from './DataTableActionBar';
 
 export type DataTableSortDirection = 'asc' | 'desc';
@@ -22,6 +24,7 @@ export interface DataTableGridColumn<TKey extends string> {
   headClassName?: string;
   cellClassName?: string;
   defaultWidth?: number;
+  copyValue?: (row: unknown) => string | number | boolean | null | undefined;
 }
 
 interface DataTableGridProps<TRow, TKey extends string> {
@@ -70,6 +73,8 @@ interface DataTableGridProps<TRow, TKey extends string> {
   enableColumnResize?: boolean;
   /** Mobilde tablo yerine gosterilecek icerik (or. SalesDesk kart listesi). */
   mobileView?: ReactNode;
+  enableCellCopyButton?: boolean;
+  getCellCopyValue?: (row: TRow, columnKey: TKey) => string | null;
 }
 
 const MIN_COL_WIDTH = 60;
@@ -266,6 +271,8 @@ export function DataTableGrid<TRow, TKey extends string>({
   onColumnOrderChange,
   enableColumnResize = true,
   mobileView,
+  enableCellCopyButton = true,
+  getCellCopyValue,
 }: DataTableGridProps<TRow, TKey>): ReactElement {
   const { t } = useTranslation('common');
   const MISSING_TRANSLATION = 'Çeviri eksik';
@@ -469,6 +476,22 @@ export function DataTableGrid<TRow, TKey extends string>({
   const colSpan = localVisibleColumnKeys.length + (showActionsColumn ? 1 : 0) || 1;
   const hasAnyWidth = enableColumnResize && localVisibleColumnKeys.some(k => columnWidths[k] !== undefined);
 
+  const renderCellContent = (row: TRow, key: TKey, colWidth?: number): ReactNode => {
+    const content = renderCell(row, key, colWidth);
+    if (!enableCellCopyButton) return content;
+
+    const column = columns.find((item) => item.key === key);
+    const copyText =
+      getCellCopyValue?.(row, key) ??
+      resolveRowCellCopyValue(
+        row,
+        key,
+        column?.copyValue ? (currentRow) => column.copyValue!(currentRow) : undefined
+      );
+
+    return wrapTableCellWithCopy(content, copyText, column?.label, { centered: centerColumnHeaders });
+  };
+
   return (
     <div className="flex min-w-0 w-full flex-col gap-2">
       {actionBar ? <DataTableActionBar {...actionBar} /> : toolbar}
@@ -638,7 +661,7 @@ export function DataTableGrid<TRow, TKey extends string>({
                               'min-w-0',
                               colWidth !== undefined && 'overflow-hidden truncate [&>div]:min-w-0 [&>div]:overflow-hidden [&_span]:truncate [&_span]:min-w-0'
                             )}>
-                              {renderCell(row, key, colWidth)}
+                              {renderCellContent(row, key, colWidth)}
                             </div>
                           </TableCell>
                         );

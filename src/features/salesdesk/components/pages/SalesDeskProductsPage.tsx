@@ -17,7 +17,6 @@ import {
   toProductFormValues,
   type ProductFormValues,
 } from '../../types/salesdesk-schemas';
-import { LowStockBadge } from './salesdesk-badges';
 
 export function SalesDeskProductsPage(): ReactElement {
   const listPage = useSalesDeskListPage();
@@ -37,8 +36,6 @@ export function SalesDeskProductsPage(): ReactElement {
   const deleteProduct = useDeleteSalesDeskProduct();
 
   const rows = data?.data ?? [];
-  const statsRows = statsData?.data ?? [];
-  const lowStockCount = statsRows.filter((item) => item.isLowStock).length;
 
   const handleSubmit = async (values: ProductFormValues): Promise<void> => {
     if (editing) {
@@ -58,7 +55,6 @@ export function SalesDeskProductsPage(): ReactElement {
       icon={<ShoppingCart size={22} />}
       metrics={[
         { label: 'Toplam Urun', value: statsData?.totalCount ?? data?.totalCount ?? 0 },
-        { label: 'Dusuk Stok', value: lowStockCount, tone: 'red' },
         { label: 'Listelenen', value: rows.length },
       ]}
       columns={[
@@ -67,8 +63,6 @@ export function SalesDeskProductsPage(): ReactElement {
         { key: 'category', header: 'KATEGORI', render: (row) => row.category || '-' },
         { key: 'unit', header: 'BIRIM', render: (row) => row.unit },
         { key: 'salesPrice', header: 'SATIS FIYATI', render: (row) => formatMoney(row.salesPrice) },
-        { key: 'stock', header: 'STOK', render: (row) => row.stockQuantity.toFixed(2) },
-        { key: 'minStock', header: 'MIN. STOK', render: (row) => <LowStockBadge isLowStock={row.isLowStock} /> },
       ]}
       rows={rows}
       isLoading={isLoading}
@@ -104,7 +98,7 @@ export function SalesDeskProductsPage(): ReactElement {
       deleteTitle="Urunu sil"
       deleteLabel={(row) => row.name}
       mobilePrimaryKey="name"
-      mobileDetailKeys={['code', 'category', 'unit', 'salesPrice', 'stock', 'minStock']}
+      mobileDetailKeys={['code', 'category', 'unit', 'salesPrice']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}
@@ -123,8 +117,6 @@ export function SalesDeskProductsPage(): ReactElement {
             { name: 'category', label: 'Kategori' },
             { name: 'unit', label: 'Birim', required: true },
             { name: 'salesPrice', label: 'Satis Fiyati', type: 'number', min: 0, step: 0.01 },
-            { name: 'stockQuantity', label: 'Stok', type: 'number', min: 0, step: 0.01 },
-            { name: 'minimumStockQuantity', label: 'Min. Stok', type: 'number', min: 0, step: 0.01 },
           ]}
         />
       }

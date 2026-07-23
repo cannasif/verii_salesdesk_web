@@ -1,12 +1,10 @@
 import { type ReactElement, type ReactNode, useEffect, useMemo, useState } from 'react';
-import { Copy } from 'lucide-react';
 import { DataTableGrid, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
-import { Button } from '@/components/ui/button';
-import { cn, arraysEqual } from '@/lib/utils';
+import { wrapTableCellWithCopy } from '@/components/shared/TableCellWithCopy';
+import { arraysEqual } from '@/lib/utils';
 import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import type { SalesDeskColumn } from './SalesDeskListLayout';
-import { SD_TABLE_ACTION_BUTTON } from '../lib/salesdesk-popup-styles';
-import { copySalesDeskCellValue, resolveSalesDeskColumnCopyValue } from '../lib/salesdesk-cell-copy';
+import { resolveSalesDeskColumnCopyValue } from '../lib/salesdesk-cell-copy';
 import { SalesDeskMobileCardList } from './SalesDeskMobileCardList';
 
 interface SalesDeskManagementTableProps<T extends { id: number }> {
@@ -60,7 +58,7 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   onPageChange,
   totalCount,
   onColumnOrderChange,
-  enableCellCopyButton = false,
+  enableCellCopyButton = true,
 }: SalesDeskManagementTableProps<T>): ReactElement {
   const defaultOrder = useMemo(() => columns.map((column) => column.key), [columns]);
   const [internalColumnOrder, setInternalColumnOrder] = useState<string[]>(defaultOrder);
@@ -87,41 +85,29 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   const startRow = totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
   const endRow = totalCount === 0 ? 0 : Math.min(pageNumber * pageSize, totalCount);
 
-  const renderCell = (row: T, key: string): ReactNode => {
+  const renderCellContent = (row: T, key: string): ReactNode => {
     const column = columns.find((item) => item.key === key);
     if (!column) return '-';
-
-    const content = column.render(row);
-    if (!enableCellCopyButton) return content;
-
-    const copyText = resolveSalesDeskColumnCopyValue(row, column);
-    if (!copyText) return content;
-
-    return (
-      <div className="flex min-w-0 items-center gap-0.5">
-        <span className="min-w-0 flex-1 truncate">{content}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          title="Kopyala"
-          aria-label="Kopyala"
-          data-skip-row-double-click
-          data-no-drag-scroll
-          className={cn(
-            SD_TABLE_ACTION_BUTTON,
-            'h-7 w-7 shrink-0 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-zinc-100'
-          )}
-          onClick={(event) => {
-            event.stopPropagation();
-            void copySalesDeskCellValue(copyText, column.header);
-          }}
-        >
-          <Copy size={14} />
-        </Button>
-      </div>
-    );
+    return column.render(row);
   };
+
+  const resolveCopyText = (row: T, key: string): string | null => {
+    const column = columns.find((item) => item.key === key);
+    if (!column) return null;
+    return resolveSalesDeskColumnCopyValue(row, column);
+  };
+
+  const renderCell = (row: T, key: string): ReactNode => {
+    const content = renderCellContent(row, key);
+    if (!enableCellCopyButton) return content;
+    return wrapTableCellWithCopy(content, resolveCopyText(row, key), columnHeaderFor(key), {
+      centered: true,
+    });
+  };
+
+  function columnHeaderFor(key: string): string | undefined {
+    return columns.find((item) => item.key === key)?.header;
+  }
 
   const showActions = Boolean(onDetail || onEdit || onDelete || renderExtraActions);
   const rowDetailHandler = onDetail ?? onEdit;
@@ -164,7 +150,9 @@ export function SalesDeskManagementTable<T extends { id: number }>({
       visibleColumnKeys={visibleKeys}
       rows={rows}
       rowKey={(row) => row.id}
-      renderCell={renderCell}
+      renderCell={renderCellContent}
+      getCellCopyValue={(row, key) => resolveCopyText(row, key)}
+      enableCellCopyButton={enableCellCopyButton}
       isLoading={isLoading}
       isError={isError}
       errorText={errorText}

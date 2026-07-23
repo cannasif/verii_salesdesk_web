@@ -5,6 +5,7 @@ export type { ColumnDef } from './ColumnPreferencesPopover';
 export { GridExportMenu } from './GridExportMenu';
 export { DataTableActionBar } from './DataTableActionBar';
 export type { DataTableActionBarProps, DataTableSearchConfig } from './DataTableActionBar';
+export { TableCellWithCopy, wrapTableCellWithCopy } from './TableCellWithCopy';
 export { DataTableGrid } from './DataTableGrid';
 export type { DataTableGridColumn, DataTableSortDirection } from './DataTableGrid';
 export { ManagementDataTableChrome } from './ManagementDataTableChrome';

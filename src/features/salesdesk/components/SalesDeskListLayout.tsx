@@ -95,9 +95,9 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   enableCellCopyButton?: boolean;
   detailTitle?: string;
   getDetailSubtitle?: (row: T) => string;
-  /** Full column set for read-only detail dialog; table uses `columns` only. */
+  /** Optional full column set for read-only detail (e.g. Sirket Yonetimi). Table still uses `columns`. */
   detailColumns?: SalesDeskColumn<T>[];
-  /** Keys and order for detail fields; defaults to all keys in `detailColumns`. */
+  /** Field keys/order in detail when `detailColumns` is set. Ignored on other pages. */
   detailColumnKeys?: string[];
 }
 
@@ -152,7 +152,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
   hideToolbar = false,
   contentAboveTable,
   customTable,
-  enableCellCopyButton = false,
+  enableCellCopyButton = true,
   detailTitle,
   getDetailSubtitle,
   detailColumns,
@@ -228,14 +228,15 @@ export function SalesDeskListLayout<T extends { id: number }>({
   };
 
   const resolvedDetailTitle = detailTitle ?? `${tableTitle} Detay`;
+  const hasCustomDetail = detailColumns != null || detailColumnKeys != null;
+  const resolvedDetailColumns = detailColumns ?? columns;
+  const resolvedDetailColumnKeys = hasCustomDetail
+    ? (detailColumnKeys ?? resolvedDetailColumns.map((column) => column.key))
+    : orderedVisibleColumnKeys;
   const resolvedDetailDescription = detailRow
     ? getDetailSubtitle?.(detailRow) ??
-      resolveSalesDeskDetailSubtitle(detailRow, detailColumns ?? columns, mobilePrimaryKey)
+      resolveSalesDeskDetailSubtitle(detailRow, resolvedDetailColumns, mobilePrimaryKey)
     : undefined;
-
-  const resolvedDetailColumns = detailColumns ?? columns;
-  const resolvedDetailColumnKeys =
-    detailColumnKeys ?? resolvedDetailColumns.map((column) => column.key);
 
   return (
     <div className="relative w-full space-y-6">
