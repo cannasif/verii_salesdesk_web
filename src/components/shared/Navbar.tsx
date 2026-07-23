@@ -192,7 +192,7 @@ export function Navbar(): ReactElement {
     <>
       <header
         className={cn(
-          'grid w-full grid-cols-1 items-center gap-3 border-b pt-[env(safe-area-inset-top)] sm:gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,720px)_minmax(0,1fr)] lg:gap-4',
+          'grid w-full grid-cols-1 items-center gap-3 border-b pt-[env(safe-area-inset-top)] sm:gap-3 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)_minmax(0,240px)] lg:gap-4 xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)_minmax(0,280px)]',
           'min-h-[64px] sm:min-h-[76px]',
           CRM_APP_PANEL_GLASS,
           'shadow-[0_10px_26px_rgba(0,0,0,.18)]',
@@ -223,8 +223,32 @@ export function Navbar(): ReactElement {
           </div>
         </div>
 
-        <div className="order-3 flex min-w-0 justify-center px-1 sm:px-2 lg:order-2 lg:px-4">
-          <div className="w-full min-w-0 max-w-[720px]">
+        <div className="order-3 flex min-w-0 flex-col gap-2 px-1 sm:px-2 lg:order-2 lg:px-4">
+          <div className="hidden w-full min-w-0 items-center gap-1.5 overflow-hidden lg:flex lg:gap-2 xl:gap-4">
+            <NavbarLiveExchangeRates
+              codes={['USD', 'EUR']}
+              className="min-w-0 flex-1 justify-end overflow-x-visible"
+            />
+            <div className="w-full min-w-0 max-w-[420px] shrink-0 xl:max-w-[480px]">
+              <NavbarSearchField
+                searchInputRef={searchInputRef}
+                searchQuery={searchQuery}
+                onSearch={handleSearch}
+                onClear={() => setSearchQuery('')}
+                placeholder={t('navbar.search_placeholder')}
+                isSupported={isSupported}
+                isListening={isListening}
+                onStartListening={startListening}
+                voiceSearchTitle={t('common.voiceSearchTitle')}
+              />
+            </div>
+            <NavbarLiveExchangeRates
+              codes={['GBP', 'ALTIN']}
+              className="min-w-0 flex-1 justify-start overflow-x-visible"
+            />
+          </div>
+
+          <div className="w-full min-w-0 lg:hidden">
             <NavbarSearchField
               searchInputRef={searchInputRef}
               searchQuery={searchQuery}
@@ -237,10 +261,11 @@ export function Navbar(): ReactElement {
               voiceSearchTitle={t('common.voiceSearchTitle')}
             />
           </div>
+
+          <NavbarLiveExchangeRates className="justify-center lg:hidden" />
         </div>
 
         <div className="order-2 flex min-w-0 items-center justify-end gap-2 sm:gap-3 lg:order-3">
-          <NavbarLiveExchangeRates />
           <NotificationIcon />
 
           {user ? <div className="hidden h-8 w-px shrink-0 bg-slate-200 dark:bg-white/10 sm:block" /> : null}

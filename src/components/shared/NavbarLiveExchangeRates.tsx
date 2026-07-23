@@ -4,6 +4,11 @@ import { cn } from '@/lib/utils';
 import { NAVBAR_LIVE_RATE_DISPLAY, type NavbarLiveRateCode } from '@/lib/live-exchange-rates';
 import { useNavbarLiveExchangeRates, LIVE_RATE_REFRESH_MS } from '@/hooks/useNavbarLiveExchangeRates';
 
+interface NavbarLiveExchangeRatesProps {
+  codes?: readonly NavbarLiveRateCode[];
+  className?: string;
+}
+
 const RATE_ICON_META: Record<
   NavbarLiveRateCode,
   {
@@ -47,20 +52,29 @@ function formatUpdatedAt(value: Date | null): string {
   }).format(value);
 }
 
-export function NavbarLiveExchangeRates(): ReactElement {
+export function NavbarLiveExchangeRates({
+  codes,
+  className,
+}: NavbarLiveExchangeRatesProps): ReactElement {
   const { displayRates, isLoading, updatedAt } = useNavbarLiveExchangeRates();
   const updatedLabel = formatUpdatedAt(updatedAt);
+  const visibleRates = codes?.length
+    ? displayRates.filter((rate) => codes.includes(rate.code))
+    : displayRates;
 
   return (
     <div
-      className="scrollbar-hide flex min-w-0 max-w-full items-center gap-1 overflow-x-auto sm:gap-1.5 lg:max-w-[min(100%,520px)] lg:overflow-x-visible lg:justify-end"
+      className={cn(
+        'scrollbar-hide flex min-w-0 items-center gap-1 overflow-x-auto sm:gap-1.5',
+        className
+      )}
       title={
         updatedLabel
           ? `Canli kurlar · Son guncelleme ${updatedLabel} · ${Math.round(LIVE_RATE_REFRESH_MS / 60_000)} dk'da bir yenilenir`
           : 'Canli kurlar'
       }
     >
-      {displayRates.map((rate) => {
+      {visibleRates.map((rate) => {
         const pending = 'pending' in rate && rate.pending;
         const meta = RATE_ICON_META[rate.code];
         const display = NAVBAR_LIVE_RATE_DISPLAY[rate.code];
@@ -90,8 +104,8 @@ export function NavbarLiveExchangeRates(): ReactElement {
             <div className="flex min-w-0 flex-col leading-tight">
               <span className="truncate text-[10px] font-semibold tracking-wide text-slate-600 dark:text-slate-300 sm:text-[11px]">
                 <span className="font-bold text-slate-700 dark:text-slate-200">{display.shortCode}</span>
-                <span className="mx-1 text-slate-400 dark:text-slate-500">·</span>
-                <span>{display.label}</span>
+                <span className="mx-1 hidden xl:inline text-slate-400 dark:text-slate-500">·</span>
+                <span className="hidden xl:inline">{display.label}</span>
               </span>
               <span className="mt-0.5 text-[11px] font-bold tabular-nums tracking-tight text-slate-900 antialiased dark:text-white sm:text-xs">
                 {pending && isLoading ? '...' : rate.formatted}
