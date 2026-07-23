@@ -73,7 +73,7 @@ export function BrandThemeSettings(): ReactElement {
           <div
             className={cn(
               'rounded-2xl p-2.5 shadow-sm md:p-4',
-              'bg-violet-100/80 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300/90',
+              'bg-[var(--crm-brand-soft)] text-[var(--crm-brand-primary)]',
             )}
           >
             <Palette size={18} className="md:h-6 md:w-6" />
@@ -88,12 +88,12 @@ export function BrandThemeSettings(): ReactElement {
         <Switch
           checked={isBrandThemeActive}
           onCheckedChange={setIsBrandThemeActive}
-          className="scale-75 data-[state=checked]:bg-[var(--crm-brand-primary)] md:scale-100"
+          className="scale-75 md:scale-100"
         />
       </div>
 
       {isBrandThemeActive ? (
-        <div className="space-y-2 border-t border-slate-200/70 px-2 pb-2 pt-2.5 dark:border-white/[0.06] md:px-3 md:pb-3 md:pt-3 lg:px-4 lg:pb-4">
+        <div className="max-h-[min(28rem,52vh)] space-y-2 overflow-y-auto border-t border-slate-200/70 px-2 pb-2 pt-2.5 dark:border-white/[0.06] md:px-3 md:pb-3 md:pt-3 lg:px-4 lg:pb-4">
           {brandThemes.map((theme) => {
             const selected = brandTheme === theme.id;
             const accentColor = theme.swatches[1];

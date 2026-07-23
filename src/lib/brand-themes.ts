@@ -1,4 +1,14 @@
-export type BrandTheme = 'v3rii-merkez' | 'gece-operasyonu' | 'canli-satis' | 'minimal-masa' | 'yonetici';
+export type BrandTheme =
+  | 'v3rii-merkez'
+  | 'gece-operasyonu'
+  | 'canli-satis'
+  | 'minimal-masa'
+  | 'yonetici'
+  | 'kurumsal-lacivert'
+  | 'gun-batimi'
+  | 'okyanus-briz'
+  | 'bordo-klasik'
+  | 'platin-karbon';
 
 export type BrandThemeDefinition = {
   id: BrandTheme;
@@ -50,6 +60,50 @@ export const brandThemes: readonly BrandThemeDefinition[] = [
     swatches: ['#312e81', '#4f46e5', '#6366f1'],
     baseAppearance: 'dark',
   },
+  {
+    id: 'kurumsal-lacivert',
+    label: 'Kurumsal Lacivert',
+    description: 'Güven veren, profesyonel mavi tonlarında kurumsal görünüm.',
+    className: 'theme-kurumsal-lacivert',
+    swatches: ['#1e40af', '#2563eb', '#0ea5e9'],
+    baseAppearance: 'light',
+  },
+  {
+    id: 'gun-batimi',
+    label: 'Gün Batımı',
+    description: 'Sıcak turuncu ve kehribar aksanlı, akşam odaklı koyu tema.',
+    className: 'theme-gun-batimi',
+    swatches: ['#7c2d12', '#ea580c', '#f97316'],
+    baseAppearance: 'dark',
+  },
+  {
+    id: 'okyanus-briz',
+    label: 'Okyanus Briz',
+    description: 'Ferah turkuaz ve camgöbeği tonlarında aydınlık çalışma alanı.',
+    className: 'theme-okyanus-briz',
+    swatches: ['#0891b2', '#06b6d4', '#0e7490'],
+    baseAppearance: 'light',
+  },
+  {
+    id: 'bordo-klasik',
+    label: 'Bordo Klasik',
+    description: 'Zarif bordo ve şarap tonlarında yönetici paneli hissi.',
+    className: 'theme-bordo-klasik',
+    swatches: ['#881337', '#9f1239', '#be123c'],
+    baseAppearance: 'dark',
+  },
+  {
+    id: 'platin-karbon',
+    label: 'Platin Karbon',
+    description: 'Nötr grafit yüzeyler üzerinde camgöbeği vurgulu modern tema.',
+    className: 'theme-platin-karbon',
+    swatches: ['#334155', '#475569', '#22d3ee'],
+    baseAppearance: 'dark',
+  },
 ] as const;
 
 export const DEFAULT_BRAND_THEME: BrandTheme = 'v3rii-merkez';
+
+export function getBrandThemeDefinition(id: BrandTheme): BrandThemeDefinition {
+  return brandThemes.find((theme) => theme.id === id) ?? brandThemes[0];
+}

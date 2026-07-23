@@ -3,6 +3,7 @@ import {
   type BrandTheme,
   DEFAULT_BRAND_THEME,
   brandThemes,
+  getBrandThemeDefinition,
 } from '@/lib/brand-themes';
 
 type Theme = 'dark' | 'light' | 'system';
@@ -89,8 +90,18 @@ export const initializeThemeDom = (storageKey = 'vite-ui-theme', defaultTheme: T
     localStorage.removeItem(key);
   }
 
-  applyThemeClass(getStoredTheme(storageKey, defaultTheme));
-  applyBrandThemeClass(getStoredBrandTheme(), getStoredBrandThemeActive());
+  const brandActive = getStoredBrandThemeActive();
+  const storedBrandTheme = getStoredBrandTheme();
+
+  if (brandActive) {
+    const appearance = getBrandThemeDefinition(storedBrandTheme).baseAppearance;
+    localStorage.setItem(storageKey, appearance);
+    applyThemeClass(appearance);
+  } else {
+    applyThemeClass(getStoredTheme(storageKey, defaultTheme));
+  }
+
+  applyBrandThemeClass(storedBrandTheme, brandActive);
 };
 
 const initialState: ThemeProviderState = {
@@ -128,6 +139,14 @@ export function ThemeProvider({
   useEffect(() => {
     applyBrandThemeClass(brandTheme, isBrandThemeActive);
   }, [brandTheme, isBrandThemeActive]);
+
+  useEffect(() => {
+    if (!isBrandThemeActive) return;
+    const appearance = getBrandThemeDefinition(brandTheme).baseAppearance;
+    localStorage.setItem(storageKey, appearance);
+    setThemeState(appearance);
+    applyThemeClass(appearance);
+  }, [brandTheme, isBrandThemeActive, storageKey]);
 
   const setThemeAndStore = useCallback(
     (newTheme: Theme) => {
