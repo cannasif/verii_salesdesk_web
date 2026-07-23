@@ -29,6 +29,9 @@ export interface SalesDeskQuotePreviewData {
 }
 
 function buildLineDescription(line: InvoiceLineFormState, formNotes?: string): string {
+  const customDescription = line.description?.trim();
+  if (customDescription) return customDescription;
+
   const parts = [
     line.productCode ? `Urun/Hizmet kodu: ${line.productCode}` : null,
     `Miktar: ${line.quantity} ${line.unit}`,
@@ -44,6 +47,9 @@ function buildLineDescription(line: InvoiceLineFormState, formNotes?: string): s
 }
 
 function buildLineDescriptionFromDto(line: SalesDeskQuoteDto['lines'][number]): string {
+  const customDescription = line.description?.trim();
+  if (customDescription) return customDescription;
+
   const parts = [
     line.productCode ? `Urun/Hizmet kodu: ${line.productCode}` : null,
     `Miktar: ${line.quantity}`,

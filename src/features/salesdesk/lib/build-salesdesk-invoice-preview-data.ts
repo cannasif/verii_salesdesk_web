@@ -13,6 +13,9 @@ function invoiceDocumentTitle(invoiceType: number): string {
 }
 
 function buildLineDescriptionFromDto(line: SalesDeskInvoiceDto['lines'][number]): string {
+  const customDescription = line.description?.trim();
+  if (customDescription) return customDescription;
+
   const parts = [
     line.productCode ? `Urun/Hizmet kodu: ${line.productCode}` : null,
     `Miktar: ${line.quantity}`,

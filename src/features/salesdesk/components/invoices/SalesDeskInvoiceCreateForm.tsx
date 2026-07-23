@@ -258,7 +258,7 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
                   <Layers className="h-4 w-4 text-zinc-400" />
                   <h3 className={SD_CREATE_SECTION_TITLE_CLASSNAME}>Fatura Kalemleri</h3>
                 </div>
-                <div className="overflow-x-auto p-0">
+                <div className="w-full overflow-hidden p-0">
                   <SalesDeskDocumentLineTable
                     lines={lines}
                     onLinesChange={setLines}

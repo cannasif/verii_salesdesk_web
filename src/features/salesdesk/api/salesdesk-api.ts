@@ -96,6 +96,7 @@ export interface SalesDeskLineDto {
   unitPrice: number;
   vatRate: number;
   lineTotal: number;
+  description?: string | null;
 }
 
 export interface SalesDeskLineUpsertDto {
@@ -103,6 +104,7 @@ export interface SalesDeskLineUpsertDto {
   quantity: number;
   unitPrice: number;
   vatRate: number;
+  description?: string;
 }
 
 export type SalesDeskInvoiceCreateBody = Omit<Partial<SalesDeskInvoiceDto>, 'lines'> & {

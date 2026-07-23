@@ -146,6 +146,7 @@ function buildInvoiceDto(input: CreateSalesDeskInvoiceInput, id: number): SalesD
       unitPrice: line.unitPrice,
       vatRate: line.vatRate,
       lineTotal: calculateInvoiceLineTotal(line),
+      description: line.description?.trim() || null,
     })),
   };
 }

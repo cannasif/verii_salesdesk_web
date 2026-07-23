@@ -98,6 +98,7 @@ function buildQuoteDto(input: CreateSalesDeskQuoteInput, id: number): SalesDeskQ
       unitPrice: line.unitPrice,
       vatRate: line.vatRate,
       lineTotal: calculateInvoiceLineTotal(line),
+      description: line.description?.trim() || null,
     })),
   };
 }

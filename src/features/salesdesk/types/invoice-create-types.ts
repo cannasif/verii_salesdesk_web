@@ -7,6 +7,7 @@ export interface InvoiceLineFormState {
   quantity: number;
   unitPrice: number;
   vatRate: number;
+  description: string;
 }
 
 export interface InvoiceTotals {
@@ -53,6 +54,7 @@ export function createEmptyInvoiceLine(product?: {
     quantity: 1,
     unitPrice: product?.salesPrice ?? 0,
     vatRate: 20,
+    description: '',
   };
 }
 
@@ -61,6 +63,7 @@ export function invoiceLinesToPayload(lines: InvoiceLineFormState[]): Array<{
   quantity: number;
   unitPrice: number;
   vatRate: number;
+  description?: string;
 }> {
   return lines
     .filter((line) => line.productId > 0 && line.quantity > 0)
@@ -69,5 +72,6 @@ export function invoiceLinesToPayload(lines: InvoiceLineFormState[]): Array<{
       quantity: line.quantity,
       unitPrice: line.unitPrice,
       vatRate: line.vatRate,
+      description: line.description?.trim() || undefined,
     }));
 }

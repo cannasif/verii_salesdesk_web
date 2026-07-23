@@ -2,6 +2,7 @@ import { type ReactElement, useMemo, useState } from 'react';
 import {
   Box,
   Edit,
+  FileText,
   Hash,
   Layers,
   Package,
@@ -15,6 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -102,7 +104,10 @@ export function SalesDeskDocumentLineTable({
     const product = products.find((item) => item.id === Number(productId));
     setDialog((current) => ({
       ...current,
-      draft: createEmptyInvoiceLine(product),
+      draft: {
+        ...createEmptyInvoiceLine(product),
+        description: current.draft.description,
+      },
     }));
   };
 
@@ -132,7 +137,7 @@ export function SalesDeskDocumentLineTable({
   );
 
   return (
-    <div className="overflow-hidden rounded-none border-0 bg-[var(--crm-app-panel)] shadow-sm dark:bg-[color-mix(in_srgb,var(--crm-app-panel)_50%,transparent)]">
+    <div className="w-full overflow-hidden rounded-none border-0 bg-[var(--crm-app-panel)] shadow-sm dark:bg-[color-mix(in_srgb,var(--crm-app-panel)_50%,transparent)]">
       <div className="flex flex-col justify-between gap-4 border-b border-[var(--crm-app-border)] p-5 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <div className={SD_DOCUMENT_LINE_TOOLBAR_ICON}>
@@ -172,6 +177,9 @@ export function SalesDeskDocumentLineTable({
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{line.productCode || '—'}</p>
                   <p className="text-xs text-zinc-500">{line.productName || 'Urun secilmedi'}</p>
+                  {line.description?.trim() ? (
+                    <p className="mt-1 line-clamp-2 text-[11px] text-[var(--crm-app-text-muted)]">{line.description}</p>
+                  ) : null}
                   <p className="mt-1 text-[11px] font-semibold text-[var(--crm-brand-text)]">{line.unit}</p>
                 </div>
                 <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
@@ -215,29 +223,37 @@ export function SalesDeskDocumentLineTable({
               </article>
             ))}
           </div>
-          <div className="custom-scrollbar hidden cursor-grab overflow-x-auto pb-3 md:block">
-          <table className="min-w-[980px] border-separate border-spacing-0">
+          <div className="custom-scrollbar hidden w-full overflow-x-auto md:block">
+            <table className="w-full min-w-[980px] table-fixed border-separate border-spacing-0">
+              <colgroup>
+                <col className="w-[34%]" />
+                <col className="w-[12%]" />
+                <col className="w-[16%]" />
+                <col className="w-[10%]" />
+                <col className="w-[16%]" />
+                <col className="w-[12%]" />
+              </colgroup>
             <thead>
               <tr>
-                <th className="sticky left-0 z-40 h-11 min-w-[320px] w-[320px] border-b border-r border-[var(--crm-app-border)] bg-zinc-50/80 px-4 text-left text-xs font-bold uppercase tracking-wider text-zinc-600 dark:bg-zinc-900/50 dark:text-zinc-400">
+                <th className="sticky left-0 z-40 h-11 border-b border-r border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_88%,transparent)] px-4 text-left text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   <div className="flex items-center gap-2">
                     <Layers className="h-3.5 w-3.5" />
                     Stok
                   </div>
                 </th>
-                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-zinc-50/80 px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:bg-zinc-900/50 dark:text-zinc-400">
+                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_88%,transparent)] px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   Miktar
                 </th>
-                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-zinc-50/80 px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:bg-zinc-900/50 dark:text-zinc-400">
+                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_88%,transparent)] px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   Birim Fiyat
                 </th>
-                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-zinc-50/80 px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:bg-zinc-900/50 dark:text-zinc-400">
+                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_88%,transparent)] px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   KDV %
                 </th>
-                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-zinc-50/80 px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:bg-zinc-900/50 dark:text-zinc-400">
+                <th className="h-11 border-b border-r border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_88%,transparent)] px-4 text-right text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   Tutar
                 </th>
-                <th className="h-11 border-b border-[var(--crm-app-border)] bg-zinc-50/80 px-4 text-center text-xs font-bold uppercase tracking-wider text-zinc-600 dark:bg-zinc-900/50 dark:text-zinc-400">
+                <th className="h-11 border-b border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_88%,transparent)] px-4 text-center text-xs font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
                   Islem
                 </th>
               </tr>
@@ -247,27 +263,30 @@ export function SalesDeskDocumentLineTable({
                 <tr key={line.id} className="group">
                   <td
                     className={cn(
-                      'sticky left-0 z-30 border-b border-r border-[var(--crm-app-border)] bg-zinc-50 p-4 dark:bg-zinc-900',
-                      'shadow-[4px_0_12px_-4px_rgba(0,0,0,0.12)] group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/40'
+                      'sticky left-0 z-30 border-b border-r border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] p-4',
+                      'shadow-[4px_0_12px_-4px_rgba(0,0,0,0.12)] group-hover:bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_70%,transparent)]'
                     )}
                   >
                     <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{line.productCode || '—'}</p>
                     <p className="text-xs text-zinc-500">{line.productName || 'Urun secilmedi'}</p>
+                    {line.description?.trim() ? (
+                      <p className="mt-1 line-clamp-2 text-[11px] text-[var(--crm-app-text-muted)]">{line.description}</p>
+                    ) : null}
                     <p className="mt-1 text-[11px] font-semibold text-[var(--crm-brand-text)]">{line.unit}</p>
                   </td>
-                  <td className="border-b border-r border-[var(--crm-app-border)] p-4 text-right text-sm font-mono tabular-nums group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/40">
+                  <td className="border-b border-r border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] p-4 text-right text-sm font-mono tabular-nums group-hover:bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_70%,transparent)]">
                     {line.quantity}
                   </td>
-                  <td className="border-b border-r border-[var(--crm-app-border)] p-4 text-right text-sm font-mono tabular-nums group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/40">
+                  <td className="border-b border-r border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] p-4 text-right text-sm font-mono tabular-nums group-hover:bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_70%,transparent)]">
                     {formatMoney(line.unitPrice)}
                   </td>
-                  <td className="border-b border-r border-[var(--crm-app-border)] p-4 text-right text-sm font-mono tabular-nums group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/40">
+                  <td className="border-b border-r border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] p-4 text-right text-sm font-mono tabular-nums group-hover:bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_70%,transparent)]">
                     %{line.vatRate}
                   </td>
-                  <td className="border-b border-r border-[var(--crm-app-border)] p-4 text-right text-sm font-semibold font-mono tabular-nums group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/40">
+                  <td className="border-b border-r border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] p-4 text-right text-sm font-semibold font-mono tabular-nums group-hover:bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_70%,transparent)]">
                     {formatMoney(calculateInvoiceLineTotal(line))}
                   </td>
-                  <td className="border-b border-[var(--crm-app-border)] p-4 group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800/40">
+                  <td className="border-b border-[var(--crm-app-border)] bg-[var(--crm-app-panel)] p-4 group-hover:bg-[color-mix(in_srgb,var(--crm-app-panel-muted)_70%,transparent)]">
                     <div className="flex items-center justify-center gap-2">
                       <Button
                         type="button"
@@ -292,8 +311,8 @@ export function SalesDeskDocumentLineTable({
                 </tr>
               ))}
             </tbody>
-          </table>
-        </div>
+            </table>
+          </div>
         </>
       )}
 
@@ -374,6 +393,29 @@ export function SalesDeskDocumentLineTable({
                 </span>
               </div>
             ) : null}
+
+            <div>
+              <Label className={SD_CREATE_FORM_LABEL_CLASSNAME}>
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[color-mix(in_srgb,var(--crm-brand-primary)_18%,transparent)] text-[var(--crm-brand-accent)] ring-1 ring-[color-mix(in_srgb,var(--crm-brand-primary)_30%,transparent)]">
+                  <FileText className="h-3.5 w-3.5" />
+                </span>
+                Aciklama
+              </Label>
+              <Textarea
+                value={dialog.draft.description}
+                onChange={(event) =>
+                  setDialog((current) => ({
+                    ...current,
+                    draft: { ...current.draft, description: event.target.value },
+                  }))
+                }
+                className={cn(
+                  SD_CREATE_FORM_INPUT_CLASSNAME,
+                  'min-h-[88px] h-auto resize-y py-3'
+                )}
+                placeholder="Kalem aciklamasi..."
+              />
+            </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
