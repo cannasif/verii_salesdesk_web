@@ -1533,6 +1533,27 @@ input[type="number"].allow-native-number-spinners {
   }
 }
 
+/* Switch — acik temalarda da net gorunsun */
+[data-slot='switch'][data-state='unchecked'] {
+  background-color: #94a3b8 !important;
+  border-color: #64748b !important;
+}
+
+html.dark [data-slot='switch'][data-state='unchecked'] {
+  background-color: #475569 !important;
+  border-color: rgb(255 255 255 / 22%) !important;
+}
+
+[data-slot='switch'][data-state='checked'] {
+  background-color: var(--crm-brand-primary, hsl(var(--primary))) !important;
+  border-color: var(--crm-brand-primary, hsl(var(--primary))) !important;
+}
+
+[data-slot='switch-thumb'] {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 0.28) !important;
+}
+
 /* --- V3RII ÖZEL TEMALAR (GÜNCELLENMİŞ VE KATI) --- */
 
 /* Seçicinin gücünü artırmak için html üzerindeki sınıflarla birlikte hedefliyoruz */

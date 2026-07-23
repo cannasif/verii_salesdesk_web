@@ -201,7 +201,7 @@ export function UserProfileModal({
                   checked={isDark}
                   onCheckedChange={() => setTheme(isDark ? 'light' : 'dark')}
                   disabled={isBrandThemeActive}
-                  className="scale-75 data-[state=checked]:bg-[var(--crm-brand-primary)] md:scale-100"
+                  className="shrink-0"
                 />
               </div>
 

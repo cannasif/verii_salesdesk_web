@@ -88,7 +88,7 @@ export function BrandThemeSettings(): ReactElement {
         <Switch
           checked={isBrandThemeActive}
           onCheckedChange={setIsBrandThemeActive}
-          className="scale-75 md:scale-100"
+          className="shrink-0"
         />
       </div>
 
