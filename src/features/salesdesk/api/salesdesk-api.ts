@@ -483,6 +483,21 @@ async function getOne<T>(path: string, id: number): Promise<T> {
   return unwrapApiData(response, 'Kayit bulunamadi');
 }
 
+/** Backend GET-by-id yoksa (405/404) list endpoint uzerinden kaydi bulur. */
+async function getOneOrListById<T extends { id: number }>(path: string, id: number): Promise<T> {
+  try {
+    return await getOne<T>(path, id);
+  } catch (error) {
+    const status = isAxiosError(error) ? error.response?.status : undefined;
+    if (status !== 405 && status !== 404) throw error;
+  }
+
+  const page = await getPaged<T>(path, { pageNumber: 1, pageSize: 1000 });
+  const row = page.data.find((item) => item.id === id);
+  if (!row) throw new Error('Kayit bulunamadi');
+  return row;
+}
+
 async function createOne<T, TBody>(
   path: string,
   body: TBody,
@@ -589,7 +604,7 @@ export const salesDeskApi = {
   },
   visitForms: {
     list: (params?: PagedParams) => getPaged<SalesDeskVisitFormDto>('visit-forms', params),
-    get: (id: number) => getOne<SalesDeskVisitFormDto>('visit-forms', id),
+    get: (id: number) => getOneOrListById<SalesDeskVisitFormDto>('visit-forms', id),
     create: (body: Partial<SalesDeskVisitFormDto>) => createOne<SalesDeskVisitFormDto, Partial<SalesDeskVisitFormDto>>('visit-forms', body),
     update: (id: number, body: Partial<SalesDeskVisitFormDto>) => updateOne<SalesDeskVisitFormDto, Partial<SalesDeskVisitFormDto>>('visit-forms', id, body),
     delete: (id: number) => deleteOne('visit-forms', id),

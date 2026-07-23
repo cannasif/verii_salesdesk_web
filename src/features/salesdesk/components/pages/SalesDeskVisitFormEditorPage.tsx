@@ -1,5 +1,5 @@
 import { type ReactElement } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { SalesDeskVisitFormEditor } from '../visit-forms/SalesDeskVisitFormEditor';
@@ -9,6 +9,7 @@ import {
   useSalesDeskVisitForm,
   useUpdateSalesDeskVisitForm,
 } from '../../hooks/useSalesDeskModules';
+import type { SalesDeskVisitFormDto } from '../../api/salesdesk-api';
 import type { VisitFormRecordValues } from '../../types/salesdesk-schemas';
 import { salesDeskPageShellClass } from '../../lib/salesdesk-shared';
 
@@ -48,12 +49,18 @@ export function SalesDeskVisitFormCreatePage(): ReactElement {
 
 export function SalesDeskVisitFormEditPage(): ReactElement {
   const navigate = useNavigate();
+  const location = useLocation();
   const params = useParams();
   const formId = Number(params.id);
   const authUser = useAuthStore((state) => state.user);
   const updateForm = useUpdateSalesDeskVisitForm();
   const { data: customers, isPending: customersPending } = useSalesDeskCustomerOptions();
-  const { data: entity, isPending, isError, error } = useSalesDeskVisitForm(Number.isFinite(formId) ? formId : null);
+  const prefetched = (location.state as { visitForm?: SalesDeskVisitFormDto } | null)?.visitForm;
+  const initialEntity = prefetched?.id === formId ? prefetched : undefined;
+  const { data: entity, isPending, isError, error } = useSalesDeskVisitForm(
+    Number.isFinite(formId) ? formId : null,
+    initialEntity
+  );
 
   const handleSubmit = async (values: VisitFormRecordValues): Promise<void> => {
     if (!entity) return;

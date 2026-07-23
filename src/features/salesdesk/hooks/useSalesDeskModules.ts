@@ -19,6 +19,7 @@ import {
   type SalesDeskActivitiesListResult,
   type SalesDeskProjectsListResult,
   type SalesDeskTaskDto,
+  type SalesDeskVisitFormDto,
 } from '../api/salesdesk-api';
 import { isSalesDeskActivityTask } from '../lib/salesdesk-activities';
 import { isSalesDeskProjectTask } from '../lib/salesdesk-project-tracking';
@@ -789,11 +790,15 @@ export const useDeleteSalesDeskVisit = visits.useDelete;
 
 export const useSalesDeskVisitFormList = visitForms.useList;
 export const useSalesDeskVisitFormStats = visitForms.useStats;
-export function useSalesDeskVisitForm(id: number | null) {
+export function useSalesDeskVisitForm(
+  id: number | null,
+  initialEntity?: SalesDeskVisitFormDto | null
+) {
   return useQuery({
     queryKey: [...visitForms.allKey, 'detail', id],
     queryFn: () => salesDeskApi.visitForms.get(id!),
     enabled: id != null && id > 0,
+    initialData: initialEntity != null && initialEntity.id === id ? initialEntity : undefined,
     staleTime: 30_000,
     ...DATA_TABLE_QUERY_OPTIONS,
   });

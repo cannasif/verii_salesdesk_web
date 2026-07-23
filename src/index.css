@@ -949,6 +949,20 @@ html:not(.dark) .theme-v3rii {
     border-color: var(--crm-app-border) !important;
   }
 
+  /* Portal ile body'e acilan dropdown/popover — html token'larini kullanir */
+  [data-slot='select-content'],
+  [data-slot='popover-content'] {
+    background: var(--crm-app-popover, var(--popover)) !important;
+    border-color: var(--crm-app-border, var(--border)) !important;
+    color: inherit;
+  }
+
+  [data-slot='select-item'][data-highlighted],
+  [data-slot='select-item']:focus {
+    background: var(--crm-brand-soft, var(--accent)) !important;
+    color: var(--crm-brand-on-soft, var(--accent-foreground)) !important;
+  }
+
   .salesdesk-shell :where(
     [class*='text-cyan'],
     [class*='text-teal'],

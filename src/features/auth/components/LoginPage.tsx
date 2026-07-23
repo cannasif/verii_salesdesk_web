@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation, Trans } from 'react-i18next';
@@ -95,6 +95,7 @@ export function LoginPage(): React.JSX.Element {
   const [capsLockActive, setCapsLockActive] = useState(false);
   const [didMeasureBranchesReady, setDidMeasureBranchesReady] = useState(false);
   const [bgAnimation, setBgAnimation] = useState(readBgAnimationPreference);
+  const authPortalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const startMark = 'login:mount:start';
@@ -157,7 +158,7 @@ export function LoginPage(): React.JSX.Element {
   };
 
   return (
-    <div className={AUTH_SHELL}>
+    <div className={AUTH_SHELL} ref={authPortalRef}>
       <style>{AUTH_AUTOFILL_CSS}</style>
 
       <div className="pointer-events-none absolute inset-0 z-0">
@@ -214,7 +215,7 @@ export function LoginPage(): React.JSX.Element {
                             >
                               <SelectValue placeholder={t('login.branchPlaceholder')} />
                             </SelectTrigger>
-                            <SelectContent className={AUTH_SELECT_CONTENT}>
+                            <SelectContent portalContainer={authPortalRef} className={AUTH_SELECT_CONTENT}>
                               {branches?.map((branch) => (
                                 <SelectItem key={branch.id} value={branch.id} className={AUTH_SELECT_ITEM}>
                                   <span className="block w-full whitespace-normal break-words pr-2 text-left leading-relaxed">

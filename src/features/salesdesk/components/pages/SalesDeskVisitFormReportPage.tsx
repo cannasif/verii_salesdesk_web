@@ -264,7 +264,7 @@ export function SalesDeskVisitFormReportPage(): ReactElement {
         <SalesDeskVisitFormReportGrid
           rows={visibleRows}
           weekDays={dateRange.weekDays}
-          onFormSelect={(form) => navigate(`/salesdesk/visit-forms/${form.id}/edit`)}
+          onFormSelect={(form) => navigate(`/salesdesk/visit-forms/${form.id}/edit`, { state: { visitForm: form } })}
         />
       ) : (
         <SalesDeskVisitFormReportMonthView rows={visibleRows} />

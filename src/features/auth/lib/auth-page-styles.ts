@@ -66,10 +66,10 @@ export const AUTH_SECURE_FOOTER =
   'mt-6 flex items-center justify-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--crm-app-text-muted)]';
 
 export const AUTH_SELECT_CONTENT =
-  'max-h-60 w-[var(--radix-select-trigger-width)] border border-[var(--crm-app-border)] bg-[var(--crm-app-popover)] text-white backdrop-blur-xl';
+  'z-[100] max-h-60 w-[var(--radix-select-trigger-width)] border border-[var(--crm-app-border)] !bg-[var(--crm-app-popover)] text-white shadow-[0_16px_48px_rgba(0,0,0,0.55)] backdrop-blur-xl';
 
 export const AUTH_SELECT_ITEM =
-  'cursor-pointer items-start py-3 focus:bg-[var(--crm-brand-soft)] focus:text-[var(--crm-brand-on-soft)]';
+  'cursor-pointer items-start py-3 text-slate-200 data-[highlighted]:!bg-[var(--crm-brand-soft)] data-[highlighted]:!text-[var(--crm-brand-on-soft)] focus:!bg-[var(--crm-brand-soft)] focus:!text-[var(--crm-brand-on-soft)]';
 
 export const AUTH_MOBILE_HERO =
   'lg:hidden border-b border-[var(--crm-app-border)] bg-[color-mix(in_srgb,var(--crm-app-panel)_60%,transparent)] px-4 py-6 backdrop-blur-md';

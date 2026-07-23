@@ -170,7 +170,7 @@ export function SalesDeskVisitFormsPage(): ReactElement {
         totalPages={totalPages}
         onPageChange={setPageNumber}
         onPageSizeChange={setPageSize}
-        onEdit={(form) => navigate(`/salesdesk/visit-forms/${form.id}/edit`)}
+        onEdit={(form) => navigate(`/salesdesk/visit-forms/${form.id}/edit`, { state: { visitForm: form } })}
         onDelete={setDeleting}
         onPreviewPdf={handlePreviewPdf}
       />
