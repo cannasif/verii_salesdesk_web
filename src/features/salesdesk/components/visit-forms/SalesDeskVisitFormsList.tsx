@@ -14,6 +14,7 @@ import type { VisitFormCustomerContact } from '../../lib/visit-form-recipient';
 import { PAGE_SIZE_OPTIONS } from '../../lib/salesdesk-shared';
 import { SD_SEARCH_FOCUS, SD_SELECT_CONTENT } from '../../lib/salesdesk-popup-styles';
 import { SalesDeskVisitFormListRow } from './SalesDeskVisitFormListRow';
+import { SalesDeskVisitFormDateFilter } from './SalesDeskVisitFormDateFilter';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface SalesDeskVisitFormsListProps {
@@ -26,6 +27,8 @@ interface SalesDeskVisitFormsListProps {
   errorMessage?: string | null;
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  selectedDates: string[];
+  onSelectedDatesChange: (dates: string[]) => void;
   onRefresh: () => void;
   pageNumber: number;
   pageSize: number;
@@ -57,6 +60,8 @@ export function SalesDeskVisitFormsList({
   errorMessage,
   searchTerm,
   onSearchChange,
+  selectedDates,
+  onSelectedDatesChange,
   onRefresh,
   pageNumber,
   pageSize,
@@ -71,40 +76,57 @@ export function SalesDeskVisitFormsList({
   const hasNextPage = pageNumber < totalPages;
   const rangeStart = totalCount === 0 ? 0 : (pageNumber - 1) * pageSize + 1;
   const rangeEnd = Math.min(pageNumber * pageSize, totalCount);
+  const hasDateFilter = selectedDates.length > 0;
+  const hasActiveFilters = searchTerm.trim().length > 0 || hasDateFilter;
 
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-list-card)] px-4 py-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="group/search relative min-w-0 flex-1">
-            <Search
-              size={16}
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)]"
-            />
-            <Input
-              value={searchTerm}
-              onChange={(event) => onSearchChange(event.target.value)}
-              placeholder="Baslik, cari veya icerikte ara..."
-              className={cn(
-                'h-10 rounded-xl border-[var(--crm-app-border)] bg-[var(--crm-app-input)] pl-10 text-sm text-slate-900 dark:text-slate-100',
-                SD_SEARCH_FOCUS
-              )}
-            />
+        <div className="space-y-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
+            <div className="group/search relative min-w-0 flex-1">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--crm-app-text-muted)]"
+              />
+              <Input
+                value={searchTerm}
+                onChange={(event) => onSearchChange(event.target.value)}
+                placeholder="Baslik, cari veya icerikte ara..."
+                className={cn(
+                  'h-10 rounded-xl border-[var(--crm-app-border)] bg-[var(--crm-app-input)] pl-10 text-sm text-slate-900 dark:text-slate-100',
+                  SD_SEARCH_FOCUS
+                )}
+              />
+            </div>
+            <div className="flex w-full flex-col gap-2 sm:flex-row lg:w-auto">
+              <SalesDeskVisitFormDateFilter
+                selectedDates={selectedDates}
+                onSelectedDatesChange={onSelectedDatesChange}
+                disabled={isFetching}
+              />
+              <button
+                type="button"
+                onClick={onRefresh}
+                disabled={isFetching}
+                className="inline-flex h-10 min-h-[40px] w-full items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300 sm:w-auto"
+              >
+                <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
+                Yenile
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={isFetching}
-            className="inline-flex h-11 min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-[var(--crm-app-border)] px-4 text-sm font-medium text-slate-600 transition-colors hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-accent)] dark:text-slate-300 sm:w-auto"
-          >
-            <RefreshCw size={15} className={isFetching ? 'animate-spin' : ''} />
-            Yenile
-          </button>
         </div>
       </div>
 
       <div className="rounded-2xl border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)]/50 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300">
         <span className="font-semibold text-slate-900 dark:text-slate-100">{totalCount}</span> ziyaret formu
+        {hasDateFilter ? (
+          <span className="text-[var(--crm-app-text-muted)]">
+            {' '}
+            · {selectedDates.length} tarih filtresi aktif
+          </span>
+        ) : null}
       </div>
 
       {isError ? (
@@ -118,11 +140,11 @@ export function SalesDeskVisitFormsList({
       ) : forms.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--crm-app-border)] px-6 py-16 text-center">
           <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
-            {searchTerm.trim() ? 'Sonuc bulunamadi' : 'Henuz ziyaret formu yok'}
+            {hasActiveFilters ? 'Sonuc bulunamadi' : 'Henuz ziyaret formu yok'}
           </p>
           <p className="mt-1 text-sm text-[var(--crm-app-text-muted)]">
-            {searchTerm.trim()
-              ? 'Arama kriterlerinizi degistirmeyi deneyin.'
+            {hasActiveFilters
+              ? 'Arama veya tarih filtrelerinizi degistirmeyi deneyin.'
               : 'Yeni ziyaret formu olusturmak icin ustteki butonu kullanin.'}
           </p>
         </div>

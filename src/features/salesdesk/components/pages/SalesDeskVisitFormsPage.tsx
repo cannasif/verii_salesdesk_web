@@ -1,4 +1,4 @@
-import { type ReactElement, useMemo, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BriefcaseBusiness, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,10 +22,25 @@ import {
   SD_PAGE_PULSE,
   SD_PAGE_TITLE,
 } from '../../lib/salesdesk-popup-styles';
+import {
+  filterVisitFormsByDates,
+  paginateVisitForms,
+} from '../../lib/visit-form-list-filters';
+
+const VISIT_FORM_DATE_FILTER_FETCH_SIZE = 500;
 
 export function SalesDeskVisitFormsPage(): ReactElement {
   const navigate = useNavigate();
-  const listPage = useSalesDeskListPage(10);
+  const {
+    searchTerm,
+    setSearchTerm,
+    pageNumber,
+    setPageNumber,
+    pageSize,
+    setPageSize,
+    listParams: baseListParams,
+  } = useSalesDeskListPage(10);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [deleting, setDeleting] = useState<SalesDeskVisitFormDto | null>(null);
   const [pdfPreview, setPdfPreview] = useState<{
     title: string;
@@ -34,18 +49,43 @@ export function SalesDeskVisitFormsPage(): ReactElement {
   } | null>(null);
   const [pdfLoading, setPdfLoading] = useState(false);
 
+  const hasDateFilter = selectedDates.length > 0;
+
+  useEffect(() => {
+    setPageNumber(1);
+  }, [selectedDates, setPageNumber]);
+
   const listParams = useMemo(
-    () => ({ ...listPage.listParams, sortBy: 'FormDate', sortDirection: 'desc' }),
-    [listPage.listParams]
+    () =>
+      hasDateFilter
+        ? {
+            pageNumber: 1,
+            pageSize: VISIT_FORM_DATE_FILTER_FETCH_SIZE,
+            search: baseListParams.search,
+            sortBy: 'FormDate',
+            sortDirection: 'desc' as const,
+          }
+        : { ...baseListParams, sortBy: 'FormDate', sortDirection: 'desc' as const },
+    [hasDateFilter, baseListParams]
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } = useSalesDeskVisitFormList(listParams);
   const { data: customers } = useSalesDeskCustomerOptions();
   const deleteForm = useDeleteSalesDeskVisitForm();
 
-  const rows = data?.data ?? [];
-  const totalCount = data?.totalCount ?? 0;
-  const totalPages = Math.max(1, data?.totalPages ?? 1);
+  const filteredRows = useMemo(() => {
+    const fetchedRows = data?.data ?? [];
+    return hasDateFilter ? filterVisitFormsByDates(fetchedRows, selectedDates) : fetchedRows;
+  }, [data?.data, hasDateFilter, selectedDates]);
+  const rows = useMemo(
+    () =>
+      hasDateFilter ? paginateVisitForms(filteredRows, pageNumber, pageSize) : filteredRows,
+    [filteredRows, hasDateFilter, pageNumber, pageSize]
+  );
+  const totalCount = hasDateFilter ? filteredRows.length : (data?.totalCount ?? 0);
+  const totalPages = hasDateFilter
+    ? Math.max(1, Math.ceil(filteredRows.length / pageSize))
+    : Math.max(1, data?.totalPages ?? 1);
 
   const customerContacts = useMemo(() => {
     const map: Record<number, { email?: string | null; phone?: string | null }> = {};
@@ -120,14 +160,16 @@ export function SalesDeskVisitFormsPage(): ReactElement {
         isFetching={isFetching}
         isError={isError}
         errorMessage={(error as Error | null)?.message}
-        searchTerm={listPage.searchTerm}
-        onSearchChange={listPage.setSearchTerm}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedDates={selectedDates}
+        onSelectedDatesChange={setSelectedDates}
         onRefresh={() => refetch()}
-        pageNumber={listPage.pageNumber}
-        pageSize={listPage.pageSize}
+        pageNumber={pageNumber}
+        pageSize={pageSize}
         totalPages={totalPages}
-        onPageChange={listPage.setPageNumber}
-        onPageSizeChange={listPage.setPageSize}
+        onPageChange={setPageNumber}
+        onPageSizeChange={setPageSize}
         onEdit={(form) => navigate(`/salesdesk/visit-forms/${form.id}/edit`)}
         onDelete={setDeleting}
         onPreviewPdf={handlePreviewPdf}
