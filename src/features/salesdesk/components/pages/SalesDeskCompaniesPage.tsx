@@ -2,7 +2,7 @@ import { type ReactElement, useMemo, useState } from 'react';
 import { Building2, Globe, KeyRound, Network, Server } from 'lucide-react';
 import type { SalesDeskCompanyDto } from '../../types/company-management-types';
 import { SalesDeskEntityForm } from '../SalesDeskEntityForm';
-import { SalesDeskListLayout } from '../SalesDeskListLayout';
+import { SalesDeskListLayout, type SalesDeskColumn } from '../SalesDeskListLayout';
 import {
   useCreateSalesDeskCompany,
   useDeleteSalesDeskCompany,
@@ -32,6 +32,55 @@ function renderLink(value?: string | null): ReactElement | string {
       {trimmed}
     </a>
   );
+}
+
+const COMPANY_TABLE_COLUMN_KEYS = ['name', 'ipAddress', 'vpnPassword', 'loginUrl', 'description'] as const;
+
+const COMPANY_DETAIL_COLUMN_KEYS = [
+  'name',
+  'ipAddress',
+  'ipUsername',
+  'ipPassword',
+  'vpnName',
+  'vpnUsername',
+  'vpnPassword',
+  'vpnIpAddress',
+  'vpnPort',
+  'databaseUsername',
+  'databasePassword',
+  'loginUrl',
+  'description',
+  'description1',
+] as const;
+
+function buildCompanyColumns(): SalesDeskColumn<SalesDeskCompanyDto>[] {
+  const allColumns: SalesDeskColumn<SalesDeskCompanyDto>[] = [
+    { key: 'name', header: 'ŞİRKET ADI', render: (row) => <span className="font-semibold">{row.name}</span> },
+    { key: 'ipAddress', header: 'IP BİLGİSİ', render: (row) => row.ipAddress || '-' },
+    { key: 'ipUsername', header: 'IP KULLANICI ADI', render: (row) => row.ipUsername || '-' },
+    { key: 'ipPassword', header: 'IP KULLANICI ŞİFRESİ', render: (row) => maskSecret(row.ipPassword) },
+    { key: 'vpnName', header: 'VPN İSMİ', render: (row) => row.vpnName || '-' },
+    { key: 'vpnUsername', header: 'VPN KULLANICI ADI', render: (row) => row.vpnUsername || '-' },
+    { key: 'vpnPassword', header: 'VPN ŞİFRE', render: (row) => maskSecret(row.vpnPassword) },
+    { key: 'vpnIpAddress', header: 'VPN IP ADRESİ', render: (row) => row.vpnIpAddress || '-' },
+    { key: 'vpnPort', header: 'VPN PORT', render: (row) => row.vpnPort || '-' },
+    { key: 'databaseUsername', header: 'DATABASE KULLANICI ADI', render: (row) => row.databaseUsername || '-' },
+    { key: 'databasePassword', header: 'DATABASE KULLANICI ŞİFRE', render: (row) => maskSecret(row.databasePassword) },
+    { key: 'loginUrl', header: 'GİRİŞ LİNKİ', render: (row) => renderLink(row.loginUrl) },
+    { key: 'description', header: 'AÇIKLAMA', render: (row) => row.description || '-' },
+    { key: 'description1', header: 'AÇIKLAMA 1', render: (row) => row.description1 || '-' },
+  ];
+
+  return allColumns;
+}
+
+function pickCompanyColumns(
+  keys: readonly string[],
+  allColumns: SalesDeskColumn<SalesDeskCompanyDto>[]
+): SalesDeskColumn<SalesDeskCompanyDto>[] {
+  return keys
+    .map((key) => allColumns.find((column) => column.key === key))
+    .filter((column): column is SalesDeskColumn<SalesDeskCompanyDto> => column != null);
 }
 
 export function SalesDeskCompaniesPage(): ReactElement {
@@ -64,6 +113,13 @@ export function SalesDeskCompaniesPage(): ReactElement {
     await createCompany.mutateAsync(values);
   };
 
+  const companyColumns = useMemo(() => buildCompanyColumns(), []);
+  const tableColumns = useMemo(
+    () => pickCompanyColumns(COMPANY_TABLE_COLUMN_KEYS, companyColumns),
+    [companyColumns]
+  );
+  const detailColumns = useMemo(() => companyColumns, [companyColumns]);
+
   return (
     <SalesDeskListLayout
       pageKey="salesdesk-companies"
@@ -79,22 +135,9 @@ export function SalesDeskCompaniesPage(): ReactElement {
         { label: 'VPN Tanimli', value: withVpnCount, tone: 'violet' },
         { label: 'DB Erisimi', value: withDbCount, tone: 'green' },
       ]}
-      columns={[
-        { key: 'name', header: 'SIRKET ADI', render: (row) => <span className="font-semibold">{row.name}</span> },
-        { key: 'ipAddress', header: 'IP BILGISI', render: (row) => row.ipAddress || '-' },
-        { key: 'ipUsername', header: 'IP KULLANICI ADI', render: (row) => row.ipUsername || '-' },
-        { key: 'ipPassword', header: 'IP KULLANICI SIFRESI', render: (row) => maskSecret(row.ipPassword) },
-        { key: 'vpnName', header: 'VPN ISMI', render: (row) => row.vpnName || '-' },
-        { key: 'vpnUsername', header: 'VPN KULLANICI ADI', render: (row) => row.vpnUsername || '-' },
-        { key: 'vpnPassword', header: 'VPN KULLANICI SIFRESI', render: (row) => maskSecret(row.vpnPassword) },
-        { key: 'vpnIpAddress', header: 'VPN IP ADRESI', render: (row) => row.vpnIpAddress || '-' },
-        { key: 'vpnPort', header: 'VPN PORT', render: (row) => row.vpnPort || '-' },
-        { key: 'databaseUsername', header: 'DB KULLANICI ADI', render: (row) => row.databaseUsername || '-' },
-        { key: 'databasePassword', header: 'DB KULLANICI SIFRE', render: (row) => maskSecret(row.databasePassword) },
-        { key: 'loginUrl', header: 'GIRIS LINKI', render: (row) => renderLink(row.loginUrl) },
-        { key: 'description', header: 'ACIKLAMA', render: (row) => row.description || '-' },
-        { key: 'description1', header: 'ACIKLAMA 1', render: (row) => row.description1 || '-' },
-      ]}
+      columns={tableColumns}
+      detailColumns={detailColumns}
+      detailColumnKeys={[...COMPANY_DETAIL_COLUMN_KEYS]}
       rows={rows}
       isLoading={isLoading && !isError}
       isFetching={isFetching}
@@ -128,9 +171,9 @@ export function SalesDeskCompaniesPage(): ReactElement {
       isDeleting={deleteCompany.isPending}
       deleteTitle="Sirketi sil"
       deleteLabel={(row) => row.name}
-      minTableWidthClassName="min-w-[2200px]"
+      minTableWidthClassName="min-w-[960px]"
       mobilePrimaryKey="name"
-      mobileDetailKeys={['ipAddress', 'vpnName', 'vpnIpAddress', 'databaseUsername', 'loginUrl']}
+      mobileDetailKeys={['ipAddress', 'vpnPassword', 'loginUrl', 'description']}
       formDialog={
         <SalesDeskEntityForm
           open={formOpen}

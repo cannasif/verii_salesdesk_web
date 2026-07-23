@@ -95,6 +95,10 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   enableCellCopyButton?: boolean;
   detailTitle?: string;
   getDetailSubtitle?: (row: T) => string;
+  /** Full column set for read-only detail dialog; table uses `columns` only. */
+  detailColumns?: SalesDeskColumn<T>[];
+  /** Keys and order for detail fields; defaults to all keys in `detailColumns`. */
+  detailColumnKeys?: string[];
 }
 
 function loadSalesDeskColumnPrefs(pageKey: string, userId: number | undefined, defaultOrder: string[]) {
@@ -151,6 +155,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
   enableCellCopyButton = false,
   detailTitle,
   getDetailSubtitle,
+  detailColumns,
+  detailColumnKeys,
 }: SalesDeskListLayoutProps<T>): ReactElement {
   const user = useAuthStore((state) => state.user);
   const showTableLoading = Boolean(isLoading && !isError);
@@ -224,8 +230,12 @@ export function SalesDeskListLayout<T extends { id: number }>({
   const resolvedDetailTitle = detailTitle ?? `${tableTitle} Detay`;
   const resolvedDetailDescription = detailRow
     ? getDetailSubtitle?.(detailRow) ??
-      resolveSalesDeskDetailSubtitle(detailRow, columns, mobilePrimaryKey)
+      resolveSalesDeskDetailSubtitle(detailRow, detailColumns ?? columns, mobilePrimaryKey)
     : undefined;
+
+  const resolvedDetailColumns = detailColumns ?? columns;
+  const resolvedDetailColumnKeys =
+    detailColumnKeys ?? resolvedDetailColumns.map((column) => column.key);
 
   return (
     <div className="relative w-full space-y-6">
@@ -342,8 +352,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
         onOpenChange={setDetailOpen}
         title={resolvedDetailTitle}
         description={resolvedDetailDescription}
-        columns={columns}
-        columnKeys={orderedVisibleColumnKeys}
+        columns={resolvedDetailColumns}
+        columnKeys={resolvedDetailColumnKeys}
         row={detailRow}
       />
 
