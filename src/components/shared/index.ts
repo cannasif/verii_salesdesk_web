@@ -11,6 +11,8 @@ export { ManagementDataTableChrome } from './ManagementDataTableChrome';
 export { ProtectedRoute } from './ProtectedRoute';
 export { Navbar } from './Navbar';
 export { Sidebar } from './Sidebar';
+export { TopMegaMenuNav } from './TopMegaMenuNav';
+export type { TopNavItem } from './TopMegaMenuNav';
 export { Footer } from './Footer';
 export { MainLayout } from './MainLayout';
 export { CustomerSelectDialog } from './CustomerSelectDialog';

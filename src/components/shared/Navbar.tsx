@@ -1,6 +1,6 @@
 import { type ChangeEvent, type ReactElement, type RefObject, useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { SidebarLeft01Icon, SearchList01Icon, Cancel01Icon, Mic01Icon } from 'hugeicons-react'
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
@@ -9,7 +9,8 @@ import { UserProfileModal } from '@/features/user-detail-management/components/U
 import { useAppShellStore } from '@/stores/app-shell-store';
 import { getImageUrl } from '@/features/user-detail-management/utils/image-url';
 import { cn } from '@/lib/utils';
-import { APP_DISPLAY_NAME } from '@/lib/brand-assets';
+import { APP_DISPLAY_NAME, SALESDESK_LOGO_ALT, SALESDESK_LOGO_SIDEBAR_CLASS, SALESDESK_LOGO_URL } from '@/lib/brand-assets';
+import { APP_SHELL_GUTTER_X } from '@/lib/app-shell-layout';
 import { CRM_APP_PANEL_GLASS } from '@/lib/management-list-layout';
 import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
@@ -69,25 +70,32 @@ function NavbarSearchField({
   onStartListening,
   voiceSearchTitle,
 }: NavbarSearchFieldProps): ReactElement {
+  const showClear = searchQuery.length > 0;
+  const rightPadding = isSupported && showClear ? 'pr-[4.5rem] md:pr-[5.5rem]' : isSupported ? 'pr-12 md:pr-14' : showClear ? 'pr-10 md:pr-12' : 'pr-4 md:pr-5';
+
   return (
-    <div className="relative flex min-w-0 items-center">
-      <SearchList01Icon className="absolute left-3 h-4 w-4 text-slate-500 transition-colors duration-300 group-focus-within:text-violet-300 md:left-4 md:h-5 md:w-5" />
+    <div className="group/search relative w-full min-w-0">
+      <SearchList01Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors duration-200 group-focus-within/search:text-[var(--crm-brand-primary)] md:left-4 md:h-[18px] md:w-[18px]" />
       <input
         ref={searchInputRef}
-        type="search"
+        type="text"
+        role="search"
+        inputMode="search"
+        autoComplete="off"
+        spellCheck={false}
         value={searchQuery}
         onChange={onSearch}
         placeholder={placeholder}
         className={cn(
-          'h-10 w-full min-w-0 rounded-xl border py-0 pl-9 pr-14 text-sm font-medium outline-none transition-all duration-300 md:h-12 md:rounded-2xl md:pl-12 md:pr-24',
-          'border-slate-200 bg-white text-slate-900 placeholder:text-slate-400',
-          'focus:border-violet-400/60 focus:bg-white focus:ring-4 focus:ring-violet-500/10',
-          'dark:border-white/10 dark:bg-[#0b0d19]/90 dark:text-white dark:placeholder:text-slate-500',
-          'dark:focus:border-violet-400/60 dark:focus:bg-[#0f1222]'
+          'h-10 w-full min-w-0 rounded-xl border py-0 pl-9 text-sm font-medium outline-none transition-all duration-200 md:h-11 md:rounded-2xl md:pl-11',
+          rightPadding,
+          'border-[var(--crm-app-border)] bg-[var(--crm-app-input)] text-slate-900 placeholder:text-slate-400',
+          'focus:border-[var(--crm-brand-accent)] focus:ring-2 focus:ring-[var(--crm-brand-focus-glow)]',
+          'dark:text-white dark:placeholder:text-slate-500'
         )}
       />
-      <div className="absolute right-1.5 flex items-center gap-1 md:right-3 md:gap-2">
-        {isSupported && (
+      <div className="absolute inset-y-0 right-1.5 flex items-center gap-0.5 md:right-2">
+        {isSupported ? (
           <button
             type="button"
             onClick={(e) => {
@@ -95,24 +103,25 @@ function NavbarSearchField({
               onStartListening();
             }}
             className={cn(
-              'rounded-lg p-1.5 transition-all duration-300 md:rounded-xl md:p-2',
+              'inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors duration-200',
               isListening
-                ? 'animate-pulse bg-violet-500/10 text-violet-300'
-                : 'text-slate-400 hover:bg-white/10 hover:text-violet-300'
+                ? 'animate-pulse bg-[var(--crm-brand-soft)] text-[var(--crm-brand-text)]'
+                : 'text-slate-400 hover:bg-white/10 hover:text-[var(--crm-brand-text)]'
             )}
             title={voiceSearchTitle}
+            aria-label={voiceSearchTitle}
           >
-            <Mic01Icon size={16} className="md:hidden" />
-            <Mic01Icon size={18} className="hidden md:block" />
+            <Mic01Icon size={17} />
           </button>
-        )}
-        {searchQuery ? (
+        ) : null}
+        {showClear ? (
           <button
             type="button"
             onClick={onClear}
-            className="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 dark:hover:bg-white/20 dark:hover:text-white"
+            aria-label="Aramayi temizle"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/10 hover:text-slate-200"
           >
-            <Cancel01Icon size={14} />
+            <Cancel01Icon size={16} />
           </button>
         ) : null}
       </div>
@@ -136,7 +145,7 @@ export function Navbar(): ReactElement {
   const { isListening, isSupported, startListening } = useVoiceSearch({
     onResult: (text) => {
       setSearchQuery(text);
-      if (text.trim().length > 0) {
+      if (text.trim().length > 0 && window.innerWidth < 1024) {
         setSidebarOpen(true);
       }
     },
@@ -172,7 +181,7 @@ export function Navbar(): ReactElement {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const val = e.target.value;
     setSearchQuery(val);
-    if (val.trim().length > 0) {
+    if (val.trim().length > 0 && window.innerWidth < 1024) {
       setSidebarOpen(true);
     }
   };
@@ -181,27 +190,39 @@ export function Navbar(): ReactElement {
     <>
       <header
         className={cn(
-          'sticky top-0 z-40 flex min-h-[64px] items-center justify-between gap-3 border-b px-3 pt-[env(safe-area-inset-top)] transition-all sm:min-h-[76px] sm:gap-4 sm:px-6',
+          'grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b pt-[env(safe-area-inset-top)] sm:gap-3 lg:gap-4',
+          'min-h-[64px] sm:min-h-[76px]',
           CRM_APP_PANEL_GLASS,
-          'shadow-[0_10px_26px_rgba(0,0,0,.18)]'
+          'shadow-[0_10px_26px_rgba(0,0,0,.18)]',
+          APP_SHELL_GUTTER_X
         )}
       >
-        <div className="flex h-[52px] min-w-0 flex-1 items-center gap-2 sm:h-[76px] sm:gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
             onClick={toggleSidebar}
             aria-pressed={isSidebarOpen}
-            className="shrink-0 rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-500 transition-all duration-300 hover:bg-violet-500/10 hover:text-violet-600 focus:outline-none dark:border-white/8 dark:bg-white/[.03] dark:text-slate-400 dark:hover:text-violet-300"
+            className="shrink-0 rounded-xl border border-slate-200 bg-slate-50 p-2 text-slate-500 transition-all duration-300 hover:bg-violet-500/10 hover:text-violet-600 focus:outline-none dark:border-white/8 dark:bg-white/[.03] dark:text-slate-400 dark:hover:text-violet-300 lg:hidden"
           >
             <SidebarLeft01Icon size={21} />
           </button>
 
-          <div className="hidden min-w-[140px] shrink-0 border-l border-slate-200 pl-4 dark:border-white/10 md:block">
-            <p className="text-[11px] text-slate-500">{APP_DISPLAY_NAME}</p>
-            <p className="mt-1 truncate text-base font-semibold text-slate-900 dark:text-slate-100">{pageTitle}</p>
-          </div>
+          <Link
+            to="/"
+            className="hidden shrink-0 items-center lg:flex"
+            aria-label="Ana sayfa"
+          >
+            <img src={SALESDESK_LOGO_URL} alt={SALESDESK_LOGO_ALT} className={cn(SALESDESK_LOGO_SIDEBAR_CLASS, 'h-9 w-auto')} />
+          </Link>
 
-          <div className="group relative min-w-0 flex-1 md:mx-auto md:max-w-[760px]">
+          <div className="hidden min-w-0 max-w-[180px] shrink-0 border-l border-slate-200 pl-3 dark:border-white/10 xl:block xl:max-w-[220px] xl:pl-4">
+            <p className="truncate text-[11px] text-slate-500">{APP_DISPLAY_NAME}</p>
+            <p className="mt-0.5 truncate text-sm font-semibold text-slate-900 dark:text-slate-100 xl:text-base">{pageTitle}</p>
+          </div>
+        </div>
+
+        <div className="flex min-w-0 justify-center px-1 sm:px-2 lg:px-4">
+          <div className="w-full min-w-0 max-w-[720px]">
             <NavbarSearchField
               searchInputRef={searchInputRef}
               searchQuery={searchQuery}
@@ -216,7 +237,7 @@ export function Navbar(): ReactElement {
           </div>
         </div>
 
-        <div className="flex h-[52px] shrink-0 items-center gap-2 sm:h-[76px] sm:gap-4">
+        <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
           <NotificationIcon />
 
           {user ? <div className="hidden h-8 w-px shrink-0 bg-slate-200 dark:bg-white/10 sm:block" /> : null}

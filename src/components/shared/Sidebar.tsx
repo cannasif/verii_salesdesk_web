@@ -425,13 +425,13 @@ export function Sidebar({ items }: SidebarProps): ReactElement {
       />
       
       <aside className={cn(
-        'app-sidebar-panel fixed lg:sticky top-0 min-h-dvh h-[100dvh] z-50 flex flex-col shrink-0 overflow-hidden will-change-[width,transform]',
+        'app-sidebar-panel fixed top-0 min-h-dvh h-[100dvh] z-50 flex flex-col shrink-0 overflow-hidden will-change-[width,transform] lg:hidden',
         CRM_APP_PANEL_GLASS,
         'border-r shadow-[8px_0_34px_rgba(0,0,0,.28)]',
         'pb-[env(safe-area-inset-bottom)]',
         'transition-[width,transform] duration-[260ms] motion-reduce:transition-none',
         SIDEBAR_EASE,
-        isSidebarOpen ? "w-72 translate-x-0" : "w-72 -translate-x-full lg:w-20 lg:translate-x-0"
+        isSidebarOpen ? "w-72 translate-x-0" : "w-72 -translate-x-full"
       )}
         data-sidebar-open={isSidebarOpen ? 'true' : 'false'}
       >
