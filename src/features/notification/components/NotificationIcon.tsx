@@ -33,29 +33,29 @@ export function NotificationIcon(): ReactElement {
     <NotificationDropdown>
       <button
         className={cn(
-          "relative p-2 rounded-xl transition-all duration-300 group outline-none", // p-2.5'ten p-2'ye çekildi
-          "hover:bg-slate-100 dark:hover:bg-white/10",
-          "active:scale-95"
+          'group relative rounded-xl p-2 outline-none transition-all duration-300',
+          'hover:bg-[var(--crm-brand-soft)] active:scale-95'
         )}
         aria-label={`${t('notifications')}${hasUnread ? ` (${totalUnread} ${t('new')})` : ''}`}
       >
-        <Notification01Icon 
-          size={20} // 22'den 20'ye düşürüldü, daha zarif
+        <Notification01Icon
+          size={20}
           className={cn(
-            "transition-colors duration-300",
-            "text-slate-500 group-hover:text-pink-500 dark:text-slate-400 dark:group-hover:text-pink-400"
-          )} 
+            'transition-colors duration-300',
+            'text-slate-500 group-hover:text-[var(--crm-brand-accent)] dark:text-slate-400 dark:group-hover:text-[var(--crm-brand-primary)]'
+          )}
         />
-        
-        {hasUnread && (
-          <span className="absolute top-1.5 right-1.5 flex h-2 w-2"> 
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-            <span className={cn(
-              "relative inline-flex rounded-full h-2 w-2 bg-pink-500 border", // 2.5'tan 2'ye, border-2'den border'e
-              "border-white dark:border-[#0c0516]"
-            )}></span>
+
+        {hasUnread ? (
+          <span className="absolute right-1.5 top-1.5 flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--crm-brand-primary)] opacity-75" />
+            <span
+              className={cn(
+                'relative inline-flex h-2 w-2 rounded-full border border-white bg-[var(--crm-brand-primary)] dark:border-[var(--crm-app-background)]'
+              )}
+            />
           </span>
-        )}
+        ) : null}
       </button>
     </NotificationDropdown>
   );

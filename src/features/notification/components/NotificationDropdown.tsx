@@ -153,19 +153,18 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
       <DropdownMenuContent 
         align="end" 
         className={cn(
-          "w-80 p-0 border shadow-2xl overflow-hidden z-50 transition-all duration-300", // w-96'dan w-80'e düşürüldü
-          "bg-white/90 dark:bg-[#0c0516]/90 backdrop-blur-xl", // Opaklık azaltıldı
-          "border-slate-200/60 dark:border-white/10 rounded-2xl",
+          "w-80 overflow-hidden rounded-2xl border p-0 shadow-2xl z-50 transition-all duration-300",
+          "border-[var(--crm-app-border)] bg-[var(--crm-app-popover)]/95 backdrop-blur-xl",
           "animate-in fade-in zoom-in-95"
         )}
       >
-        <div className="p-3.5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-[var(--crm-app-border)] p-3.5">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">
+            <span className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">
               {t('title')}
             </span>
             {combinedUnreadCount > 0 && (
-              <span className="text-[10px] font-bold bg-pink-500 text-white px-1.5 py-0.5 rounded-md leading-none">
+              <span className="rounded-md bg-[var(--crm-brand-primary)] px-1.5 py-0.5 text-[10px] font-bold leading-none text-[var(--crm-brand-on-primary)]">
                 {combinedUnreadCount}
               </span>
             )}
@@ -186,19 +185,19 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
         >
           {isLoadingInitial ? (
             <div className="p-10 text-center">
-              <div className="w-5 h-5 border-2 border-pink-500/20 border-t-pink-500 rounded-full animate-spin mx-auto" />
+              <div className="mx-auto h-5 w-5 animate-spin rounded-full border-2 border-[var(--crm-brand-ring)] border-t-[var(--crm-brand-primary)]" />
             </div>
           ) : notifications.length === 0 ? (
             <div className="px-6 py-10 text-center">
-              <div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Search size={20} className="text-slate-300 dark:text-slate-600" />
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--crm-app-panel-muted)]">
+                <Search size={20} className="text-slate-400 dark:text-slate-500" />
               </div>
-              <p className="text-slate-400 dark:text-slate-500 text-[13px] font-medium italic">
+              <p className="text-[13px] font-medium italic text-slate-500 dark:text-slate-400">
                 {t('noNotifications')}
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-50 dark:divide-white/5">
+            <div className="divide-y divide-[var(--crm-app-border)]">
               {notifications.map((notification) => (
                 <NotificationItem 
                   key={notification.id} 
@@ -211,14 +210,14 @@ export function NotificationDropdown({ children }: NotificationDropdownProps): R
           )}
         </div>
 
-        <div className="p-2 border-t border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/5">
+        <div className="border-t border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)]/50 p-2">
           <button 
             type="button"
             onClick={handleMarkAllAsRead} 
             className={cn(
-              "w-full py-2 text-[11px] font-bold uppercase tracking-widest transition-all rounded-lg",
-              "text-slate-500 hover:text-pink-500 dark:text-slate-400 dark:hover:text-pink-400",
-              "disabled:opacity-30 disabled:cursor-not-allowed"
+              "w-full rounded-lg py-2 text-[11px] font-bold uppercase tracking-widest transition-all",
+              "text-[var(--crm-brand-accent)] hover:bg-[var(--crm-brand-soft)] hover:text-[var(--crm-brand-primary)]",
+              "disabled:cursor-not-allowed disabled:opacity-30"
             )}
             disabled={combinedUnreadCount === 0 || markAllAsReadMutation.isPending}
           >

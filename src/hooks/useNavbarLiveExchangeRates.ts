@@ -29,7 +29,7 @@ export function useNavbarLiveExchangeRates(): {
     retry: 2,
   });
 
-  const rates = data?.rates ?? [];
+  const rates = useMemo(() => data?.rates ?? [], [data?.rates]);
   const updatedAt = useMemo(() => {
     if (!data?.updatedAt) return null;
     const parsed = new Date(data.updatedAt.replace(' ', 'T'));

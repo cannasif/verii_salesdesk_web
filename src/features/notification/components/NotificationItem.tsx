@@ -134,7 +134,7 @@ export function NotificationItem({ notification, onNavigate }: NotificationItemP
       return <CalendarClock size={16} className="text-emerald-400" />;
     }
     if (notificationType === 'QuotationDetail' || notificationType === 'QuotationApproval' || entityName.includes('Quotation') || entityName.includes('Teklif')) {
-      return <FileText size={16} className="text-pink-400" />;
+      return <FileText size={16} className="text-[var(--crm-brand-primary)]" />;
     }
     if (notificationType === 'OrderDetail' || notificationType === 'OrderApproval' || entityName.includes('Order') || entityName.includes('Sipariş')) {
       return <Package size={16} className="text-orange-400" />;
@@ -146,7 +146,7 @@ export function NotificationItem({ notification, onNavigate }: NotificationItemP
       return <Headphones size={16} className="text-blue-400" />;
     }
 
-    return <Info size={16} className="text-purple-400" />;
+    return <Info size={16} className="text-[var(--crm-brand-accent)]" />;
   }, [notification.notificationType, notification.relatedEntityName]);
 
   return (
@@ -160,29 +160,31 @@ export function NotificationItem({ notification, onNavigate }: NotificationItemP
       }}
       role="button"
       tabIndex={0}
-      className={`px-4 py-3 flex items-start gap-3 hover:bg-white/5 transition-colors cursor-pointer group border-l-2 ${
-        !notification.isRead ? 'bg-white/5 border-pink-500/50' : 'border-transparent hover:border-pink-500/50'
+      className={`group flex cursor-pointer items-start gap-3 border-l-2 px-4 py-3 transition-colors hover:bg-[var(--crm-brand-soft)] ${
+        !notification.isRead
+          ? 'border-[var(--crm-brand-primary)] bg-[var(--crm-brand-soft)]/40'
+          : 'border-transparent hover:border-[var(--crm-brand-ring)]'
       }`}
     >
-      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--crm-app-border)] bg-[var(--crm-app-panel-muted)]">
         {icon}
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="text-sm text-white font-medium truncate leading-tight">
+        <div className="truncate text-sm font-medium leading-tight text-slate-900 dark:text-white">
           {notification.title}
         </div>
-        <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
           {notification.message}
         </p>
-        <div className="text-[10px] text-slate-600 mt-1.5 font-medium">
+        <div className="mt-1.5 text-[10px] font-medium text-slate-400 dark:text-slate-500">
           {formatNotificationTime(notification.timestamp || notification.createdDate)}
         </div>
       </div>
 
       {!notification.isRead && (
         <div 
-          className="w-2 h-2 rounded-full bg-pink-500 shrink-0 mt-1.5 shadow-[0_0_8px_rgba(236,72,153,0.5)]" 
+          className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--crm-brand-primary)] shadow-[0_0_8px_var(--crm-brand-focus-glow)]" 
           title={t('unread')}
           onClick={handleMarkAsRead}
           onKeyDown={(e) => {

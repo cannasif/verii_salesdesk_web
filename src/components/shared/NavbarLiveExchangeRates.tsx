@@ -27,9 +27,9 @@ const RATE_ICON_META: Record<
   },
   GBP: {
     Icon: PoundSterling,
-    iconClass: 'text-indigo-600 dark:text-indigo-400',
-    iconBgClass: 'bg-indigo-500/12 dark:bg-indigo-500/15',
-    chipClass: 'from-indigo-500/8 to-indigo-500/4 border-indigo-500/25',
+    iconClass: 'text-orange-600 dark:text-orange-400',
+    iconBgClass: 'bg-orange-500/12 dark:bg-orange-500/15',
+    chipClass: 'from-orange-500/8 to-orange-500/4 border-orange-500/25',
   },
   ALTIN: {
     Icon: Coins,
@@ -53,7 +53,7 @@ export function NavbarLiveExchangeRates(): ReactElement {
 
   return (
     <div
-      className="flex min-w-0 items-center gap-1 overflow-x-auto sm:gap-1.5"
+      className="scrollbar-hide flex min-w-0 max-w-full items-center gap-1 overflow-x-auto sm:gap-1.5 lg:max-w-[min(100%,520px)] lg:overflow-x-visible lg:justify-end"
       title={
         updatedLabel
           ? `Canli kurlar · Son guncelleme ${updatedLabel} · ${Math.round(LIVE_RATE_REFRESH_MS / 60_000)} dk'da bir yenilenir`
@@ -72,14 +72,14 @@ export function NavbarLiveExchangeRates(): ReactElement {
             key={rate.code}
             aria-label={`${display.label}: ${valueLabel}`}
             className={cn(
-              'inline-flex shrink-0 items-center gap-2 rounded-xl border bg-gradient-to-b px-2 py-1.5 shadow-sm sm:px-2.5 sm:py-1.5',
+              'inline-flex shrink-0 items-center gap-1.5 rounded-xl border bg-gradient-to-b px-1.5 py-1 shadow-sm sm:gap-2 sm:px-2.5 sm:py-1.5',
               meta.chipClass,
               (isLoading || pending) && 'animate-pulse opacity-90'
             )}
           >
             <span
               className={cn(
-                'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] shadow-sm dark:border-white/10',
+                'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-black/[0.06] shadow-sm dark:border-white/10 sm:h-8 sm:w-8',
                 meta.iconBgClass,
                 meta.iconClass
               )}
