@@ -1560,7 +1560,8 @@ html.dark [data-slot='switch'][data-state='unchecked'] {
 html.theme-v3rii-merkez,
 html.theme-v3rii-merkez :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
 html[data-brand-theme='v3rii-merkez'],
-html[data-brand-theme='v3rii-merkez'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell) {
+html[data-brand-theme='v3rii-merkez'] :is(.theme-v3rii, .salesdesk-shell, .auth-shell),
+.auth-shell.theme-v3rii-merkez {
   --primary: 43 96% 56% !important;
   --primary-foreground: 0 0% 9% !important;
   --ring: 43 96% 56% !important;
@@ -1785,4 +1786,122 @@ html[data-brand-theme='platin-karbon'] :is(.theme-v3rii, .salesdesk-shell, .auth
   --crm-brand-shadow: rgb(51 65 85 / 24%) !important;
   --crm-brand-gradient: linear-gradient(180deg, #22d3ee 0%, #0891b2 100%) !important;
   --crm-brand-gradient-soft: linear-gradient(135deg, rgb(34 211 238 / 14%) 0%, rgb(51 65 85 / 12%) 100%) !important;
+}
+
+/* Auth giriş — global marka temasından bağımsız V3RII Merkez */
+html .auth-shell.theme-v3rii-merkez,
+html:is([class*='theme-'], [data-brand-theme]) .auth-shell.theme-v3rii-merkez {
+  --primary: 43 96% 56% !important;
+  --primary-foreground: 0 0% 9% !important;
+  --ring: 43 96% 56% !important;
+  --sidebar-primary: 43 96% 56% !important;
+  --sidebar-ring: 43 96% 56% !important;
+  --crm-brand-primary: #fbbf24 !important;
+  --crm-brand-secondary: #f59e0b !important;
+  --crm-brand-accent: #d97706 !important;
+  --crm-brand-on-primary: #0a0e17 !important;
+  --crm-brand-text: #fcd34d !important;
+  --crm-brand-on-soft: #fde68a !important;
+  --crm-brand-soft: rgb(251 191 36 / 14%) !important;
+  --crm-brand-ring: rgb(251 191 36 / 32%) !important;
+  --crm-brand-focus-glow: rgb(251 191 36 / 40%) !important;
+  --crm-brand-shadow: rgb(217 119 6 / 28%) !important;
+  --crm-brand-gradient: linear-gradient(180deg, #fbbf24 0%, #d97706 100%) !important;
+  --crm-brand-gradient-soft: linear-gradient(135deg, rgb(251 191 36 / 18%) 0%, rgb(245 158 11 / 12%) 100%) !important;
+  /* Auth — sıcak altın zemin (lacivert değil) */
+  --crm-app-background: #0f0b06 !important;
+  --crm-app-panel: #171108 !important;
+  --crm-app-panel-muted: rgb(251 191 36 / 7%) !important;
+  --crm-app-panel-strong: #1f170c !important;
+  --crm-app-border: rgb(251 191 36 / 16%) !important;
+  --crm-app-text-muted: #b8a88a !important;
+  --crm-app-aura-start: rgb(251 191 36 / 10%) !important;
+  --crm-app-aura-end: rgb(217 119 6 / 6%) !important;
+  --crm-app-input: #141008 !important;
+  --crm-app-popover: rgb(18 14 8 / 98%) !important;
+  --crm-app-list-card: rgb(15 11 6 / 88%) !important;
+  --crm-brand-on-primary: #0f0b06 !important;
+}
+
+@keyframes auth-hero-wander {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+  20% { transform: translate3d(90px, -70px, 0) scale(1.1); opacity: 0.85; }
+  40% { transform: translate3d(-60px, -130px, 0) scale(0.92); opacity: 0.7; }
+  60% { transform: translate3d(-110px, 50px, 0) scale(1.06); opacity: 0.9; }
+  80% { transform: translate3d(40px, 100px, 0) scale(0.98); opacity: 0.65; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+}
+
+@keyframes auth-hero-wander-alt {
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.5; }
+  25% { transform: translate3d(-80px, 90px, 0) scale(1.12) rotate(12deg); opacity: 0.8; }
+  50% { transform: translate3d(100px, 40px, 0) scale(0.9) rotate(-8deg); opacity: 0.75; }
+  75% { transform: translate3d(30px, -100px, 0) scale(1.05) rotate(6deg); opacity: 0.85; }
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.5; }
+}
+
+@keyframes auth-hero-ring-spin {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: 0.6; }
+  33% { transform: translate3d(50px, -80px, 0) rotate(120deg) scale(1.08); opacity: 0.85; }
+  66% { transform: translate3d(-70px, 60px, 0) rotate(240deg) scale(0.94); opacity: 0.7; }
+  100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(1); opacity: 0.6; }
+}
+
+@keyframes auth-hero-glow {
+  0%, 100% { opacity: 0.45; transform: translate3d(0, 0, 0) scale(1); }
+  33% { opacity: 0.8; transform: translate3d(6vw, -4vh, 0) scale(1.18); }
+  66% { opacity: 0.6; transform: translate3d(-4vw, 5vh, 0) scale(1.08); }
+}
+
+@keyframes auth-hero-drift {
+  0% { transform: translate3d(0, 110vh, 0); opacity: 0; }
+  8% { opacity: 0.85; }
+  92% { opacity: 0.85; }
+  100% { transform: translate3d(30px, -20vh, 0); opacity: 0; }
+}
+
+@keyframes auth-hero-orbit {
+  0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+.auth-shell .auth-hero-wander {
+  animation: auth-hero-wander 22s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.auth-shell .auth-hero-wander-alt {
+  animation: auth-hero-wander-alt 26s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.auth-shell .auth-hero-ring-spin {
+  animation: auth-hero-ring-spin 30s linear infinite;
+  will-change: transform, opacity;
+}
+
+.auth-shell .auth-hero-glow {
+  animation: auth-hero-glow 16s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.auth-shell .auth-hero-drift {
+  animation: auth-hero-drift linear infinite;
+  will-change: transform, opacity;
+}
+
+.auth-shell .auth-hero-orbit {
+  animation: auth-hero-orbit 20s linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-shell .auth-hero-wander,
+  .auth-shell .auth-hero-wander-alt,
+  .auth-shell .auth-hero-ring-spin,
+  .auth-shell .auth-hero-glow,
+  .auth-shell .auth-hero-drift,
+  .auth-shell .auth-hero-orbit {
+    animation: none !important;
+  }
 }
