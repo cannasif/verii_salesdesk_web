@@ -14,6 +14,8 @@ import {
 } from '../lib/salesdesk-list-toolbar-utils';
 import { SalesDeskKpiCards } from './SalesDeskKpiCards';
 import { SalesDeskManagementTable } from './SalesDeskManagementTable';
+import { SalesDeskRecordDetailDialog } from './SalesDeskRecordDetailDialog';
+import { resolveSalesDeskDetailSubtitle } from '../lib/salesdesk-detail-utils';
 import { SD_PAGE_ADD_BUTTON, SD_PAGE_HEADER_ROW, SD_PAGE_PULSE, SD_PAGE_TITLE } from '../lib/salesdesk-popup-styles';
 import { buildSalesDeskDeleteDescription, SalesDeskDeleteDialog } from './SalesDeskDeleteDialog';
 import {
@@ -91,6 +93,8 @@ interface SalesDeskListLayoutProps<T extends { id: number }> {
   contentAboveTable?: ReactNode;
   customTable?: ReactNode;
   enableCellCopyButton?: boolean;
+  detailTitle?: string;
+  getDetailSubtitle?: (row: T) => string;
 }
 
 function loadSalesDeskColumnPrefs(pageKey: string, userId: number | undefined, defaultOrder: string[]) {
@@ -145,6 +149,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
   contentAboveTable,
   customTable,
   enableCellCopyButton = false,
+  detailTitle,
+  getDetailSubtitle,
 }: SalesDeskListLayoutProps<T>): ReactElement {
   const user = useAuthStore((state) => state.user);
   const showTableLoading = Boolean(isLoading && !isError);
@@ -165,6 +171,8 @@ export function SalesDeskListLayout<T extends { id: number }>({
   );
   const [draftFilterRows, setDraftFilterRows] = useState<FilterRow[]>([]);
   const [appliedFilterRows, setAppliedFilterRows] = useState<FilterRow[]>([]);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailRow, setDetailRow] = useState<T | null>(null);
 
   useEffect(() => {
     const prefs = loadSalesDeskColumnPrefs(pageKey, user?.id, defaultColumnKeys);
@@ -207,6 +215,17 @@ export function SalesDeskListLayout<T extends { id: number }>({
       return [...newVisibleOrder, ...hiddenColumns];
     });
   };
+
+  const handleDetailClick = (row: T): void => {
+    setDetailRow(row);
+    setDetailOpen(true);
+  };
+
+  const resolvedDetailTitle = detailTitle ?? `${tableTitle} Detay`;
+  const resolvedDetailDescription = detailRow
+    ? getDetailSubtitle?.(detailRow) ??
+      resolveSalesDeskDetailSubtitle(detailRow, columns, mobilePrimaryKey)
+    : undefined;
 
   return (
     <div className="relative w-full space-y-6">
@@ -294,6 +313,7 @@ export function SalesDeskListLayout<T extends { id: number }>({
                   minTableWidthClassName={minTableWidthClassName}
                   mobilePrimaryKey={mobilePrimaryKey}
                   mobileDetailKeys={mobileDetailKeys}
+                  onDetail={handleDetailClick}
                   onEdit={onEdit}
                   onDelete={onDeleteRequest}
                   renderExtraActions={renderExtraActions}
@@ -316,6 +336,16 @@ export function SalesDeskListLayout<T extends { id: number }>({
       </Card>
 
       {formDialog}
+
+      <SalesDeskRecordDetailDialog
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        title={resolvedDetailTitle}
+        description={resolvedDetailDescription}
+        columns={columns}
+        columnKeys={orderedVisibleColumnKeys}
+        row={detailRow}
+      />
 
       {onDeleteConfirm && onDeleteCancel ? (
         <SalesDeskDeleteDialog

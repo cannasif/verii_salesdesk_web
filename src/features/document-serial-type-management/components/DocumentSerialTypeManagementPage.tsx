@@ -9,6 +9,7 @@ import {
   DataTableActionBar,
   ManagementDataTableChrome,
   ManagementListPageHeader,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +31,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   ADD_BUTTON_CLASS,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 
 import { fetchAllPagedData } from '@/lib/fetch-all-paged-data';
 import { DOCUMENT_SERIAL_TYPE_QUERY_KEYS } from '../utils/query-keys';
@@ -52,7 +54,7 @@ import type { FilterRow } from '@/lib/advanced-filter-types';
 import type { PagedFilter } from '@/types/api';
 import { documentSerialTypeApi } from '../api/document-serial-type-api';
 import { Alert02Icon } from 'hugeicons-react';
-import { ArrowDown, ArrowUp, ArrowUpDown, Edit2, Loader2, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Plus } from 'lucide-react';
 import { DefinitionExcelActions } from '@/features/definition-excel/components/DefinitionExcelActions';
 
 const PAGE_KEY = 'document-serial-type-management';
@@ -465,25 +467,13 @@ export function DocumentSerialTypeManagementPage(): ReactElement {
                 showActionsColumn
                 actionsHeaderLabel={t('actions')}
                 renderActionsCell={(documentSerialType) => (
-                  <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(documentSerialType)}
-                      className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-                    >
-                      <Edit2 size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteClick(documentSerialType)}
-                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
+                  <ManagementTableRowActions
+                    onDetail={() => handleEdit(documentSerialType)}
+                    onEdit={() => handleEdit(documentSerialType)}
+                    onDelete={() => handleDeleteClick(documentSerialType)}
+                  />
                 )}
+                initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
                 rowClassName="group"
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}

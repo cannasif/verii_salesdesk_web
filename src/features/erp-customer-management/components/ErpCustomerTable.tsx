@@ -1,6 +1,7 @@
 import { type ReactElement } from 'react';
 import type { TFunction } from 'i18next';
-import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import type { ErpCustomer } from '../types/erp-customer-types';
 
 type ErpCustomerColumnKey = keyof ErpCustomer;
@@ -91,6 +92,14 @@ export function ErpCustomerTable({
   paginationInfoText,
   onColumnOrderChange,
 }: ErpCustomerTableProps): ReactElement {
+  const renderActionsCell = (customer: ErpCustomer): ReactElement => (
+    <ManagementTableRowActions
+      onDetail={onRowClick ? () => onRowClick(customer) : undefined}
+      showEdit={false}
+      showDelete={false}
+    />
+  );
+
   return (
     <DataTableGrid<ErpCustomer, ErpCustomerColumnKey>
       toolbar={toolbar}
@@ -109,7 +118,9 @@ export function ErpCustomerTable({
       errorText={errorText}
       emptyText={emptyText}
       minTableWidthClassName={minTableWidthClassName}
-      showActionsColumn={showActionsColumn}
+      showActionsColumn={showActionsColumn && Boolean(onRowClick)}
+      renderActionsCell={onRowClick ? renderActionsCell : undefined}
+      initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
       onRowClick={onRowClick}
       rowClassName={rowClassName}
       pageSize={pageSize}

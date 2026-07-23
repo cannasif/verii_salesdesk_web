@@ -1,5 +1,5 @@
 import { type MouseEvent, type ReactElement } from 'react';
-import { Edit2, GitBranchPlus, Mail, RotateCcw, ShoppingCart } from 'lucide-react';
+import { Eye, GitBranchPlus, Mail, RotateCcw, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { MANAGEMENT_TABLE_ACTION_DETAIL_CLASSNAME } from '@/lib/management-table-actions';
 
 export interface DocumentListRowActionsProps {
   detailLabel: string;
@@ -100,9 +101,9 @@ export function DocumentListRowActions({
       <ActionIconButton
         label={detailLabel}
         onClick={() => onDetail()}
-        className="text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10"
+        className={MANAGEMENT_TABLE_ACTION_DETAIL_CLASSNAME}
       >
-        <Edit2 className="h-4 w-4" />
+        <Eye className="h-4 w-4" />
       </ActionIconButton>
 
       <DropdownMenu>

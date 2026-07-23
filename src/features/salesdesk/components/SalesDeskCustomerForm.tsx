@@ -214,9 +214,9 @@ export function SalesDeskCustomerForm({
             name="city"
             render={({ field }) => (
               <FormItem className="space-y-0">
-                <SalesDeskFormFieldLabel icon={MapPin}>Il</SalesDeskFormFieldLabel>
+                <SalesDeskFormFieldLabel icon={MapPin}>İl</SalesDeskFormFieldLabel>
                 <FormControl>
-                  <Input {...field} className={SD_FORM_INPUT_MD} placeholder="Il" />
+                  <Input {...field} className={SD_FORM_INPUT_MD} placeholder="İl" />
                 </FormControl>
                 <FormMessage className={SD_FORM_MESSAGE} />
               </FormItem>
@@ -228,9 +228,9 @@ export function SalesDeskCustomerForm({
             name="district"
             render={({ field }) => (
               <FormItem className="space-y-0">
-                <SalesDeskFormFieldLabel icon={MapPin}>Ilce</SalesDeskFormFieldLabel>
+                <SalesDeskFormFieldLabel icon={MapPin}>İlçe</SalesDeskFormFieldLabel>
                 <FormControl>
-                  <Input {...field} className={SD_FORM_INPUT_MD} placeholder="Ilce" />
+                  <Input {...field} className={SD_FORM_INPUT_MD} placeholder="İlçe" />
                 </FormControl>
                 <FormMessage className={SD_FORM_MESSAGE} />
               </FormItem>

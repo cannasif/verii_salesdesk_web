@@ -9,6 +9,7 @@ import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +29,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { Badge } from '@/components/ui/badge';
 import { usePermissionDefinitionsQuery } from '../hooks/usePermissionDefinitionsQuery';
 import { useSyncPermissionDefinitionsMutation } from '../hooks/useSyncPermissionDefinitionsMutation';
@@ -193,28 +195,13 @@ export function PermissionDefinitionsPage(): ReactElement {
   );
 
   const renderActionsCell = (item: PermissionDefinitionDto): ReactElement => (
-    <div className="flex justify-end gap-2">
-      {canUpdate && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="rounded-xl text-slate-600 hover:bg-cyan-50 hover:text-cyan-700 dark:text-slate-300 dark:hover:bg-cyan-900/30 dark:hover:text-cyan-300"
-          onClick={() => handleEditClick(item)}
-        >
-          {t('common.edit')}
-        </Button>
-      )}
-      {canDelete && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="rounded-xl text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
-          onClick={() => handleDeleteClick(item)}
-        >
-          {t('common.delete.action')}
-        </Button>
-      )}
-    </div>
+    <ManagementTableRowActions
+      onDetail={() => handleEditClick(item)}
+      onEdit={canUpdate ? () => handleEditClick(item) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(item) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+    />
   );
 
   const headerCardStyle = `
@@ -439,6 +426,7 @@ export function PermissionDefinitionsPage(): ReactElement {
                 showActionsColumn={canUpdate || canDelete}
                 actionsHeaderLabel={t('common.actions')}
                 renderActionsCell={renderActionsCell}
+                initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}
                 onPageSizeChange={(s) => {

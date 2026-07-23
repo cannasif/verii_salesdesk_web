@@ -1,13 +1,10 @@
 import { type ReactElement } from 'react';
 import type { TFunction } from 'i18next';
-import { DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
-import { Button } from '@/components/ui/button';
+import { DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { SalesDeskMobileCardList } from '@/features/salesdesk/components/SalesDeskMobileCardList';
-import { SD_TABLE_ACTION_BUTTON } from '@/features/salesdesk/lib/salesdesk-popup-styles';
-import { cn } from '@/lib/utils';
 import type { UserDto } from '../types/user-types';
-import { Edit2, Trash2 } from 'lucide-react';
 import { MANAGEMENT_LIST_ID_COLUMN_DEF } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 
 type UserColumnKey = keyof UserDto | 'status';
 
@@ -125,32 +122,13 @@ export function UserTable({
   };
 
   const renderActionsCell = (user: UserDto): ReactElement => (
-    <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-      {onEdit || onDelete ? (
-        <div className="inline-flex shrink-0 items-center gap-1">
-          {onEdit ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(user)}
-              className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
-            >
-              <Edit2 size={18} />
-            </Button>
-          ) : null}
-          {onDelete ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(user)}
-              className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
-            >
-              <Trash2 size={18} />
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+    <ManagementTableRowActions
+      onDetail={onEdit ? () => onEdit(user) : undefined}
+      onEdit={onEdit ? () => onEdit(user) : undefined}
+      onDelete={onDelete ? () => onDelete(user) : undefined}
+      showEdit={Boolean(onEdit)}
+      showDelete={Boolean(onDelete)}
+    />
   );
 
   const mobileView = (
@@ -162,34 +140,7 @@ export function UserTable({
       renderCell={renderCell}
       primaryKey="fullName"
       detailKeys={['username', 'email', 'role', 'status']}
-      renderActions={
-        onEdit || onDelete
-          ? (user) => (
-              <div className="inline-flex shrink-0 items-center gap-1">
-                {onEdit ? (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(user)}
-                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
-                  >
-                    <Edit2 size={18} />
-                  </Button>
-                ) : null}
-                {onDelete ? (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onDelete(user)}
-                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
-                  >
-                    <Trash2 size={18} />
-                  </Button>
-                ) : null}
-              </div>
-            )
-          : undefined
-      }
+      renderActions={onEdit || onDelete ? renderActionsCell : undefined}
       isLoading={isLoading}
       isError={false}
       errorText={errorText}
@@ -220,6 +171,7 @@ export function UserTable({
       showActionsColumn={showActionsColumn}
       actionsHeaderLabel={actionsHeaderLabel}
       renderActionsCell={renderActionsCell}
+      initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
       mobileView={mobileView}
       rowClassName={rowClassName}
       onRowDoubleClick={onEdit}

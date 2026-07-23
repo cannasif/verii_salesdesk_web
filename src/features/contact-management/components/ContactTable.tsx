@@ -1,7 +1,7 @@
 import { type ReactElement, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,11 +13,10 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { MANAGEMENT_DATA_GRID_CLASSNAME, MANAGEMENT_LIST_ID_COLUMN_CELL_CLASSNAME, MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { useDeleteContact } from '../hooks/useDeleteContact';
 import type { ContactDto } from '../types/contact-types';
 import {
-  Edit2,
-  Trash2,
   Mail,
   Phone,
   Smartphone,
@@ -261,37 +260,23 @@ export function ContactTable({
   };
 
   const renderActionsCell = (contact: ContactDto): ReactElement => (
-    <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-      {canUpdate ? (
+    <ManagementTableRowActions
+      onEdit={canUpdate ? () => onEdit(contact) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(contact) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+      afterActions={
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => onEdit(contact)}
-          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
+          onClick={() => onQuickActivity(contact)}
+          className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-500/10"
+          title={t('quickActivity')}
         >
-          <Edit2 size={16} />
+          <Activity size={16} />
         </Button>
-      ) : null}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onQuickActivity(contact)}
-        className="h-8 w-8 text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-500/10"
-        title={t('quickActivity')}
-      >
-        <Activity size={16} />
-      </Button>
-      {canDelete ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleDeleteClick(contact)}
-          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-        >
-          <Trash2 size={16} />
-        </Button>
-      ) : null}
-    </div>
+      }
+    />
   );
 
   return (
@@ -317,6 +302,7 @@ export function ContactTable({
           showActionsColumn={showActionsColumn}
           actionsHeaderLabel={actionsHeaderLabel}
           renderActionsCell={renderActionsCell}
+          initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
           rowClassName={rowClassName}
           onRowDoubleClick={onEdit}
           pageSize={pageSize}

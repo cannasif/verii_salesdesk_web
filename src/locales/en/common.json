@@ -21,6 +21,7 @@
       "action": "Delete"
     },
     "edit": "Edit",
+    "detail": "Detail",
     "search": "Search",
     "filter": "Filter",
     "reset": "Reset",

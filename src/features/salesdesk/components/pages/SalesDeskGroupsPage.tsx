@@ -19,6 +19,7 @@ import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import { cn } from '@/lib/utils';
@@ -30,6 +31,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
 import { useSalesDeskUserOptions } from '../../hooks/useSalesDeskModules';
 import {
@@ -41,6 +43,8 @@ import {
 } from '../../hooks/useSalesDeskGroups';
 import { SalesDeskGroupForm } from '../groups/SalesDeskGroupForm';
 import { SalesDeskGroupMemberSelect } from '../groups/SalesDeskGroupMemberSelect';
+import { SalesDeskRecordDetailDialog } from '../SalesDeskRecordDetailDialog';
+import type { SalesDeskColumn } from '../SalesDeskListLayout';
 import type { SalesDeskGroupDto, SalesDeskGroupFormSchema } from '../../types/salesdesk-group-types';
 import {
   SD_DIALOG_CONTENT_FORM,
@@ -50,7 +54,7 @@ import {
   SD_PAGE_TITLE,
   SD_TABLE_ACTION_BUTTON,
 } from '../../lib/salesdesk-popup-styles';
-import { Edit2, Loader2, Plus, RefreshCw, Trash2, UserPlus, UsersRound } from 'lucide-react';
+import { Loader2, Plus, RefreshCw, UserPlus, UsersRound } from 'lucide-react';
 
 const PAGE_KEY = 'salesdesk-groups';
 const PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
@@ -85,6 +89,8 @@ export function SalesDeskGroupsPage(): ReactElement {
   const [memberDraftIds, setMemberDraftIds] = useState<number[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [groupToDelete, setGroupToDelete] = useState<SalesDeskGroupDto | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailGroup, setDetailGroup] = useState<SalesDeskGroupDto | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -149,6 +155,53 @@ export function SalesDeskGroupsPage(): ReactElement {
     setGroupToDelete(group);
     setDeleteOpen(true);
   };
+
+  const handleDetailClick = (group: SalesDeskGroupDto): void => {
+    setDetailGroup(group);
+    setDetailOpen(true);
+  };
+
+  const groupDetailColumns: SalesDeskColumn<SalesDeskGroupDto>[] = [
+    { key: 'name', header: 'Grup Adi', render: (row) => row.name },
+    {
+      key: 'description',
+      header: 'Aciklama',
+      render: (row) => row.description?.trim() || '-',
+    },
+    {
+      key: 'memberCount',
+      header: 'Uye Sayisi',
+      render: (row) => String(row.memberCount),
+    },
+    {
+      key: 'updatedAt',
+      header: 'Guncellendi',
+      render: (row) => formatDate(row.updatedAt),
+    },
+  ];
+
+  const renderGroupActions = (row: SalesDeskGroupDto): ReactElement => (
+    <ManagementTableRowActions
+      onDetail={() => handleDetailClick(row)}
+      onEdit={canUpdate ? () => handleEditClick(row) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(row) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+      beforeActions={
+        canUpdate ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(SD_TABLE_ACTION_BUTTON, 'h-8 w-8 min-h-8 min-w-8 text-cyan-400 hover:bg-cyan-500/10')}
+            onClick={() => handleMembersClick(row)}
+            title="Uyeler"
+          >
+            <UserPlus size={16} />
+          </Button>
+        ) : undefined
+      }
+    />
+  );
 
   const handleFormSubmit = async (values: SalesDeskGroupFormSchema): Promise<void> => {
     if (editingGroup) {
@@ -329,45 +382,11 @@ export function SalesDeskGroupsPage(): ReactElement {
                 errorText={queryErrorMessage}
                 emptyText="Henuz grup yok. Yeni Grup ile baslayin."
                 minTableWidthClassName="min-w-[760px]"
-                showActionsColumn={canUpdate || canDelete}
+                showActionsColumn
                 actionsHeaderLabel={t('common.actions', { defaultValue: 'Islemler' })}
-                renderActionsCell={(row) => (
-                  <div className="flex w-full flex-col items-end gap-2 md:flex-row md:justify-end md:gap-1">
-                    {canUpdate ? (
-                      <div className="inline-flex shrink-0 items-center gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={cn(SD_TABLE_ACTION_BUTTON, 'text-cyan-400 hover:bg-cyan-500/10')}
-                          onClick={() => handleMembersClick(row)}
-                          title="Uyeler"
-                        >
-                          <UserPlus size={18} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
-                          onClick={() => handleEditClick(row)}
-                          title={t('common.edit', { defaultValue: 'Duzenle' })}
-                        >
-                          <Edit2 size={18} />
-                        </Button>
-                      </div>
-                    ) : null}
-                    {canDelete ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
-                        onClick={() => handleDeleteClick(row)}
-                        title={t('common.delete.action', { defaultValue: 'Sil' })}
-                      >
-                        <Trash2 size={18} />
-                      </Button>
-                    ) : null}
-                  </div>
-                )}
+                renderActionsCell={renderGroupActions}
+                initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 180)}
+                onRowDoubleClick={handleDetailClick}
                 mobileView={
                   <SalesDeskMobileCardList
                     columns={columns.map((column) => ({ key: column.key, label: column.label }))}
@@ -383,44 +402,8 @@ export function SalesDeskGroupsPage(): ReactElement {
                     }}
                     primaryKey="name"
                     detailKeys={['description', 'memberCount', 'updatedAt']}
-                    renderActions={
-                      canUpdate || canDelete
-                        ? (row) => (
-                            <div className="flex w-full flex-col items-end gap-2">
-                              {canUpdate ? (
-                                <div className="inline-flex shrink-0 items-center gap-1">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-cyan-400 hover:bg-cyan-500/10')}
-                                    onClick={() => handleMembersClick(row)}
-                                  >
-                                    <UserPlus size={18} />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={cn(SD_TABLE_ACTION_BUTTON, 'text-blue-400 hover:bg-blue-500/10')}
-                                    onClick={() => handleEditClick(row)}
-                                  >
-                                    <Edit2 size={18} />
-                                  </Button>
-                                </div>
-                              ) : null}
-                              {canDelete ? (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className={cn(SD_TABLE_ACTION_BUTTON, 'text-red-400 hover:bg-red-500/10')}
-                                  onClick={() => handleDeleteClick(row)}
-                                >
-                                  <Trash2 size={18} />
-                                </Button>
-                              ) : null}
-                            </div>
-                          )
-                        : undefined
-                    }
+                    renderActions={renderGroupActions}
+                    onRowActivate={handleDetailClick}
                     isLoading={isLoading}
                     isError={isError}
                     errorText={queryErrorMessage}
@@ -498,6 +481,15 @@ export function SalesDeskGroupsPage(): ReactElement {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <SalesDeskRecordDetailDialog
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        title="Grup Detay"
+        description={detailGroup ? `${detailGroup.name} — grup bilgilerini goruntuluyorsunuz.` : undefined}
+        columns={groupDetailColumns}
+        row={detailGroup}
+      />
 
       <SalesDeskDeleteDialog
         open={deleteOpen}

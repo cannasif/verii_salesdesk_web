@@ -1,13 +1,13 @@
 import { type ReactElement, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertCircle, Eye, Loader2, RefreshCw, SearchX, List } from 'lucide-react';
+import { AlertCircle, Loader2, RefreshCw, SearchX, List } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { rowsToBackendFilters, type FilterColumnConfig, type FilterRow } from '@/lib/advanced-filter-types';
 import {
   MANAGEMENT_LIST_CARD_CLASSNAME,
@@ -17,6 +17,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { auditLogApi } from '../api/auditLogApi';
@@ -431,30 +432,26 @@ export function AuditLogsPage(): ReactElement {
                 showActionsColumn
                 actionsHeaderLabel={t('common.actions')}
                 renderActionsCell={(row) => (
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-xl text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 font-semibold"
-                      onClick={() => setSelectedAuditLogId(row.id)}
-                    >
-                      <Eye size={16} className="mr-2" />
-                      {t('auditLogs.viewDetail')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-xl text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/30 font-semibold"
-                      onClick={() => {
-                        setTraceFilter(row.traceId);
-                        setPageNumber(1);
-                      }}
-                    >
-                      <List size={16} className="mr-2" />
-                      {t('auditLogs.filterTrace')}
-                    </Button>
-                  </div>
+                  <ManagementTableRowActions
+                    onDetail={() => setSelectedAuditLogId(row.id)}
+                    detailLabel={t('auditLogs.viewDetail')}
+                    afterActions={
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-xl text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/30 font-semibold"
+                        onClick={() => {
+                          setTraceFilter(row.traceId);
+                          setPageNumber(1);
+                        }}
+                      >
+                        <List size={16} className="mr-2" />
+                        {t('auditLogs.filterTrace')}
+                      </Button>
+                    }
+                  />
                 )}
+                initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 200)}
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}
                 onPageSizeChange={(size) => {

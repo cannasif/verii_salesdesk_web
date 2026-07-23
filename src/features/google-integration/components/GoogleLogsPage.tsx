@@ -1,6 +1,6 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ArrowUp, ArrowUpDown, Eye, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, RefreshCw } from 'lucide-react';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
@@ -13,11 +13,13 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { rowsToBackendFilters, type FilterColumnConfig, type FilterRow } from '@/lib/advanced-filter-types';
 import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -358,18 +360,12 @@ export function GoogleLogsPage(): ReactElement {
             showActionsColumn={SHOW_ACTIONS_COLUMN}
             actionsHeaderLabel={t('logs.actions')}
             renderActionsCell={(log) => (
-              <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-                  onClick={() => handleOpenDetails(log)}
-                  title={t('logs.viewDetails')}
-                >
-                  <Eye size={16} />
-                </Button>
-              </div>
+              <ManagementTableRowActions
+                onDetail={() => handleOpenDetails(log)}
+                detailLabel={t('logs.viewDetails')}
+              />
             )}
+            initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
             rowClassName={(_log) =>
               `group hover:bg-rose-50/40 dark:hover:bg-rose-500/5 transition-colors duration-200 ${
                 !SHOW_ACTIONS_COLUMN ? 'cursor-pointer' : ''

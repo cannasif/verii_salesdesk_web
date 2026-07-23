@@ -17,6 +17,7 @@ import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import {
@@ -26,10 +27,11 @@ import {
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { normalizeSearchValue } from '@/lib/search';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Edit2, Trash2, ArrowLeft, TableProperties, X, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Plus, ArrowLeft, TableProperties, X, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -343,25 +345,13 @@ export function PdfTablePresetManagementPage(): ReactElement {
                 showActionsColumn
                 actionsHeaderLabel={t('common.actions')}
                 renderActionsCell={(preset) => (
-                  <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => openEdit(preset)}
-                      className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:text-blue-400"
-                    >
-                      <Edit2 size={16} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(preset)}
-                      className="h-8 w-8 text-red-600 hover:bg-red-50 dark:text-red-400"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
+                  <ManagementTableRowActions
+                    onDetail={() => openEdit(preset)}
+                    onEdit={() => openEdit(preset)}
+                    onDelete={() => handleDelete(preset)}
+                  />
                 )}
+                initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
                 pageSize={pageSize}
                 pageSizeOptions={[10, 20, 50]}
                 onPageSizeChange={setPageSize}

@@ -1,7 +1,7 @@
 import { type ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -13,10 +13,11 @@ import {
 } from '@/components/ui/dialog';
 import { useDeleteApprovalRole } from '../hooks/useDeleteApprovalRole';
 import type { ApprovalRoleDto } from '../types/approval-role-types';
-import { Edit2, Trash2, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Alert02Icon } from 'hugeicons-react';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
 import { MANAGEMENT_LIST_ID_COLUMN_DEF } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 
 export interface ColumnDef<T> {
   key: keyof T | 'actions';
@@ -147,30 +148,14 @@ export function ApprovalRoleTable({
     onSortChange(backendSortBy, newDirection);
   };
 
-  const renderActionsCell = (role: ApprovalRoleDto): ReactElement => (
-    <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-      {canUpdate ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(role)}
-          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-        >
-          <Edit2 size={16} />
-        </Button>
-      ) : null}
-      {canDelete ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleDeleteClick(role)}
-          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-        >
-          <Trash2 size={16} />
-        </Button>
-      ) : null}
-    </div>
-  );
+    const renderActionsCell = (role: ApprovalRoleDto): ReactElement => (
+    <ManagementTableRowActions
+      onEdit={canUpdate ? () => onEdit(role) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(role) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+    />
+  );;
 
   return (
     <>
@@ -192,10 +177,9 @@ export function ApprovalRoleTable({
           errorText={errorText}
           emptyText={emptyText}
           minTableWidthClassName={minTableWidthClassName}
-          showActionsColumn={Boolean(showActionsColumn && (canUpdate || canDelete))}
+          showActionsColumn={showActionsColumn}
           actionsHeaderLabel={actionsHeaderLabel}
-          renderActionsCell={renderActionsCell}
-          rowClassName={rowClassName}
+          renderActionsCell={renderActionsCell}          initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}          rowClassName={rowClassName}
           pageSize={pageSize}
           pageSizeOptions={pageSizeOptions}
           onPageSizeChange={onPageSizeChange}

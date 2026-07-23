@@ -10,6 +10,7 @@ import {
   DataTableGrid,
   DocumentBackButton,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   WaitingApprovalsActionButtons,
   WaitingApprovalsRejectDialog,
   WaitingApprovalsStatusBadge,
@@ -22,6 +23,7 @@ import {
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import { arraysEqual, cn } from '@/lib/utils';
 import { useWaitingApprovals } from '../hooks/useWaitingApprovals';
@@ -207,21 +209,26 @@ export function WaitingApprovalsPage(): ReactElement {
   };
 
   const renderActionsCell = (approval: ApprovalActionGetDto): ReactElement => (
-    <WaitingApprovalsActionButtons
-      approveLabel={approveLabel}
-      rejectLabel={rejectLabel}
-      isPending={approveAction.isPending || rejectAction.isPending}
-      onApprove={(event) => {
-        event.stopPropagation();
-        approveAction.mutate({ approvalActionId: approval.id });
-      }}
-      onReject={(event) => {
-        event.stopPropagation();
-        setSelectedApproval(approval);
-        setRejectReason('');
-        setRejectDialogOpen(true);
-      }}
-      className="flex justify-center gap-2"
+    <ManagementTableRowActions
+      onDetail={() => navigateToDemand(approval)}
+      afterActions={
+        <WaitingApprovalsActionButtons
+          approveLabel={approveLabel}
+          rejectLabel={rejectLabel}
+          isPending={approveAction.isPending || rejectAction.isPending}
+          onApprove={(event) => {
+            event.stopPropagation();
+            approveAction.mutate({ approvalActionId: approval.id });
+          }}
+          onReject={(event) => {
+            event.stopPropagation();
+            setSelectedApproval(approval);
+            setRejectReason('');
+            setRejectDialogOpen(true);
+          }}
+          className="flex justify-center gap-2"
+        />
+      }
     />
   );
 
@@ -329,6 +336,7 @@ export function WaitingApprovalsPage(): ReactElement {
                       showActionsColumn
                       actionsHeaderLabel={t('actions')}
                       renderActionsCell={renderActionsCell}
+                      initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 220)}
                       iconOnlyActions={false}
                       rowClassName="cursor-pointer hover:bg-muted/50 transition-colors"
                       onRowClick={navigateToDemand}

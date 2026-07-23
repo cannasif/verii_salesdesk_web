@@ -13,6 +13,7 @@ import {
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { arraysEqual, cn } from '@/lib/utils';
 import { rowsToBackendFilters, type FilterColumnConfig, type FilterRow } from '@/lib/advanced-filter-types';
 import { fetchAllPagedData } from '@/lib/fetch-all-paged-data';
@@ -21,6 +22,7 @@ import {
   DataTableActionBar,
   DocumentBackButton,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   WaitingApprovalsActionButtons,
   WaitingApprovalsRejectDialog,
   WaitingApprovalsStatusBadge,
@@ -354,19 +356,24 @@ export function WaitingApprovalsPage(): ReactElement {
   };
 
   const renderActionsCell = (approval: ApprovalActionGetDto): ReactElement => (
-    <WaitingApprovalsActionButtons
-      approveLabel={approveLabel}
-      rejectLabel={rejectLabel}
-      isPending={approveAction.isPending || rejectAction.isPending}
-      onApprove={(event) => {
-        event.stopPropagation();
-        handleApprove(approval);
-      }}
-      onReject={(event) => {
-        event.stopPropagation();
-        handleRejectClick(approval);
-      }}
-      className="flex justify-center gap-2"
+    <ManagementTableRowActions
+      onDetail={() => navigateToQuotation(approval)}
+      afterActions={
+        <WaitingApprovalsActionButtons
+          approveLabel={approveLabel}
+          rejectLabel={rejectLabel}
+          isPending={approveAction.isPending || rejectAction.isPending}
+          onApprove={(event) => {
+            event.stopPropagation();
+            handleApprove(approval);
+          }}
+          onReject={(event) => {
+            event.stopPropagation();
+            handleRejectClick(approval);
+          }}
+          className="flex justify-center gap-2"
+        />
+      }
     />
   );
 
@@ -497,6 +504,7 @@ export function WaitingApprovalsPage(): ReactElement {
                       showActionsColumn
                       actionsHeaderLabel={t('actions')}
                       renderActionsCell={renderActionsCell}
+                      initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 220)}
                       iconOnlyActions={false}
                       rowClassName="cursor-pointer hover:bg-muted/50 transition-colors"
                       onRowClick={navigateToQuotation}

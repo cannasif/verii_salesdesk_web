@@ -77,8 +77,8 @@ export function SalesDeskPotentialsPage(): ReactElement {
           header: 'DURUM',
           render: (row) => <PotentialStatusBadge status={row.status} />,
         },
-        { key: 'city', header: 'IL', render: (row) => row.city || '-' },
-        { key: 'district', header: 'ILCE', render: (row) => row.district || '-' },
+        { key: 'city', header: 'İL', render: (row) => row.city || '-' },
+        { key: 'district', header: 'İLÇE', render: (row) => row.district || '-' },
       ]}
       rows={potentials}
       isLoading={isLoading}

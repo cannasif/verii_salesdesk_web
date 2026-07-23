@@ -8,6 +8,8 @@ export type { DataTableActionBarProps, DataTableSearchConfig } from './DataTable
 export { DataTableGrid } from './DataTableGrid';
 export type { DataTableGridColumn, DataTableSortDirection } from './DataTableGrid';
 export { ManagementDataTableChrome } from './ManagementDataTableChrome';
+export { ManagementTableRowActions } from './ManagementTableRowActions';
+export type { ManagementTableRowActionsProps } from './ManagementTableRowActions';
 export { ProtectedRoute } from './ProtectedRoute';
 export { Navbar } from './Navbar';
 export { Sidebar } from './Sidebar';

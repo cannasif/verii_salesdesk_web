@@ -329,7 +329,7 @@ export function ErpCustomerManagementPage(): ReactElement {
                 errorText={t('noData')}
                 emptyText={t('noData')}
                 minTableWidthClassName="min-w-[800px] lg:min-w-[1100px]"
-                showActionsColumn={false}
+                showActionsColumn
                 onRowClick={handleRowClick}
                 rowClassName="group cursor-pointer"
                 pageSize={pageSize}

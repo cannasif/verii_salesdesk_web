@@ -17,8 +17,6 @@ import {
   ArrowUp,
   ArrowUpDown,
   Plus,
-  Edit2,
-  Trash2,
   CheckCircle2,
   XCircle,
   Calendar,
@@ -35,7 +33,7 @@ import {
 } from 'lucide-react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { DataTableGrid, DataTableActionBar, type DataTableGridColumn, DescriptionCell } from '@/components/shared';
+import { DataTableGrid, DataTableActionBar, ManagementTableRowActions, type DataTableGridColumn, DescriptionCell } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import { arraysEqual } from '@/lib/utils';
@@ -47,6 +45,7 @@ import {
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { fetchAllPagedData } from '@/lib/fetch-all-paged-data';
 import type { PagedFilter } from '@/types/api';
 import { getActivityColumns } from './activity-columns';
@@ -645,69 +644,60 @@ export function ActivityManagementPage(): ReactElement {
       activity.status === 'Canceled';
 
     return (
-      <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-        {canUpdate && !isCompleted && !isCancelled && (
+      <ManagementTableRowActions
+        onDetail={() => handleEdit(activity)}
+        onEdit={canUpdate ? () => handleEdit(activity) : undefined}
+        onDelete={canDelete ? () => handleDeleteClick(activity) : undefined}
+        showEdit={canUpdate}
+        showDelete={canDelete}
+        beforeActions={
+          canUpdate && !isCompleted && !isCancelled ? (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-green-600 hover:bg-green-50 dark:text-green-400"
+                onClick={() => void handleStatusChange(activity, ActivityStatus.Completed)}
+                title={t('complete', { defaultValue: 'Tamamla' })}
+              >
+                <CheckCircle2 size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-orange-600 hover:bg-orange-50 dark:text-orange-400"
+                onClick={() => void handleStatusChange(activity, ActivityStatus.Cancelled)}
+                title={t('cancel', { defaultValue: 'İptal Et' })}
+              >
+                <XCircle size={16} />
+              </Button>
+              <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1 self-center" />
+            </>
+          ) : undefined
+        }
+        afterActions={
           <>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-green-600 hover:bg-green-50 dark:text-green-400"
-              onClick={() => void handleStatusChange(activity, ActivityStatus.Completed)}
-              title={t('complete', { defaultValue: 'Tamamla' })}
+              className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400"
+              onClick={() => handleMailClick(activity)}
+              title={t('google-integration:mailDialog.openButton', { defaultValue: 'Mail' })}
             >
-              <CheckCircle2 size={16} />
+              <Mail size={16} />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-orange-600 hover:bg-orange-50 dark:text-orange-400"
-              onClick={() => void handleStatusChange(activity, ActivityStatus.Cancelled)}
-              title={t('cancel', { defaultValue: 'İptal Et' })}
+              className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-sky-600 hover:bg-sky-50 dark:text-sky-400"
+              onClick={() => handleOutlookMailClick(activity)}
+              title={t('outlook-integration:mailDialog.openButton', { defaultValue: 'Outlook Mail' })}
             >
-              <XCircle size={16} />
+              <Mail size={16} />
             </Button>
-            <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1 self-center" />
           </>
-        )}
-        {canUpdate ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:text-blue-400"
-            onClick={() => handleEdit(activity)}
-          >
-            <Edit2 size={16} />
-          </Button>
-        ) : null}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400"
-          onClick={() => handleMailClick(activity)}
-          title={t('google-integration:mailDialog.openButton', { defaultValue: 'Mail' })}
-        >
-          <Mail size={16} />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-sky-600 hover:bg-sky-50 dark:text-sky-400"
-          onClick={() => handleOutlookMailClick(activity)}
-          title={t('outlook-integration:mailDialog.openButton', { defaultValue: 'Outlook Mail' })}
-        >
-          <Mail size={16} />
-        </Button>
-        {canDelete ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-red-600 hover:bg-red-50 dark:text-red-400"
-            onClick={() => handleDeleteClick(activity)}
-          >
-            <Trash2 size={16} />
-          </Button>
-        ) : null}
-      </div>
+        }
+      />
     );
   };
 
@@ -827,6 +817,7 @@ export function ActivityManagementPage(): ReactElement {
                 showActionsColumn
                 actionsHeaderLabel={t('actions', { ns: 'common' })}
                 renderActionsCell={renderActionsCell}
+                initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 220)}
                 onRowDoubleClick={
                   canUpdate
                     ? (row) => {

@@ -9,6 +9,7 @@ import { SalesDeskEntityForm } from '../SalesDeskEntityForm';
 import { SalesDeskKpiCards } from '../SalesDeskKpiCards';
 import { salesDeskMetricsToKpiItems } from '../../lib/salesdesk-kpi-utils';
 import { SalesDeskManagementTable } from '../SalesDeskManagementTable';
+import { SalesDeskRecordDetailDialog } from '../SalesDeskRecordDetailDialog';
 import type { SalesDeskColumn } from '../SalesDeskListLayout';
 import {
   useCreateSalesDeskProductCustomer,
@@ -66,6 +67,8 @@ export function SalesDeskProductCustomersPage(): ReactElement {
   const [selectedProduct, setSelectedProduct] = useState<SalesDeskProductDto | null>(null);
   const [linkOpen, setLinkOpen] = useState(false);
   const [deletingLink, setDeletingLink] = useState<SalesDeskProductCustomerDto | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailLink, setDetailLink] = useState<SalesDeskProductCustomerDto | null>(null);
 
   const productParams = useMemo(
     () => ({ ...productListPage.listParams, sortBy: 'Name', sortDirection: 'asc' }),
@@ -252,6 +255,10 @@ export function SalesDeskProductCustomersPage(): ReactElement {
                   minTableWidthClassName="min-w-0 md:min-w-[480px]"
                   mobilePrimaryKey="name"
                   mobileDetailKeys={['type']}
+                  onDetail={(row) => {
+                    setDetailLink(row);
+                    setDetailOpen(true);
+                  }}
                   onDelete={selectedProduct ? setDeletingLink : undefined}
                   pageSize={Math.max(filteredLinks.length, 10)}
                   pageSizeOptions={[10, 20, 50] as const}
@@ -296,6 +303,19 @@ export function SalesDeskProductCustomersPage(): ReactElement {
           ]}
         />
       ) : null}
+
+      <SalesDeskRecordDetailDialog
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        title="Baglanti Detay"
+        description={
+          detailLink
+            ? `${detailLink.customerName || detailLink.potentialCustomerName || 'Kayit'} — baglanti bilgilerini goruntuluyorsunuz.`
+            : undefined
+        }
+        columns={linkColumns}
+        row={detailLink}
+      />
 
       <SalesDeskDeleteDialog
         open={deletingLink != null}

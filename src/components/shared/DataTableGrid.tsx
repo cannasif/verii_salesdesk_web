@@ -74,7 +74,7 @@ interface DataTableGridProps<TRow, TKey extends string> {
 
 const MIN_COL_WIDTH = 60;
 const DEFAULT_COL_WIDTH = 150;
-const ACTIONS_COL_WIDTH = 84;
+const ACTIONS_COL_WIDTH = 132;
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false;
@@ -573,8 +573,8 @@ export function DataTableGrid<TRow, TKey extends string>({
                 Array.from({ length: Math.min(pageSize, 10) }).map((_, i) => (
                   <TableRow key={`skeleton-${i}`}>
                     {localVisibleColumnKeys.map((key) => (
-                      <TableCell key={key}>
-                        <Skeleton className="h-5 w-full max-w-[120px] bg-slate-200/60 dark:bg-white/10" />
+                      <TableCell key={key} className={centerColumnHeaders ? 'text-center' : undefined}>
+                        <Skeleton className="mx-auto h-5 w-full max-w-[120px] bg-slate-200/60 dark:bg-white/10" />
                       </TableCell>
                     ))}
                     {showActionsColumn && (
@@ -623,7 +623,11 @@ export function DataTableGrid<TRow, TKey extends string>({
                         return (
                           <TableCell
                             key={`${rowKey(row)}-${key}`}
-                            className={cn(column?.cellClassName, colWidth !== undefined && 'max-w-0')}
+                            className={cn(
+                              centerColumnHeaders && 'text-center',
+                              column?.cellClassName,
+                              colWidth !== undefined && 'max-w-0'
+                            )}
                             style={
                               colWidth !== undefined
                                 ? { width: `${colWidth}px`, maxWidth: `${colWidth}px`, overflow: 'hidden' }
@@ -646,7 +650,7 @@ export function DataTableGrid<TRow, TKey extends string>({
                             actionsCellClassName,
                             'overflow-visible',
                             iconOnlyActions &&
-                            '[&_button]:h-11 [&_button]:w-11 [&_button]:p-0 [&_button]:min-w-11 [&_button]:min-h-11 [&_button]:text-[0px] [&_button]:leading-none [&_button_svg]:h-4 [&_button_svg]:w-4 [&_button_svg]:mx-auto [&_button_svg]:shrink-0 [&_button_span]:hidden'
+                            '[&_button]:h-8 [&_button]:w-8 [&_button]:p-0 [&_button]:min-w-8 [&_button]:min-h-8 [&_button]:text-[0px] [&_button]:leading-none [&_button_svg]:h-4 [&_button_svg]:w-4 [&_button_svg]:mx-auto [&_button_svg]:shrink-0 [&_button_span]:hidden'
                           )}
                           onClick={(event) => event.stopPropagation()}
                           onDoubleClick={(event) => event.stopPropagation()}

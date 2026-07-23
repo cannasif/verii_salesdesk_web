@@ -1,7 +1,7 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ArrowUp, ArrowUpDown, Eye, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { loadColumnPreferences } from '@/lib/column-preferences';
 import { arraysEqual } from '@/lib/utils';
@@ -9,11 +9,13 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { rowsToBackendFilters, type FilterColumnConfig, type FilterRow } from '@/lib/advanced-filter-types';
 import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import { Card, CardContent } from '@/components/ui/card';
@@ -360,18 +362,16 @@ export function CustomerMailLogsTab({ customerId }: CustomerMailLogsTabProps): R
           showActionsColumn
           actionsHeaderLabel={provider === 'google' ? t('google-integration:logs.actions') : t('outlook-integration:logs.actions')}
           renderActionsCell={(log) => (
-            <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-sky-600 hover:text-sky-700 hover:bg-sky-50 dark:text-sky-400 dark:hover:bg-sky-500/10"
-                onClick={() => handleOpenDetails(log)}
-                title={provider === 'google' ? t('google-integration:logs.viewDetails') : t('outlook-integration:logs.viewDetails')}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </div>
+            <ManagementTableRowActions
+              onDetail={() => handleOpenDetails(log)}
+              detailLabel={
+                provider === 'google'
+                  ? t('google-integration:logs.viewDetails')
+                  : t('outlook-integration:logs.viewDetails')
+              }
+            />
           )}
+          initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
           rowClassName="group"
           pageSize={pageSize}
           pageSizeOptions={PAGE_SIZE_OPTIONS}

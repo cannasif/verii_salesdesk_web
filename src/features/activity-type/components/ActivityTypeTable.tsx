@@ -1,7 +1,7 @@
 import { type ReactElement, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,10 +14,11 @@ import {
 import { useDeleteActivityType } from '../hooks/useDeleteActivityType';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
 import type { ActivityTypeDto } from '../types/activity-type-types';
-import { Edit2, Trash2, Calendar, User, ListTodo } from 'lucide-react';
+import { Calendar, User, ListTodo } from 'lucide-react';
 
 import { DescriptionCell } from '@/components/shared';
 import { MANAGEMENT_LIST_ID_COLUMN_DEF } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { Alert02Icon } from 'hugeicons-react';
 
 export interface ColumnDef<T> {
@@ -184,30 +185,14 @@ export function ActivityTypeTable({
     return String(val);
   };
 
-  const renderActionsCell = (activityType: ActivityTypeDto): ReactElement => (
-    <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-      {canUpdate && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(activityType)}
-          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-        >
-          <Edit2 size={16} />
-        </Button>
-      )}
-      {canDelete && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleDeleteClick(activityType)}
-          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-        >
-          <Trash2 size={16} />
-        </Button>
-      )}
-    </div>
-  );
+    const renderActionsCell = (activityType: ActivityTypeDto): ReactElement => (
+    <ManagementTableRowActions
+      onEdit={canUpdate ? () => onEdit(activityType) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(activityType) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+    />
+  );;
 
   return (
     <>
@@ -229,10 +214,9 @@ export function ActivityTypeTable({
           errorText={errorText}
           emptyText={emptyText}
           minTableWidthClassName={minTableWidthClassName}
-          showActionsColumn={Boolean(showActionsColumn && (canUpdate || canDelete))}
+          showActionsColumn={showActionsColumn}
           actionsHeaderLabel={actionsHeaderLabel}
-          renderActionsCell={renderActionsCell}
-          rowClassName={rowClassName}
+          renderActionsCell={renderActionsCell}          initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}          rowClassName={rowClassName}
           pageSize={pageSize}
           pageSizeOptions={pageSizeOptions}
           onPageSizeChange={onPageSizeChange}

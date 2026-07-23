@@ -1,8 +1,9 @@
 import { type ReactElement, type ReactNode, useEffect, useMemo, useState } from 'react';
-import { Copy, Edit2, Trash2 } from 'lucide-react';
-import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
+import { Copy } from 'lucide-react';
+import { DataTableGrid, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import { cn, arraysEqual } from '@/lib/utils';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import type { SalesDeskColumn } from './SalesDeskListLayout';
 import { SD_TABLE_ACTION_BUTTON } from '../lib/salesdesk-popup-styles';
 import { copySalesDeskCellValue, resolveSalesDeskColumnCopyValue } from '../lib/salesdesk-cell-copy';
@@ -18,6 +19,7 @@ interface SalesDeskManagementTableProps<T extends { id: number }> {
   minTableWidthClassName?: string;
   mobilePrimaryKey?: string;
   mobileDetailKeys?: string[];
+  onDetail?: (row: T) => void;
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
   renderExtraActions?: (row: T) => ReactNode;
@@ -44,6 +46,7 @@ export function SalesDeskManagementTable<T extends { id: number }>({
   minTableWidthClassName = 'min-w-[800px] lg:min-w-[1000px]',
   mobilePrimaryKey,
   mobileDetailKeys,
+  onDetail,
   onEdit,
   onDelete,
   renderExtraActions,
@@ -120,52 +123,20 @@ export function SalesDeskManagementTable<T extends { id: number }>({
     );
   };
 
-  const showActions = Boolean(onEdit || onDelete || renderExtraActions);
+  const showActions = Boolean(onDetail || onEdit || onDelete || renderExtraActions);
+  const rowDetailHandler = onDetail ?? onEdit;
 
   const renderActionsCell = (row: T): ReactElement => (
-    <div
-      className="flex w-full flex-col items-end gap-2 md:flex-row md:flex-wrap md:justify-end md:gap-1"
-      data-skip-row-double-click
-      data-no-drag-scroll
-      onClick={(event) => event.stopPropagation()}
-      onDoubleClick={(event) => event.stopPropagation()}
-    >
-      {renderExtraActions ? (
-        <div className="flex flex-wrap items-center justify-end gap-1">{renderExtraActions(row)}</div>
-      ) : null}
-      {onEdit || onDelete ? (
-        <div className="inline-flex shrink-0 items-center gap-1">
-          {onEdit ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(row)}
-              title="Duzenle"
-              className={cn(
-                SD_TABLE_ACTION_BUTTON,
-                'text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10'
-              )}
-            >
-              <Edit2 size={18} />
-            </Button>
-          ) : null}
-          {onDelete ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(row)}
-              title="Sil"
-              className={cn(
-                SD_TABLE_ACTION_BUTTON,
-                'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10'
-              )}
-            >
-              <Trash2 size={18} />
-            </Button>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+    <ManagementTableRowActions
+      onDetail={onDetail ? () => onDetail(row) : undefined}
+      onEdit={onEdit ? () => onEdit(row) : undefined}
+      onDelete={onDelete ? () => onDelete(row) : undefined}
+      beforeActions={
+        renderExtraActions ? (
+          <div className="flex flex-row flex-nowrap items-center justify-end gap-1">{renderExtraActions(row)}</div>
+        ) : undefined
+      }
+    />
   );
 
   const mobileView = (
@@ -178,7 +149,7 @@ export function SalesDeskManagementTable<T extends { id: number }>({
       primaryKey={mobilePrimaryKey}
       detailKeys={mobileDetailKeys}
       renderActions={showActions ? renderActionsCell : undefined}
-      onRowActivate={onEdit}
+      onRowActivate={rowDetailHandler}
       isLoading={isLoading}
       isError={isError}
       errorText={errorText}
@@ -203,11 +174,13 @@ export function SalesDeskManagementTable<T extends { id: number }>({
       showActionsColumn={showActions}
       actionsHeaderLabel="Islemler"
       renderActionsCell={showActions ? renderActionsCell : undefined}
-      initialActionsColumnWidth={renderExtraActions ? 320 : undefined}
+      initialActionsColumnWidth={
+        renderExtraActions ? Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 320) : MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH
+      }
       actionsCellClassName="crm-text-end align-middle overflow-visible"
       iconOnlyActions
       rowClassName="group"
-      onRowDoubleClick={onEdit}
+      onRowDoubleClick={rowDetailHandler}
       pageSize={pageSize}
       pageSizeOptions={pageSizeOptions}
       onPageSizeChange={onPageSizeChange}

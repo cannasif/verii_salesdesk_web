@@ -2,7 +2,7 @@ import { type ReactElement, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,8 +16,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useDeleteCustomer } from '../hooks/useDeleteCustomer';
 import type { CustomerDto } from '../types/customer-types';
 import {
-  Edit2,
-  Trash2,
   Tag,
   MapPin,
   Mail,
@@ -35,6 +33,7 @@ import {
 } from 'lucide-react';
 import { Alert02Icon } from 'hugeicons-react';
 import { MANAGEMENT_DATA_GRID_CLASSNAME, MANAGEMENT_LIST_ID_COLUMN_CELL_CLASSNAME, MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
 import { useMyPermissionsQuery } from '@/features/access-control/hooks/useMyPermissionsQuery';
 import { hasPermission } from '@/features/access-control/utils/hasPermission';
@@ -373,61 +372,50 @@ export function CustomerTable({
   };
 
   const renderActionsCell = (customer: CustomerDto): ReactElement => (
-    <div className="flex justify-end gap-2 opacity-100 transition-opacity">
-      {canCreateErpCustomer && !customer.isERPIntegrated && !customer.isIntegrated ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          disabled={createErpCustomer.isPending}
-          onClick={() => handleErpCreateClick(customer)}
-          title={t('customerManagement.erpCreate.button', {
-            ns: CRM_NS,
-            defaultValue: 'ERP Müşterisi Oluştur',
-          })}
-          className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
-        >
-          <CloudUpload size={16} />
-        </Button>
-      ) : null}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onQuickActivity(customer)}
-        title={t('quickActivity', { ns: CRM_NS })}
-        className="h-8 w-8 text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-500/10"
-      >
-        <Activity size={16} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => navigate(`/customer-360/${customer.id}`)}
-        title={t('customer360.button', { ns: CRM_NS, defaultValue: 'Müşteri 360' })}
-        className="h-8 w-8 text-violet-600 hover:text-violet-700 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-500/10"
-      >
-        <LayoutGrid size={16} />
-      </Button>
-      {canUpdate ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(customer)}
-          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10"
-        >
-          <Edit2 size={16} />
-        </Button>
-      ) : null}
-      {canDelete ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleDeleteClick(customer)}
-          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-        >
-          <Trash2 size={16} />
-        </Button>
-      ) : null}
-    </div>
+    <ManagementTableRowActions
+      onDetail={() => navigate(`/customer-360/${customer.id}`)}
+      onEdit={canUpdate ? () => onEdit(customer) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(customer) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+      afterActions={
+        <>
+          {canCreateErpCustomer && !customer.isERPIntegrated && !customer.isIntegrated ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={createErpCustomer.isPending}
+              onClick={() => handleErpCreateClick(customer)}
+              title={t('customerManagement.erpCreate.button', {
+                ns: CRM_NS,
+                defaultValue: 'ERP Müşterisi Oluştur',
+              })}
+              className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
+            >
+              <CloudUpload size={16} />
+            </Button>
+          ) : null}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onQuickActivity(customer)}
+            title={t('quickActivity', { ns: CRM_NS })}
+            className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-500/10"
+          >
+            <Activity size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(`/customer-360/${customer.id}`)}
+            title={t('customer360.button', { ns: CRM_NS, defaultValue: 'Müşteri 360' })}
+            className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-violet-600 hover:text-violet-700 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-500/10"
+          >
+            <LayoutGrid size={16} />
+          </Button>
+        </>
+      }
+    />
   );
 
   return (
@@ -453,6 +441,7 @@ export function CustomerTable({
           showActionsColumn={showActionsColumn}
           actionsHeaderLabel={actionsHeaderLabel}
           renderActionsCell={renderActionsCell}
+          initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 280)}
           rowClassName={rowClassName}
           onRowDoubleClick={onEdit}
           pageSize={pageSize}

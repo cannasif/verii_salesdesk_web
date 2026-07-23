@@ -22,6 +22,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
 import { SD_PAGE_ADD_BUTTON, SD_PAGE_HEADER_ROW, SD_PAGE_PULSE, SD_PAGE_TITLE } from '../lib/salesdesk-popup-styles';
 import { SalesDeskCustomerDeleteDialog } from './SalesDeskCustomerDeleteDialog';
+import { SalesDeskCustomerDetailDialog } from './SalesDeskCustomerDetailDialog';
 import { SalesDeskCustomerForm } from './SalesDeskCustomerForm';
 import { SalesDeskKpiCards } from './SalesDeskKpiCards';
 import {
@@ -72,7 +73,7 @@ const BASE_COLUMNS: ColumnDef[] = [
   { key: 'email', label: 'E-posta' },
   { key: 'kind', label: 'Tip' },
   { key: 'balance', label: 'Bakiye' },
-  { key: 'city', label: 'Il' },
+  { key: 'city', label: 'İL' },
 ];
 
 const DEFAULT_COLUMN_ORDER = BASE_COLUMNS.map((column) => column.key);
@@ -121,7 +122,9 @@ export function SalesDeskCustomersPage(): ReactElement {
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [formOpen, setFormOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<SalesDeskCustomerDto | null>(null);
+  const [detailCustomer, setDetailCustomer] = useState<SalesDeskCustomerDto | null>(null);
   const [deletingCustomer, setDeletingCustomer] = useState<SalesDeskCustomerDto | null>(null);
   const [draftFilterRows, setDraftFilterRows] = useState<FilterRow[]>([]);
   const [appliedFilterRows, setAppliedFilterRows] = useState<FilterRow[]>([]);
@@ -233,7 +236,12 @@ export function SalesDeskCustomersPage(): ReactElement {
         key: column.key as SalesDeskCustomerColumnKey,
         label: column.label,
         sortable: true,
-        headClassName: column.key === 'id' ? MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME : undefined,
+        headClassName:
+          column.key === 'id'
+            ? MANAGEMENT_LIST_ID_COLUMN_HEAD_CLASSNAME
+            : column.key === 'city'
+              ? 'normal-case'
+              : undefined,
         cellClassName: column.key === 'id' ? MANAGEMENT_LIST_ID_COLUMN_CELL_CLASSNAME : undefined,
       })),
     []
@@ -271,6 +279,11 @@ export function SalesDeskCustomersPage(): ReactElement {
   const handleEditClick = (customer: SalesDeskCustomerDto): void => {
     setEditingCustomer(customer);
     setFormOpen(true);
+  };
+
+  const handleDetailClick = (customer: SalesDeskCustomerDto): void => {
+    setDetailCustomer(customer);
+    setDetailOpen(true);
   };
 
   const handleFormSubmit = async (values: SalesDeskCustomerFormValues): Promise<void> => {
@@ -428,6 +441,7 @@ export function SalesDeskCustomersPage(): ReactElement {
                 loadingText="Yukleniyor..."
                 errorText={(error as Error)?.message || 'Cari listesi yuklenemedi. API baglantisini kontrol edin.'}
                 emptyText="Kayit bulunamadi."
+                onDetail={handleDetailClick}
                 onEdit={handleEditClick}
                 onDelete={setDeletingCustomer}
                 pageSize={pageSize}
@@ -460,6 +474,12 @@ export function SalesDeskCustomersPage(): ReactElement {
           </div>
         </CardContent>
       </Card>
+
+      <SalesDeskCustomerDetailDialog
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        customer={detailCustomer}
+      />
 
       <SalesDeskCustomerForm
         open={formOpen}

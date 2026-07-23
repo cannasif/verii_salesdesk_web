@@ -1,7 +1,7 @@
 import { type ReactElement, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert02Icon } from 'hugeicons-react';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,7 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { useDeleteSalesRepMatch } from '../hooks/useDeleteSalesRepMatch';
 import type { SalesRepMatchGetDto } from '../types/sales-rep-match-types';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
@@ -108,22 +109,19 @@ export function SalesRepMatchTable({
           showActionsColumn={canDelete}
           actionsHeaderLabel={t('common.actions', { ns: 'common' })}
           renderActionsCell={(item) => (
-            <div className="flex justify-end gap-2">
-              {canDelete ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setDeleteDialogOpen(true);
-                  }}
-                  className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-                >
-                  <Trash2 size={16} />
-                </Button>
-              ) : null}
-            </div>
+            <ManagementTableRowActions
+              onDelete={
+                canDelete
+                  ? () => {
+                      setSelectedItem(item);
+                      setDeleteDialogOpen(true);
+                    }
+                  : undefined
+              }
+              showDelete={canDelete}
+            />
           )}
+          initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
           pageSize={pageSize}
           pageSizeOptions={pageSizeOptions}
           onPageSizeChange={onPageSizeChange}

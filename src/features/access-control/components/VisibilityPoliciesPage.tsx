@@ -6,8 +6,8 @@ import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Edit2, Eye, Layers, Loader2, Plus, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react';
-import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { Eye, Layers, Loader2, Plus, RefreshCw, ShieldCheck } from 'lucide-react';
+import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import type { FilterRow } from '@/lib/advanced-filter-types';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import {
@@ -18,6 +18,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { visibilityPolicyApi } from '../api/visibilityPolicyApi';
 import { VisibilityPolicyForm } from './VisibilityPolicyForm';
 import { AccessControlBooleanBadge } from './AccessControlBooleanBadge';
@@ -336,35 +337,26 @@ export function VisibilityPoliciesPage(): ReactElement {
                 showActionsColumn
                 actionsHeaderLabel={t('common.actions')}
                 renderActionsCell={(row) => (
-                  <div className="flex justify-end gap-2">
-                    {canUpdate && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-xl text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 font-semibold"
-                        onClick={() => {
-                          setEditingItem(row);
-                          setFormOpen(true);
-                        }}
-                      >
-                        <Edit2 size={16} className="mr-2" />
-                        {t('common.edit')}
-                      </Button>
-                    )}
-                    {canDelete && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="rounded-xl text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30 font-semibold"
-                        onClick={() => deleteMutation.mutate(row.id)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 size={16} className="mr-2" />
-                        {t('common.delete.action')}
-                      </Button>
-                    )}
-                  </div>
+                  <ManagementTableRowActions
+                    onDetail={() => {
+                      setEditingItem(row);
+                      setFormOpen(true);
+                    }}
+                    onEdit={
+                      canUpdate
+                        ? () => {
+                            setEditingItem(row);
+                            setFormOpen(true);
+                          }
+                        : undefined
+                    }
+                    onDelete={canDelete ? () => deleteMutation.mutate(row.id) : undefined}
+                    showEdit={canUpdate}
+                    showDelete={canDelete}
+                    deleteDisabled={deleteMutation.isPending}
+                  />
                 )}
+                initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}
                 onPageSizeChange={(size) => {

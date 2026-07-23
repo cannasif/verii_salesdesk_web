@@ -1,6 +1,6 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowDown, ArrowUp, ArrowUpDown, Eye, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
@@ -14,8 +14,9 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { arraysEqual, cn } from '@/lib/utils';
-import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -401,16 +402,12 @@ export function ErpOrderListPage(): ReactElement {
                 actionsHeaderLabel={t('actions', { ns: 'common' })}
                 actionsCellClassName="text-right align-middle min-w-[120px]"
                 renderActionsCell={(row) => (
-                  <Button
-                    variant={selectedOrder?.fatirsNo === row.fatirsNo ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-8 gap-2"
-                    onClick={() => setSelectedOrder(row)}
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>{t('erpOrder.detailAction')}</span>
-                  </Button>
+                  <ManagementTableRowActions
+                    onDetail={() => setSelectedOrder(row)}
+                    detailLabel={t('erpOrder.detailAction')}
+                  />
                 )}
+                initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
                 onRowClick={setSelectedOrder}
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}

@@ -24,9 +24,7 @@ import {
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import {
   Plus,
-  Edit2,
   Copy,
-  Trash2,
   FileDown,
   TableProperties,
   Loader2,
@@ -41,6 +39,7 @@ import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import type { FilterRow } from '@/lib/advanced-filter-types';
@@ -53,6 +52,7 @@ import {
   MANAGEMENT_LIST_CARD_TITLE_CLASSNAME,
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
 import { useCrudPermissions } from '@/features/access-control/hooks/useCrudPermissions';
@@ -581,58 +581,44 @@ export function PdfReportDesignerListPage(): ReactElement {
                 actionsHeaderLabel={t('common.actions')}
                 actionsCellClassName="text-right align-middle min-w-[180px]"
                 renderActionsCell={(template) => (
-                  <div className="flex justify-end gap-1 opacity-100 transition-opacity">
-                    {canUpdate ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        asChild
-                        className="h-8 w-8 text-blue-600 hover:bg-blue-50 dark:text-blue-400"
-                        title={t('common.edit')}
-                      >
-                        <Link to={`/pdf-report-designer/edit/${template.id}`}>
-                          <Edit2 size={16} />
-                        </Link>
-                      </Button>
-                    ) : null}
-                    {canCreate ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-violet-600 hover:bg-violet-50 dark:text-violet-400"
-                        title={t('pdfReportDesigner.copy')}
-                        disabled={copyingTemplateId === template.id}
-                        onClick={() => handleCopyAction(template)}
-                      >
-                        {copyingTemplateId === template.id ? (
-                          <Loader2 size={16} className="animate-spin" />
-                        ) : (
-                          <Copy size={16} />
-                        )}
-                      </Button>
-                    ) : null}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-sky-600 hover:bg-sky-50 dark:text-sky-400"
-                      title={t('pdfReportDesigner.generatePdf')}
-                      onClick={() => handlePdfAction(template)}
-                    >
-                      <FileDown size={16} />
-                    </Button>
-                    {canDeleteTemplate ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-red-600 hover:bg-red-50 dark:text-red-400"
-                        title={t('common.delete.action')}
-                        onClick={() => handleRowDeleteClick(template)}
-                      >
-                        <Trash2 size={16} />
-                      </Button>
-                    ) : null}
-                  </div>
+                  <ManagementTableRowActions
+                    onDetail={() => navigate(`/pdf-report-designer/edit/${template.id}`)}
+                    onEdit={canUpdate ? () => navigate(`/pdf-report-designer/edit/${template.id}`) : undefined}
+                    onDelete={canDeleteTemplate ? () => handleRowDeleteClick(template) : undefined}
+                    showEdit={canUpdate}
+                    showDelete={canDeleteTemplate}
+                    afterActions={
+                      <>
+                        {canCreate ? (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-violet-600 hover:bg-violet-50 dark:text-violet-400"
+                            title={t('pdfReportDesigner.copy')}
+                            disabled={copyingTemplateId === template.id}
+                            onClick={() => handleCopyAction(template)}
+                          >
+                            {copyingTemplateId === template.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Copy size={16} />
+                            )}
+                          </Button>
+                        ) : null}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-sky-600 hover:bg-sky-50 dark:text-sky-400"
+                          title={t('pdfReportDesigner.generatePdf')}
+                          onClick={() => handlePdfAction(template)}
+                        >
+                          <FileDown size={16} />
+                        </Button>
+                      </>
+                    }
+                  />
                 )}
+                initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 200)}
                 onRowDoubleClick={canUpdate ? (template) => navigate(`/pdf-report-designer/edit/${template.id}`) : undefined}
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}

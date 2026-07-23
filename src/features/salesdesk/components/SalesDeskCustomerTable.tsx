@@ -1,10 +1,7 @@
 import { type ReactElement, type ReactNode } from 'react';
-import { Edit2, Trash2 } from 'lucide-react';
-import { DataTableGrid, type DataTableGridColumn } from '@/components/shared';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { DataTableGrid, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import type { SalesDeskCustomerDto } from '../api/salesdesk-api';
-import { SD_TABLE_ACTION_BUTTON } from '../lib/salesdesk-popup-styles';
 import { SalesDeskMobileCardList } from './SalesDeskMobileCardList';
 
 export type SalesDeskCustomerColumnKey =
@@ -32,6 +29,7 @@ interface SalesDeskCustomerTableProps {
   loadingText?: string;
   errorText?: string;
   emptyText?: string;
+  onDetail: (customer: SalesDeskCustomerDto) => void;
   onEdit: (customer: SalesDeskCustomerDto) => void;
   onDelete: (customer: SalesDeskCustomerDto) => void;
   pageSize: number;
@@ -63,6 +61,7 @@ export function SalesDeskCustomerTable({
   loadingText = 'Yükleniyor...',
   errorText = 'Veri yüklenemedi.',
   emptyText = 'Kayıt bulunamadı.',
+  onDetail,
   onEdit,
   onDelete,
   pageSize,
@@ -80,38 +79,11 @@ export function SalesDeskCustomerTable({
   onColumnOrderChange,
 }: SalesDeskCustomerTableProps): ReactElement {
   const renderActionsCell = (customer: SalesDeskCustomerDto): ReactElement => (
-    <div
-      className="flex justify-end gap-2 opacity-100"
-      data-skip-row-double-click
-      data-no-drag-scroll
-      onClick={(event) => event.stopPropagation()}
-      onDoubleClick={(event) => event.stopPropagation()}
-    >
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onEdit(customer)}
-        title="Düzenle"
-        className={cn(
-          SD_TABLE_ACTION_BUTTON,
-          'text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-500/10'
-        )}
-      >
-        <Edit2 size={18} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => onDelete(customer)}
-        title="Sil"
-        className={cn(
-          SD_TABLE_ACTION_BUTTON,
-          'text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10'
-        )}
-      >
-        <Trash2 size={18} />
-      </Button>
-    </div>
+    <ManagementTableRowActions
+      onDetail={() => onDetail(customer)}
+      onEdit={() => onEdit(customer)}
+      onDelete={() => onDelete(customer)}
+    />
   );
 
   const mobileView = (
@@ -123,7 +95,7 @@ export function SalesDeskCustomerTable({
       renderCell={(row, key) => renderCell(row, key)}
       primaryKey="name"
       renderActions={renderActionsCell}
-      onRowActivate={onEdit}
+      onRowActivate={onDetail}
       isLoading={isLoading}
       isError={isError}
       errorText={errorText}
@@ -153,9 +125,10 @@ export function SalesDeskCustomerTable({
       showActionsColumn
       actionsHeaderLabel="İşlemler"
       renderActionsCell={renderActionsCell}
+      initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
       iconOnlyActions
       rowClassName="group"
-      onRowDoubleClick={onEdit}
+      onRowDoubleClick={onDetail}
       pageSize={pageSize}
       pageSizeOptions={pageSizeOptions}
       onPageSizeChange={onPageSizeChange}

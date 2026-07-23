@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
-import { KeyRound, Loader2, Plus, RefreshCw, Settings, ShieldCheck, Users2, Edit2, Trash2 } from 'lucide-react';
+import { KeyRound, Loader2, Plus, RefreshCw, Settings, ShieldCheck, Users2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   DataTableActionBar,
   DataTableGrid,
   ManagementDataTableChrome,
+  ManagementTableRowActions,
   type DataTableGridColumn,
 } from '@/components/shared';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
@@ -32,6 +33,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { usePermissionGroupsQuery } from '../hooks/usePermissionGroupsQuery';
 import { useCreatePermissionGroupMutation } from '../hooks/useCreatePermissionGroupMutation';
 import { useUpdatePermissionGroupMutation } from '../hooks/useUpdatePermissionGroupMutation';
@@ -236,47 +238,34 @@ export function PermissionGroupsPage(): ReactElement {
   );
 
   const renderActionsCell = (item: PermissionGroupDto): ReactElement => (
-    <div className="flex justify-end gap-2">
-      {canUpdate && (
-        <>
+    <ManagementTableRowActions
+      onDetail={() => handleEditClick(item)}
+      onEdit={canUpdate ? () => handleEditClick(item) : undefined}
+      onDelete={canDelete ? () => handleDeleteClick(item) : undefined}
+      showEdit={canUpdate}
+      showDelete={canDelete}
+      editDisabled={item.isSystemAdmin}
+      deleteDisabled={item.isSystemAdmin}
+      afterActions={
+        canUpdate ? (
           <Button
             variant="ghost"
             size="sm"
             className="rounded-xl text-cyan-600 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:bg-cyan-900/30 font-semibold"
             onClick={() => handlePermissionsClick(item)}
-            title={item.isSystemAdmin ? t('permissionGroups.systemAdminLocked', 'System Admin grubu değiştirilemez') : t('permissionGroups.managePermissions')}
+            title={
+              item.isSystemAdmin
+                ? t('permissionGroups.systemAdminLocked', 'System Admin grubu değiştirilemez')
+                : t('permissionGroups.managePermissions')
+            }
             disabled={item.isSystemAdmin}
           >
             <Settings size={16} className="mr-2" />
             {t('permissionGroups.managePermissions', { defaultValue: 'Yetkiler' })}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-xl text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30 font-semibold"
-            onClick={() => handleEditClick(item)}
-            disabled={item.isSystemAdmin}
-            title={item.isSystemAdmin ? t('permissionGroups.systemAdminLocked', 'System Admin grubu değiştirilemez') : undefined}
-          >
-            <Edit2 size={16} className="mr-2" />
-            {t('common.edit')}
-          </Button>
-        </>
-      )}
-      {canDelete && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="rounded-xl text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30 font-semibold"
-          onClick={() => handleDeleteClick(item)}
-          disabled={item.isSystemAdmin}
-          title={item.isSystemAdmin ? t('permissionGroups.systemAdminLocked', 'System Admin grubu değiştirilemez') : undefined}
-        >
-          <Trash2 size={16} className="mr-2" />
-          {t('common.delete.action')}
-        </Button>
-      )}
-    </div>
+        ) : null
+      }
+    />
   );
 
   const headerCardStyle = ACCESS_CONTROL_HEADER_CARD_CLASSNAME;
@@ -471,6 +460,7 @@ export function PermissionGroupsPage(): ReactElement {
                 showActionsColumn={canUpdate || canDelete}
                 actionsHeaderLabel={t('common.actions')}
                 renderActionsCell={renderActionsCell}
+                initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 220)}
                 pageSize={pageSize}
                 pageSizeOptions={PAGE_SIZE_OPTIONS}
                 onPageSizeChange={(s) => {

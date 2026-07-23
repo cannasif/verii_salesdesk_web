@@ -2,14 +2,14 @@ import { type ReactElement, useCallback, useEffect, useMemo, useState } from 're
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Pencil, Plus, RefreshCw, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, Plus, RefreshCw } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, type DataTableGridColumn } from '@/components/shared';
+import { DataTableActionBar, DataTableGrid, ManagementDataTableChrome, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { VoiceSearchCombobox } from '@/components/shared/VoiceSearchCombobox';
 import type { ComboboxOption } from '@/components/shared/VoiceSearchCombobox';
 import {
@@ -20,6 +20,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_TOOLBAR_OUTLINE_BUTTON_CLASSNAME,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import { arraysEqual } from '@/lib/utils';
 import type { FilterRow } from '@/lib/advanced-filter-types';
@@ -415,41 +416,27 @@ function DefinitionManagementTable({ config }: { config: DefinitionSectionConfig
               showActionsColumn={canUpdate || canDelete}
               centerColumnHeaders
               actionsHeaderLabel={t('table.actions')}
-              renderActionsCell={(item) => (
-                <div className="flex justify-end gap-2">
-                  {canUpdate ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="rounded-xl"
-                      onClick={() => {
-                        setEditingItem(item);
-                        setDraftName(item.name);
-                        setDraftDemirName('');
-                        setDraftVidaName('');
-                        setDraftProfilDefinitionId(item.profilDefinitionId ? String(item.profilDefinitionId) : null);
-                        setDialogOpen(true);
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                  {canDelete ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="rounded-xl text-red-600"
-                      onClick={() => {
-                        void deleteMutation.mutateAsync(item.id);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                </div>
-              )}
+              renderActionsCell={(item) => {
+                const openEdit = (): void => {
+                  setEditingItem(item);
+                  setDraftName(item.name);
+                  setDraftDemirName('');
+                  setDraftVidaName('');
+                  setDraftProfilDefinitionId(item.profilDefinitionId ? String(item.profilDefinitionId) : null);
+                  setDialogOpen(true);
+                };
+
+                return (
+                  <ManagementTableRowActions
+                    onDetail={openEdit}
+                    onEdit={canUpdate ? openEdit : undefined}
+                    onDelete={canDelete ? () => void deleteMutation.mutateAsync(item.id) : undefined}
+                    showEdit={canUpdate}
+                    showDelete={canDelete}
+                  />
+                );
+              }}
+              initialActionsColumnWidth={MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH}
               pageSize={pageSize}
               pageSizeOptions={PAGE_SIZE_OPTIONS}
               onPageSizeChange={(size) => {

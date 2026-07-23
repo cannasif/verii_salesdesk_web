@@ -2,13 +2,13 @@ import { type ReactElement, useCallback, useEffect, useMemo, useState } from 're
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, CloudUpload, Eye, Heart, LayoutGrid, List } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, CloudUpload, Heart, LayoutGrid, List } from 'lucide-react';
 import { useUIStore } from '@/stores/ui-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { loadColumnPreferences, saveColumnPreferences } from '@/lib/column-preferences';
 import { rowsToBackendFilters, type FilterColumnConfig, type FilterRow } from '@/lib/advanced-filter-types';
 import { fetchAllPagedData } from '@/lib/fetch-all-paged-data';
-import { DataTableGrid, DataTableActionBar, ManagementDataTableChrome, ManagementListPageHeader, type DataTableGridColumn } from '@/components/shared';
+import { DataTableGrid, DataTableActionBar, ManagementDataTableChrome, ManagementListPageHeader, ManagementTableRowActions, type DataTableGridColumn } from '@/components/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,7 @@ import {
   MANAGEMENT_LIST_TABLE_SHELL_CLASSNAME,
   MANAGEMENT_LIST_ID_COLUMN_DEF,
 } from '@/lib/management-list-layout';
+import { MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH } from '@/lib/management-table-actions';
 
 import { arraysEqual, cn } from '@/lib/utils';
 import { useMyPermissionsQuery } from '@/features/access-control/hooks/useMyPermissionsQuery';
@@ -640,55 +641,51 @@ export function StockListPage(): ReactElement {
                   showActionsColumn
                   actionsHeaderLabel={t('list.actions')}
                   renderActionsCell={(stock) => (
-                    <div className="flex justify-end gap-2 opacity-100 transition-opacity pr-4">
-                      {canCreateErpStock && !stock.isERPIntegrated ? (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
-                          disabled={createErpStock.isPending}
-                          aria-label={t('list.createErpStock')}
-                          title={t('list.createErpStock')}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            createErpStock.mutate(stock.id);
-                          }}
-                        >
-                          <CloudUpload className="h-4 w-4" />
-                        </Button>
-                      ) : null}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={cn(
-                          'h-8 w-8 text-slate-400 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-500/10',
-                          stock.isFavorite && 'text-pink-600 dark:text-pink-400'
-                        )}
-                        disabled={toggleStockFavorite.isPending}
-                        aria-label={stock.isFavorite ? t('list.removeFavorite') : t('list.addFavorite')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleStockFavorite.mutate({
-                            stockId: stock.id,
-                            data: { isFavorite: !stock.isFavorite },
-                          });
-                        }}
-                      >
-                        <Heart className={cn('h-4 w-4', stock.isFavorite && 'fill-current')} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-500/10"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigateToStockDetail(stock.id);
-                        }}
-                      >
-                        <Eye size={16} />
-                      </Button>
-                    </div>
+                    <ManagementTableRowActions
+                      onDetail={() => navigateToStockDetail(stock.id)}
+                      afterActions={
+                        <>
+                          {canCreateErpStock && !stock.isERPIntegrated ? (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
+                              disabled={createErpStock.isPending}
+                              aria-label={t('list.createErpStock')}
+                              title={t('list.createErpStock')}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                createErpStock.mutate(stock.id);
+                              }}
+                            >
+                              <CloudUpload className="h-4 w-4" />
+                            </Button>
+                          ) : null}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={cn(
+                              'inline-flex h-8 w-8 min-h-8 min-w-8 shrink-0 items-center justify-center p-0 text-slate-400 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-500/10',
+                              stock.isFavorite && 'text-pink-600 dark:text-pink-400'
+                            )}
+                            disabled={toggleStockFavorite.isPending}
+                            aria-label={stock.isFavorite ? t('list.removeFavorite') : t('list.addFavorite')}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleStockFavorite.mutate({
+                                stockId: stock.id,
+                                data: { isFavorite: !stock.isFavorite },
+                              });
+                            }}
+                          >
+                            <Heart className={cn('h-4 w-4', stock.isFavorite && 'fill-current')} />
+                          </Button>
+                        </>
+                      }
+                      className="pr-4"
+                    />
                   )}
+                  initialActionsColumnWidth={Math.max(MANAGEMENT_TABLE_ACTIONS_COLUMN_WIDTH, 160)}
                   rowClassName="group"
                   pageSize={pageSize}
                   pageSizeOptions={PAGE_SIZE_OPTIONS}
