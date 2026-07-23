@@ -27,6 +27,8 @@ import {
   SD_CREATE_GLASS_CARD_CLASSNAME,
 } from '../../lib/salesdesk-document-create-styles';
 import type { InvoiceFormValues } from '../../types/salesdesk-schemas';
+import type { SalesDeskQuoteDto } from '../../api/salesdesk-api';
+import { SalesDeskOpenQuotesBox } from './SalesDeskOpenQuotesBox';
 import { cn } from '@/lib/utils';
 
 interface SalesDeskInvoiceHeaderFormProps {
@@ -34,6 +36,11 @@ interface SalesDeskInvoiceHeaderFormProps {
   isPurchase: boolean;
   customerOptions: Array<{ value: string; label: string }>;
   optionsPending?: boolean;
+  openQuotes?: SalesDeskQuoteDto[];
+  openQuotesPending?: boolean;
+  selectedQuoteLabel?: string;
+  onQuoteSelect?: (quote: SalesDeskQuoteDto) => void;
+  onQuoteClear?: () => void;
 }
 
 function LabelIconBox({
@@ -64,15 +71,31 @@ export function SalesDeskInvoiceHeaderForm({
   isPurchase,
   customerOptions,
   optionsPending = false,
+  openQuotes = [],
+  openQuotesPending = false,
+  selectedQuoteLabel,
+  onQuoteSelect,
+  onQuoteClear,
 }: SalesDeskInvoiceHeaderFormProps): ReactElement {
   const form = useFormContext<InvoiceFormValues>();
   const statusOptions = enumToSelectOptions(DOCUMENT_STATUS_LABELS);
   const hasCustomer = Boolean(form.watch('customerId'));
+  const selectedQuoteId = form.watch('quoteId');
 
   return (
     <div className="relative space-y-6 pb-8 pt-2 animate-in fade-in slide-in-from-bottom-3 duration-700">
       <div className="pointer-events-none absolute -left-20 top-0 h-96 w-96 rounded-full bg-[var(--crm-brand-primary)]/10 blur-[100px]" />
       <div className="pointer-events-none absolute -right-16 top-10 h-80 w-80 rounded-full bg-[var(--crm-brand-secondary)]/8 blur-[80px]" />
+
+      {onQuoteSelect ? (
+        <SalesDeskOpenQuotesBox
+          quotes={openQuotes}
+          selectedQuoteId={selectedQuoteId}
+          isLoading={openQuotesPending}
+          onQuoteSelect={onQuoteSelect}
+          onQuoteClear={onQuoteClear}
+        />
+      ) : null}
 
       <div className={cn(SD_CREATE_GLASS_CARD_CLASSNAME, 'p-5 md:p-6')}>
         <div className="grid gap-6">
@@ -265,20 +288,11 @@ export function SalesDeskInvoiceHeaderForm({
                 </FormItem>
               )}
             />
-            {!isPurchase ? (
-              <FormField
-                control={form.control}
-                name="quoteId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={SD_CREATE_FORM_LABEL_CLASSNAME}>Teklif ID</FormLabel>
-                    <FormControl>
-                      <Input {...field} className={SD_CREATE_FORM_INPUT_CLASSNAME} placeholder="Opsiyonel" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {selectedQuoteId?.trim() ? (
+              <div className="rounded-xl border border-[color-mix(in_srgb,var(--crm-brand-primary)_22%,transparent)] bg-[var(--crm-brand-soft)] px-3 py-2 text-xs text-[var(--crm-brand-on-soft)]">
+                Bagli teklif:{' '}
+                <span className="font-semibold">{selectedQuoteLabel ?? `#${selectedQuoteId.trim()}`}</span>
+              </div>
             ) : null}
             <FormField
               control={form.control}

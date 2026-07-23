@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import {
   useCreateSalesDeskInvoice,
   useSalesDeskCustomerOptions,
+  useSalesDeskInvoiceStats,
   useSalesDeskProductOptions,
+  useSalesDeskQuoteStats,
 } from '../../hooks/useSalesDeskModules';
 import {
   invoiceFormSchema,
@@ -46,6 +48,12 @@ import { SalesDeskDocumentLineTable } from './SalesDeskDocumentLineTable';
 import { SalesDeskDocumentSummaryCard } from './SalesDeskDocumentSummaryCard';
 import { SalesDeskQuotePreviewDialog } from '../quotes/SalesDeskQuotePreviewDialog';
 import { buildSalesDeskInvoicePreviewData } from '../../lib/build-salesdesk-invoice-preview-data';
+import {
+  getOpenQuotesForInvoice,
+  quoteToInvoiceLines,
+} from '../../lib/salesdesk-open-quotes';
+import type { SalesDeskQuoteDto } from '../../api/salesdesk-api';
+import { NONE_SELECT_VALUE } from '../../lib/salesdesk-shared';
 import { cn } from '@/lib/utils';
 
 const INVOICE_DUE_DAYS = 30;
@@ -84,6 +92,10 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
     customerId: number;
     customerName: string;
   } | null>(null);
+  const linkedQuoteIdRef = useRef<number | null>(null);
+
+  const { data: quoteStatsData, isPending: quotesPending } = useSalesDeskQuoteStats();
+  const { data: invoiceStatsData, isPending: invoicesPending } = useSalesDeskInvoiceStats();
 
   const customerNameById = useMemo(() => {
     const map = new Map<string, string>();
@@ -126,7 +138,58 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
   useEffect(() => {
     form.reset(toInvoiceFormValues(undefined, invoiceType));
     setLines([]);
+    linkedQuoteIdRef.current = null;
   }, [form, invoiceType]);
+
+  const watchedCustomerId = form.watch('customerId');
+  const parsedCustomerId =
+    watchedCustomerId && watchedCustomerId !== NONE_SELECT_VALUE ? Number(watchedCustomerId) : null;
+
+  const openQuotes = useMemo(
+    () =>
+      getOpenQuotesForInvoice(
+        quoteStatsData?.data ?? [],
+        invoiceStatsData?.data ?? [],
+        parsedCustomerId && !Number.isNaN(parsedCustomerId) ? parsedCustomerId : null
+      ),
+    [invoiceStatsData?.data, parsedCustomerId, quoteStatsData?.data]
+  );
+
+  const openQuotesPending = quotesPending || invoicesPending;
+
+  const handleQuoteSelect = (quote: SalesDeskQuoteDto): void => {
+    linkedQuoteIdRef.current = quote.id;
+    form.setValue('customerId', String(quote.customerId), { shouldValidate: true });
+    form.setValue('quoteId', String(quote.id), { shouldValidate: true });
+    form.setValue('discountRate', quote.discountRate ?? 0, { shouldValidate: true });
+    form.setValue('notes', quote.notes?.trim() ?? '', { shouldValidate: true });
+    setLines(quoteToInvoiceLines(quote, products ?? []));
+    toast.success('Teklif secildi', { description: `${quote.quoteNumber} faturaya baglandi.` });
+  };
+
+  const handleQuoteClear = (): void => {
+    linkedQuoteIdRef.current = null;
+    form.setValue('quoteId', '', { shouldValidate: true });
+    setLines([]);
+  };
+
+  const watchedQuoteId = form.watch('quoteId');
+  const selectedQuoteLabel = useMemo(() => {
+    if (!watchedQuoteId?.trim()) return undefined;
+    const quote = (quoteStatsData?.data ?? []).find((item) => String(item.id) === watchedQuoteId.trim());
+    return quote?.quoteNumber;
+  }, [quoteStatsData?.data, watchedQuoteId]);
+
+  useEffect(() => {
+    if (linkedQuoteIdRef.current == null) return;
+    const linkedQuote = (quoteStatsData?.data ?? []).find((quote) => quote.id === linkedQuoteIdRef.current);
+    if (!linkedQuote) return;
+    if (parsedCustomerId && linkedQuote.customerId !== parsedCustomerId) {
+      linkedQuoteIdRef.current = null;
+      form.setValue('quoteId', '', { shouldValidate: true });
+      setLines([]);
+    }
+  }, [form, parsedCustomerId, quoteStatsData?.data]);
 
   const watchedInvoiceDate = form.watch('invoiceDate');
 
@@ -248,6 +311,11 @@ export function SalesDeskInvoiceCreateForm({ invoiceType }: SalesDeskInvoiceCrea
                     isPurchase={isPurchase}
                     customerOptions={customerOptions}
                     optionsPending={optionsPending}
+                    openQuotes={openQuotes}
+                    openQuotesPending={openQuotesPending}
+                    selectedQuoteLabel={selectedQuoteLabel}
+                    onQuoteSelect={handleQuoteSelect}
+                    onQuoteClear={handleQuoteClear}
                   />
                 </div>
               </section>
