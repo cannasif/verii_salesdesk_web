@@ -5,6 +5,7 @@ import { SidebarLeft01Icon, SearchList01Icon, Cancel01Icon, Mic01Icon } from 'hu
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
 import { NotificationIcon } from '@/features/notification/components/NotificationIcon';
+import { NavbarLiveExchangeRates } from '@/components/shared/NavbarLiveExchangeRates';
 import { UserProfileModal } from '@/features/user-detail-management/components/UserProfileModal';
 import { useAppShellStore } from '@/stores/app-shell-store';
 import { getImageUrl } from '@/features/user-detail-management/utils/image-url';
@@ -190,14 +191,14 @@ export function Navbar(): ReactElement {
     <>
       <header
         className={cn(
-          'grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b pt-[env(safe-area-inset-top)] sm:gap-3 lg:gap-4',
+          'grid w-full grid-cols-1 items-center gap-3 border-b pt-[env(safe-area-inset-top)] sm:gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,720px)_minmax(0,1fr)] lg:gap-4',
           'min-h-[64px] sm:min-h-[76px]',
           CRM_APP_PANEL_GLASS,
           'shadow-[0_10px_26px_rgba(0,0,0,.18)]',
           APP_SHELL_GUTTER_X
         )}
       >
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 items-center justify-start gap-2 sm:gap-3 lg:order-1">
           <button
             type="button"
             onClick={toggleSidebar}
@@ -221,7 +222,7 @@ export function Navbar(): ReactElement {
           </div>
         </div>
 
-        <div className="flex min-w-0 justify-center px-1 sm:px-2 lg:px-4">
+        <div className="order-3 flex min-w-0 justify-center px-1 sm:px-2 lg:order-2 lg:px-4">
           <div className="w-full min-w-0 max-w-[720px]">
             <NavbarSearchField
               searchInputRef={searchInputRef}
@@ -237,7 +238,8 @@ export function Navbar(): ReactElement {
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+        <div className="order-2 flex min-w-0 items-center justify-end gap-2 sm:gap-3 lg:order-3">
+          <NavbarLiveExchangeRates />
           <NotificationIcon />
 
           {user ? <div className="hidden h-8 w-px shrink-0 bg-slate-200 dark:bg-white/10 sm:block" /> : null}
